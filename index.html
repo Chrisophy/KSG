@@ -1,4 +1,4 @@
-<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-3 
+<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-4 
 RECHTLICHER HINWEIS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
 Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern, Umschreiben oder die unautorisierte Weiterverbreitung des Codes ist strengstens untersagt.-->
 <!DOCTYPE html>
@@ -96,7 +96,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
 
       <div class="grid grid-cols-2 gap-2 mt-2">
         <div><label for="m-author" class="l">Autor</label><input id="m-author" class="inp" oninput="setMeta('author',this.value)"></div>
-        <div><label for="m-ver" class="l">Version</label><input id="m-ver" class="inp" oninput="setMeta('ver',this.value)"></div>
+        <div><label for="m-ver" class="l">Version</label><div class="flex gap-1"><input id="m-ver" class="inp" oninput="setMeta('ver',this.value)"><button class="btn" title="Version um 1 erhöhen" aria-label="Version erhöhen" onclick="bumpVer()">＋</button></div></div>
       </div>
 
       <label for="m-desc" class="l">Kurzbeschreibung (erscheint in Kodi)</label>
@@ -112,6 +112,26 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
         <option value="21">Omega 21</option>
       </select>
 
+      <details class="mt-3">
+        <summary class="hint cursor-pointer">⚙ Erweiterte Addon-Angaben (optional)</summary>
+        <label for="m-web" class="l">Webseite</label>
+        <input id="m-web" class="inp" oninput="setMeta('web',this.value)" placeholder="https://…">
+        <label for="m-news" class="l">Neu in dieser Version</label>
+        <input id="m-news" class="inp" oninput="setMeta('news',this.value)" placeholder="z.B. Neues Menü, Fehler behoben">
+        <label for="m-welcome" class="l">Begrüßung beim Start</label>
+        <input id="m-welcome" class="inp" oninput="setMeta('welcome',this.value)" placeholder="z.B. Willkommen im Hub!">
+        <p class="hint">Eine kleine Meldung, die beim Öffnen des Addons kurz in Kodi erscheint.</p>
+        <label for="m-deps" class="l">Zusätzliche Abhängigkeiten</label>
+        <input id="m-deps" class="inp" oninput="setMeta('deps',this.value)" placeholder="script.module.requests, …">
+        <div class="flex flex-wrap gap-1.5 mt-1">
+          <button class="btn" onclick="addDep('script.module.requests')">requests</button>
+          <button class="btn" onclick="addDep('script.module.beautifulsoup4')">beautifulsoup4</button>
+          <button class="btn" onclick="addDep('script.module.inputstreamhelper')">inputstreamhelper</button>
+          <button class="btn" onclick="addDep('script.module.routing')">routing</button>
+        </div>
+        <p class="hint">Andere Kodi-Addons, die dein Addon braucht. Kodi installiert sie beim Installieren automatisch mit. Ein Klick fügt hinzu bzw. entfernt.</p>
+      </details>
+
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">2 · Hinzufügen</h3>
       <button class="btn pri w-full mt-2" onclick="showLib()">📚 Befehlsliste (Button aus Liste)</button>
       <button class="btn w-full mt-2" onclick="$('f-pic').click()">🖼 Eigenes Bild einfügen</button>
@@ -122,6 +142,8 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
         <button class="btn" onclick="addEl('text')">🔤 Text</button>
         <button class="btn" onclick="addEl('image')">🖼 Poster-Platzhalter</button>
         <button class="btn" onclick="addEl('box')">⬛ Fläche</button>
+        <button class="btn" onclick="addEl('prog')">▬ Fortschrittsbalken</button>
+        <button class="btn" onclick="addEl('art')">🎵 Cover (läuft gerade)</button>
       </div>
 
       <input type="file" id="f-pic" accept="image/*" multiple class="hidden" onchange="addPics(this)">
@@ -147,6 +169,14 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
         <button class="btn" onclick="noBg()" aria-label="Hintergrundbild entfernen">✖</button>
       </div>
       <input type="file" id="bgf" accept="image/*" class="hidden" onchange="setBg(this)">
+
+      <label for="t-anim" class="l">Übergang beim Seitenwechsel</label>
+      <select id="t-anim" class="inp" onchange="S.theme.anim=this.value;save()">
+        <option value="fade">Einblenden</option>
+        <option value="slide">Hereinschieben</option>
+        <option value="zoom">Heranzoomen</option>
+        <option value="none">Keiner</option>
+      </select>
 
       <label for="t-rad" class="l">Rundung aller Buttons <span id="t-rad-v" class="text-sky-400"></span></label>
       <input type="range" id="t-rad" min="0" max="100" class="w-full" oninput="setThemeRad(this.value)">
@@ -197,6 +227,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       <input type="file" id="f-add" multiple class="hidden" onchange="onFiles(this)">
 
       <button class="btn w-full mt-3" onclick="showFiles()">📁 Ordner & Dateien verwalten</button>
+      <button class="btn w-full mt-2" onclick="showSettings()">⚙ Einstellungen deines Addons bauen</button>
       <p class="hint mt-1" id="fcount"></p>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">Projekt sichern</h3>
@@ -214,7 +245,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       <div id="wrap" class="shadow-2xl">
         <div id="stage"></div>
       </div>
-      <p class="hint mt-2 mb-4">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Strg+Y = wiederholen · Strg+C / Strg+V = kopieren / einfügen · Ecke unten rechts = Größe ändern</p>
+      <p class="hint mt-2 mb-4">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Strg+Y = wiederholen · Strg+C / Strg+V = kopieren / einfügen · Strg+S = Projekt speichern · Ecke unten rechts = Größe ändern</p>
 
       <!-- RECHTS / UNTEN: EIGENSCHAFTEN (FÜR MOBILGERÄTE AUCH DIREKT UNTER DEM EDITOR) -->
       <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl lg:hidden">
@@ -247,23 +278,30 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       Cyberpunk: ['#d946ef', '#22d3ee', '#180828'],
       Matrix: ['#15803d', '#4ade80', '#052e16'],
       Sonnenuntergang: ['#ea580c', '#facc15', '#1c0a05'],
-      Hell: ['#2563eb', '#f59e0b', '#e2e8f0']
+      Hell: ['#2563eb', '#f59e0b', '#e2e8f0'],
+      Netflix: ['#dc2626', '#fca5a5', '#0a0a0a'],
+      Ozean: ['#0891b2', '#67e8f9', '#082f49'],
+      Wald: ['#16a34a', '#bef264', '#0a1f12'],
+      Violett: ['#7c3aed', '#c4b5fd', '#1e1033'],
+      Monochrom: ['#475569', '#f8fafc', '#0b0f14']
     };
-    const TYPES = { button: 'Button', text: 'Text', image: 'Poster-Platzhalter', box: 'Fläche', pic: 'Bild' };
+    const TYPES = { button: 'Button', text: 'Text', image: 'Poster-Platzhalter', box: 'Fläche', pic: 'Bild', prog: 'Fortschrittsbalken', art: 'Cover (läuft gerade)' };
     const ACTS = [
       ['none', 'Nichts (nur Optik)'], ['page', 'Andere Seite öffnen'], ['addon', 'Anderes Addon öffnen'],
       ['play', 'Video / Stream abspielen'], ['playpause', 'Play / Pause'], ['next', 'Nächster Titel'],
       ['stop', 'Wiedergabe stoppen'], ['back', 'Zurück (vorherige Seite)'], ['settings', 'Kodi-Einstellungen öffnen'],
-      ['quit', 'Kodi beenden'], ['custom', 'Kodi-Befehl (aus Liste oder selbst)']
+      ['quit', 'Kodi beenden'], ['mysettings', 'Einstellungen dieses Addons öffnen'], ['addonfile', 'Datei aus diesem Addon abspielen'], ['custom', 'Kodi-Befehl (aus Liste oder selbst)']
     ];
     const ACTHINT = {
       page: 'Wähle die Seite, die sich öffnen soll.',
       addon: 'Adresse des Addons, z.B. plugin://plugin.video.youtube/',
       play: 'Internet-Adresse (https://…) oder Dateipfad des Videos.',
       custom: 'Am einfachsten über „Befehlsliste“. Profis können hier selbst etwas eintragen.',
-      back: 'Geht zur vorherigen Seite. Auf der Startseite schließt es das Addon.'
+      back: 'Geht zur vorherigen Seite. Auf der Startseite schließt es das Addon.',
+      mysettings: 'Öffnet die Einstellungen, die du unter „⚙ Einstellungen deines Addons bauen“ angelegt hast.',
+      addonfile: 'Pfad im Addon, z.B. resources/playlist.m3u (Datei vorher unter „📁 Ordner & Dateien“ anlegen).'
     };
-    const QUICK = [['🎬 Filme', 'page'], ['📺 Live TV', 'page'], ['🎵 Musik', 'page'], ['⚙ Einstellungen', 'settings'], ['⏯ Play/Pause', 'playpause'], ['⬅ Zurück', 'back']];
+    const QUICK = [['🎬 Filme', 'page'], ['📺 Live TV', 'page'], ['🎵 Musik', 'page'], ['⚙ Einstellungen', 'settings'], ['🔧 Addon-Optionen', 'mysettings'], ['⏯ Play/Pause', 'playpause'], ['⬅ Zurück', 'back']];
     const CLOSE_CMDS = ['activatewindow', 'replacewindow', 'runaddon', 'runscript', 'playmedia', 'quit', 'restartapp', 'reboot', 'powerdown', 'suspend', 'hibernate', 'shutdown', 'activatescreensaver'];
     const needClose = c => { const s = String(c || '').trim().toLowerCase(); return CLOSE_CMDS.some(x => s.startsWith(x)); };
 
@@ -274,7 +312,17 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       ['📅 Datum', '$INFO[System.Date]'],
       ['🌡 Temperatur', '$INFO[Weather.Temperature]'],
       ['🎵 Läuft gerade', '$INFO[Player.Title]'],
-      ['⏱ Laufzeit', '$INFO[Player.Time] / $INFO[Player.Duration]']
+      ['⏱ Laufzeit', '$INFO[Player.Time] / $INFO[Player.Duration]'],
+      ['🕒 Uhrzeit mit Sekunden', '$INFO[System.Time(hh:mm:ss)]'],
+      ['📆 Datum kurz', '$INFO[System.Date(dd.mm.yyyy)]'],
+      ['☁ Wetter', '$INFO[Weather.Conditions]'],
+      ['📍 Wetter-Ort', '$INFO[Weather.Location]'],
+      ['🎤 Interpret', '$INFO[MusicPlayer.Artist]'],
+      ['🎬 Filmtitel', '$INFO[VideoPlayer.Title]'],
+      ['💾 Freier Speicher', '$INFO[System.FreeMemory]'],
+      ['⚙ CPU-Last', '$INFO[System.CPUUsage]'],
+      ['🌐 IP-Adresse', '$INFO[Network.IPAddress]'],
+      ['ℹ Kodi-Version', '$INFO[System.BuildVersion]']
     ];
     const LIVEPV = {
       'System.Time': () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
@@ -282,7 +330,17 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       'Weather.Temperature': () => '18 °C',
       'Player.Title': () => 'Titel des Videos',
       'Player.Time': () => '12:34',
-      'Player.Duration': () => '1:45:00'
+      'Player.Duration': () => '1:45:00',
+      'System.Time(hh:mm:ss)': () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      'System.Date(dd.mm.yyyy)': () => new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      'Weather.Conditions': () => 'Sonnig',
+      'Weather.Location': () => 'Berlin',
+      'MusicPlayer.Artist': () => 'Interpret',
+      'VideoPlayer.Title': () => 'Filmtitel',
+      'System.FreeMemory': () => '1850 MB',
+      'System.CPUUsage': () => '12%',
+      'Network.IPAddress': () => '192.168.0.20',
+      'System.BuildVersion': () => '21.0'
     };
     const liveTxt = s => String(s ?? '').replace(/\$INFO\[([^\]]+)\]/g, (m, k) => LIVEPV[k] ? LIVEPV[k]() : '⟨' + k + '⟩');
     const isLive = s => /\$INFO\[/.test(s || '');
@@ -305,6 +363,17 @@ Navigation|📂|Dateimanager|ActivateWindow(filemanager)|Dateien kopieren und ve
 Navigation|🌤|Wetter|ActivateWindow(weather)|Wetteranzeige
 Navigation|🕹|Programme|ActivateWindow(programs)|Programm-Addons
 Navigation|🛒|Addon-Browser|ActivateWindow(addonbrowser)|Neue Addons installieren
+Navigation|🆕|Neu hinzugefügte Filme|ActivateWindow(videos,videodb://recentlyaddedmovies/,return)|Zuletzt hinzugefügte Filme
+Navigation|🆕|Neue Episoden|ActivateWindow(videos,videodb://recentlyaddedepisodes/,return)|Zuletzt hinzugefügte Serienfolgen
+Navigation|🎭|Film-Genres|ActivateWindow(videos,videodb://movies/genres/,return)|Filme nach Genre sortiert
+Navigation|📆|Filme nach Jahr|ActivateWindow(videos,videodb://movies/years/,return)|Filme nach Erscheinungsjahr
+Navigation|🗂|Film-Sammlungen|ActivateWindow(videos,videodb://movies/sets/,return)|Filmreihen und Sammlungen
+Navigation|🎤|Interpreten|ActivateWindow(music,musicdb://artists/,return)|Alle Musik-Interpreten
+Navigation|💿|Alben|ActivateWindow(music,musicdb://albums/,return)|Alle Alben
+Navigation|🆕|Neue Alben|ActivateWindow(music,musicdb://recentlyaddedalbums/,return)|Zuletzt hinzugefügte Alben
+Navigation|📃|Video-Wiedergabeliste|ActivateWindow(videoplaylist)|Die aktuelle Video-Warteschlange
+Navigation|🎶|Musik-Wiedergabeliste|ActivateWindow(musicplaylist)|Die aktuelle Musik-Warteschlange
+Navigation|📜|Ereignisprotokoll|ActivateWindow(eventlog)|Meldungen und Ereignisse von Kodi
 Wiedergabe|⏯|Play / Pause|PlayerControl(Play)|Startet oder pausiert das Video
 Wiedergabe|⏹|Stopp|PlayerControl(Stop)|Beendet die Wiedergabe
 Wiedergabe|⏭|Nächster Titel|PlayerControl(Next)|Springt zum nächsten Titel
@@ -319,6 +388,10 @@ Wiedergabe|📺|Vollbild|Action(FullScreen)|Wiedergabe im Vollbild
 Wiedergabe|ℹ|Info anzeigen|Action(Info)|Infos zum laufenden Titel
 Wiedergabe|💬|Untertitel an/aus|Action(ShowSubtitles)|Untertitel ein- oder ausblenden
 Wiedergabe|🗣|Audiospur wechseln|Action(AudioNextLanguage)|Nächste Sprache / Tonspur
+Wiedergabe|🔤|Untertitel wechseln|Action(NextSubtitle)|Nächster Untertitel
+Wiedergabe|🖥|Seitenverhältnis ändern|Action(AspectRatio)|Bildformat / Zoom durchschalten
+Wiedergabe|🛠|Codec-Info|Action(CodecInfo)|Technische Infos zum Video
+Wiedergabe|🎉|Party-Modus Musik|PlayerControl(Partymode(music))|Zufällige Musik-Mischung
 Lautstärke|🔊|Lauter|Action(VolumeUp)|Lautstärke erhöhen
 Lautstärke|🔉|Leiser|Action(VolumeDown)|Lautstärke verringern
 Lautstärke|🔇|Stumm schalten|Mute|Ton an/aus
@@ -329,6 +402,8 @@ Einstellungen|📚|Medien-Einstellungen|ActivateWindow(mediasettings)|Bibliothek
 Einstellungen|🌐|Dienste / Netzwerk|ActivateWindow(servicesettings)|Webserver, UPnP, Fernbedienung
 Einstellungen|👤|Profile|ActivateWindow(profiles)|Benutzerprofile wechseln
 Einstellungen|💻|System-Info|ActivateWindow(systeminfo)|Infos zu Gerät und Kodi
+Einstellungen|🔧|System-Einstellungen|ActivateWindow(systemsettings)|Ton, Anzeige, Energie
+Einstellungen|📡|TV-Einstellungen|ActivateWindow(pvrsettings)|PVR / Live-TV Optionen
 System|🔄|Video-Bibliothek aktualisieren|UpdateLibrary(video)|Sucht nach neuen Filmen/Serien
 System|🧹|Video-Bibliothek säubern|CleanLibrary(video)|Entfernt gelöschte Einträge
 System|🎼|Musik-Bibliothek aktualisieren|UpdateLibrary(music)|Sucht nach neuer Musik
@@ -342,12 +417,17 @@ System|❌|Kodi beenden|Quit|Schließt Kodi
 System|😴|Ruhezustand|Suspend|Gerät in den Ruhezustand
 System|🔁|Gerät neu starten|Reboot|Startet das ganze Gerät neu
 System|⏻|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
+System|⏲|Sleep-Timer 30 Minuten|AlarmClock(Schlaftimer,Quit,30,silent)|Beendet Kodi nach 30 Minuten
+System|🚫|Sleep-Timer abbrechen|CancelAlarm(Schlaftimer)|Bricht den Sleep-Timer ab
+System|🐞|Debug-Log umschalten|ToggleDebug|Ausführliches Protokoll an/aus
 Addons|▶|YouTube starten|RunAddon(plugin.video.youtube)|Braucht das YouTube-Addon
 Addons|🎬|Netflix starten|RunAddon(plugin.video.netflix)|Braucht das Netflix-Addon
 Addons|🎮|Twitch starten|RunAddon(plugin.video.twitch)|Braucht das Twitch-Addon
 Addons|📻|Radio.de starten|RunAddon(plugin.audio.radio_de)|Braucht das Radio-Addon
 Addons|🧩|Eigenes Addon starten|RunAddon(DEINE.ADDON.ID)|DEINE.ADDON.ID durch die echte ID ersetzen
 Addons|🔧|Addon-Einstellungen öffnen|Addon.OpenSettings(plugin.video.youtube)|ID des Addons anpassen
+Addons|⬆|Veraltete Addons aktualisieren|ActivateWindow(addonbrowser,addons://outdated/)|Zeigt Addons mit Updates
+Addons|📜|Skript starten|RunScript(DEIN.SKRIPT.ID)|DEIN.SKRIPT.ID durch die echte ID ersetzen
 Abspielen|🌐|Video direkt abspielen|PlayMedia(https://)|Adresse hinter PlayMedia( eintragen
 Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile/playlists/video/,return)|Deine Video-Playlists`.split('\n').map(l => { const a = l.split('|'); return { c: a[0], i: a[1], l: a[2], v: a[3], d: a[4] || '' }; });
 
@@ -376,8 +456,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     const mk = (type, o = {}) => Object.assign({
       id: uid(), type, x: 760, y: 440,
-      w: type === 'text' ? 600 : type === 'image' ? 300 : type === 'box' ? 500 : type === 'pic' ? 400 : 420,
-      h: type === 'text' ? 80 : type === 'image' ? 450 : type === 'box' ? 300 : type === 'pic' ? 400 : 100,
+      w: type === 'text' ? 600 : type === 'image' ? 300 : type === 'box' ? 500 : type === 'pic' ? 400 : type === 'prog' ? 800 : type === 'art' ? 400 : 420,
+      h: type === 'text' ? 80 : type === 'image' ? 450 : type === 'box' ? 300 : type === 'pic' ? 400 : type === 'prog' ? 40 : type === 'art' ? 400 : 100,
       label: type === 'button' ? 'Neuer Button' : type === 'text' ? 'Text hier' : '',
       icon: '', color: null, img: null, fit: 'keep', act: { t: 'none', v: '' },
       rad: null, bw: 0, bc: '#ffffff', op: 100, al: type === 'button' ? 'center' : 'left', tc: '', bimg: null, lock: false
@@ -393,19 +473,20 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         p('tv', 'Live TV', [mk('text', { label: 'Live TV', x: 120, y: 60, w: 600, h: 100 }), btn('Das Erste', '📺', 120, 240, 'play', 'https://'), btn('ZDF', '📺', 120, 380, 'play', 'https://'), btn('Zurück', '⬅', 120, 900, 'back')])
       ];
       if (name === 'live') return [p('home', 'Start', [mk('text', { label: 'Live TV', x: 120, y: 90, w: 800, h: 110 }), btn('Sender 1', '📺', 120, 280, 'play', 'https://'), btn('Sender 2', '📺', 120, 420, 'play', 'https://'), btn('Sender 3', '📺', 120, 560, 'play', 'https://'), btn('Einstellungen', '⚙', 120, 800, 'settings')])];
-      if (name === 'music') return [p('home', 'Start', [mk('text', { label: 'Musik Player', x: 120, y: 90, w: 800, h: 110 }), mk('box', { x: 120, y: 260, w: 600, h: 600, color: '#1e293b' }), btn('⏯ Play / Pause', '', 800, 300, 'playpause'), btn('Nächster Titel', '⏭', 800, 440, 'next'), btn('Stopp', '⏹', 800, 580, 'stop'), btn('Zurück', '⬅', 800, 760, 'back')])];
+      if (name === 'music') return [p('home', 'Start', [mk('text', { label: 'Musik Player', x: 120, y: 90, w: 800, h: 110 }), mk('art', { x: 120, y: 260, w: 600, h: 600 }), btn('⏯ Play / Pause', '', 800, 300, 'playpause'), btn('Nächster Titel', '⏭', 800, 440, 'next'), btn('Stopp', '⏹', 800, 580, 'stop'), btn('Zurück', '⬅', 800, 760, 'back'), mk('text', { label: '$INFO[Player.Title]', x: 800, y: 200, w: 1000, h: 70 }), mk('prog', { x: 800, y: 920, w: 1000, h: 40 })])];
       return [p('home', 'Start', [mk('text', { label: 'Mein Menü', x: 120, y: 90, w: 800, h: 110 }), btn('Mein erster Button', '⭐', 120, 300, 'none')])];
     }
 
-    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2], rad: 35 }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
+    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later', web: '', news: '', welcome: '', deps: '' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2], rad: 35, anim: 'fade' }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], settings: [], pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
 
     function norm() {
       S.mode = 'addon'; S.pv = false; S.sel = null; S.bgImg = S.bgImg || null;
-      S.meta = Object.assign({ desc: '', lic: 'GPL-2.0-or-later' }, S.meta);
+      S.meta = Object.assign({ desc: '', lic: 'GPL-2.0-or-later', web: '', news: '', welcome: '', deps: '' }, S.meta);
       S.assets = Object.assign({ icon: null, fanart: null, shots: [] }, S.assets || {});
       S.assets.shots = S.assets.shots || [];
-      S.files = S.files || []; S.folders = S.folders || []; S.imgs = S.imgs || {};
+      S.files = S.files || []; S.folders = S.folders || []; S.imgs = S.imgs || {}; S.settings = S.settings || [];
       if (S.theme.rad == null) S.theme.rad = 35;
+      if (!S.theme.anim) S.theme.anim = 'fade';
       S.pages.forEach(p => p.els.forEach(e => {
         if (!e.act) e.act = { t: 'none', v: '' };
         if (!e.fit) e.fit = 'keep';
@@ -502,10 +583,11 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function pvReset() { pvNav = S.cur === 0 ? [0] : [0, S.cur]; }
 
     function renderAll() { renderLeft(); renderPages(); renderStage(); renderProps(); save(); }
-    function fc() { $('fcount').textContent = `Eigene Dateien: ${S.files.length} · Ordner: ${S.folders.length}`; }
+    function fc() { $('fcount').textContent = `Eigene Dateien: ${S.files.length} · Ordner: ${S.folders.length} · Optionen: ${S.settings.length}`; }
 
     function renderLeft() {
       $('m-name').value = S.meta.name; $('m-author').value = S.meta.author; $('m-ver').value = S.meta.ver; $('m-desc').value = S.meta.desc || ''; $('m-lic').value = S.meta.lic || ''; $('m-kodi').value = S.kodi; $('m-id').textContent = addonId();
+      $('m-web').value = S.meta.web || ''; $('m-news').value = S.meta.news || ''; $('m-welcome').value = S.meta.welcome || ''; $('m-deps').value = S.meta.deps || ''; $('t-anim').value = S.theme.anim || 'fade';
       ['primary', 'focus', 'bg'].forEach(k => $('t-' + k).value = S.theme[k]);
       $('t-rad').value = S.theme.rad; $('t-rad-v').textContent = S.theme.rad + ' %';
       $('live').innerHTML = LIVEOPTS.map((q, i) => `<button class="btn" onclick="addLive(${i})">${q[0]}</button>`).join('');
@@ -538,7 +620,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     // Automatischer Resize-Observer für absolut stabile Skalierung
     new ResizeObserver(() => fit()).observe($('wrap'));
 
-    const radPct = e => e.rad != null ? e.rad : e.type === 'button' ? S.theme.rad : (e.type === 'box' || e.type === 'image') ? Math.round(S.theme.rad * .4) : 0;
+    const radPct = e => e.type === 'prog' ? 0 : e.rad != null ? e.rad : e.type === 'button' ? S.theme.rad : (e.type === 'box' || e.type === 'image' || e.type === 'art') ? Math.round(S.theme.rad * .4) : 0;
+    const baseCol = e => e.color || (e.type === 'box' || e.type === 'image' || e.type === 'art' ? '#334155' : e.type === 'prog' ? S.theme.focus : S.theme.primary);
     const radPx = e => Math.round(Math.min(e.w, e.h) / 2 * Math.max(0, Math.min(100, radPct(e))) / 100);
     const opOf = e => e.op == null ? 100 : e.op;
     const bwOf = e => e.bw || 0;
@@ -550,7 +633,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       st.style.backgroundImage = S.bgImg ? `url(${S.bgImg})` : ''; st.style.backgroundSize = S.bgImg ? 'cover' : '';
       st.innerHTML = page().els.map(e => {
         const on = !S.pv && e.id === S.sel;
-        const c = e.color || (e.type === 'box' || e.type === 'image' ? '#334155' : S.theme.primary);
+        const c = baseCol(e);
         const r = radPx(e), bw = bwOf(e), op = opOf(e) / 100;
         const fitCss = { stretch: '100% 100%', keep: 'contain', scale: 'cover' }[e.fit] || 'contain';
         const rs = `border-radius:${r}px;`;
@@ -576,6 +659,14 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           if (im) bg = `<div class="bgl" style="background:url('${im.d}') center/${fitCss} no-repeat;opacity:${op};${rs}"></div>`;
           else { bg = `<div class="bgl" style="background:#334155;${rs}"></div>`; s += 'font-size:36px;'; txt = '🖼 Bild fehlt'; }
           if (e.act && e.act.t !== 'none') cls += ' pa';
+        }
+        else if (e.type === 'prog') {
+          bg = `<div class="bgl" style="background:${rgba(c, op * .3)};"></div><div class="bgl" style="background:${rgba(c, op)};right:60%;"></div>`;
+        }
+        else if (e.type === 'art') {
+          s += `font-size:${Math.min(120, e.w * .3)}px;`;
+          bg = `<div class="bgl" style="background:linear-gradient(135deg, ${rgba('#475569', op)}, ${rgba('#1e293b', op)});${rs}"></div>`;
+          ls = '🎵'; txt = '🎵';
         }
         else bg = `<div class="bgl" style="background:${rgba(c, op * .85)};${rs}"></div>`;
         const bdr = bw > 0 ? `<div class="bdr" style="border:${bw}px solid ${e.bc || '#ffffff'};${rs}"></div>` : '';
@@ -604,9 +695,11 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       let h = '';
       if (!e) { h = '<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button><button class="btn w-full mt-2" onclick="$(\'f-pic\').click()">🖼 Eigenes Bild einfügen</button>'; }
       else {
-        const isBtn = e.type === 'button', isPic = e.type === 'pic', isTxt = e.type === 'text', hasBimg = isBtn && !!e.bimg;
+        const isBtn = e.type === 'button', isPic = e.type === 'pic', isTxt = e.type === 'text', hasBimg = isBtn && !!e.bimg, isProg = e.type === 'prog', isArt = e.type === 'art';
         h = `<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}${e.lock ? ' 🔒' : ''}</b><div class="flex gap-1"><button class="btn" aria-label="Kopieren" onclick="copyEl()">📋</button><button class="btn" aria-label="Duplizieren" onclick="dupEl()">⧉</button><button class="btn" aria-label="Löschen" onclick="delEl()">🗑</button></div></div>`;
-        if (e.type !== 'box' && !isPic) h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
+        if (isArt) h += '<p class="hint mt-2">Zeigt das Cover bzw. Bild des gerade laufenden Titels. In der Vorschau siehst du nur einen Platzhalter.</p>';
+        if (isProg) h += '<p class="hint mt-2">Zeigt den Fortschritt der laufenden Wiedergabe. In der Vorschau ist er auf 40 % gesetzt.</p>';
+        if (e.type !== 'box' && !isPic && !isProg && !isArt) h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
         if (isBtn || isTxt) h += `<select class="inp mt-1" onchange="insLive(this.value);this.value=''"><option value="">➕ Live-Info einfügen …</option>${LIVEOPTS.map((q, i) => `<option value="${i}">${q[0]}</option>`).join('')}</select><p class="hint">Live-Infos füllt Kodi während der Nutzung selbst aus (Uhr, Datum, Wetter, Titel).</p>`;
         if (isBtn) h += field('Symbol (Emoji)', `<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`, 'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
         if (isBtn || isTxt) h += field('Textausrichtung', `<select class="inp" onchange="setP('al',this.value)">${[['left', 'Links'], ['center', 'Mittig'], ['right', 'Rechts']].map(a => `<option value="${a[0]}" ${(e.al || (isBtn ? 'center' : 'left')) === a[0] ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`);
@@ -620,9 +713,9 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           if (hasBimg) h += fitSel(e);
           else h += '<p class="hint">Der Button bekommt statt der Farbe ein Bild. Beschriftung kannst du leeren, wenn das Bild alleine wirken soll.</p>';
         }
-        if (!isPic && !hasBimg) h += colF(isTxt ? 'Textfarbe' : 'Farbe', 'color', e.color || (isTxt ? '#ffffff' : S.theme.primary), 'null');
+        if (!isPic && !isArt && !hasBimg) h += colF(isTxt ? 'Textfarbe' : isProg ? 'Farbe des Balkens' : 'Farbe', 'color', e.color || (isTxt ? '#ffffff' : isProg ? S.theme.focus : S.theme.primary), 'null');
 
-        if (!isTxt) {
+        if (!isTxt && !isProg) {
           h += `<div class="mt-4 p-3 rounded-xl border border-slate-700 bg-slate-950/40"><b class="text-xs text-sky-400">🔘 Form & Stil</b>
             <div class="flex flex-wrap gap-1.5 mt-2"><button class="btn" onclick="preset('square')">▢ Eckig</button><button class="btn" onclick="preset('round')">▢ Abgerundet</button><button class="btn" onclick="preset('pill')">💊 Pille</button><button class="btn" onclick="preset('outline')">◻ Nur Rahmen</button><button class="btn" onclick="preset('glass')">🪟 Glas</button></div>
             <label class="l">Rundung der Ecken</label>${sld('rad', 0, 100, radPct(e), ' %')}
@@ -642,7 +735,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           const known = e.act.t === 'custom' && LIB.find(x => x.v === e.act.v);
           h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${isPic ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
           if (e.act.t === 'page') h += `<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q => `<option value="${q.id}" ${q.id === e.act.v ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select>`;
-          else if (ACTHINT[e.act.t]) h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
+          else if (ACTHINT[e.act.t] && e.act.t !== 'back' && e.act.t !== 'mysettings') h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
           if (known) h += `<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
           h += `<p class="hint">${ACTHINT[e.act.t] || (isPic ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
         }
@@ -784,8 +877,119 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function setBg(inp) { const f = inp.files[0]; inp.value = ''; if (!f) return; loadImgFile(f, im => { S.bgImg = coverCanvas(im, 1920, 1080).toDataURL('image/jpeg', .8); renderAll(); toast('Hintergrundbild gesetzt'); }); }
     function noBg() { if (!S.bgImg) return; S.bgImg = null; renderAll(); toast('Hintergrundbild entfernt'); }
 
+    // ---- Textdateien bearbeiten ----
+    const isTxtFile = p => /\.(xml|json|txt|py|m3u8?|md|html?|css|js|cfg|ini|csv|strings|po|log|ya?ml)$/i.test(p);
+    const txtToData = s => { const u = new TextEncoder().encode(s); let b = ''; for (let i = 0; i < u.length; i += 8192) b += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); return 'data:text/plain;base64,' + btoa(b); };
+    const dataToTxt = d => new TextDecoder().decode(b64ToBytes(b64(d)));
+    const TPLS = {
+      m3u: ['playlist.m3u', '#EXTM3U\n#EXTINF:-1,Mein Sender 1\nhttps://\n#EXTINF:-1,Mein Sender 2\nhttps://\n'],
+      py: ['helper.py', '# -*- coding: utf-8 -*-\nimport xbmc\n\n\ndef log(msg):\n    xbmc.log("[Mein Addon] %s" % msg, xbmc.LOGINFO)\n'],
+      log: ['changelog.txt', 'v1.0.0\n- Erste Version\n']
+    };
+    function tplFile(k) { const t = TPLS[k]; if (!t) return; $('tf-n').value = t[0]; $('tf-c').value = t[1]; }
+
+    function editFile(i) {
+      const e = window._E[i]; if (!e || !e.f) return;
+      window._EF = e.f.p;
+      modal(`<div class="flex justify-between items-center mb-2"><b class="text-sm break-all">✎ ${esc(e.p)}</b><button class="btn" onclick="showFiles()">Zurück</button></div>
+        <textarea id="ef-t" class="inp" rows="16" wrap="off" spellcheck="false" style="font-family:monospace;font-size:12px;white-space:pre;overflow:auto"></textarea>
+        <div class="flex gap-2 mt-3"><button class="btn pri" onclick="saveEdit()">💾 Speichern</button><button class="btn" onclick="showFiles()">Abbrechen</button></div>`);
+      try { $('ef-t').value = dataToTxt(e.f.d); } catch (err) { toast('Datei konnte nicht gelesen werden'); showFiles(); }
+    }
+
+    function saveEdit() {
+      const f = S.files.find(x => x.p === window._EF); if (!f) return;
+      f.d = txtToData($('ef-t').value); save(); toast('Datei gespeichert.'); showFiles();
+    }
+
+    // ---- Version, Abhängigkeiten ----
+    function bumpVer() {
+      const p = String(S.meta.ver || '1.0.0').split('.'), n = parseInt(p[p.length - 1], 10);
+      if (isNaN(n)) S.meta.ver = p.join('.') + '.1'; else { p[p.length - 1] = String(n + 1); S.meta.ver = p.join('.'); }
+      $('m-ver').value = S.meta.ver; save(); toast('Version erhöht: ' + S.meta.ver);
+    }
+    function depList() { return [...new Set((S.meta.deps || '').split(/[\s,;]+/).filter(x => /^[A-Za-z0-9_.\-]+$/.test(x) && x !== 'xbmc.python'))]; }
+    function addDep(id) {
+      const l = depList(), i = l.indexOf(id);
+      if (i >= 0) l.splice(i, 1); else l.push(id);
+      S.meta.deps = l.join(', '); $('m-deps').value = S.meta.deps; save();
+      toast(i >= 0 ? 'Abhängigkeit entfernt: ' + id : 'Abhängigkeit hinzugefügt: ' + id);
+    }
+
+    // ---- Einstellungen des Addons (resources/settings.xml) ----
+    const SETT = { bool: 'Schalter (An/Aus)', text: 'Text', number: 'Zahl', select: 'Auswahlliste' };
+
+    function settingsXml() {
+      const rows = S.settings.map(s => {
+        const a = `id="${esc(s.id)}" label="${esc(s.l)}"`;
+        if (s.t === 'bool') return `    <setting ${a} type="bool" default="${s.d === 'true' ? 'true' : 'false'}"/>`;
+        if (s.t === 'number') return `    <setting ${a} type="number" default="${esc(s.d)}"/>`;
+        if (s.t === 'select') {
+          const vs = String(s.v || '').split(',').map(x => x.replace(/\|/g, '').trim()).filter(Boolean);
+          return `    <setting ${a} type="labelenum" values="${esc(vs.join('|'))}" default="${esc(vs.includes(s.d) ? s.d : vs[0] || '')}"/>`;
+        }
+        return `    <setting ${a} type="text" default="${esc(s.d)}"/>`;
+      }).join('\n');
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<settings>\n  <category label="Allgemein">\n${rows}\n  </category>\n</settings>`;
+    }
+
+    function showSettings() {
+      modal(`<div class="flex justify-between items-center mb-2"><b>⚙ Einstellungen deines Addons</b><button class="btn" onclick="closeModal()">Schließen</button></div>
+        <p class="hint mb-3">Hier legst du Optionen an, die man in Kodi unter „Addon → Konfigurieren“ ändern kann. Ein Menü-Button kann sie direkt öffnen (Aktion „Einstellungen dieses Addons öffnen“).</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="l">Art der Option</label><select id="st-t" class="inp" onchange="stForm()">${Object.keys(SETT).map(k => `<option value="${k}">${SETT[k]}</option>`).join('')}</select></div>
+          <div><label class="l">Name (so sieht man es in Kodi)</label><input id="st-l" class="inp" placeholder="z.B. Altersfreigabe prüfen"></div>
+          <div><label class="l">Startwert</label><input id="st-d" class="inp" placeholder="an oder aus"></div>
+          <div id="st-vw" class="hidden"><label class="l">Auswahl (mit Komma trennen)</label><input id="st-v" class="inp" placeholder="Klein, Mittel, Groß"></div>
+        </div>
+        <button class="btn pri mt-3" onclick="addSetting()">＋ Option hinzufügen</button>
+        <div id="st-list" class="space-y-1.5 mt-4"></div>
+        <p class="hint mt-3">Beim Export entsteht daraus automatisch <b>resources/settings.xml</b>. Im Addon-Code liest du eine Option mit <code>xbmcaddon.Addon().getSetting('ID')</code>.</p>`);
+      stForm(); stList();
+    }
+
+    function stForm() {
+      const t = $('st-t').value;
+      $('st-vw').classList.toggle('hidden', t !== 'select');
+      $('st-d').placeholder = { bool: 'an oder aus', text: 'Standardtext (darf leer sein)', number: 'Zahl, z.B. 10', select: 'Startwert (einer der Auswahl-Werte)' }[t];
+    }
+
+    function stList() {
+      if (!$('st-list')) return;
+      $('st-list').innerHTML = S.settings.length ? S.settings.map((s, i) => `<div class="row"><div class="flex-1 min-w-0"><b class="text-xs">${esc(s.l)}</b><div class="hint">${SETT[s.t]} · Startwert: ${esc(s.d || '–')}${s.t === 'select' ? ' · ' + esc(s.v) : ''}</div><code>${esc(s.id)}</code></div><button class="btn" aria-label="Option löschen" onclick="delSetting(${i})">✖</button></div>`).join('') : '<p class="text-sm text-slate-400">Noch keine Optionen angelegt.</p>';
+      fc();
+    }
+
+    function addSetting() {
+      const t = $('st-t').value, l = $('st-l').value.trim(); let d = $('st-d').value.trim(), v = $('st-v').value.trim();
+      if (!l) return toast('Bitte einen Namen für die Option eingeben.');
+      if (t === 'select') {
+        const vs = v.split(',').map(x => x.replace(/\|/g, '').trim()).filter(Boolean);
+        if (vs.length < 2) return toast('Auswahlliste: bitte mindestens 2 Werte mit Komma trennen.');
+        v = vs.join(','); if (!vs.includes(d)) d = vs[0];
+      }
+      if (t === 'number') d = String(parseInt(d, 10) || 0);
+      if (t === 'bool') d = /^(an|ein|ja|true|1)$/i.test(d) ? 'true' : 'false';
+      const base = 'opt_' + slug(l); let id = base, n = 2;
+      while (S.settings.some(x => x.id === id)) id = base + '_' + n++;
+      S.settings.push({ id, t, l, d, v }); save();
+      $('st-l').value = ''; $('st-d').value = ''; $('st-v').value = ''; stList(); toast('Option hinzugefügt.');
+    }
+
+    function delSetting(i) { S.settings.splice(i, 1); save(); stList(); }
+
+    function animXml() {
+      const a = S.theme.anim || 'fade';
+      const T = {
+        fade: ['<animation effect="fade" time="200">WindowOpen</animation>'],
+        slide: ['<animation effect="slide" start="120,0" end="0,0" time="250" tween="cubic" easing="out">WindowOpen</animation>', '<animation effect="fade" time="250">WindowOpen</animation>'],
+        zoom: ['<animation effect="zoom" start="92" end="100" center="960,540" time="250" tween="cubic" easing="out">WindowOpen</animation>', '<animation effect="fade" time="250">WindowOpen</animation>']
+      }[a] || [];
+      return T.map(x => '\n ' + x).join('');
+    }
+
     function showFiles() {
-      modal(`<div class="flex justify-between items-center mb-2"><b>📁 Ordner & Dateien im Addon</b><button class="btn" onclick="closeModal()">Schließen</button></div> <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart, Screenshots und Menü-Bilder brauchst du hier nicht – die werden automatisch eingebaut. Der Bereich <b>resources/skins</b> ist für das Menü reserviert.</p> <div class="flex gap-2 mb-2"><input id="nd" class="inp" placeholder="Neuer Ordner, z.B. resources/lib"><button class="btn" onclick="addDir()">＋ Ordner</button></div> <div class="flex gap-2 mb-2"><select id="fd" class="inp" onchange="FD=this.value"></select><button class="btn pri" onclick="$('f-add').click()">＋ Dateien hinzufügen</button></div> <p class="hint mb-2">Die Dateien kommen in den oben gewählten Ordner. Max. 4 MB pro Datei.</p> <details class="mb-3"><summary class="hint cursor-pointer">📝 Textdatei selbst schreiben</summary> <input id="tf-n" class="inp mt-2" placeholder="Dateiname, z.B. settings.xml"><textarea id="tf-c" class="inp mt-2" rows="5" placeholder="Inhalt der Datei"></textarea> <button class="btn mt-2" onclick="addText()">＋ Datei anlegen</button></details> <div id="fl" class="space-y-1.5"></div>`);
+      modal(`<div class="flex justify-between items-center mb-2"><b>📁 Ordner & Dateien im Addon</b><button class="btn" onclick="closeModal()">Schließen</button></div> <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart, Screenshots und Menü-Bilder brauchst du hier nicht – die werden automatisch eingebaut. Der Bereich <b>resources/skins</b> ist für das Menü reserviert.</p> <div class="flex gap-2 mb-2"><input id="nd" class="inp" placeholder="Neuer Ordner, z.B. resources/lib"><button class="btn" onclick="addDir()">＋ Ordner</button></div> <div class="flex gap-2 mb-2"><select id="fd" class="inp" onchange="FD=this.value"></select><button class="btn pri" onclick="$('f-add').click()">＋ Dateien hinzufügen</button></div> <p class="hint mb-2">Die Dateien kommen in den oben gewählten Ordner. Max. 4 MB pro Datei. Textdateien kannst du mit ✎ später ändern.</p> <details class="mb-3"><summary class="hint cursor-pointer">📝 Textdatei selbst schreiben</summary> <select class="inp mt-2" onchange="tplFile(this.value);this.value=''"><option value="">Vorlage wählen …</option><option value="m3u">M3U-Playlist (Sender-Liste)</option><option value="py">Python-Hilfsdatei</option><option value="log">Änderungsprotokoll (changelog.txt)</option></select> <input id="tf-n" class="inp mt-2" placeholder="Dateiname, z.B. settings.xml"><textarea id="tf-c" class="inp mt-2" rows="5" placeholder="Inhalt der Datei"></textarea> <button class="btn mt-2" onclick="addText()">＋ Datei anlegen</button></details> <div id="fl" class="space-y-1.5"></div>`);
       fileList();
     }
 
@@ -797,7 +1001,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       window._E = E;
       $('fd').innerHTML = '<option value="">📁 Hauptordner des Addons</option>' + [...dirs].sort().map(d => `<option value="${esc(d)}" ${d === FD ? 'selected' : ''}>📁 ${esc(d)}</option>`).join('');
       FD = $('fd').value;
-      $('fl').innerHTML = E.length ? E.map((e, i) => `<div class="row" style="margin-left:${(e.p.split('/').length - 1) * 14}px"><span>${e.dir ? '📁' : '📄'}</span><div class="flex-1 min-w-0 text-xs break-all">${esc(e.p.split('/').pop())}${e.f ? ` <span class="hint">· ${Math.max(1, Math.round(e.f.d.length * .75 / 1024))} KB</span>` : ''}</div><button class="btn" onclick="delEntry(${i})">✖</button></div>`).join('') : '<p class="text-sm text-slate-400">Noch nichts hinzugefügt.</p>';
+      $('fl').innerHTML = E.length ? E.map((e, i) => `<div class="row" style="margin-left:${(e.p.split('/').length - 1) * 14}px"><span>${e.dir ? '📁' : '📄'}</span><div class="flex-1 min-w-0 text-xs break-all">${esc(e.p.split('/').pop())}${e.f ? ` <span class="hint">· ${Math.max(1, Math.round(e.f.d.length * .75 / 1024))} KB</span>` : ''}</div>${e.f && isTxtFile(e.p) ? `<button class="btn" aria-label="Datei bearbeiten" onclick="editFile(${i})">✎</button>` : ''}<button class="btn" onclick="delEntry(${i})">✖</button></div>`).join('') : '<p class="text-sm text-slate-400">Noch nichts hinzugefügt.</p>';
     }
 
     function addDir() {
@@ -806,7 +1010,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       $('nd').value = ''; FD = p; fileList(); save(); toast('Ordner angelegt.');
     }
 
-    const reserved = p => p === 'addon.py' || p === 'addon.xml' || p === 'pages.json' || p.startsWith('resources/skins');
+    const reserved = p => p === 'addon.py' || p === 'addon.xml' || p === 'pages.json' || p.startsWith('resources/skins') || (p === 'resources/settings.xml' && S.settings && S.settings.length > 0);
 
     function onFiles(inp) {
       const fs = [...inp.files]; inp.value = ''; if (!fs.length) return;
@@ -826,7 +1030,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       const p = cleanPath((FD ? FD + '/' : '') + $('tf-n').value); if (!$('tf-n').value.trim()) return toast('Bitte einen Dateinamen eingeben.');
       if (reserved(p)) return toast('Diese Datei wird automatisch erzeugt.');
       S.files = S.files.filter(x => x.p !== p);
-      S.files.push({ p, d: 'data:text/plain;base64,' + btoa(unescape(encodeURIComponent($('tf-c').value))) });
+      S.files.push({ p, d: txtToData($('tf-c').value) });
       $('tf-n').value = ''; $('tf-c').value = ''; fileList(); save(); toast('Datei angelegt.');
     }
 
@@ -862,7 +1066,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function zOrder(front = true) { const e = sel(); if (!e) return; hpush(true); const rest = page().els.filter(x => x !== e); page().els = front ? rest.concat(e) : [e].concat(rest); renderStage(); save(); toast(front ? 'Nach vorn gebracht.' : 'Nach hinten gesetzt.'); }
     function setMeta(k, v) { S.meta[k] = v; $('m-id').textContent = addonId(); save(); }
     function setTheme(k, v) { S.theme[k] = v; renderStage(); save(); }
-    function applyTheme(n) { const t = THEMES[n]; S.theme = { primary: t[0], focus: t[1], bg: t[2], rad: S.theme.rad }; renderAll(); }
+    function applyTheme(n) { const t = THEMES[n]; S.theme = { primary: t[0], focus: t[1], bg: t[2], rad: S.theme.rad, anim: S.theme.anim }; renderAll(); }
     function gotoPage(i) { S.cur = i; S.sel = null; if (S.pv) pvReset(); renderAll(); }
 
     function addPage() {
@@ -928,6 +1132,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     stage.addEventListener('pointerup', () => { if (drag && drag.moved) { renderStage(); save(); } drag = null; });
 
     document.addEventListener('keydown', ev => {
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's') { ev.preventDefault(); exportJson(); return; }
       if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
       const mod = ev.ctrlKey || ev.metaKey, k = ev.key.toLowerCase();
       if (mod && k === 'z' && !ev.shiftKey) { ev.preventDefault(); undo(); return; }
@@ -952,6 +1157,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         case 'stop': return 'PlayerControl(Stop)';
         case 'settings': return 'ActivateWindow(settings)';
         case 'quit': return 'Quit';
+        case 'mysettings': return 'Addon.OpenSettings(' + addonId() + ')';
+        case 'addonfile': return a.v ? 'PlayMedia(special://home/addons/' + addonId() + '/' + cleanPath(a.v) + ')' : '';
         case 'custom': return a.v;
       }
       return '';
@@ -999,8 +1206,11 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           if (a.t === 'none') { if (e.type === 'button') r.push(['i', `${n} hat noch keine Aktion.`]); }
           else if (a.t === 'play' && (!a.v || a.v === 'https://')) r.push(['w', `${n}: Es fehlt die Video-Adresse.`]);
           else if ((a.t === 'addon' || a.t === 'custom') && !a.v) r.push(['w', `${n}: Es fehlt der Befehl bzw. die Adresse.`]);
-          else if (a.t === 'custom' && /DEINE\.ADDON\.ID|PlayMedia\(https:\/\/\)$/.test(a.v)) r.push(['w', `${n}: Im Befehl steht noch ein Platzhalter, bitte anpassen.`]);
+          else if (a.t === 'custom' && /DEINE\.ADDON\.ID|DEIN\.SKRIPT\.ID|PlayMedia\(https:\/\/\)$/.test(a.v)) r.push(['w', `${n}: Im Befehl steht noch ein Platzhalter, bitte anpassen.`]);
           else if (a.t === 'page' && !S.pages.some(q => q.id === a.v)) r.push(['w', `${n}: Die Ziel-Seite gibt es nicht mehr.`]);
+          else if (a.t === 'addonfile' && !a.v) r.push(['w', `${n}: Es fehlt der Dateipfad im Addon.`]);
+          else if (a.t === 'addonfile' && !S.files.some(f => cleanPath(f.p) === cleanPath(a.v))) r.push(['w', `${n}: Die Datei „${a.v}“ gibt es unter „📁 Ordner & Dateien“ nicht.`]);
+          else if (a.t === 'mysettings' && !S.settings.length) r.push(['w', `${n}: Du hast noch keine Addon-Einstellungen angelegt („⚙ Einstellungen deines Addons bauen“).`]);
         });
         if (!focusables(p).length) r.push(['w', `Seite „${p.name}“ hat keinen anklickbaren Button oder Bild – damit kann man sie in Kodi nicht bedienen.`]);
         if (i > 0 && !S.pages.some(q => q.els.some(e => (e.type === 'button' || e.type === 'pic') && e.act && e.act.t === 'page' && e.act.v === p.id))) r.push(['w', `Seite „${p.name}“ ist nicht erreichbar – nichts führt dorthin.`]);
@@ -1103,7 +1313,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       const foc = focusables(p), id = e => fid(p, e), FC = S.theme.focus.slice(1).toUpperCase();
       const ctr = p.els.map((e, idx) => {
         const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`;
-        const c = e.color || (e.type === 'box' || e.type === 'image' ? '#334155' : S.theme.primary);
+        const c = baseCol(e);
         const r = radPx(e), bw = bwOf(e), op = opOf(e), t0 = tex(r, 0);
         let ring = '';
         if (bw > 0) { const rt = tex(r, bw); ring = `\n <control type="image" id="${2000 + idx}">${pos}<texture${brd(rt)} colordiffuse="${hex(e.bc || '#ffffff')}">${rt.f}</texture></control>`; }
@@ -1126,24 +1336,30 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           if (e.act && e.act.t !== 'none') x += `\n <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="55${FC}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>`;
           return x + ring;
         }
+        if (e.type === 'prog') return ` <control type="progress" id="${100 + idx}">${pos}<texturebg colordiffuse="${hexA(c, Math.round(op * .3))}">white.png</texturebg><midtexture colordiffuse="${hexA(c, op)}">white.png</midtexture><info>Player.Progress</info></control>`;
+        if (e.type === 'art') {
+          const m = maskTex(e.w, e.h, r);
+          return ` <control type="image" id="${100 + idx}">${pos}<aspectratio>keep</aspectratio>${op < 100 ? `<colordiffuse>${hexA('#ffffff', op)}</colordiffuse>` : ''}<texture${m ? ` diffuse="${m}"` : ''}>$INFO[Player.Art(thumb)]</texture></control>${ring}`;
+        }
         return ` <control type="image" id="${100 + idx}">${pos}<texture${brd(t0)} colordiffuse="${hexA(c, op)}">${t0.f}</texture></control>${ring}`;
       }).join('\n');
 
       const bgTex = S.bgImg ? '<aspectratio>scale</aspectratio><texture>background.jpg</texture>' : `<texture colordiffuse="${hex(S.theme.bg)}">white.png</texture>`;
       const first = [...foc].sort((a, c) => a.y - c.y || a.x - c.x)[0];
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<window>\n <defaultcontrol always="true">${first ? id(first) : 100}</defaultcontrol>\n <animation effect="fade" time="200">WindowOpen</animation>\n <controls>\n <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>\n${ctr}\n </controls>\n</window>`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<window>\n <defaultcontrol always="true">${first ? id(first) : 100}</defaultcontrol>${animXml()}\n <controls>\n <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>\n${ctr}\n </controls>\n</window>`;
     }
 
     function buildFiles() {
       const id = addonId(), m = S.meta, A = S.assets, F = {}, pad = n => String(n + 1).padStart(2, '0'); TX = {};
       const shots = A.shots.map((d, i) => `resources/screenshot-${pad(i)}.jpg`);
-      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
+      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
       
       F['icon.png'] = { b64: A.icon ? b64(A.icon) : mkImg(512, 512, 'image/png', 1) };
       F['fanart.jpg'] = { b64: A.fanart ? b64(A.fanart) : S.bgImg ? b64(S.bgImg) : mkImg(1920, 1080, 'image/jpeg', .12) };
       A.shots.forEach((d, i) => { F[shots[i]] = { b64: b64(d) }; });
-      F['addon.xml'] = `<?xml version="1.0" encoding="UTF-8"?>\n<addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">\n <requires><import addon="xbmc.python" version="${PY[S.kodi]}"/></requires>\n <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>\n ${meta}\n</addon>`;
+      F['addon.xml'] = `<?xml version="1.0" encoding="UTF-8"?>\n<addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">\n <requires>\n <import addon="xbmc.python" version="${PY[S.kodi]}"/>${depList().map(d => `\n <import addon="${esc(d)}"/>`).join('')}\n </requires>\n <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>\n ${meta}\n</addon>`;
       
+      if (S.settings.length) F['resources/settings.xml'] = settingsXml();
       F[MEDIA + 'white.png'] = { b64: mkWhite() };
       if (S.bgImg) F[MEDIA + 'background.jpg'] = { b64: b64(S.bgImg) };
       const used = new Set();
@@ -1156,6 +1372,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       S.pages.forEach(p => { const mp = {}; focusables(p).forEach(e => { const s = actSpec(e); if (s) mp[fid(p, e)] = s; }); actions[p.id] = mp; });
       F['pages.json'] = JSON.stringify({
         start: S.pages[0].id,
+        welcome: (m.welcome || '').trim(),
         pages: S.pages.map((p, i) => ({ id: p.id, name: p.name, file: i === 0 ? 'home.xml' : `page_${i}.xml` })),
         actions
       }, null, 2);
@@ -1238,6 +1455,9 @@ def main():
         handle = int(sys.argv[1])
     if handle >= 0:
         xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
+    welcome = CONFIG.get('welcome')
+    if welcome:
+        xbmcgui.Dialog().notification(ADDON_NAME, welcome, xbmcgui.NOTIFICATION_INFO, 4000)
     try:
         pending = run()
     except Exception as exc:
@@ -1332,14 +1552,14 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal')) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
       modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt Seiten und Elemente. Bilder, Dateien und Einstellungen bleiben erhalten.</p> <div class="grid sm:grid-cols-2 gap-3">${[['stream', '🎬 Streaming-Hub', 'Startseite, Filme, Live TV'], ['live', '📺 Live TV', 'Senderliste mit Abspiel-Buttons'], ['music', '🎵 Musik-Player', 'Play, Weiter, Stopp'], ['empty', '📄 Leer', 'Nur ein Button']].map(t => `<button class="btn text-left p-4" onclick="loadTpl('${t[0]}')"><b class="block text-sm">${t[1]}</b><span class="text-[11px] text-slate-400">${t[2]}</span></button>`).join('')}</div> <button class="btn mt-4" onclick="closeModal()">Abbrechen</button>`);
     }
 
-    function loadTpl(n) { const keep = { meta: S.meta, mode: S.mode, kodi: S.kodi, theme: S.theme, bgImg: S.bgImg, assets: S.assets, files: S.files, folders: S.folders }; S = Object.assign(newState(n), keep); norm(); hist = []; redoS = []; closeModal(); renderAll(); fit(); }
+    function loadTpl(n) { const keep = { meta: S.meta, mode: S.mode, kodi: S.kodi, theme: S.theme, bgImg: S.bgImg, assets: S.assets, files: S.files, folders: S.folders, settings: S.settings }; S = Object.assign(newState(n), keep); norm(); hist = []; redoS = []; closeModal(); renderAll(); fit(); }
 
     (function init() {
       try { const d = JSON.parse(localStorage.getItem('kfe5') || localStorage.getItem('kfe4')); if (d && d.pages) S = d; } catch (e) {}
