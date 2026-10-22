@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de" class="dark">
+<html lang="de" class="dark select-none">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kodi Skin & Addon Fusion Engine v3.5 Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kodi Skin & Addon Fusion Engine v3.7 Pro</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -36,8 +36,32 @@
         .kodi-preview-bg { background-size: cover; background-position: center; transition: all 0.3s ease; }
         pre code { font-family: 'Fira Code', 'Courier New', Courier, monospace; font-size: 0.82rem; line-height: 1.5; }
         .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .draggable-el { position: absolute; cursor: move; user-select: none; touch-action: none; }
-        .draggable-el:hover { outline: 2px dashed rgba(56, 189, 248, 0.6); }
+        
+        /* Absoluter Schutz gegen Textauswahl auf Touchscreen */
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* Erlaubt Texteingabe nur in Formularen */
+        input, textarea, select {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            user-select: text !important;
+        }
+
+        .draggable-el { 
+            position: absolute; 
+            cursor: move; 
+            touch-action: none !important; 
+            z-index: 30; 
+        }
+        .draggable-el:hover, .draggable-el:active { 
+            outline: 2px dashed rgba(56, 189, 248, 0.9); 
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-x-hidden">
@@ -51,9 +75,9 @@
             <div>
                 <h1 class="text-lg font-bold bg-gradient-to-r from-sky-400 via-cyan-200 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
                     Kodi Skin & Addon Fusion Engine 
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">v3.5 Pro</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">v3.7 Pro</span>
                 </h1>
-                <p class="text-xs text-slate-400">Visueller Builder mit Drag & Drop, Python Script Generator & XML Studio</p>
+                <p class="text-xs text-slate-400">Visueller Builder mit Touch Drag & Drop, Python & XML Studio</p>
             </div>
         </div>
 
@@ -78,7 +102,7 @@
 
             <button onclick="exportAsZip()" class="bg-gradient-to-r from-sky-500 via-cyan-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg flex items-center space-x-2 transition shadow-lg shadow-sky-500/20 active:scale-95">
                 <i data-lucide="download" class="w-4 h-4"></i>
-                <span>Komplettes ZIP Paket Exportieren</span>
+                <span>ZIP Exportieren</span>
             </button>
         </div>
     </header>
@@ -420,7 +444,7 @@ def router(paramstring):
                         </div>
                     </div>
 
-                    <!-- Dynamic Preview Screen Area (Frei verschiebbare Elemente) -->
+                    <!-- Dynamic Preview Screen Area (Touch & Mouse Draggable Elements) -->
                     <div id="pv-dynamic-content" class="flex-1 relative overflow-hidden z-10">
                         <!-- Content render target -->
                     </div>
@@ -428,9 +452,8 @@ def router(paramstring):
                     <!-- Footer Info Bar -->
                     <div class="p-3 bg-slate-950/80 border-t border-slate-800/60 flex justify-between items-center z-10 text-[11px] text-slate-400">
                         <div class="flex items-center space-x-4">
-                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">Drag</kbd> Verschieben</span>
-                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">OK</kbd> Edit Action</span>
-                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">Back</kbd> Return</span>
+                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">Touch/Drag</kbd> Verschieben</span>
+                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">Tap/Click</kbd> Edit Action</span>
                         </div>
 
                         <div id="pv-overlay-actions" class="flex items-center space-x-2">
@@ -503,7 +526,7 @@ def router(paramstring):
         </main>
     </div>
 
-    <!-- ACTION & BUTTON EDITOR MODAL (Erweitert mit X/Y/Width/Height) -->
+    <!-- ACTION & BUTTON EDITOR MODAL -->
     <div id="actionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -668,7 +691,6 @@ def router(paramstring):
             currentScreen: 'home',
             activeCodeFile: 'addon.xml',
             buttonFilterScreen: 'all',
-            // Default buttons with explicit X, Y, width, height for absolute positioning
             buttons: [
                 {
                     id: 'btn_vod_hub',
@@ -679,7 +701,7 @@ def router(paramstring):
                     route: 'plugin://plugin.video.myfusion/?action=vod',
                     icon: 'film',
                     color: '#38bdf8',
-                    left: 240, top: 220, width: 220, height: 60
+                    left: 200, top: 180, width: 220, height: 60
                 },
                 {
                     id: 'btn_iptv_epg',
@@ -690,7 +712,7 @@ def router(paramstring):
                     route: 'plugin://plugin.video.myfusion/?action=iptv',
                     icon: 'tv',
                     color: '#10b981',
-                    left: 480, top: 220, width: 220, height: 60
+                    left: 440, top: 180, width: 220, height: 60
                 },
                 {
                     id: 'btn_music_player',
@@ -701,7 +723,7 @@ def router(paramstring):
                     route: 'PlayerControl(Play)',
                     icon: 'music',
                     color: '#a855f7',
-                    left: 720, top: 220, width: 220, height: 60
+                    left: 680, top: 180, width: 220, height: 60
                 },
                 {
                     id: 'btn_matrix_play',
@@ -712,7 +734,7 @@ def router(paramstring):
                     route: 'plugin://plugin.video.myfusion/?action=play&id=matrix',
                     icon: 'play-circle',
                     color: '#38bdf8',
-                    left: 240, top: 220, width: 240, height: 80
+                    left: 200, top: 180, width: 240, height: 80
                 },
                 {
                     id: 'btn_quick_settings',
@@ -887,13 +909,13 @@ def router(paramstring):
                 route: `plugin://${state.meta.id}/?action=custom_${newId}`,
                 icon: 'zap',
                 color: state.style.focusColor,
-                left: 100, top: 150, width: 200, height: 50
+                left: 150, top: 150, width: 200, height: 50
             };
             state.buttons.push(newBtn);
             renderButtonsList();
             renderPreview();
             openActionEditor(newId);
-            showToast("Neuer Button erstellt! Positioniere oder konfiguriere ihn.");
+            showToast("Neuer Button erstellt!");
         }
 
         function filterButtonsByScreen(sc) {
@@ -972,7 +994,7 @@ def router(paramstring):
                 document.getElementById('modal-btn-route').value = btn.route;
                 document.getElementById('modal-btn-icon').value = btn.icon || 'zap';
                 document.getElementById('modal-btn-color').value = btn.color || state.style.focusColor;
-                document.getElementById('modal-btn-x').value = btn.left || 100;
+                document.getElementById('modal-btn-x').value = btn.left || 150;
                 document.getElementById('modal-btn-y').value = btn.top || 150;
                 document.getElementById('modal-btn-w').value = btn.width || 200;
                 document.getElementById('modal-btn-h').value = btn.height || 50;
@@ -1011,7 +1033,7 @@ def router(paramstring):
             const route = document.getElementById('modal-btn-route').value;
             const icon = document.getElementById('modal-btn-icon').value;
             const color = document.getElementById('modal-btn-color').value;
-            const left = parseInt(document.getElementById('modal-btn-x').value) || 100;
+            const left = parseInt(document.getElementById('modal-btn-x').value) || 150;
             const top = parseInt(document.getElementById('modal-btn-y').value) || 150;
             const width = parseInt(document.getElementById('modal-btn-w').value) || 200;
             const height = parseInt(document.getElementById('modal-btn-h').value) || 50;
@@ -1052,10 +1074,100 @@ def router(paramstring):
             }
         }
 
-        /* DRAG & DROP INTERACTIVE PREVIEW RENDERING */
+        /* PERFEKTER DRAG & DROP HANDLER MIT GESTENTRENNUNG (KLICK VS. MOVE) */
         let draggedBtnId = null;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
+        let isMoved = false;
+
+        function startDrag(e, id) {
+            e.preventDefault(); // Verhindert Textmarkierung & Kontextmenü sofort
+            isMoved = false;
+
+            let clientX, clientY;
+            if (e.type === 'touchstart') {
+                if (e.touches.length === 0) return;
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                if (e.button !== 0) return;
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            draggedBtnId = id;
+            const el = document.getElementById(id);
+            const rect = el.getBoundingClientRect();
+            
+            dragOffsetX = clientX - rect.left;
+            dragOffsetY = clientY - rect.top;
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchmove', onMouseMove, { passive: false });
+            document.addEventListener('touchend', onMouseUp);
+            e.stopPropagation();
+        }
+
+        function onMouseMove(e) {
+            if (!draggedBtnId) return;
+            if (e.cancelable) e.preventDefault(); // Verhindert Wischen/Scrollen der ganzen Seite
+
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                if (e.touches.length === 0) return;
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const viewport = document.getElementById('kodi-viewport');
+            const vRect = viewport.getBoundingClientRect();
+
+            const scaleX = 1920 / vRect.width;
+            const scaleY = 1080 / vRect.height;
+
+            const newLeft = Math.max(0, Math.min(1700, Math.round((clientX - vRect.left - dragOffsetX) * scaleX)));
+            const newTop = Math.max(50, Math.min(950, Math.round((clientY - vRect.top - dragOffsetY) * scaleY)));
+
+            const btnObj = state.buttons.find(b => b.id === draggedBtnId);
+            if (btnObj) {
+                // Wenn Bewegung > 3px war, kennzeichnen als Drag
+                if (Math.abs(btnObj.left - newLeft) > 3 || Math.abs(btnObj.top - newTop) > 3) {
+                    isMoved = true;
+                }
+                btnObj.left = newLeft;
+                btnObj.top = newTop;
+                const el = document.getElementById(draggedBtnId);
+                if (el) {
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                    const subLabel = el.querySelector('span');
+                    if (subLabel) subLabel.innerText = `X:${newLeft} Y:${newTop}`;
+                }
+            }
+        }
+
+        function onMouseUp(e) {
+            if (draggedBtnId) {
+                const targetId = draggedBtnId;
+                draggedBtnId = null;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                document.removeEventListener('touchmove', onMouseMove);
+                document.removeEventListener('touchend', onMouseUp);
+
+                if (isMoved) {
+                    renderButtonsList();
+                    showToast("Button-Position aktualisiert!");
+                } else {
+                    // War kein Ziehen, sondern nur einfaches Antippen -> Editor öffnen!
+                    openActionEditor(targetId);
+                }
+            }
+        }
 
         function renderPreview() {
             document.getElementById('pv-title').innerText = state.meta.name.toUpperCase();
@@ -1095,33 +1207,33 @@ def router(paramstring):
             const mainContentButtons = activeScreenButtons.filter(b => b.section === 'content' || b.section === 'sidebar');
             
             let htmlContent = `
-                <div class="absolute top-4 left-4 text-[10px] text-slate-400 bg-slate-950/60 px-2 py-1 rounded border border-slate-800">
-                    💡 Klicke & ziehe Buttons frei auf dem Bildschirm (X/Y-Steuerung)
+                <div class="absolute top-3 left-3 text-[10px] text-slate-300 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 pointer-events-none shadow">
+                    💡 Antippen = Bearbeiten | Gedrückt halten & Ziehen = Verschieben
                 </div>
-                <button onclick="createNewButton('${state.currentScreen}', 'content')" class="absolute bottom-4 right-4 px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-lg text-xs font-bold flex items-center space-x-1 z-20">
+                <button onclick="createNewButton('${state.currentScreen}', 'content')" class="absolute bottom-3 right-3 px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 rounded-lg text-xs font-bold flex items-center space-x-1 z-20 shadow">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                    <span>Button hier hinzufügen</span>
+                    <span>Button hinzufügen</span>
                 </button>
             `;
 
             mainContentButtons.forEach((b, idx) => {
-                const left = b.left !== undefined ? b.left : (80 + (idx % 3) * 240);
-                const top = b.top !== undefined ? b.top : (120 + Math.floor(idx / 3) * 90);
+                const left = b.left !== undefined ? b.left : (150 + (idx % 3) * 240);
+                const top = b.top !== undefined ? b.top : (150 + Math.floor(idx / 3) * 90);
                 const width = b.width !== undefined ? b.width : 220;
                 const height = b.height !== undefined ? b.height : 60;
                 b.left = left; b.top = top; b.width = width; b.height = height;
 
                 htmlContent += `
-                    <div id="${b.id}" class="draggable-el bg-slate-900/90 border border-slate-700 hover:border-sky-400 p-3 rounded-xl flex items-center space-x-3 shadow-xl backdrop-blur-md transition-shadow"
+                    <div id="${b.id}" class="draggable-el bg-slate-900/95 border border-slate-700 hover:border-sky-400 p-3 rounded-xl flex items-center space-x-3 shadow-2xl backdrop-blur-md"
                          style="left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px;"
                          onmousedown="startDrag(event, '${b.id}')"
-                         ondblclick="openActionEditor('${b.id}')">
-                        <div class="p-2 rounded-lg bg-slate-800 flex items-center justify-center" style="color: ${b.color}">
+                         ontouchstart="startDrag(event, '${b.id}')">
+                        <div class="p-2 rounded-lg bg-slate-800 flex items-center justify-center pointer-events-none" style="color: ${b.color}">
                             <i data-lucide="${b.icon || 'film'}" class="w-4 h-4"></i>
                         </div>
-                        <div class="overflow-hidden">
+                        <div class="overflow-hidden pointer-events-none">
                             <h4 class="text-xs font-bold text-slate-100 truncate">${b.label}</h4>
-                            <span class="text-[9px] text-slate-400 font-mono">X:${left} Y:${top}</span>
+                            <span class="text-[9px] text-sky-400 font-mono">X:${left} Y:${top}</span>
                         </div>
                     </div>
                 `;
@@ -1131,60 +1243,7 @@ def router(paramstring):
             lucide.createIcons();
         }
 
-        /* Mouse Drag & Drop Handlers for Preview Viewport */
-        function startDrag(e, id) {
-            if (e.button !== 0) return; // only left click
-            draggedBtnId = id;
-            const btnObj = state.buttons.find(b => b.id === id);
-            const el = document.getElementById(id);
-            const rect = el.getBoundingClientRect();
-            const viewportRect = document.getElementById('kodi-viewport').getBoundingClientRect();
-            
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-            e.stopPropagation();
-        }
-
-        function onMouseMove(e) {
-            if (!draggedBtnId) return;
-            const viewport = document.getElementById('kodi-viewport');
-            const vRect = viewport.getBoundingClientRect();
-
-            // Calculate relative position inside viewport (scaled safely)
-            const scaleX = 1920 / vRect.width;
-            const scaleY = 1080 / vRect.height;
-
-            const newLeft = Math.max(0, Math.min(1700, Math.round((e.clientX - vRect.left - dragOffsetX) * scaleX)));
-            const newTop = Math.max(50, Math.min(950, Math.round((e.clientY - vRect.top - dragOffsetY) * scaleY)));
-
-            const btnObj = state.buttons.find(b => b.id === draggedBtnId);
-            if (btnObj) {
-                btnObj.left = newLeft;
-                btnObj.top = newTop;
-                const el = document.getElementById(draggedBtnId);
-                if (el) {
-                    el.style.left = newLeft + 'px';
-                    el.style.top = newTop + 'px';
-                    const subLabel = el.querySelector('span');
-                    if (subLabel) subLabel.innerText = `X:${newLeft} Y:${newTop}`;
-                }
-            }
-        }
-
-        function onMouseUp() {
-            if (draggedBtnId) {
-                draggedBtnId = null;
-                document.removeEventListener('mousemove', onMouseMove);
-                document.removeEventListener('mouseup', onMouseUp);
-                renderButtonsList();
-                showToast("Button-Position aktualisiert!");
-            }
-        }
-
-        /* CODE GENERATION ENGINE INCLUDING DYNAMIC BUTTONS & POSITIONS */
+        /* CODE GENERATION ENGINE */
         function renderCodeTabs() {
             const tabsContainer = document.getElementById('code-file-tabs');
             const files = state.fusionMode === 'addon_skin' 
@@ -1233,7 +1292,6 @@ def router(paramstring):
 
             if (fileName === 'main.py') {
                 const buttonRoutes = state.buttons.map(b => `    elif action == '${b.id}':
-        # Custom Action handler for ${b.label}
         xbmcgui.Dialog().notification('${b.label}', 'Executing ${b.actionType}', xbmcgui.NOTIFICATION_INFO, 2000)
         ${b.actionType === 'PlayMedia' ? `xbmc.Player().play('${b.route}')` : `xbmcexecute("${b.route}")`}`).join('\n');
 
@@ -1248,14 +1306,12 @@ def router(paramstring):
     action = params.get('action')
     
     if not action:
-        # Default Catalog Landing Page
         list_root_menu()
 ${buttonRoutes}
     else:
         xbmcgui.Dialog().ok("Fusion Engine", f"Action execution: {action}")
 
 def list_root_menu():
-    # Dynamisch generiertes Kodi Menu
     pass
 
 if __name__ == '__main__':
@@ -1265,10 +1321,9 @@ if __name__ == '__main__':
             if (fileName === 'Home.xml') {
                 const homeButtons = state.buttons.filter(b => b.screen === 'home');
                 const xmlControls = homeButtons.map((b, idx) => `
-        <!-- Custom Dynamic Button: ${b.label} -->
         <control type="button" id="${3000 + idx}">
-            <left>${b.left || 100}</left>
-            <top>${b.top || 200}</top>
+            <left>${b.left || 150}</left>
+            <top>${b.top || 150}</top>
             <width>${b.width || 200}</width>
             <height>${b.height || 50}</height>
             <label>${b.label}</label>
@@ -1282,7 +1337,6 @@ if __name__ == '__main__':
 <window>
     <defaultcontrol always="true">3000</defaultcontrol>
     <controls>
-        <!-- Background Overlay -->
         <control type="image">
             <depth>Background</depth>
             <left>0</left>
@@ -1291,8 +1345,6 @@ if __name__ == '__main__':
             <height>1080</height>
             <texture background="true">special://skin/backgrounds/default.jpg</texture>
         </control>
-
-        <!-- Dynamisch generierte Skin Buttons -->
 ${xmlControls}
     </controls>
 </window>`;
