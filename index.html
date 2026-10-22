@@ -1,10 +1,3 @@
-<!-- Kodi Video-Addon Generator · Copyright (c) 2026 Team IT('s) Possible · Version 2026.10.22-5 (v8.1 Final)
-KOSTENLOS FÜR DIE KODI-COMMUNITY: Dieses Werkzeug darf von allen – Anfängern wie Profis – kostenlos genutzt werden.
-VERKAUF VERBOTEN: Der Verkauf, die kostenpflichtige Weitergabe oder jede andere kommerzielle Verwertung dieses Werkzeugs
-(auch kopiert, verändert, umbenannt oder als Teil eines anderen Produkts) ist ausdrücklich untersagt.
-Weitergabe ist nur kostenlos, unverändert und mit diesem Hinweis erlaubt. Das Verändern und Ausgeben als eigenes Werk ist untersagt.
-Die mit diesem Werkzeug erstellten Addons gehören ihren jeweiligen Erstellern.
-HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. Nutzung auf eigene Gefahr. -->
 <!DOCTYPE html>
 <html lang="de" class="dark">
 <head>
@@ -21,10 +14,13 @@ HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art is
     
     .btn { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; font-size: 12px; color: #e2e8f0; white-space: nowrap; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
     .btn:hover { background: #334155; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
     .btn:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }
     
     .pri { background: linear-gradient(90deg, #0ea5e9, #2563eb); border: 0; color: #fff; font-weight: 600; }
     .pri:hover { background: linear-gradient(90deg, #0284c7, #1d4ed8); }
+    .exitb { border-color: #b91c1c; color: #fca5a5; }
+    .exitb:hover { background: #7f1d1d; }
     
     #wrap { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; background: #0f172a; border-radius: 12px; border: 2px solid #1e293b; }
 
@@ -54,6 +50,7 @@ HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art is
     .mod { position: fixed; inset: 0; background: rgba(2, 6, 23, .85); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px); }
     .row { display: flex; align-items: center; gap: 8px; background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 8px 10px; }
     .row code { font-size: 10.5px; color: #38bdf8; word-break: break-all; }
+    .edt { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important; font-size: 12px !important; line-height: 1.45; white-space: pre; overflow: auto; tab-size: 4; height: 52vh; resize: vertical; color: #7dd3fc; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
@@ -75,8 +72,9 @@ HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art is
       <button class="btn" onclick="redo()">↪ Wiederholen</button>
       <button class="btn" id="btn-pv" onclick="togglePv()">▶ Testen</button>
       <button class="btn" onclick="showCheck(false)">✔ Prüfen</button>
-      <button class="btn" onclick="showCode()">&lt;/&gt; Code</button>
+      <button class="btn" onclick="showCode()">💻 Editor</button>
       <button class="btn pri" onclick="exportZip()">⬇ ZIP exportieren</button>
+      <button class="btn exitb" onclick="exitApp()">🚪 Beenden</button>
     </div>
   </header>
 
@@ -200,6 +198,7 @@ HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art is
         <button class="btn" onclick="gridArrange()">🔲 Buttons im Raster anordnen …</button>
         <button class="btn" onclick="styleAll()">🎨 Stil des markierten Buttons auf alle Buttons</button>
         <div class="grid grid-cols-2 gap-2"><button class="btn" onclick="copyEl()">📋 Kopieren</button><button class="btn" onclick="pasteEl()">📌 Einfügen</button></div>
+        <button class="btn" onclick="showCode()">💻 Dateien von Hand bearbeiten (Editor)</button>
       </div>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">5 · Addon-Bilder & Dateien</h3>
@@ -485,7 +484,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       return [p('home', 'Start', [mk('text', { label: 'Mein Menü', x: 120, y: 90, w: 800, h: 110 }), btn('Mein erster Button', '⭐', 120, 300, 'none')])];
     }
 
-    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later', web: '', news: '', welcome: '', deps: '' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2], rad: 35, anim: 'fade' }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], settings: [], pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
+    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later', web: '', news: '', welcome: '', deps: '' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2], rad: 35, anim: 'fade' }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], settings: [], overrides: {}, pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
 
     function norm() {
       S.mode = 'addon'; S.pv = false; S.sel = null; S.bgImg = S.bgImg || null;
@@ -493,6 +492,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       S.assets = Object.assign({ icon: null, fanart: null, shots: [] }, S.assets || {});
       S.assets.shots = S.assets.shots || [];
       S.files = S.files || []; S.folders = S.folders || []; S.imgs = S.imgs || {}; S.settings = S.settings || [];
+      S.overrides = (S.overrides && typeof S.overrides === 'object') ? S.overrides : {};
       if (S.theme.rad == null) S.theme.rad = 35;
       if (!S.theme.anim) S.theme.anim = 'fade';
       S.pages.forEach(p => p.els.forEach(e => {
@@ -594,7 +594,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function pvReset() { pvNav = S.cur === 0 ? [0] : [0, S.cur]; }
 
     function renderAll() { renderLeft(); renderPages(); renderStage(); renderProps(); save(); }
-    function fc() { $('fcount').textContent = `Eigene Dateien: ${S.files.length} · Ordner: ${S.folders.length} · Optionen: ${S.settings.length}`; }
+    function fc() { const n = Object.keys(S.overrides || {}).length; $('fcount').textContent = `Eigene Dateien: ${S.files.length} · Ordner: ${S.folders.length} · Optionen: ${S.settings.length}${n ? ' · Von Hand geändert: ' + n : ''}`; }
 
     function renderLeft() {
       $('m-name').value = S.meta.name; $('m-author').value = S.meta.author; $('m-ver').value = S.meta.ver; $('m-desc').value = S.meta.desc || ''; $('m-lic').value = S.meta.lic || ''; $('m-kodi').value = S.kodi; $('m-id').textContent = addonId();
@@ -1034,7 +1034,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     }
 
     function showFiles() {
-      modal(`<div class="flex justify-between items-center mb-2"><b>📁 Ordner & Dateien im Addon</b><button class="btn" onclick="closeModal()">Schließen</button></div> <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart, Screenshots und Menü-Bilder brauchst du hier nicht – die werden automatisch eingebaut. Der Bereich <b>resources/skins</b> ist für das Menü reserviert.</p> <div class="flex gap-2 mb-2"><input id="nd" class="inp" placeholder="Neuer Ordner, z.B. resources/lib"><button class="btn" onclick="addDir()">＋ Ordner</button></div> <div class="flex gap-2 mb-2"><select id="fd" class="inp" onchange="FD=this.value"></select><button class="btn pri" onclick="$('f-add').click()">＋ Dateien hinzufügen</button></div> <p class="hint mb-2">Die Dateien kommen in den oben gewählten Ordner. Max. 4 MB pro Datei. Textdateien kannst du mit ✎ später ändern.</p> <details class="mb-3"><summary class="hint cursor-pointer">📝 Textdatei selbst schreiben</summary> <select class="inp mt-2" onchange="tplFile(this.value);this.value=''"><option value="">Vorlage wählen …</option><option value="m3u">M3U-Playlist (Sender-Liste)</option><option value="py">Python-Hilfsdatei</option><option value="log">Änderungsprotokoll (changelog.txt)</option></select> <input id="tf-n" class="inp mt-2" placeholder="Dateiname, z.B. settings.xml"><textarea id="tf-c" class="inp mt-2" rows="5" placeholder="Inhalt der Datei"></textarea> <button class="btn mt-2" onclick="addText()">＋ Datei anlegen</button></details> <div id="fl" class="space-y-1.5"></div>`);
+      modal(`<div class="flex justify-between items-center mb-2"><b>📁 Ordner & Dateien im Addon</b><button class="btn" onclick="closeModal()">Schließen</button></div> <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart, Screenshots und Menü-Bilder brauchst du hier nicht – die werden automatisch eingebaut. Der Bereich <b>resources/skins</b> ist für das Menü reserviert. Die automatisch erzeugten Dateien (addon.py, addon.xml, home.xml …) bearbeitest du im <b>💻 Editor</b>.</p> <div class="flex gap-2 mb-2"><input id="nd" class="inp" placeholder="Neuer Ordner, z.B. resources/lib"><button class="btn" onclick="addDir()">＋ Ordner</button></div> <div class="flex gap-2 mb-2"><select id="fd" class="inp" onchange="FD=this.value"></select><button class="btn pri" onclick="$('f-add').click()">＋ Dateien hinzufügen</button></div> <p class="hint mb-2">Die Dateien kommen in den oben gewählten Ordner. Max. 4 MB pro Datei. Textdateien kannst du mit ✎ später ändern.</p> <details class="mb-3"><summary class="hint cursor-pointer">📝 Textdatei selbst schreiben</summary> <select class="inp mt-2" onchange="tplFile(this.value);this.value=''"><option value="">Vorlage wählen …</option><option value="m3u">M3U-Playlist (Sender-Liste)</option><option value="py">Python-Hilfsdatei</option><option value="log">Änderungsprotokoll (changelog.txt)</option></select> <input id="tf-n" class="inp mt-2" placeholder="Dateiname, z.B. settings.xml"><textarea id="tf-c" class="inp mt-2" rows="5" placeholder="Inhalt der Datei"></textarea> <button class="btn mt-2" onclick="addText()">＋ Datei anlegen</button></details> <div id="fl" class="space-y-1.5"></div>`);
       fileList();
     }
 
@@ -1064,7 +1064,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         const r = new FileReader();
         r.onload = () => {
           const p = cleanPath((FD ? FD + '/' : '') + f.name);
-          if (reserved(p)) { toast('Diese Datei wird automatisch erzeugt und kann nicht ersetzt werden.'); return res(); }
+          if (reserved(p)) { toast('Diese Datei wird automatisch erzeugt und kann nicht ersetzt werden. Bearbeite sie im 💻 Editor.'); return res(); }
           S.files = S.files.filter(x => x.p !== p); S.files.push({ p, d: r.result }); res();
         };
         r.onerror = () => res(); r.readAsDataURL(f);
@@ -1073,7 +1073,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     function addText() {
       const p = cleanPath((FD ? FD + '/' : '') + $('tf-n').value); if (!$('tf-n').value.trim()) return toast('Bitte einen Dateinamen eingeben.');
-      if (reserved(p)) return toast('Diese Datei wird automatisch erzeugt.');
+      if (reserved(p)) return toast('Diese Datei wird automatisch erzeugt – bearbeite sie im 💻 Editor.');
       S.files = S.files.filter(x => x.p !== p);
       S.files.push({ p, d: txtToData($('tf-c').value) });
       $('tf-n').value = ''; $('tf-c').value = ''; fileList(); save(); toast('Datei angelegt.');
@@ -1182,7 +1182,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     stage.addEventListener('pointerup', () => { if (drag && drag.moved) { renderStage(); save(); } drag = null; });
 
     document.addEventListener('keydown', ev => {
-      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's') { ev.preventDefault(); exportJson(); return; }
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's') { ev.preventDefault(); if (window._ED) edSave(); else exportJson(); return; }
       if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
       const mod = ev.ctrlKey || ev.metaKey, k = ev.key.toLowerCase();
       if (mod && k === 'z' && !ev.shiftKey) { ev.preventDefault(); undo(); return; }
@@ -1274,6 +1274,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       if (S.pages.some(p => p.els.some(e => e.type === 'image' && !imgSrc(e)))) r.push(['i', 'Poster ohne Bild werden als farbige Flächen exportiert. Markiere ein Poster und wähle rechts ein Bild oder eine Internet-Adresse.']);
       if (!S.assets.icon) r.push(['i', 'Du hast kein eigenes Icon gewählt – es wird automatisch ein einfaches erzeugt.']);
       if (!S.meta.name.trim()) r.push(['w', 'Dein Projekt hat noch keinen Namen.']);
+      const ov = Object.keys(S.overrides || {}).length;
+      if (ov) r.push(['i', `${ov} Datei(en) hast du im 💻 Editor von Hand geändert. Diese werden unverändert exportiert – Änderungen im Designer wirken sich dort nicht mehr aus (im Editor kannst du das Original wiederherstellen).`]);
       return r;
     }
 
@@ -1414,7 +1416,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       return `<?xml version="1.0" encoding="UTF-8"?>\n<window>\n <defaultcontrol always="true">${first ? id(first) : 100}</defaultcontrol>${animXml()}\n <controls>\n <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>\n${ctr}\n </controls>\n</window>`;
     }
 
-    function buildFiles() {
+    // raw = true: ohne die von Hand geänderten Dateien (Originale aus dem Designer)
+    function buildFiles(raw) {
       const id = addonId(), m = S.meta, A = S.assets, F = {}, pad = n => String(n + 1).padStart(2, '0'); TX = {};
       const shots = A.shots.map((d, i) => `resources/screenshot-${pad(i)}.jpg`);
       const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
@@ -1556,13 +1559,102 @@ if __name__ == '__main__':
         if (!p || reserved(p)) return;
         F[p] = { b64: b64(f.d) };
       });
+      // Von Hand bearbeitete Dateien aus dem Editor überschreiben die erzeugten Texte
+      if (!raw) Object.keys(S.overrides || {}).forEach(p => { if (typeof F[p] === 'string') F[p] = S.overrides[p]; });
       return F;
     }
 
-    function showCode() {
-      const F = buildFiles(), names = Object.keys(F).filter(k => typeof F[k] === 'string');
-      modal(`<div class="flex justify-between items-center mb-3"><b>Erzeugte Dateien</b><button class="btn" onclick="closeModal()">Schließen</button></div> <select class="inp mb-3" onchange="$('code').textContent=window._F[this.value]">${names.map(n => `<option>${esc(n)}</option>`).join('')}</select> <pre class="bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] text-sky-300 overflow-auto max-h-[60vh]"><code id="code"></code></pre> <p class="hint mt-2">Bilder und eigene Dateien (${Object.keys(F).length - names.length} Stück) sind in der ZIP enthalten, werden hier aber nicht als Text angezeigt.</p>`);
-      window._F = F; $('code').textContent = F[names[0]];
+    // ================= EDITOR / TERMINAL für die erzeugten Dateien =================
+    window._ED = null;
+    const edDirty = () => { const d = window._ED, t = $('ed-t'); return !!(d && t && t.value !== d.saved); };
+
+    function edSelHtml() {
+      const d = window._ED; if (!d || !$('ed-sel')) return;
+      $('ed-sel').innerHTML = d.names.map(n => `<option value="${esc(n)}" ${n === d.cur ? 'selected' : ''}>${S.overrides[n] != null ? '✎ ' : ''}${esc(n)}</option>`).join('');
+    }
+
+    function showCode(start) {
+      const F = buildFiles(true), names = Object.keys(F).filter(k => typeof F[k] === 'string');
+      const nbin = Object.keys(F).length - names.length;
+      modal(`<div class="flex justify-between items-center mb-2 gap-2"><b>💻 Editor – erzeugte Dateien bearbeiten</b><button class="btn" onclick="edClose()">Schließen</button></div>
+        <p class="hint mb-2">Hier kannst du jede erzeugte Textdatei (addon.py, addon.xml, home.xml, pages.json …) von Hand ändern. Mit <b>💾 Übernehmen</b> (oder Strg+S) wird sie so in die ZIP geschrieben. Bilder (${nbin} Stück) sind in der ZIP enthalten, werden hier aber nicht angezeigt.</p>
+        <div class="flex gap-2 mb-2"><select id="ed-sel" class="inp" onchange="edSwitch(this.value)"></select></div>
+        <textarea id="ed-t" class="inp edt" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" oninput="edInfo()" onkeydown="edKey(event)"></textarea>
+        <p class="hint mt-1" id="ed-info"></p>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button class="btn pri" onclick="edSave()">💾 Übernehmen</button>
+          <button class="btn" id="ed-rs" onclick="edReset()">↺ Original wiederherstellen</button>
+          <button class="btn" onclick="edResetAll()">↺ Alle Originale</button>
+        </div>
+        <p class="hint mt-2">⚠ Von Hand geänderte Dateien (✎) werden beim Export 1:1 übernommen. Wenn du danach im Designer etwas änderst, aktualisiert sich diese Datei nicht mehr von selbst – stelle dann das Original wieder her oder passe sie hier erneut an. XML und JSON werden beim Übernehmen auf Syntaxfehler geprüft.</p>`);
+      $('modal-in').style.maxWidth = '64rem';
+      window._ED = { raw: F, names, cur: names.includes(start) ? start : names[0], saved: '' };
+      edSelHtml(); edLoad(window._ED.cur);
+    }
+
+    function edLoad(n) {
+      const d = window._ED; if (!d) return;
+      d.cur = n;
+      const txt = S.overrides[n] != null ? S.overrides[n] : d.raw[n];
+      d.saved = txt; $('ed-t').value = txt; $('ed-t').scrollTop = 0;
+      edSelHtml(); edInfo();
+    }
+
+    function edInfo() {
+      const d = window._ED; if (!d || !$('ed-info')) return;
+      const t = $('ed-t').value, ch = S.overrides[d.cur] != null;
+      $('ed-info').textContent = `${d.cur} · ${t.split('\n').length} Zeilen · ${t.length} Zeichen · ${ch ? '✎ von dir geändert' : 'Original (automatisch erzeugt)'}${edDirty() ? ' · ● nicht übernommen' : ''}`;
+      $('ed-rs').disabled = !ch;
+    }
+
+    function edSwitch(n) {
+      const d = window._ED; if (!d) return;
+      if (edDirty() && !confirm('Du hast ungespeicherte Änderungen in dieser Datei. Verwerfen und die andere Datei öffnen?')) { $('ed-sel').value = d.cur; return; }
+      edLoad(n);
+    }
+
+    function edKey(ev) {
+      if (ev.key !== 'Tab') return;
+      ev.preventDefault();
+      const t = ev.target, ind = /\.py$/i.test(window._ED.cur) ? '    ' : '  ';
+      t.setRangeText(ind, t.selectionStart, t.selectionEnd, 'end');
+      edInfo();
+    }
+
+    function edValidate(n, t) {
+      if (/\.xml$/i.test(n)) {
+        const x = new DOMParser().parseFromString(t, 'application/xml'), pe = x.querySelector('parsererror');
+        if (pe) return 'XML-Syntaxfehler: ' + (pe.textContent || '').trim().split('\n')[0].slice(0, 200);
+      }
+      if (/\.json$/i.test(n)) { try { JSON.parse(t); } catch (er) { return 'JSON-Fehler: ' + er.message; } }
+      return '';
+    }
+
+    function edSave() {
+      const d = window._ED; if (!d) return;
+      const n = d.cur, t = $('ed-t').value, err = edValidate(n, t);
+      if (err && !confirm('⚠️ ' + err + '\n\nTrotzdem übernehmen?')) return;
+      if (t === d.raw[n]) delete S.overrides[n]; else S.overrides[n] = t;
+      d.saved = t; save(); edSelHtml(); edInfo(); fc();
+      toast(S.overrides[n] != null ? '✎ „' + n + '“ übernommen – kommt so in die ZIP.' : 'Entspricht dem Original – keine Änderung nötig.');
+    }
+
+    function edReset() {
+      const d = window._ED; if (!d || S.overrides[d.cur] == null) return;
+      if (!confirm('Original von „' + d.cur + '“ wiederherstellen? Deine Änderungen an dieser Datei gehen verloren.')) return;
+      delete S.overrides[d.cur]; save(); edLoad(d.cur); fc(); toast('Original wiederhergestellt.');
+    }
+
+    function edResetAll() {
+      const d = window._ED; if (!d) return;
+      if (!Object.keys(S.overrides).length) return toast('Es gibt keine von Hand geänderten Dateien.');
+      if (!confirm('Alle von Hand geänderten Dateien auf das Original zurücksetzen?')) return;
+      S.overrides = {}; save(); edLoad(d.cur); fc(); toast('Alle Originale wiederhergestellt.');
+    }
+
+    function edClose() {
+      if (edDirty() && !confirm('Ungespeicherte Änderungen verwerfen und den Editor schließen?')) return;
+      closeModal();
     }
 
     // Eigener ZIP-Schreiber (ohne Internet / ohne Fremd-Bibliothek)
@@ -1605,10 +1697,10 @@ if __name__ == '__main__':
         S.folders.forEach(d => { if (!reserved(d)) E.push({ p: root + '/' + d, dir: 1 }); });
         for (const k in F) E.push({ p: root + '/' + k, d: typeof F[k] === 'string' ? enc.encode(F[k]) : b64ToBytes(F[k].b64) });
       } catch (err) { return toast('Fehler beim Erstellen der ZIP-Datei: ' + err.message); }
-      const n = S.assets.shots.length, fl = S.files.length;
+      const n = S.assets.shots.length, fl = S.files.length, ov = Object.keys(S.overrides || {}).length;
       Promise.resolve().then(() => makeZip(E)).then(b => {
         const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = addonId() + '.zip'; a.click();
-        modal(`<h3 class="font-bold text-lg mb-2">✅ ZIP erstellt!</h3><p class="text-sm text-slate-300 mb-3">So kommt es in Kodi:</p><ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1"><li>ZIP-Datei auf das Kodi-Gerät kopieren.</li><li>Kodi: <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (ggf. „Unbekannte Quellen“ erlauben).</li><li>Dein Addon findest du unter <b>Addons → Video-Addons</b>. Beim Öffnen erscheint sofort dein gestaltetes Menü (home.xml) im Vollbild.</li></ol><p class="hint mt-2">Enthalten und in der addon.xml eingetragen: Icon, Fanart${n ? `, ${n} Screenshot${n > 1 ? 's' : ''}` : ''}${fl ? `. Dazu ${fl} eigene Datei${fl > 1 ? 'en' : ''}` : ''}.</p><p class="hint mt-1">Falls sich ein altes Addon gleichen Namens nicht ändert: erst deinstallieren oder die Version erhöhen und neu installieren.</p><button class="btn pri mt-4" onclick="closeModal()">Verstanden</button>`);
+        modal(`<h3 class="font-bold text-lg mb-2">✅ ZIP erstellt!</h3><p class="text-sm text-slate-300 mb-3">So kommt es in Kodi:</p><ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1"><li>ZIP-Datei auf das Kodi-Gerät kopieren.</li><li>Kodi: <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (ggf. „Unbekannte Quellen“ erlauben).</li><li>Dein Addon findest du unter <b>Addons → Video-Addons</b>. Beim Öffnen erscheint sofort dein gestaltetes Menü (home.xml) im Vollbild.</li></ol><p class="hint mt-2">Enthalten und in der addon.xml eingetragen: Icon, Fanart${n ? `, ${n} Screenshot${n > 1 ? 's' : ''}` : ''}${fl ? `. Dazu ${fl} eigene Datei${fl > 1 ? 'en' : ''}` : ''}${ov ? `. ${ov} Datei${ov > 1 ? 'en' : ''} mit deinen Änderungen aus dem Editor` : ''}.</p><p class="hint mt-1">Falls sich ein altes Addon gleichen Namens nicht ändert: erst deinstallieren oder die Version erhöhen und neu installieren.</p><button class="btn pri mt-4" onclick="closeModal()">Verstanden</button>`);
       }).catch(err => {
         toast('Fehler beim Erstellen der ZIP-Datei: ' + err.message);
       });
@@ -1627,19 +1719,62 @@ if __name__ == '__main__':
       localStorage.removeItem('kfe5'); localStorage.removeItem('kfe4'); S = newState('stream'); norm(); hist = []; redoS = []; renderAll(); fit(); toast('Neues Projekt gestartet!');
     }
 
-    function modal(h) { $('modal-in').innerHTML = h; $('modal').classList.remove('hidden'); }
-    function closeModal() { $('modal').classList.add('hidden'); }
-    $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal')) closeModal(); });
+    function modal(h) { window._ED = null; $('modal-in').style.maxWidth = ''; $('modal-in').innerHTML = h; $('modal').classList.remove('hidden'); }
+    function closeModal() { window._ED = null; $('modal').classList.add('hidden'); }
+    // Beim Editor schließt ein Tipp neben das Fenster nicht mehr (Schutz vor verlorenen Änderungen)
+    $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Deine damit gebauten Addons gehören dir.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Deine damit gebauten Addons gehören dir.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
-      modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt Seiten und Elemente. Bilder, Dateien und Einstellungen bleiben erhalten.</p> <div class="grid sm:grid-cols-2 gap-3">${[['stream', '🎬 Streaming-Hub', 'Startseite, Filme, Live TV'], ['live', '📺 Live TV', 'Senderliste mit Abspiel-Buttons'], ['music', '🎵 Musik-Player', 'Play, Weiter, Stopp'], ['empty', '📄 Leer', 'Nur ein Button']].map(t => `<button class="btn text-left p-4" onclick="loadTpl('${t[0]}')"><b class="block text-sm">${t[1]}</b><span class="text-[11px] text-slate-400">${t[2]}</span></button>`).join('')}</div> <button class="btn mt-4" onclick="closeModal()">Abbrechen</button>`);
+      modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt Seiten und Elemente. Bilder, Dateien und Einstellungen bleiben erhalten. Von Hand geänderte Dateien aus dem Editor werden zurückgesetzt.</p> <div class="grid sm:grid-cols-2 gap-3">${[['stream', '🎬 Streaming-Hub', 'Startseite, Filme, Live TV'], ['live', '📺 Live TV', 'Senderliste mit Abspiel-Buttons'], ['music', '🎵 Musik-Player', 'Play, Weiter, Stopp'], ['empty', '📄 Leer', 'Nur ein Button']].map(t => `<button class="btn text-left p-4" onclick="loadTpl('${t[0]}')"><b class="block text-sm">${t[1]}</b><span class="text-[11px] text-slate-400">${t[2]}</span></button>`).join('')}</div> <button class="btn mt-4" onclick="closeModal()">Abbrechen</button>`);
     }
 
     function loadTpl(n) { const keep = { meta: S.meta, mode: S.mode, kodi: S.kodi, theme: S.theme, bgImg: S.bgImg, assets: S.assets, files: S.files, folders: S.folders, settings: S.settings }; S = Object.assign(newState(n), keep); norm(); hist = []; redoS = []; closeModal(); renderAll(); fit(); }
+
+    // ================= SEITE VERLASSEN: nur über den Beenden-Button, sonst Rückfrage =================
+    let allowLeave = false, guardN = 0;
+    const LEAVE_MSG = 'Möchtest du die Seite wirklich verlassen?\n\nDein Projekt bleibt im Browser gespeichert. Zum Beenden nutze den Button „🚪 Beenden“.';
+
+    function guardPush() { try { history.pushState({ kfeGuard: 1 }, '', location.href); guardN++; } catch (e) {} }
+
+    // Tab schließen, Neu laden, Adresse ändern
+    window.addEventListener('beforeunload', ev => {
+      if (allowLeave) return;
+      save(); ev.preventDefault(); ev.returnValue = ''; return '';
+    });
+
+    // Zurück-Taste / Zurück-Geste: Eintrag wieder auffüllen und nachfragen
+    window.addEventListener('popstate', () => {
+      if (allowLeave) return;
+      guardPush();
+      if (confirm(LEAVE_MSG)) leaveNow();
+    });
+
+    function leaveNow() {
+      allowLeave = true; save();
+      try { history.go(-(guardN + 1)); } catch (e) {}
+      setTimeout(() => {
+        try { window.close(); } catch (e) {}
+        setTimeout(() => { location.replace('about:blank'); }, 200);
+      }, 400);
+    }
+
+    function exitApp() {
+      if (edDirty() && !confirm('Im Editor gibt es ungespeicherte Änderungen. Trotzdem beenden?')) return;
+      if (!confirm('Generator beenden?\n\nDein Projekt bleibt im Browser gespeichert. Zusätzlich kannst du es mit „💾 Speichern“ als Datei sichern.')) return;
+      leaveNow();
+    }
+
+    // Chrome zählt History-Einträge ohne Nutzeraktion nicht: darum beim ersten Tippen/Klicken noch einmal auffüllen
+    guardPush();
+    (function () {
+      const once = () => { document.removeEventListener('pointerdown', once, true); document.removeEventListener('keydown', once, true); guardPush(); };
+      document.addEventListener('pointerdown', once, true);
+      document.addEventListener('keydown', once, true);
+    })();
 
     (function init() {
       try { const d = JSON.parse(localStorage.getItem('kfe5') || localStorage.getItem('kfe4')); if (d && d.pages) S = d; } catch (e) {}
