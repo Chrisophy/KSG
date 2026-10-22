@@ -36,6 +36,7 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
   <div><h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">🔌 Kodi Video-Addon Generator <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.0 Pro</span></h1>
   <p class="text-[11px] text-slate-400">Gestalte das Menü deines Addons (home.xml) mit Buttons und Bildern und exportiere alles als installierbare ZIP.</p></div>
   <div class="flex flex-wrap gap-2">
+    <button class="btn" onclick="newProject()">🗑 Neu</button>      
     <button class="btn" onclick="showHelp()">❓ So geht's</button>
     <button class="btn" onclick="showTpl()">📂 Vorlagen</button>
     <button class="btn" onclick="undo()">↩ Rückgängig</button>
@@ -808,6 +809,18 @@ function exportZip(force){
 }
 function exportJson(){const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=slug(S.meta.name)+'_projekt.json';a.click()}
 function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.pages)throw 0;S=d;norm();hist=[];renderAll();fit();toast('Projekt geladen')}catch(e){toast('Datei konnte nicht gelesen werden')}};r.readAsText(f);inp.value=''}
+
+function newProject() {
+  if (!confirm('Wirklich ein neues Projekt starten? Nicht gespeicherte Änderungen gehen verloren!')) return;
+  localStorage.removeItem('kfe5');
+  localStorage.removeItem('kfe4');
+  S = newState('stream');
+  norm();
+  hist = [];
+  renderAll();
+  fit();
+  toast('Neues Projekt gestartet!');
+}
 
 /* ---------- Dialoge ---------- */
 function modal(h){$('modal-in').innerHTML=h;$('modal').classList.remove('hidden')}
