@@ -1,4 +1,4 @@
-<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-2 
+<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-3 
 RECHTLICHER HINWEIS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
 Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern, Umschreiben oder die unautorisierte Weiterverbreitung des Codes ist strengstens untersagt.-->
 <!DOCTYPE html>
@@ -8,7 +8,6 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kodi Video-Addon Generator v8.1 Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oiz/RK654AGN689p5UsL19aae8/fcf14a51A9e12vHFf8a6H2g1344Bef9b8oMvM0+8F6kU5C2d38w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
     input, textarea, select { -webkit-user-select: text !important; user-select: text !important; }
@@ -1266,14 +1265,48 @@ if __name__ == '__main__':
       window._F = F; $('code').textContent = F[names[0]];
     }
 
+    // Eigener ZIP-Schreiber (ohne Internet / ohne Fremd-Bibliothek)
+    const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+    const crc32 = u => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = CRC_T[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+    const b64ToBytes = s => { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+
+    function makeZip(entries) {
+      const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+      const now = new Date();
+      const dt = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF;
+      const dd = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+      entries.forEach(e => {
+        const name = enc.encode(e.p + (e.dir ? '/' : '')), data = e.dir ? new Uint8Array(0) : e.d, crc = e.dir ? 0 : crc32(data);
+        const lh = new DataView(new ArrayBuffer(30));
+        lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+        lh.setUint16(10, dt, true); lh.setUint16(12, dd, true); lh.setUint32(14, crc, true);
+        lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+        parts.push(new Uint8Array(lh.buffer), name, data);
+        const ch = new DataView(new ArrayBuffer(46));
+        ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+        ch.setUint16(12, dt, true); ch.setUint16(14, dd, true); ch.setUint32(16, crc, true);
+        ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true); ch.setUint16(28, name.length, true);
+        ch.setUint32(38, e.dir ? 0x10 : 0, true); ch.setUint32(42, off, true);
+        cen.push(new Uint8Array(ch.buffer), name);
+        off += 30 + name.length + data.length;
+      });
+      const cs = cen.reduce((s, x) => s + x.length, 0), end = new DataView(new ArrayBuffer(22));
+      end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+      end.setUint32(12, cs, true); end.setUint32(16, off, true);
+      return new Blob([...parts, ...cen, new Uint8Array(end.buffer)], { type: 'application/zip' });
+    }
+
     function exportZip(force) {
       if (!force && check().some(x => x[0] === 'w')) return showCheck(true);
-      if (typeof JSZip === 'undefined') return toast('ZIP-Bibliothek nicht geladen – bitte Internetverbindung prüfen.');
-      const zip = new JSZip(), root = zip.folder(addonId()), F = buildFiles();
-      S.folders.forEach(d => { if (!reserved(d)) root.folder(d); });
-      for (const k in F) typeof F[k] === 'string' ? root.file(k, F[k]) : root.file(k, F[k].b64, { base64: true });
+      let E;
+      try {
+        const F = buildFiles(), root = addonId(), enc = new TextEncoder();
+        E = [{ p: root, dir: 1 }];
+        S.folders.forEach(d => { if (!reserved(d)) E.push({ p: root + '/' + d, dir: 1 }); });
+        for (const k in F) E.push({ p: root + '/' + k, d: typeof F[k] === 'string' ? enc.encode(F[k]) : b64ToBytes(F[k].b64) });
+      } catch (err) { return toast('Fehler beim Erstellen der ZIP-Datei: ' + err.message); }
       const n = S.assets.shots.length, fl = S.files.length;
-      zip.generateAsync({ type: 'blob' }).then(b => {
+      Promise.resolve().then(() => makeZip(E)).then(b => {
         const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = addonId() + '.zip'; a.click();
         modal(`<h3 class="font-bold text-lg mb-2">✅ ZIP erstellt!</h3><p class="text-sm text-slate-300 mb-3">So kommt es in Kodi:</p><ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1"><li>ZIP-Datei auf das Kodi-Gerät kopieren.</li><li>Kodi: <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (ggf. „Unbekannte Quellen“ erlauben).</li><li>Dein Addon findest du unter <b>Addons → Video-Addons</b>. Beim Öffnen erscheint sofort dein gestaltetes Menü (home.xml) im Vollbild.</li></ol><p class="hint mt-2">Enthalten und in der addon.xml eingetragen: Icon, Fanart${n ? `, ${n} Screenshot${n > 1 ? 's' : ''}` : ''}${fl ? `. Dazu ${fl} eigene Datei${fl > 1 ? 'en' : ''}` : ''}.</p><p class="hint mt-1">Falls sich ein altes Addon gleichen Namens nicht ändert: erst deinstallieren oder die Version erhöhen und neu installieren.</p><button class="btn pri mt-4" onclick="closeModal()">Verstanden</button>`);
       }).catch(err => {
