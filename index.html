@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kodi Skin Generator v6.0 Pro</title>
+<title>Kodi Video-Addon Generator v8.0 Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -21,6 +21,7 @@ input, textarea, select {-webkit-user-select:text !important;user-select:text !i
 .el.sel{outline:6px solid #fff;outline-offset:4px;z-index:5}
 .pv .el{cursor:pointer}
 .pv .b:hover{background:var(--f)!important;color:#000}
+.pv .pa:hover::after{content:'';position:absolute;left:0;top:0;right:0;bottom:0;background:var(--f);opacity:.35}
 .rz{position:absolute;right:0;bottom:0;width:44px;height:44px;background:#fff;opacity:.9;cursor:nwse-resize;border-radius:12px 0 0 0}
 label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0 3px}
 .hint{font-size:10.5px;color:#64748b;margin-top:2px}
@@ -32,8 +33,8 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
 <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-40">
-  <div><h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">🧩 Kodi Skin Generator <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v6.0 Pro</span></h1>
-  <p class="text-[11px] text-slate-400">Buttons ziehen, Befehl aus der Liste wählen, ZIP exportieren – fertig.</p></div>
+  <div><h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">🔌 Kodi Video-Addon Generator <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.0 Pro</span></h1>
+  <p class="text-[11px] text-slate-400">Gestalte das Menü deines Addons (home.xml) mit Buttons und Bildern und exportiere alles als installierbare ZIP.</p></div>
   <div class="flex flex-wrap gap-2">
     <button class="btn" onclick="showHelp()">❓ So geht's</button>
     <button class="btn" onclick="showTpl()">📂 Vorlagen</button>
@@ -52,10 +53,9 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
     <label class="l">Wie soll es heißen?</label>
     <input id="m-name" class="inp" oninput="setMeta('name',this.value)">
     <p class="hint">Technische ID: <span id="m-id" class="font-mono text-sky-400"></span></p>
-    <label class="l">Was möchtest du bauen?</label>
-    <div class="grid grid-cols-2 gap-2">
-      <button id="mode-skin" class="btn" onclick="setMode('skin')">🎨 Skin<br><span class="text-[10px] text-slate-400">eigene Oberfläche</span></button>
-      <button id="mode-addon" class="btn" onclick="setMode('addon')">🔌 Addon<br><span class="text-[10px] text-slate-400">Menü im Video-Bereich</span></button>
+    <div class="mt-3 rounded-xl border border-sky-500/30 bg-sky-500/5 p-3">
+      <b class="text-xs text-sky-300">🔌 Kodi-Video-Addon mit eigenem Menü</b>
+      <p class="hint mt-1">Du baust ein normales Video-Addon. Dein gestaltetes Menü (<b>home.xml</b>) öffnet sich beim Start des Addons im Vollbild und ersetzt dort die Standard-Ansicht von Kodi. Es ist kein System-Skin.</p>
     </div>
     <div class="grid grid-cols-2 gap-2 mt-2">
       <div><label class="l">Autor</label><input id="m-author" class="inp" oninput="setMeta('author',this.value)"></div>
@@ -70,13 +70,16 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
 
     <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">2 · Hinzufügen</h3>
     <button class="btn pri w-full mt-2" onclick="showLib()">📚 Befehlsliste (Button aus Liste)</button>
-    <p class="hint mt-1 mb-2">Klick = Element erscheint in der Mitte. Dann einfach ziehen.</p>
+    <button class="btn w-full mt-2" onclick="$('f-pic').click()">🖼 Eigenes Bild einfügen</button>
+    <p class="hint mt-1 mb-2">Bilder können reine Deko sein oder eine Funktion bekommen (Klick = Befehl, Seitenwechsel, Video …). Klick = Element erscheint in der Mitte, dann einfach ziehen.</p>
     <div class="grid grid-cols-2 gap-2">
       <button class="btn" onclick="addEl('button')">➕ Button</button>
       <button class="btn" onclick="addEl('text')">🔤 Text</button>
-      <button class="btn" onclick="addEl('image')">🖼 Poster</button>
+      <button class="btn" onclick="addEl('image')">🖼 Poster-Platzhalter</button>
       <button class="btn" onclick="addEl('box')">⬛ Fläche</button>
     </div>
+    <input type="file" id="f-pic" accept="image/*" multiple class="hidden" onchange="addPics(this)">
+    <input type="file" id="f-picrep" accept="image/*" class="hidden" onchange="replacePic(this)">
     <p class="hint mt-3 mb-1">Schnell-Buttons (Aktion schon eingestellt):</p>
     <div class="flex flex-wrap gap-1.5" id="quick"></div>
 
@@ -98,7 +101,7 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
       <button class="btn" onclick="dupPage()">⧉ Diese Seite duplizieren</button>
     </div>
 
-    <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">5 · Bilder & Dateien</h3>
+    <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">5 · Addon-Bilder & Dateien</h3>
     <p class="hint mb-1">Icon, Fanart und Screenshots kommen automatisch ins Addon <b>und</b> in die addon.xml. Ohne eigenes Bild wird ein Icon/Fanart erzeugt.</p>
     <div class="row mt-2"><div id="pv-icon" class="w-12 shrink-0 flex justify-center"></div><div class="flex-1 min-w-0"><b class="text-xs">Icon</b><div class="hint">quadratisch</div></div><button class="btn" onclick="$('f-icon').click()">Wählen</button><button class="btn" onclick="noAsset('icon')">✖</button></div>
     <div class="row mt-2"><div id="pv-fan" class="w-12 shrink-0 flex justify-center"></div><div class="flex-1 min-w-0"><b class="text-xs">Fanart</b><div class="hint">Querformat 16:9</div></div><button class="btn" onclick="$('f-fan').click()">Wählen</button><button class="btn" onclick="noAsset('fanart')">✖</button></div>
@@ -138,12 +141,16 @@ label.l{display:block;font-size:11px;font-weight:600;color:#94a3b8;margin:10px 0
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const uid=()=>Math.random().toString(36).slice(2,8);
-const GUI={'19':'5.15.0','20':'5.16.0','21':'5.17.0'},PY={'19':'3.0.0','20':'3.0.1','21':'3.0.1'};
+const PY={'19':'3.0.0','20':'3.0.1','21':'3.0.1'};
+const MEDIA='resources/skins/Default/media/';
 const THEMES={Standard:['#0284c7','#38bdf8','#0f172a'],Cyberpunk:['#d946ef','#22d3ee','#180828'],Matrix:['#15803d','#4ade80','#052e16'],Sonnenuntergang:['#ea580c','#facc15','#1c0a05'],Hell:['#2563eb','#f59e0b','#e2e8f0']};
-const TYPES={button:'Button',text:'Text',image:'Poster-Platzhalter',box:'Fläche'};
-const ACTS=[['none','Nichts (nur Optik)'],['page','Andere Seite öffnen'],['addon','Anderes Addon öffnen'],['play','Video / Stream abspielen'],['playpause','Play / Pause'],['next','Nächster Titel'],['stop','Wiedergabe stoppen'],['back','Zurück'],['settings','Kodi-Einstellungen öffnen'],['quit','Kodi beenden'],['custom','Kodi-Befehl (aus Liste oder selbst)']];
-const ACTHINT={page:'Wähle die Seite, die sich öffnen soll.',addon:'Adresse des Addons, z.B. plugin://plugin.video.youtube/',play:'Internet-Adresse (https://…) oder Dateipfad des Videos.',custom:'Am einfachsten über „Befehlsliste“. Profis können hier selbst etwas eintragen.'};
+const TYPES={button:'Button',text:'Text',image:'Poster-Platzhalter',box:'Fläche',pic:'Bild'};
+const ACTS=[['none','Nichts (nur Optik)'],['page','Andere Seite öffnen'],['addon','Anderes Addon öffnen'],['play','Video / Stream abspielen'],['playpause','Play / Pause'],['next','Nächster Titel'],['stop','Wiedergabe stoppen'],['back','Zurück (vorherige Seite)'],['settings','Kodi-Einstellungen öffnen'],['quit','Kodi beenden'],['custom','Kodi-Befehl (aus Liste oder selbst)']];
+const ACTHINT={page:'Wähle die Seite, die sich öffnen soll.',addon:'Adresse des Addons, z.B. plugin://plugin.video.youtube/',play:'Internet-Adresse (https://…) oder Dateipfad des Videos.',custom:'Am einfachsten über „Befehlsliste“. Profis können hier selbst etwas eintragen.',back:'Geht zur vorherigen Seite. Auf der Startseite schließt es das Addon.'};
 const QUICK=[['🎬 Filme','page'],['📺 Live TV','page'],['🎵 Musik','page'],['⚙ Einstellungen','settings'],['⏯ Play/Pause','playpause'],['⬅ Zurück','back']];
+/* Befehle, nach denen sich das Addon-Menü schließen muss, damit Kodi sie ausführen kann */
+const CLOSE_CMDS=['activatewindow','replacewindow','runaddon','runscript','playmedia','quit','restartapp','reboot','powerdown','suspend','hibernate','shutdown','activatescreensaver'];
+const needClose=c=>{const s=String(c||'').trim().toLowerCase();return CLOSE_CMDS.some(x=>s.startsWith(x))};
 
 /* ---------- Befehlsliste: Kategorie | Symbol | Name | Befehl | Erklärung ---------- */
 const LIB=`Navigation|🏠|Startseite|ActivateWindow(home)|Zurück zum Kodi-Hauptmenü
@@ -211,10 +218,13 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 const CATS=['Alle',...new Set(LIB.map(x=>x.c))];
 let L={q:'',c:'Alle'},FD='';
 
-let S,hist=[],lastH=0,drag=null,scale=1,saveWarned=false;
+let S,hist=[],lastH=0,drag=null,scale=1,saveWarned=false,pvNav=[0];
 
 /* ---------- Elemente & Vorlagen ---------- */
-const mk=(type,o={})=>Object.assign({id:uid(),type,x:760,y:440,w:type==='text'?600:type==='image'?300:type==='box'?500:420,h:type==='text'?80:type==='image'?450:type==='box'?300:100,label:type==='button'?'Neuer Button':type==='text'?'Text hier':'',icon:'',color:null,act:{t:'none',v:''}},o);
+const mk=(type,o={})=>Object.assign({id:uid(),type,x:760,y:440,
+  w:type==='text'?600:type==='image'?300:type==='box'?500:type==='pic'?400:420,
+  h:type==='text'?80:type==='image'?450:type==='box'?300:type==='pic'?400:100,
+  label:type==='button'?'Neuer Button':type==='text'?'Text hier':'',icon:'',color:null,img:null,fit:'keep',act:{t:'none',v:''}},o);
 const btn=(label,icon,x,y,t,v='',extra={})=>mk('button',Object.assign({label,icon,x,y,w:420,h:110,act:{t,v}},extra));
 function tpl(name){
   const p=(id,n,els)=>({id,name:n,els});
@@ -225,14 +235,24 @@ function tpl(name){
   if(name==='music')return [p('home','Start',[mk('text',{label:'Musik Player',x:120,y:90,w:800,h:110}),mk('box',{x:120,y:260,w:600,h:600,color:'#1e293b'}),btn('⏯ Play / Pause','',800,300,'playpause'),btn('Nächster Titel','⏭',800,440,'next'),btn('Stopp','⏹',800,580,'stop'),btn('Zurück','⬅',800,760,'back')])];
   return [p('home','Start',[mk('text',{label:'Mein Menü',x:120,y:90,w:800,h:110}),btn('Mein erster Button','⭐',120,300,'none')])];
 }
-const newState=n=>({mode:'skin',kodi:'20',snap:true,meta:{name:'Mein Kodi Projekt',author:'Ich',ver:'1.0.0',desc:'',lic:'GPL-2.0-or-later'},theme:{primary:THEMES.Standard[0],focus:THEMES.Standard[1],bg:THEMES.Standard[2]},bgImg:null,assets:{icon:null,fanart:null,shots:[]},files:[],folders:[],pages:tpl(n||'stream'),cur:0,sel:null,pv:false});
-function norm(){S.pv=false;S.sel=null;S.bgImg=S.bgImg||null;S.meta=Object.assign({desc:'',lic:'GPL-2.0-or-later'},S.meta);S.assets=Object.assign({icon:null,fanart:null,shots:[]},S.assets||{});S.assets.shots=S.assets.shots||[];S.files=S.files||[];S.folders=S.folders||[];if(S.cur>=S.pages.length)S.cur=0}
+const newState=n=>({mode:'addon',kodi:'20',snap:true,meta:{name:'Mein Kodi Projekt',author:'Ich',ver:'1.0.0',desc:'',lic:'GPL-2.0-or-later'},theme:{primary:THEMES.Standard[0],focus:THEMES.Standard[1],bg:THEMES.Standard[2]},bgImg:null,assets:{icon:null,fanart:null,shots:[]},imgs:{},files:[],folders:[],pages:tpl(n||'stream'),cur:0,sel:null,pv:false});
+function norm(){
+  S.mode='addon';S.pv=false;S.sel=null;S.bgImg=S.bgImg||null;
+  S.meta=Object.assign({desc:'',lic:'GPL-2.0-or-later'},S.meta);
+  S.assets=Object.assign({icon:null,fanart:null,shots:[]},S.assets||{});S.assets.shots=S.assets.shots||[];
+  S.files=S.files||[];S.folders=S.folders||[];S.imgs=S.imgs||{};
+  S.pages.forEach(p=>p.els.forEach(e=>{if(!e.act)e.act={t:'none',v:''};if(!e.fit)e.fit='keep'}));
+  if(S.cur>=S.pages.length)S.cur=0;
+  gcImgs();
+}
+function gcImgs(){const u=new Set();S.pages.forEach(p=>p.els.forEach(e=>{if(e.img)u.add(e.img)}));Object.keys(S.imgs).forEach(k=>{if(!u.has(k))delete S.imgs[k]})}
 
 /* ---------- Hilfsfunktionen ---------- */
 const page=()=>S.pages[S.cur];
 const sel=()=>page().els.find(e=>e.id===S.sel);
+const canAct=()=>{const e=sel();return !!e&&(e.type==='button'||e.type==='pic')};
 const slug=s=>(s||'projekt').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9]+/g,'').slice(0,30)||'projekt';
-const addonId=()=>(S.mode==='skin'?'skin.':'plugin.video.')+slug(S.meta.name);
+const addonId=()=> 'plugin.video.'+slug(S.meta.name);
 const snapV=v=>S.snap?Math.round(v/20)*20:Math.round(v);
 const cleanPath=s=>String(s||'').replace(/\\/g,'/').split('/').map(x=>x.trim()).filter(x=>x&&x!=='.'&&x!=='..').map(x=>x.replace(/[<>:"|?*]/g,'_')).join('/');
 function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('opacity-0','translate-y-10');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('opacity-0','translate-y-10'),2600)}
@@ -241,13 +261,13 @@ function undo(){if(!hist.length)return toast('Nichts zum Rückgängig machen');S
 function save(){try{localStorage.setItem('kfe5',JSON.stringify(S))}catch(e){if(!saveWarned){saveWarned=true;toast('Browser-Speicher voll – bitte über „💾 Speichern“ ein Projekt-Backup anlegen.')}}}
 function loadImgFile(f,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>cb(im);im.onerror=()=>toast('Bild konnte nicht gelesen werden');im.src=r.result};r.onerror=()=>toast('Datei konnte nicht gelesen werden');r.readAsDataURL(f)}
 function coverCanvas(im,w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const k=Math.max(w/im.width,h/im.height),dw=im.width*k,dh=im.height*k;c.getContext('2d').drawImage(im,(w-dw)/2,(h-dh)/2,dw,dh);return c}
+function pvReset(){pvNav=S.cur===0?[0]:[0,S.cur]}
 
 /* ---------- Rendering ---------- */
 function renderAll(){renderLeft();renderPages();renderStage();renderProps();save()}
 function fc(){$('fcount').textContent=`Eigene Dateien: ${S.files.length} · Ordner: ${S.folders.length}`}
 function renderLeft(){
   $('m-name').value=S.meta.name;$('m-author').value=S.meta.author;$('m-ver').value=S.meta.ver;$('m-desc').value=S.meta.desc||'';$('m-lic').value=S.meta.lic||'';$('m-kodi').value=S.kodi;$('m-id').textContent=addonId();
-  $('mode-skin').classList.toggle('pri',S.mode==='skin');$('mode-addon').classList.toggle('pri',S.mode==='addon');
   ['primary','focus','bg'].forEach(k=>$('t-'+k).value=S.theme[k]);$('snap').checked=S.snap;$('stage').classList.toggle('nogrid',!S.snap);$('themes').innerHTML=Object.keys(THEMES).map(n=>`<button class="btn" onclick="applyTheme('${n}')">${n}</button>`).join('');
   $('quick').innerHTML=QUICK.map((q,i)=>`<button class="btn" onclick="quickAdd(${i})">${q[0]}</button>`).join('');
   $('btn-pv').textContent=S.pv?'✏ Bearbeiten':'▶ Testen';$('btn-pv').classList.toggle('pri',S.pv);
@@ -271,6 +291,11 @@ function renderStage(){
     if(e.type==='button'){s+=`background:${c};border-radius:18px;font-size:${Math.min(46,e.h*.4)}px;font-weight:600;`;cls+=' b';inner=esc((e.icon?e.icon+' ':'')+e.label)}
     else if(e.type==='text'){s+=`font-size:${e.h*.6}px;font-weight:700;justify-content:flex-start;text-align:left;color:${e.color||'#fff'};`;inner=esc(e.label)}
     else if(e.type==='image'){s+=`background:${c};border-radius:14px;font-size:${Math.min(40,e.w*.14)}px;opacity:.9;`;inner='🖼 '+esc(e.label||'')}
+    else if(e.type==='pic'){
+      const im=S.imgs[e.img],sz={stretch:'100% 100%',keep:'contain',scale:'cover'}[e.fit]||'contain';
+      if(im)s+=`background:url('${im.d}') center/${sz} no-repeat;`;else{s+='background:#334155;font-size:36px;';inner='🖼 Bild fehlt'}
+      if(e.act&&e.act.t!=='none')cls+=' pa';
+    }
     else s+=`background:${c};border-radius:14px;opacity:.85;`;
     const on=!S.pv&&e.id===S.sel;
     return `<div class="${cls}${on?' sel':''}" data-id="${e.id}" style="${s}">${inner}${on?'<div class="rz" data-rz="1"></div>':''}</div>`}).join('');
@@ -278,31 +303,35 @@ function renderStage(){
 function field(l,h,hint){return `<label class="l">${l}</label>${h}${hint?`<p class="hint">${hint}</p>`:''}`}
 function renderProps(){
   const e=sel(),p=$('props');
-  if(!e){p.innerHTML='<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button>';return}
+  if(!e){p.innerHTML='<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button><button class="btn w-full mt-2" onclick="$(\'f-pic\').click()">🖼 Eigenes Bild einfügen</button>';return}
   let h=`<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}</b><div class="flex gap-1"><button class="btn" onclick="dupEl()">⧉</button><button class="btn" onclick="delEl()">🗑</button></div></div>`;
-  if(e.type!=='box')h+=field('Beschriftung',`<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
+  if(e.type!=='box'&&e.type!=='pic')h+=field('Beschriftung',`<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
   if(e.type==='button')h+=field('Symbol (Emoji)',`<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`,'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
-  h+=field('Farbe',`<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.color||(e.type==='text'?'#ffffff':S.theme.primary)}" oninput="setP('color',this.value)"><button class="btn" onclick="setP('color',null);renderProps()">Standard</button></div>`);
+  if(e.type==='pic'){
+    h+=`<label class="l">Bild</label><button class="btn w-full" onclick="$('f-picrep').click()">🔄 Anderes Bild wählen</button>`;
+    h+=field('Bildanpassung',`<select class="inp" onchange="setP('fit',this.value)"><option value="keep" ${e.fit==='keep'?'selected':''}>Ganzes Bild zeigen (Seitenverhältnis behalten)</option><option value="scale" ${e.fit==='scale'?'selected':''}>Fläche füllen (Rand wird abgeschnitten)</option><option value="stretch" ${e.fit==='stretch'?'selected':''}>Strecken auf die Fläche</option></select>`);
+  }
+  else h+=field('Farbe',`<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.color||(e.type==='text'?'#ffffff':S.theme.primary)}" oninput="setP('color',this.value)"><button class="btn" onclick="setP('color',null);renderProps()">Standard</button></div>`);
   h+=`<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x','y','w','h'].map(k=>`<div><span class="hint">${k==='w'?'Breite':k==='h'?'Höhe':k.toUpperCase()}</span><input id="p-${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div>
   <div class="grid grid-cols-3 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder()">⬆ nach vorn</button></div>`;
-  if(e.type==='button'){
+  if(e.type==='button'||e.type==='pic'){
     const known=e.act.t==='custom'&&LIB.find(x=>x.v===e.act.v);
-    h+=`<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ Was passiert beim Klick?</b>
+    h+=`<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${e.type==='pic'?'Funktion des Bildes (optional)':'Was passiert beim Klick?'}</b>
     <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button>
     <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a=>`<option value="${a[0]}" ${a[0]===e.act.t?'selected':''}>${a[1]}</option>`).join('')}</select>`;
     if(e.act.t==='page')h+=`<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q=>`<option value="${q.id}" ${q.id===e.act.v?'selected':''}>${esc(q.name)}</option>`).join('')}</select>`;
     else if(ACTHINT[e.act.t])h+=`<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
     if(known)h+=`<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
-    h+=`<p class="hint">${ACTHINT[e.act.t]||'Dieser Button macht nichts, außer gut auszusehen.'}</p></div>`;
+    h+=`<p class="hint">${ACTHINT[e.act.t]||(e.type==='pic'?'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.':'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
   }
   p.innerHTML=h;
 }
 
 /* ---------- Befehlsliste ---------- */
 function showLib(){
-  const b=sel()&&sel().type==='button';
+  const b=canAct();
   modal(`<div class="flex justify-between items-center mb-2"><b>📚 Befehlsliste</b><button class="btn" onclick="closeModal()">Schließen</button></div>
-  <p class="hint mb-2">${b?'Tippe auf <b>Einsetzen</b>, um den Befehl dem markierten Button zu geben – oder auf <b>＋ Neuer Button</b>.':'Tippe auf <b>＋ Neuer Button</b>, um einen fertigen Button mit diesem Befehl zu erzeugen.'}</p>
+  <p class="hint mb-2">${b?'Tippe auf <b>Einsetzen</b>, um den Befehl dem markierten Element zu geben – oder auf <b>＋ Neuer Button</b>.':'Tippe auf <b>＋ Neuer Button</b>, um einen fertigen Button mit diesem Befehl zu erzeugen.'}</p>
   <input id="lib-q" class="inp mb-2" placeholder="🔍 Suchen, z.B. Filme, Lautstärke, Neustart …" oninput="L.q=this.value;libList()" value="${esc(L.q)}">
   <div class="flex flex-wrap gap-1.5 mb-3" id="lib-c"></div>
   <div id="lib-l" class="space-y-1.5 overflow-y-auto" style="max-height:50vh"></div>
@@ -310,16 +339,37 @@ function showLib(){
   libList();
 }
 function libList(){
-  const q=L.q.trim().toLowerCase(),b=sel()&&sel().type==='button';
+  const q=L.q.trim().toLowerCase(),b=canAct();
   $('lib-c').innerHTML=CATS.map((c,i)=>`<button class="btn ${c===L.c?'pri':''}" onclick="L.c=CATS[${i}];libList()">${c}</button>`).join('');
   const r=LIB.map((x,i)=>[x,i]).filter(([x])=>(L.c==='Alle'||x.c===L.c)&&(!q||(x.l+' '+x.d+' '+x.v+' '+x.c).toLowerCase().includes(q)));
   $('lib-l').innerHTML=r.length?r.map(([x,i])=>`<div class="row"><span class="text-xl">${x.i}</span><div class="flex-1 min-w-0"><b class="text-xs">${esc(x.l)}</b><div class="hint">${esc(x.d)}</div><code>${esc(x.v)}</code></div><div class="flex flex-col gap-1">${b?`<button class="btn pri" onclick="useCmd(${i},false)">Einsetzen</button>`:''}<button class="btn" onclick="useCmd(${i},true)">＋ Neuer Button</button></div></div>`).join(''):'<p class="text-sm text-slate-400">Nichts gefunden – versuche ein anderes Wort.</p>';
 }
 function useCmd(i,nw){
   const x=LIB[i],e=sel();
-  if(nw||!e||e.type!=='button'){closeModal();addEl('button',{label:x.l,icon:x.i,act:{t:'custom',v:x.v}});return}
-  hpush(true);e.act={t:'custom',v:x.v};if(!e.label||e.label==='Neuer Button'){e.label=x.l;e.icon=x.i}
+  if(nw||!canAct()){closeModal();addEl('button',{label:x.l,icon:x.i,act:{t:'custom',v:x.v}});return}
+  hpush(true);e.act={t:'custom',v:x.v};if(e.type==='button'&&(!e.label||e.label==='Neuer Button')){e.label=x.l;e.icon=x.i}
   closeModal();renderStage();renderProps();save();toast('Befehl eingesetzt: '+x.l);
+}
+
+/* ---------- Eigene Bilder im Menü (mit oder ohne Funktion) ---------- */
+function prepImg(im,type){
+  const k=Math.min(1,1920/im.width,1080/im.height),w=Math.max(1,Math.round(im.width*k)),h=Math.max(1,Math.round(im.height*k));
+  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+  const png=/png|gif|webp|svg/i.test(type||'');
+  return {d:png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.88),ext:png?'png':'jpg',w,h};
+}
+function addPics(inp){
+  const fs=[...inp.files];inp.value='';if(!fs.length)return;
+  fs.forEach((f,k)=>loadImgFile(f,im=>{
+    const o=prepImg(im,f.type),id=uid();S.imgs[id]=o;
+    const r=Math.min(1,600/o.w,600/o.h);
+    addEl('pic',{img:id,w:Math.max(40,Math.round(o.w*r)),h:Math.max(40,Math.round(o.h*r))});
+    const e=sel();if(e&&k){e.x=Math.max(0,Math.min(1920-e.w,e.x+k*40));e.y=Math.max(0,Math.min(1080-e.h,e.y+k*40));renderStage();renderProps();save()}
+  }));
+}
+function replacePic(inp){
+  const e=sel(),f=inp.files[0];inp.value='';if(!f||!e||e.type!=='pic')return;
+  loadImgFile(f,im=>{hpush(true);const o=prepImg(im,f.type),id=uid();S.imgs[id]=o;e.img=id;e.h=Math.max(40,Math.min(1080-e.y,Math.round(e.w*o.h/o.w)));renderStage();renderProps();save();toast('Bild ersetzt')});
 }
 
 /* ---------- Bilder (Icon, Fanart, Screenshots, Hintergrund) ---------- */
@@ -338,7 +388,7 @@ function noBg(){if(!S.bgImg)return;S.bgImg=null;renderAll();toast('Hintergrundbi
 /* ---------- Ordner & Dateien ---------- */
 function showFiles(){
   modal(`<div class="flex justify-between items-center mb-2"><b>📁 Ordner & Dateien im Addon</b><button class="btn" onclick="closeModal()">Schließen</button></div>
-  <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Bilder, Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart und Screenshots brauchst du hier nicht – die werden automatisch eingebaut.</p>
+  <p class="hint mb-3">Lege eigene Ordner an und füge Dateien hinzu (Skripte, Playlists …). Alles landet beim Export in der ZIP. Icon, Fanart, Screenshots und Menü-Bilder brauchst du hier nicht – die werden automatisch eingebaut. Der Bereich <b>resources/skins</b> ist für das Menü reserviert.</p>
   <div class="flex gap-2 mb-2"><input id="nd" class="inp" placeholder="Neuer Ordner, z.B. resources/lib"><button class="btn" onclick="addDir()">＋ Ordner</button></div>
   <div class="flex gap-2 mb-2"><select id="fd" class="inp" onchange="FD=this.value"></select><button class="btn pri" onclick="$('f-add').click()">＋ Dateien hinzufügen</button></div>
   <p class="hint mb-2">Die Dateien kommen in den oben gewählten Ordner. Max. 4 MB pro Datei.</p>
@@ -363,18 +413,19 @@ function addDir(){
   let q='';p.split('/').forEach(x=>{q+=(q?'/':'')+x;if(!S.folders.includes(q))S.folders.push(q)});
   $('nd').value='';FD=p;fileList();save();toast('Ordner angelegt.');
 }
+const reserved=p=>p==='addon.py'||p==='addon.xml'||p==='pages.json'||p.startsWith('resources/skins');
 function onFiles(inp){
   const fs=[...inp.files];inp.value='';if(!fs.length)return;
   Promise.all(fs.map(f=>new Promise(res=>{
     if(f.size>4e6){toast(`„${f.name}“ ist zu groß (max. 4 MB).`);return res()}
     const r=new FileReader();
-    r.onload=()=>{const p=cleanPath((FD?FD+'/':'')+f.name);if(p==='addon.xml'){toast('Die addon.xml wird automatisch erzeugt.');return res()}S.files=S.files.filter(x=>x.p!==p);S.files.push({p,d:r.result});res()};
+    r.onload=()=>{const p=cleanPath((FD?FD+'/':'')+f.name);if(reserved(p)){toast('Diese Datei wird automatisch erzeugt und kann nicht ersetzt werden.');return res()}S.files=S.files.filter(x=>x.p!==p);S.files.push({p,d:r.result});res()};
     r.onerror=()=>res();r.readAsDataURL(f);
   }))).then(()=>{fileList();renderLeft();save();toast('Dateien hinzugefügt.')});
 }
 function addText(){
   const p=cleanPath((FD?FD+'/':'')+$('tf-n').value);if(!$('tf-n').value.trim())return toast('Bitte einen Dateinamen eingeben.');
-  if(p==='addon.xml')return toast('Die addon.xml wird automatisch erzeugt.');
+  if(reserved(p))return toast('Diese Datei wird automatisch erzeugt.');
   S.files=S.files.filter(x=>x.p!==p);S.files.push({p,d:'data:text/plain;base64,'+btoa(unescape(encodeURIComponent($('tf-c').value)))});
   $('tf-n').value='';$('tf-c').value='';fileList();save();toast('Datei angelegt.');
 }
@@ -388,7 +439,7 @@ function delEntry(i){
 /* ---------- Bearbeiten ---------- */
 function setP(k,v){const e=sel();if(!e)return;hpush();e[k]=v;renderStage();save()}
 function setA(v){const e=sel();hpush();e.act.v=v;save()}
-function setAT(t){const e=sel();hpush(true);e.act={t,v:t==='page'?(S.pages.find(q=>q!==page())||S.pages[0]).id:''};renderProps();save()}
+function setAT(t){const e=sel();hpush(true);e.act={t,v:t==='page'?(S.pages.find(q=>q!==page())||S.pages[0]).id:''};renderStage();renderProps();save()}
 function addEl(type,o){hpush(true);const e=mk(type,o||{});e.x=snapV(960-e.w/2);e.y=snapV(540-e.h/2);page().els.push(e);S.sel=e.id;renderStage();renderProps();save();toast('Element hinzugefügt!')}
 function quickAdd(i){const q=QUICK[i],ic=q[0].split(' ')[0],lb=q[0].slice(ic.length+1);
   let v='';if(q[1]==='page'){const o=S.pages.find(p=>p!==page());v=o?o.id:S.pages[0].id}
@@ -398,15 +449,14 @@ function dupEl(){const e=sel();if(!e)return;hpush(true);const c=JSON.parse(JSON.
 function center(a){const e=sel();if(!e)return;hpush(true);if(a==='x')e.x=Math.round((1920-e.w)/2);else e.y=Math.round((1080-e.h)/2);renderStage();renderProps();save()}
 function zOrder(){const e=sel();if(!e)return;hpush(true);page().els=page().els.filter(x=>x!==e).concat(e);renderStage();save()}
 function setMeta(k,v){S.meta[k]=v;$('m-id').textContent=addonId();save()}
-function setMode(m){S.mode=m;renderLeft();save()}
 function setTheme(k,v){S.theme[k]=v;renderStage();save()}
 function applyTheme(n){const t=THEMES[n];S.theme={primary:t[0],focus:t[1],bg:t[2]};renderAll()}
-function gotoPage(i){S.cur=i;S.sel=null;renderAll()}
+function gotoPage(i){S.cur=i;S.sel=null;if(S.pv)pvReset();renderAll()}
 function addPage(){const n=prompt('Name der neuen Seite?','Neue Seite');if(!n)return;hpush(true);S.pages.push({id:uid(),name:n,els:[mk('text',{label:n,x:120,y:60,w:800,h:100}),btn('Zurück','⬅',120,900,'back')]});S.cur=S.pages.length-1;S.sel=null;renderAll();toast('Seite angelegt.')}
 function dupPage(){const c=JSON.parse(JSON.stringify(page()));c.id=uid();c.name=c.name+' (Kopie)';c.els.forEach(e=>e.id=uid());S.pages.push(c);S.cur=S.pages.length-1;S.sel=null;renderAll();toast('Seite dupliziert.')}
 function renamePage(){const n=prompt('Neuer Name?',page().name);if(n){page().name=n;renderAll()}}
-function delPage(){if(!confirm('Diese Seite wirklich löschen?'))return;hpush(true);const id=page().id;S.pages.splice(S.cur,1);S.pages.forEach(p=>p.els.forEach(e=>{if(e.act.t==='page'&&e.act.v===id)e.act={t:'none',v:''}}));S.cur=0;S.sel=null;renderAll()}
-function togglePv(){S.pv=!S.pv;S.sel=null;renderAll();if(S.pv)toast('Testmodus: Klicke auf Buttons, um die Aktionen auszuprobieren.')}
+function delPage(){if(!confirm('Diese Seite wirklich löschen?'))return;hpush(true);const id=page().id;S.pages.splice(S.cur,1);S.pages.forEach(p=>p.els.forEach(e=>{if(e.act&&e.act.t==='page'&&e.act.v===id)e.act={t:'none',v:''}}));S.cur=0;S.sel=null;renderAll()}
+function togglePv(){S.pv=!S.pv;S.sel=null;if(S.pv)pvReset();renderAll();if(S.pv)toast('Testmodus: Klicke auf Buttons und Bilder, um die Aktionen auszuprobieren.')}
 function arrange(){
   const b=page().els.filter(e=>e.type==='button').sort((a,c)=>a.y-c.y||a.x-c.x);if(!b.length)return toast('Auf dieser Seite gibt es keine Buttons.');
   hpush(true);const gap=30,tot=b.reduce((s,e)=>s+e.h+gap,-gap);let y=Math.max(200,Math.round((1080-tot)/2));
@@ -449,46 +499,68 @@ document.addEventListener('keydown',ev=>{
 window.addEventListener('resize',fit);
 
 /* ---------- Aktionen ---------- */
+/* Kodi-Befehl für eine Aktion (Seitenwechsel und „Zurück“ erledigt das Addon selbst) */
 function actCmd(e){
   const a=e.act;
   switch(a.t){
-    case 'page':{const i=S.pages.findIndex(p=>p.id===a.v);return i<=0?'ActivateWindow(home)':`ActivateWindow(${1100+i})`}
     case 'addon':return `ActivateWindow(videos,${a.v},return)`;
     case 'play':return `PlayMedia(${a.v})`;
     case 'playpause':return 'PlayerControl(Play)';
     case 'next':return 'PlayerControl(Next)';
     case 'stop':return 'PlayerControl(Stop)';
-    case 'back':return 'Action(PreviousMenu)';
     case 'settings':return 'ActivateWindow(settings)';
     case 'quit':return 'Quit';
     case 'custom':return a.v;
   }return '';
 }
+/* Aktion in der Form, wie das Addon sie aus pages.json liest */
+function actSpec(e){
+  const a=e.act||{t:'none'};
+  if(a.t==='none')return null;
+  if(a.t==='page')return {k:'page',v:a.v};
+  if(a.t==='back')return {k:'back'};
+  const c=actCmd(e);
+  return c?{k:'cmd',c,close:needClose(c)}:null;
+}
 function runAct(e){
-  if(!e||e.type!=='button')return;
-  if(e.act.t==='page'){const i=S.pages.findIndex(p=>p.id===e.act.v);if(i>=0){S.cur=i;renderAll();return}}
-  if(e.act.t==='back'&&S.cur>0){S.cur=0;renderAll();return}
-  const c=actCmd(e);toast(c?`Kodi würde ausführen: ${c}`:'Dieser Button hat keine Aktion.');
+  if(!e||(e.type!=='button'&&e.type!=='pic'))return;
+  const a=e.act;
+  if(a.t==='none'){if(e.type==='button')toast('Dieser Button hat keine Aktion.');return}
+  if(a.t==='page'){
+    const i=S.pages.findIndex(p=>p.id===a.v);
+    if(i<0)return toast('Die Ziel-Seite gibt es nicht mehr.');
+    if(i===S.cur)return;
+    const k=pvNav.indexOf(i);if(k>=0)pvNav.length=k+1;else pvNav.push(i);
+    S.cur=i;renderAll();return;
+  }
+  if(a.t==='back'){
+    if(pvNav.length>1){pvNav.pop();S.cur=pvNav[pvNav.length-1];renderAll()}
+    else toast('Zurück: Hier würde sich das Addon schließen.');
+    return;
+  }
+  const c=actCmd(e);
+  toast(c?`Kodi würde ausführen: ${c}${needClose(c)?' (das Menü schließt sich vorher)':''}`:'Diese Aktion ist noch nicht ausgefüllt.');
 }
 
 /* ---------- Prüfen ---------- */
+const focusables=p=>p.els.filter(e=>e.type==='button'||(e.type==='pic'&&e.act&&e.act.t!=='none'));
 function check(){
   const r=[];
   S.pages.forEach((p,i)=>{
     p.els.forEach(e=>{
-      if(e.type!=='button')return;
-      const a=e.act,n=`„${e.label}“ (Seite ${p.name})`;
-      if(a.t==='none')r.push(['i',`${n} hat noch keine Aktion.`]);
+      if(e.type==='pic'&&!S.imgs[e.img])r.push(['w',`Auf Seite „${p.name}“ fehlt die Bilddatei eines Bildes.`]);
+      if(e.type!=='button'&&e.type!=='pic')return;
+      const a=e.act,n=`„${e.label||'Bild'}“ (Seite ${p.name})`;
+      if(a.t==='none'){if(e.type==='button')r.push(['i',`${n} hat noch keine Aktion.`])}
       else if(a.t==='play'&&(!a.v||a.v==='https://'))r.push(['w',`${n}: Es fehlt die Video-Adresse.`]);
       else if((a.t==='addon'||a.t==='custom')&&!a.v)r.push(['w',`${n}: Es fehlt der Befehl bzw. die Adresse.`]);
       else if(a.t==='custom'&&/DEINE\.ADDON\.ID|PlayMedia\(https:\/\/\)$/.test(a.v))r.push(['w',`${n}: Im Befehl steht noch ein Platzhalter, bitte anpassen.`]);
       else if(a.t==='page'&&!S.pages.some(q=>q.id===a.v))r.push(['w',`${n}: Die Ziel-Seite gibt es nicht mehr.`]);
     });
-    if(!p.els.some(e=>e.type==='button'))r.push(['w',`Seite „${p.name}“ hat keinen Button.`]);
-    if(i>0&&!S.pages.some(q=>q.els.some(e=>e.type==='button'&&e.act.t==='page'&&e.act.v===p.id)))r.push(['w',`Seite „${p.name}“ ist nicht erreichbar – kein Button führt dorthin.`]);
+    if(!focusables(p).length)r.push(['w',`Seite „${p.name}“ hat keinen anklickbaren Button oder Bild – damit kann man sie in Kodi nicht bedienen.`]);
+    if(i>0&&!S.pages.some(q=>q.els.some(e=>(e.type==='button'||e.type==='pic')&&e.act&&e.act.t==='page'&&e.act.v===p.id)))r.push(['w',`Seite „${p.name}“ ist nicht erreichbar – nichts führt dorthin.`]);
   });
-  if(S.mode==='addon'&&S.pages.some(p=>p.els.some(e=>e.type==='image'||e.type==='box')))r.push(['i','Im Addon-Modus werden Poster und Flächen nicht angezeigt – nur die Buttons erscheinen als Menü-Einträge.']);
-  if(S.mode==='skin')r.push(['i','Ein Skin ersetzt die ganze Oberfläche. Möchtest du nur ein Menü im Video-Bereich, wähle „Addon“.']);
+  if(S.pages.some(p=>p.els.some(e=>e.type==='image')))r.push(['i','Poster-Platzhalter werden als farbige Flächen exportiert. Für echte Bilder nimm „Eigenes Bild einfügen“.']);
   if(!S.assets.icon)r.push(['i','Du hast kein eigenes Icon gewählt – es wird automatisch ein einfaches erzeugt.']);
   if(!S.meta.name.trim())r.push(['w','Dein Projekt hat noch keinen Namen.']);
   return r;
@@ -502,14 +574,16 @@ function showCheck(exp){
 
 /* ---------- Export ---------- */
 const hex=c=>'FF'+c.slice(1).toUpperCase();
-const WHITE_PNG='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const b64=d=>d.split(',')[1];
+const picName=id=>'img_'+id+'.'+(S.imgs[id]?S.imgs[id].ext:'png');
+function mkWhite(){const c=document.createElement('canvas');c.width=16;c.height=16;const x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,16,16);return b64(c.toDataURL('image/png'))}
 function mkImg(w,h,mime,alpha){
   const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,w,h);
   g.addColorStop(0,S.theme.primary);g.addColorStop(1,S.theme.bg);x.fillStyle=g;x.fillRect(0,0,w,h);
   x.globalAlpha=alpha;x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.font=`bold ${Math.round(Math.min(w,h)*.55)}px Arial`;
   x.fillText((S.meta.name.trim()[0]||'K').toUpperCase(),w/2,h/2);return b64(c.toDataURL(mime,.85));
 }
+/* Fokus-Navigation mit Fernbedienung / Pfeiltasten */
 function nav(list,b,idOf){
   let s='';
   for(const [d,dx,dy] of [['left',-1,0],['right',1,0],['up',0,-1],['down',0,1]]){
@@ -520,111 +594,200 @@ function nav(list,b,idOf){
     if(best)s+=`<on${d}>${idOf(best)}</on${d}>`;
   }return s;
 }
-function winXml(p,i){
-  const id=e=>100+p.els.indexOf(e),btns=p.els.filter(e=>e.type==='button');
-  const ctr=p.els.map(e=>{
+/* Control-ID: Buttons 100+, anklickbare Bilder 1000+ (das Bild selbst liegt als Image-Control darunter) */
+const fid=(p,e)=>(e.type==='pic'?1000:100)+p.els.indexOf(e);
+function winXml(p){
+  const foc=focusables(p),id=e=>fid(p,e);
+  const ctr=p.els.map((e,idx)=>{
     const pos=`<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`,c=hex(e.color||(e.type==='box'||e.type==='image'?'#334155':S.theme.primary));
-    if(e.type==='button')return `    <control type="button" id="${id(e)}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FF000000</focusedcolor><align>center</align><aligny>center</aligny><texturenofocus colordiffuse="${c}">white.png</texturenofocus><texturefocus colordiffuse="${hex(S.theme.focus)}">white.png</texturefocus>${nav(btns,e,id)}${actCmd(e)?`<onclick>${esc(actCmd(e))}</onclick>`:''}</control>`;
-    if(e.type==='text')return `    <control type="label" id="${id(e)}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>${hex(e.color||'#ffffff')}</textcolor><aligny>center</aligny></control>`;
-    return `    <control type="image" id="${id(e)}">${pos}<texture colordiffuse="${c}">white.png</texture></control>`;
+    if(e.type==='button')return `    <control type="button" id="${id(e)}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FF000000</focusedcolor><align>center</align><aligny>center</aligny><texturenofocus colordiffuse="${c}">white.png</texturenofocus><texturefocus colordiffuse="${hex(S.theme.focus)}">white.png</texturefocus>${nav(foc,e,id)}</control>`;
+    if(e.type==='text')return `    <control type="label" id="${100+idx}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>${hex(e.color||'#ffffff')}</textcolor><aligny>center</aligny></control>`;
+    if(e.type==='pic'){
+      if(!S.imgs[e.img])return `    <!-- Bild fehlt: ${idx} -->`;
+      const asp={stretch:'stretch',keep:'keep',scale:'scale'}[e.fit]||'keep';
+      let x=`    <control type="image" id="${100+idx}">${pos}<aspectratio>${asp}</aspectratio><texture>${picName(e.img)}</texture></control>`;
+      if(e.act&&e.act.t!=='none')x+=`\n    <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus><texturefocus colordiffuse="55${S.theme.focus.slice(1).toUpperCase()}">white.png</texturefocus>${nav(foc,e,id)}</control>`;
+      return x;
+    }
+    return `    <control type="image" id="${100+idx}">${pos}<texture colordiffuse="${c}">white.png</texture></control>`;
   }).join('\n');
-  const bgTex=S.bgImg?'<texture>background.jpg</texture>':`<texture colordiffuse="${hex(S.theme.bg)}">white.png</texture>`;
+  const bgTex=S.bgImg?'<aspectratio>scale</aspectratio><texture>background.jpg</texture>':`<texture colordiffuse="${hex(S.theme.bg)}">white.png</texture>`;
+  const first=[...foc].sort((a,c)=>a.y-c.y||a.x-c.x)[0];
   return `<?xml version="1.0" encoding="UTF-8"?>
-<window${i>0?` id="${1100+i}"`:''}>
-  <defaultcontrol always="true">${btns.length?id(btns[0]):100}</defaultcontrol>
+<window>
+  <defaultcontrol always="true">${first?id(first):100}</defaultcontrol>
+  <animation effect="fade" time="200">WindowOpen</animation>
   <controls>
-    <control type="image"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>
+    <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>
 ${ctr}
   </controls>
-</window>`;
+</window>
+`;
 }
 function buildFiles(){
   const id=addonId(),m=S.meta,A=S.assets,F={},pad=n=>String(n+1).padStart(2,'0');
   const shots=A.shots.map((d,i)=>`resources/screenshot-${pad(i)}.jpg`);
   const meta=`<extension point="xbmc.addon.metadata">
     <summary lang="de_DE">${esc(m.name)}</summary>
-    <description lang="de_DE">${esc(m.desc&&m.desc.trim()?m.desc:m.name+' – erstellt mit dem Kodi Skin Generator.')}</description>
+    <description lang="de_DE">${esc(m.desc&&m.desc.trim()?m.desc:m.name+' – erstellt mit dem Kodi Video-Addon Generator.')}</description>
     <license>${esc(m.lic&&m.lic.trim()?m.lic:'GPL-2.0-or-later')}</license>
     <platform>all</platform>
     <assets>
       <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>${shots.map(s=>`\n      <screenshot>${s}</screenshot>`).join('')}
+      <fanart>fanart.jpg</fanart>${shots.map(x=>`\n      <screenshot>${x}</screenshot>`).join('')}
     </assets>
   </extension>`;
+
   F['icon.png']={b64:A.icon?b64(A.icon):mkImg(512,512,'image/png',1)};
   F['fanart.jpg']={b64:A.fanart?b64(A.fanart):S.bgImg?b64(S.bgImg):mkImg(1920,1080,'image/jpeg',.12)};
   A.shots.forEach((d,i)=>{F[shots[i]]={b64:b64(d)}});
-  if(S.mode==='skin'){
-    F['addon.xml']=`<?xml version="1.0" encoding="UTF-8"?>
-<addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">
-  <requires><import addon="xbmc.gui" version="${GUI[S.kodi]}"/></requires>
-  <extension point="xbmc.gui.skin" debugging="false"><res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/></extension>
-  ${meta}
-</addon>`;
-    S.pages.forEach((p,i)=>{F['1080i/'+(i===0?'Home.xml':`Custom_${1100+i}_${slug(p.name)||'seite'}.xml`)]=winXml(p,i)});
-    F['1080i/Includes.xml']='<?xml version="1.0" encoding="UTF-8"?>\n<includes>\n</includes>';
-    F['1080i/Font.xml']='<?xml version="1.0" encoding="UTF-8"?>\n<fonts>\n  <fontset id="Default" unicode="true">\n    <font><name>font13</name><filename>arial.ttf</filename><size>30</size><style>bold</style></font>\n  </fontset>\n</fonts>';
-    F['media/white.png']={b64:WHITE_PNG};
-    if(S.bgImg)F['media/background.jpg']={b64:b64(S.bgImg)};
-  }else{
-    F['addon.xml']=`<?xml version="1.0" encoding="UTF-8"?>
+
+  F['addon.xml']=`<?xml version="1.0" encoding="UTF-8"?>
 <addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">
   <requires><import addon="xbmc.python" version="${PY[S.kodi]}"/></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   ${meta}
 </addon>`;
-    const data=S.pages.map((p,i)=>({id:i===0?'home':p.id,items:p.els.filter(e=>e.type==='button').sort((a,b)=>a.y-b.y||a.x-b.x).map(e=>{
-      const t=e.act.t;let k='cmd',v=actCmd(e);
-      if(t==='page'){k='page';v=e.act.v;const j=S.pages.findIndex(q=>q.id===v);if(j===0)v='home'}
-      else if(t==='play'){k='play';v=e.act.v}
-      else if(t==='addon'){v=`Container.Update(${e.act.v})`}
-      else if(t==='back'){v='Action(Back)'}
-      return {l:e.label,k,v}})}));
-    F['addon.py']=`# -*- coding: utf-8 -*-
-# Erzeugt mit dem Kodi Skin Generator
-import sys, json, xbmc, xbmcgui, xbmcplugin
-from urllib.parse import parse_qsl, urlencode
 
-HANDLE = int(sys.argv[1])
-BASE = sys.argv[0]
-PAGES = json.loads(${JSON.stringify(JSON.stringify(data))})
+  /* Menü-Skin des Addons: XML-Seiten + Texturen (white.png ist zwingend nötig, Kodi liefert sie für Addon-Fenster nicht mit) */
+  F[MEDIA+'white.png']={b64:mkWhite()};
+  if(S.bgImg)F[MEDIA+'background.jpg']={b64:b64(S.bgImg)};
+  const used=new Set();
+  S.pages.forEach(p=>p.els.forEach(e=>{if(e.type==='pic'&&S.imgs[e.img])used.add(e.img)}));
+  used.forEach(k=>{F[MEDIA+picName(k)]={b64:b64(S.imgs[k].d)}});
+  S.pages.forEach((p,i)=>{F['resources/skins/Default/1080i/'+(i===0?'home.xml':`page_${i}.xml`)]=winXml(p)});
 
-def url(**kw):
-    return BASE + '?' + urlencode(kw)
+  const actions={};
+  S.pages.forEach(p=>{const mp={};focusables(p).forEach(e=>{const s=actSpec(e);if(s)mp[fid(p,e)]=s});actions[p.id]=mp});
+  F['pages.json']=JSON.stringify({
+    start:S.pages[0].id,
+    pages:S.pages.map((p,i)=>({id:p.id,name:p.name,file:i===0?'home.xml':`page_${i}.xml`})),
+    actions
+  },null,2);
 
-def show(page_id):
-    page = next((p for p in PAGES if p['id'] == page_id), PAGES[0])
-    for it in page['items']:
-        li = xbmcgui.ListItem(label=it['l'])
-        if it['k'] == 'page':
-            xbmcplugin.addDirectoryItem(HANDLE, url(mode='page', id=it['v']), li, True)
-        elif it['k'] == 'play':
-            li.setProperty('IsPlayable', 'true')
-            xbmcplugin.addDirectoryItem(HANDLE, url(mode='play', u=it['v']), li, False)
-        else:
-            xbmcplugin.addDirectoryItem(HANDLE, url(mode='cmd', c=it['v']), li, False)
-    xbmcplugin.endOfDirectory(HANDLE)
+  F['addon.py']=`# -*- coding: utf-8 -*-
+# Startet das gestaltete Menue (home.xml) beim Oeffnen des Addons.
+import os
+import sys
+import json
+import xbmc
+import xbmcgui
+import xbmcaddon
+import xbmcvfs
+import xbmcplugin
 
-def router(query):
-    p = dict(parse_qsl(query.lstrip('?')))
-    mode = p.get('mode')
-    if mode == 'page':
-        show(p.get('id'))
-    elif mode == 'play':
-        xbmcplugin.setResolvedUrl(HANDLE, True, xbmcgui.ListItem(path=p.get('u', '')))
-    elif mode == 'cmd':
-        xbmc.executebuiltin(p.get('c', ''))
-        xbmcplugin.endOfDirectory(HANDLE, succeeded=False)
-    else:
-        show('home')
+ADDON = xbmcaddon.Addon()
+ADDON_NAME = ADDON.getAddonInfo('name')
+ADDON_PATH = ADDON.getAddonInfo('path')
+REAL_PATH = xbmcvfs.translatePath(ADDON_PATH)
+CONFIG_PATH = os.path.join(REAL_PATH, 'pages.json')
+
+
+def log(msg, level=xbmc.LOGINFO):
+    xbmc.log('[%s] %s' % (ADDON_NAME, msg), level)
+
+
+with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+    CONFIG = json.load(f)
+
+PAGES = dict((p['id'], p) for p in CONFIG.get('pages', []))
+ACTIONS = CONFIG.get('actions', {})
+ROOT = CONFIG.get('start') or (CONFIG['pages'][0]['id'] if CONFIG.get('pages') else None)
+
+
+class MenuWindow(xbmcgui.WindowXML):
+    # Wichtig: KEIN eigener __init__ mit Zusatzparametern. Kodi erwartet beim Erzeugen
+    # genau (xml, addonpfad, skin, aufloesung). Alles Weitere wird danach gesetzt.
+    page_id = None
+    result = None
+
+    def onClick(self, control_id):
+        act = ACTIONS.get(self.page_id, {}).get(str(control_id))
+        if not act:
+            return
+        kind = act.get('k')
+        if kind == 'page':
+            self.result = ('page', act.get('v'))
+            self.close()
+        elif kind == 'back':
+            self.result = ('back', None)
+            self.close()
+        elif kind == 'cmd':
+            cmd = act.get('c', '')
+            if not cmd:
+                return
+            if act.get('close'):
+                # Navigations-Befehle erst ausfuehren, wenn das Menue geschlossen ist
+                self.result = ('cmd', cmd)
+                self.close()
+            else:
+                xbmc.executebuiltin(cmd)
+
+
+def run():
+    monitor = xbmc.Monitor()
+    stack = [ROOT]
+    pending = None
+    while stack and not monitor.abortRequested():
+        page_id = stack[-1]
+        page = PAGES.get(page_id)
+        if not page:
+            stack.pop()
+            continue
+        log('Oeffne Seite %s (%s)' % (page.get('name'), page.get('file')))
+        win = MenuWindow(page.get('file', 'home.xml'), ADDON_PATH, 'Default', '1080i')
+        win.page_id = page_id
+        win.result = None
+        win.doModal()
+        result = win.result
+        del win
+        if not result or result[0] == 'back':
+            stack.pop()
+        elif result[0] == 'page':
+            target = result[1]
+            if target not in PAGES:
+                continue
+            if target in stack:
+                del stack[stack.index(target) + 1:]
+            else:
+                stack.append(target)
+        elif result[0] == 'cmd':
+            pending = result[1]
+            break
+    return pending
+
+
+def main():
+    handle = -1
+    if len(sys.argv) > 1 and sys.argv[1].lstrip('-').isdigit():
+        handle = int(sys.argv[1])
+    if handle >= 0:
+        # Verzeichnis-Anzeige von Kodi beenden, damit das Menue nicht hinter dem Lade-Dialog haengt
+        xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
+    try:
+        pending = run()
+    except Exception as exc:
+        log('Fehler beim Anzeigen des Menues: %s' % exc, xbmc.LOGERROR)
+        xbmcgui.Dialog().notification(ADDON_NAME, 'Menue konnte nicht geladen werden (siehe kodi.log)', xbmcgui.NOTIFICATION_ERROR, 5000)
+        return
+    if pending:
+        xbmc.sleep(150)
+        xbmc.executebuiltin(pending)
+
 
 if __name__ == '__main__':
-    router(sys.argv[2])
+    main()
 `;
-  }
-  S.files.forEach(f=>{if(f.p!=='addon.xml')F[f.p]={b64:b64(f.d)}});
+
+  S.files.forEach(f=>{
+    const p=cleanPath(f.p);
+    if(!p||reserved(p))return;
+    F[p]={b64:b64(f.d)};
+  });
+
   return F;
 }
+
 function showCode(){
   const F=buildFiles(),names=Object.keys(F).filter(k=>typeof F[k]==='string');
   modal(`<div class="flex justify-between items-center mb-3"><b>Erzeugte Dateien</b><button class="btn" onclick="closeModal()">Schließen</button></div>
@@ -637,11 +800,11 @@ function exportZip(force){
   if(!force&&check().some(x=>x[0]==='w'))return showCheck(true);
   if(typeof JSZip==='undefined')return toast('ZIP-Bibliothek nicht geladen – bitte Internetverbindung prüfen.');
   const zip=new JSZip(),root=zip.folder(addonId()),F=buildFiles();
-  S.folders.forEach(d=>root.folder(d));
+  S.folders.forEach(d=>{if(!reserved(d))root.folder(d)});
   for(const k in F)typeof F[k]==='string'?root.file(k,F[k]):root.file(k,F[k].b64,{base64:true});
   const n=S.assets.shots.length,fl=S.files.length;
   zip.generateAsync({type:'blob'}).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=addonId()+'.zip';a.click();
-    modal(`<h3 class="font-bold text-lg mb-2">✅ ZIP erstellt!</h3><p class="text-sm text-slate-300 mb-3">So kommt es in Kodi:</p><ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1"><li>ZIP-Datei auf das Kodi-Gerät kopieren.</li><li>Kodi: <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (ggf. „Unbekannte Quellen“ erlauben).</li><li>${S.mode==='skin'?'<b>Einstellungen → Oberfläche → Skin</b> → dein Skin auswählen.':'Dein Addon findest du unter <b>Addons → Video-Addons</b>.'}</li></ol>${S.mode==='skin'?'<p class="hint mt-3">Hinweis: Der Skin enthält nur die Seiten, die du hier gebaut hast.</p>':''}<p class="hint mt-2">Enthalten und in der addon.xml eingetragen: Icon, Fanart${n?`, ${n} Screenshot${n>1?'s':''}`:''}${fl?`. Dazu ${fl} eigene Datei${fl>1?'en':''}`:''}.</p><button class="btn pri mt-4" onclick="closeModal()">Verstanden</button>`)});
+    modal(`<h3 class="font-bold text-lg mb-2">✅ ZIP erstellt!</h3><p class="text-sm text-slate-300 mb-3">So kommt es in Kodi:</p><ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1"><li>ZIP-Datei auf das Kodi-Gerät kopieren.</li><li>Kodi: <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (ggf. „Unbekannte Quellen“ erlauben).</li><li>Dein Addon findest du unter <b>Addons → Video-Addons</b>. Beim Öffnen erscheint sofort dein gestaltetes Menü (home.xml) im Vollbild.</li></ol><p class="hint mt-2">Enthalten und in der addon.xml eingetragen: Icon, Fanart${n?`, ${n} Screenshot${n>1?'s':''}`:''}${fl?`. Dazu ${fl} eigene Datei${fl>1?'en':''}`:''}.</p><p class="hint mt-1">Falls sich ein altes Addon gleichen Namens nicht ändert: erst deinstallieren oder die Version erhöhen und neu installieren.</p><button class="btn pri mt-4" onclick="closeModal()">Verstanden</button>`)});
 }
 function exportJson(){const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=slug(S.meta.name)+'_projekt.json';a.click()}
 function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.pages)throw 0;S=d;norm();hist=[];renderAll();fit();toast('Projekt geladen')}catch(e){toast('Datei konnte nicht gelesen werden')}};r.readAsText(f);inp.value=''}
@@ -650,19 +813,20 @@ function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
 function modal(h){$('modal-in').innerHTML=h;$('modal').classList.remove('hidden')}
 function closeModal(){$('modal').classList.add('hidden')}
 $('modal').addEventListener('pointerdown',e=>{if(e.target===$('modal'))closeModal()});
-function showHelp(){modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Projekt</h3>
+function showHelp(){modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3>
 <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5">
-<li><b>Name vergeben</b> und wählen, ob du einen <b>Skin</b> (ganze Oberfläche) oder ein <b>Addon</b> (Menü im Video-Bereich) willst.</li>
-<li><b>Elemente hinzufügen</b>: Buttons, Texte, Poster. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li>
-<li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button einsetzen.</li>
-<li>Unter <b>5 · Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Sie werden automatisch ins Addon und in die addon.xml eingetragen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li>
-<li><b>▶ Testen</b> zeigt, wie es sich anfühlt. <b>✔ Prüfen</b> findet vergessene Aktionen.</li>
+<li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li>
+<li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li>
+<li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li>
+<li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li>
+<li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li>
+<li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li>
 <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li></ol>
 <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`)}
-function showTpl(){modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt dein aktuelles Projekt (Bilder, Dateien und Einstellungen bleiben erhalten).</p>
+function showTpl(){modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt Seiten und Elemente. Bilder, Dateien und Einstellungen bleiben erhalten.</p>
 <div class="grid sm:grid-cols-2 gap-3">${[['stream','🎬 Streaming-Hub','Startseite, Filme, Live TV'],['live','📺 Live TV','Senderliste mit Abspiel-Buttons'],['music','🎵 Musik-Player','Play, Weiter, Stopp'],['empty','📄 Leer','Nur ein Button']].map(t=>`<button class="btn text-left p-4" onclick="loadTpl('${t[0]}')"><b class="block text-sm">${t[1]}</b><span class="text-[11px] text-slate-400">${t[2]}</span></button>`).join('')}</div>
 <button class="btn mt-4" onclick="closeModal()">Abbrechen</button>`)}
-function loadTpl(n){const keep={meta:S.meta,mode:S.mode,kodi:S.kodi,theme:S.theme,bgImg:S.bgImg,assets:S.assets,files:S.files,folders:S.folders};S=Object.assign(newState(n),keep);hist=[];closeModal();renderAll();fit()}
+function loadTpl(n){const keep={meta:S.meta,mode:S.mode,kodi:S.kodi,theme:S.theme,bgImg:S.bgImg,assets:S.assets,files:S.files,folders:S.folders};S=Object.assign(newState(n),keep);norm();hist=[];closeModal();renderAll();fit()}
 
 /* ---------- Start ---------- */
 (function init(){
