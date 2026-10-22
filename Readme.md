@@ -33,12 +33,3 @@ Das Projekt ist zu **100% Client-side** (HTML, Tailwind CSS, JavaScript) aufgeba
    - Wähle unter *Build and deployment* -> *Branch* den Ast `main` (oder `master`) und den Ordner `/ (root)` aus.
    - Klicke auf **Save**.
 4. Nach wenigen Augenblicken ist deine App unter der angegebenen GitHub Pages URL live verfügbar!
-
----
-
-## 🖥️ Lokale Entwicklung
-
-Falls du die App lokal testen möchtest:
-1. Klone das Repository:
-   ```bash
-   git clone [https://github.com/DEIN-BENUTZERNAME/DEIN-REPO.git](https://github.com/DEIN-BENUTZERNAME/DEIN-REPO.git)
