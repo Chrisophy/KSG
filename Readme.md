@@ -1,4 +1,4 @@
-# 🚀 Kodi Skin & Addon Fusion Engine v3.0 Pro
+# 🚀 Kodi Skin & Addon Fusion Engine Pro
 
 Ein hochmoderner, browserbasierter **Visual Builder, Python Script Generator & XML Studio** für Kodi Addons und Skins. Entwickelt, um Skins und Python-Addons in einer einzigen, leistungsstarken Benutzeroberfläche zu entwerfen, anzupassen und als fertiges ZIP-Paket zu exportieren.
 
@@ -18,21 +18,6 @@ Ein hochmoderner, browserbasierter **Visual Builder, Python Script Generator & X
 - **Builtin Command & Property Explorer**: Durchsuche und verwende `$INFO[...]`, `$VAR[...]` und Kodi Built-in Befehle direkt im Editor.
 - **Echtzeit-Vorschau & Code Inspector**: Betrachte generierte XML-Includes, Windows & Python-Skripte sofort im Code-Tab.
 - **Erweiterter ZIP-Export**: Generiert mit nur 1 Klick eine voll funktionsfähige Kodi-Struktur inklusive `addon.xml`, `colors/defaults.xml`, `font/font.xml` und allen XML-Fenstern.
-
----
-
-## 🛠️ Schnellstart & GitHub Pages Setup
-
-Das Projekt ist zu **100% Client-side** (HTML, Tailwind CSS, JavaScript) aufgebaut und benötigt keinen Backend-Server. Du kannst es direkt über **GitHub Pages** hosten:
-
-1. **Repository erstellen**: Erstelle ein neues öffentliches Repository auf GitHub (z. B. `kodi-fusion-engine`).
-2. **Datei hochladen**: Lade deine `index.html` (als `index.html` im Root-Verzeichnis des Repositories) hoch.
-3. **GitHub Pages aktivieren**:
-   - Gehe in deinem Repository auf **Settings** (Einstellungen).
-   - Klicke links auf **Pages**.
-   - Wähle unter *Build and deployment* -> *Branch* den Ast `main` (oder `master`) und den Ordner `/ (root)` aus.
-   - Klicke auf **Save**.
-4. Nach wenigen Augenblicken ist deine App unter der angegebenen GitHub Pages URL live verfügbar!
 
 
 Starte jetzt dein Projekt: https://chrisophy.github.io/KSG
