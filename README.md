@@ -1,4 +1,4 @@
-# 🔌 Kodi Video-Addon Generator v8.1 Pro by IT('s) Possible (-W.I.P.-)
+# 🔌 Kodi Video-Addon Generator v8.1 by IT('s) Possible (-W.I.P.-)
 
 **Baue dein eigenes Kodi-Video-Addon mit individuellem Vollbild-Menü – ohne eine Zeile Code zu schreiben.**
 
