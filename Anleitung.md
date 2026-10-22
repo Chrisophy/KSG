@@ -1,6 +1,6 @@
-# 📖 Schritt-für-Schritt Anleitung – Kodi Video-Addon Generator v8.0 Pro
+# 📖 Schritt-für-Schritt Anleitung – Kodi Video-Addon Generator v8.1 Pro by IT('s) Possible
 
-Mit dem **Kodi Video-Addon Generator v8.0 Pro** erstellst du im Handumdrehen ein funktionstüchtiges Kodi-Video-Addon (`plugin.video...`) mit einem vollkommen individuell gestalteten Vollbild-Menü (`home.xml`). Programmierkenntnisse sind dafür nicht erforderlich.
+Mit dem **Kodi Video-Addon Generator v8.1 Pro** erstellst du im Handumdrehen ein funktionstüchtiges Kodi-Video-Addon (`plugin.video...`) mit einem vollkommen individuell gestalteten Vollbild-Menü (`home.xml`). Programmierkenntnisse sind dafür nicht erforderlich.
 
 ---
 
