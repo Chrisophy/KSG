@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kodi Skin & Addon Fusion Engine v3.0 Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        kodi: {
+                            blue: '#17B2E7',
+                            dark: '#0F172A',
+                            panel: '#1E293B',
+                            border: '#334155',
+                            accent: '#38BDF8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- JSZip for Exporting ZIP files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .kodi-preview-bg { background-size: cover; background-position: center; transition: all 0.3s ease; }
+        pre code { font-family: 'Fira Code', 'Courier New', Courier, monospace; font-size: 0.82rem; line-height: 1.5; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-x-hidden">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-sky-500 via-cyan-400 to-indigo-500 p-2.5 rounded-xl text-slate-950 shadow-lg shadow-sky-500/20">
+                <i data-lucide="cpu" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold bg-gradient-to-r from-sky-400 via-cyan-200 to-indigo-300 bg-clip-text text-transparent flex items-center gap-2">
+                    Kodi Skin & Addon Fusion Engine 
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">v3.0 Pro</span>
+                </h1>
+                <p class="text-xs text-slate-400">Visueller Builder, Python Script Generator & XML Studio</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Preset Selector -->
+        <div class="flex items-center space-x-3 flex-wrap">
+            <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                <i data-lucide="palette" class="w-4 h-4 text-sky-400"></i>
+                <label for="presetSelect" class="text-xs text-slate-300 font-medium hidden sm:inline">Themes:</label>
+                <select id="presetSelect" onchange="applyPreset(this.value)" class="bg-slate-900 text-xs text-slate-200 rounded px-2 py-1 border border-slate-700 focus:outline-none focus:border-sky-500">
+                    <option value="slate">Dark Slate (Default)</option>
+                    <option value="cyberpunk">Neon Cyberpunk</option>
+                    <option value="confluence">Classic Confluence</option>
+                    <option value="material">Material Blue</option>
+                    <option value="matrix">Matrix Green</option>
+                </select>
+            </div>
+
+            <button onclick="openBuiltinExplorer()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs px-3 py-2 rounded-lg flex items-center space-x-2 border border-slate-700 transition">
+                <i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i>
+                <span class="hidden md:inline">Builtin Explorer</span>
+            </button>
+
+            <button onclick="exportAsZip()" class="bg-gradient-to-r from-sky-500 via-cyan-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-semibold text-xs px-4 py-2 rounded-lg flex items-center space-x-2 transition shadow-lg shadow-sky-500/20 active:scale-95">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Komplettes ZIP Paket Exportieren</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Left Sidebar: Controls & Options -->
+        <aside class="w-full lg:w-[460px] bg-slate-900/95 border-r border-slate-800 flex flex-col h-[calc(100vh-61px)] overflow-y-auto">
+            
+            <!-- Navigation Tabs -->
+            <div class="flex border-b border-slate-800 bg-slate-950/60 sticky top-0 z-10 overflow-x-auto">
+                <button onclick="switchTab('fusion')" id="tab-fusion" class="flex-1 py-3 px-2 text-xs font-semibold text-sky-400 border-b-2 border-sky-500 flex items-center justify-center space-x-1 bg-slate-900/50 whitespace-nowrap">
+                    <i data-lucide="git-merge" class="w-3.5 h-3.5"></i>
+                    <span>Fusion</span>
+                </button>
+                <button onclick="switchTab('buttons')" id="tab-buttons" class="flex-1 py-3 px-2 text-xs font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                    <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i>
+                    <span>Buttons</span>
+                </button>
+                <button onclick="switchTab('templates')" id="tab-templates" class="flex-1 py-3 px-2 text-xs font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                    <span>Patterns</span>
+                </button>
+                <button onclick="switchTab('style')" id="tab-style" class="flex-1 py-3 px-2 text-xs font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                    <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                    <span>Styling</span>
+                </button>
+                <button onclick="switchTab('actions')" id="tab-actions" class="flex-1 py-3 px-2 text-xs font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                    <span>Actions</span>
+                </button>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div class="p-5 space-y-6 flex-1">
+                
+                <!-- TAB 1: ADDON + SKIN FUSION ENGINE -->
+                <div id="content-fusion" class="space-y-5">
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <i data-lucide="package" class="w-4 h-4 text-sky-400"></i> Architektur-Modus
+                        </h3>
+                        <p class="text-xs text-slate-400">Wähle zwischen reinem GUI Skin oder der intelligenten Addon-Skin-Fusion.</p>
+                    </div>
+
+                    <!-- Mode Selector Cards -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setFusionMode('skin')" id="mode-skin" class="p-3.5 border rounded-xl border-slate-700 bg-slate-800/40 hover:bg-slate-800 text-left transition flex flex-col justify-between gap-2">
+                            <div class="flex items-center justify-between">
+                                <i data-lucide="monitor" class="w-4 h-4 text-slate-400"></i>
+                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono">GUI Only</span>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-slate-200 block">Reiner Skin</span>
+                                <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">skin.myname</span>
+                            </div>
+                        </button>
+
+                        <button onclick="setFusionMode('addon_skin')" id="mode-addon" class="p-3.5 border rounded-xl border-sky-500 bg-sky-500/10 text-left transition flex flex-col justify-between gap-2">
+                            <div class="flex items-center justify-between">
+                                <i data-lucide="cpu" class="w-4 h-4 text-sky-400"></i>
+                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">Full Python</span>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-sky-400 block">Addon + Skin Fusion</span>
+                                <span class="text-[10px] text-sky-300/80 leading-tight block mt-0.5">plugin.video + Skin</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- Target Kodi Version -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-slate-300">Kodi Zielversion (GUI & Python API)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setKodiVersion('19')" id="kodi-v19" class="p-2.5 border rounded-lg border-slate-700 bg-slate-800/50 text-center transition">
+                                <span class="text-xs font-bold text-slate-200 block">Matrix 19</span>
+                                <span class="text-[9px] text-slate-400">Python 3.8</span>
+                            </button>
+                            <button onclick="setKodiVersion('20')" id="kodi-v20" class="p-2.5 border rounded-lg border-sky-500 bg-sky-500/10 text-center transition">
+                                <span class="text-xs font-bold text-sky-400 block">Nexus 20</span>
+                                <span class="text-[9px] text-sky-300">Python 3.10</span>
+                            </button>
+                            <button onclick="setKodiVersion('21')" id="kodi-v21" class="p-2.5 border rounded-lg border-slate-700 bg-slate-800/50 text-center transition">
+                                <span class="text-xs font-bold text-slate-200 block">Omega 21</span>
+                                <span class="text-[9px] text-slate-400">Python 3.11</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Form -->
+                    <div class="space-y-3 pt-2">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-sky-400"></i> Addon / Skin Metadaten
+                        </h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Addon / Plugin ID</label>
+                            <input type="text" id="meta-id" value="plugin.video.myfusion" oninput="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Projekt Titel</label>
+                            <input type="text" id="meta-name" value="My Fusion Media Addon" oninput="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Autor</label>
+                                <input type="text" id="meta-author" value="KodiDevTeam" oninput="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Version</label>
+                                <input type="text" id="meta-version" value="1.2.0" oninput="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB NEW: BUTTON STUDIO & CUSTOM ACTIONS MANAGEMENT -->
+                <div id="content-buttons" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                                <i data-lucide="mouse-pointer-click" class="w-4 h-4 text-sky-400"></i> Dynamic Button Studio
+                            </h3>
+                            <p class="text-xs text-slate-400">Erstelle Buttons mit beliebigen Aktionen & Platzierungen.</p>
+                        </div>
+                        <button onclick="createNewButton()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 transition shadow">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>Neuer Button</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 space-y-2">
+                        <span class="text-[11px] text-slate-400 block font-medium">Filter nach Kodi Screen:</span>
+                        <div class="flex flex-wrap gap-1.5" id="button-screen-filter">
+                            <button onclick="filterButtonsByScreen('all')" class="btn-filter-tag active px-2.5 py-1 rounded-md text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40">Alle Screens</button>
+                            <button onclick="filterButtonsByScreen('home')" class="btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">Home</button>
+                            <button onclick="filterButtonsByScreen('list')" class="btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">VOD Grid</button>
+                            <button onclick="filterButtonsByScreen('iptv')" class="btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">IPTV</button>
+                            <button onclick="filterButtonsByScreen('music')" class="btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">Music</button>
+                            <button onclick="filterButtonsByScreen('info')" class="btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">Dialog Info</button>
+                        </div>
+                    </div>
+
+                    <!-- Button List Container -->
+                    <div id="buttons-list" class="space-y-3">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- TAB 2: PATTERNS & TEMPLATES -->
+                <div id="content-templates" class="space-y-4 hidden">
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <i data-lucide="layout" class="w-4 h-4 text-sky-400"></i> Integrierte Muster & Vorlagen
+                        </h3>
+                        <p class="text-xs text-slate-400">Wähle eine vollständige Vorlage inklusive vordefiniertem Python-Routing & XML-Layout.</p>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div onclick="selectTemplate('vod')" id="tpl-vod" class="p-3.5 border border-sky-500 bg-sky-500/10 rounded-xl cursor-pointer transition hover:border-sky-400 flex items-start space-x-3">
+                            <div class="p-2 bg-sky-500/20 text-sky-400 rounded-lg mt-0.5"><i data-lucide="film" class="w-5 h-5"></i></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-xs font-bold text-slate-100">VOD Streaming Hub</h4>
+                                    <span class="text-[9px] px-1.5 py-0.5 bg-sky-500/20 text-sky-300 rounded font-mono">Active</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-1">Video Kategorien, Hero Banner, PlayMedia Actions & Detail-Dialoge.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="selectTemplate('iptv')" id="tpl-iptv" class="p-3.5 border border-slate-800 bg-slate-950/40 rounded-xl cursor-pointer transition hover:border-slate-700 flex items-start space-x-3">
+                            <div class="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg mt-0.5"><i data-lucide="tv" class="w-5 h-5"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-100">IPTV / Live TV EPG Guide</h4>
+                                <p class="text-[11px] text-slate-400 mt-1">Kanal-Grid, EPG-Aktionen, Senderwechsel und PiP-Player Commands.</p>
+                            </div>
+                        </div>
+
+                        <div onclick="selectTemplate('music')" id="tpl-music" class="p-3.5 border border-slate-800 bg-slate-950/40 rounded-xl cursor-pointer transition hover:border-slate-700 flex items-start space-x-3">
+                            <div class="p-2 bg-purple-500/20 text-purple-400 rounded-lg mt-0.5"><i data-lucide="music" class="w-5 h-5"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-100">Audio / Music Player</h4>
+                                <p class="text-[11px] text-slate-400 mt-1">Album Art Grid, Viz-Player Controls (PlayerControl(Play)).</p>
+                            </div>
+                        </div>
+
+                        <div onclick="selectTemplate('hub')" id="tpl-hub" class="p-3.5 border border-slate-800 bg-slate-950/40 rounded-xl cursor-pointer transition hover:border-slate-700 flex items-start space-x-3">
+                            <div class="p-2 bg-rose-500/20 text-rose-400 rounded-lg mt-0.5"><i data-lucide="grid" class="w-5 h-5"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-xs font-bold text-slate-100">Custom Addon Dashboard</h4>
+                                <p class="text-[11px] text-slate-400 mt-1">Universelles Smart-Dashboard mit frei konfigurierbaren Tiles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: STYLING & DESIGN TOKENS -->
+                <div id="content-style" class="space-y-5 hidden">
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <i data-lucide="paint-bucket" class="w-4 h-4 text-sky-400"></i> Visuelles Skin Design
+                        </h3>
+                        <p class="text-xs text-slate-400">Farben, Radien und Abstände in Echtzeit anpassen.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs text-slate-300 font-medium">Primärfarbe</label>
+                            <input type="color" id="cfg-primaryColor" value="#0284c7" onchange="updateConfig()" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs text-slate-300 font-medium">Fokus / Highlight</label>
+                            <input type="color" id="cfg-focusColor" value="#38bdf8" onchange="updateConfig()" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs text-slate-300 font-medium">Hintergrund Ton</label>
+                            <input type="color" id="cfg-bgColor" value="#0f172a" onchange="updateConfig()" class="w-8 h-8 rounded bg-transparent cursor-pointer border-0">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Overlay Opacity</span>
+                                <span id="val-opacity" class="text-sky-400 font-mono">85%</span>
+                            </div>
+                            <input type="range" id="cfg-opacity" min="20" max="100" value="85" oninput="updateConfig()" class="w-full accent-sky-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300 font-medium">Eckenabrundung (Radius)</span>
+                                <span id="val-radius" class="text-sky-400 font-mono">12px</span>
+                            </div>
+                            <input type="range" id="cfg-radius" min="0" max="24" value="12" oninput="updateConfig()" class="w-full accent-sky-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: ACTIONS & PYTHON ROUTER -->
+                <div id="content-actions" class="space-y-4 hidden">
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i> Python Plugin & Action Router
+                        </h3>
+                        <p class="text-xs text-slate-400">Konfiguriere automatische Python Routen für `main.py` und `addon.py`.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Addon Root Entry Point (`main.py`)</label>
+                            <textarea id="cfg-pythonMain" rows="6" oninput="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-sky-300 font-mono focus:outline-none focus:border-sky-500">import xbmcgui
+import xbmcplugin
+import sys
+from urllib.parse import parse_qsl
+
+def router(paramstring):
+    params = dict(parse_qsl(paramstring[1:]))
+    action = params.get('action')
+    if not action:
+        list_categories()
+    elif action == 'folder':
+        list_videos(params.get('category'))</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Standard Action per Click</label>
+                            <select id="cfg-defaultAction" onchange="updateConfig()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                                <option value="RunPlugin(plugin://plugin.video.myfusion/?action=play)">RunPlugin(plugin://...)</option>
+                                <option value="PlayMedia($INFO[ListItem.FileNameAndPath])">PlayMedia(ListItem)</option>
+                                <option value="Container.Update(plugin://plugin.video.myfusion/?action=folder)">Container.Update</option>
+                                <option value="ActivateWindow(videos)">ActivateWindow(videos)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Right Main Content: Interactive Preview & XML/Python Inspector -->
+        <main class="flex-1 flex flex-col bg-slate-950 h-[calc(100vh-61px)] overflow-hidden">
+            
+            <!-- View Mode Switcher Header -->
+            <div class="bg-slate-900/80 border-b border-slate-800 px-4 py-2 flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button onclick="setViewMode('preview')" id="btn-mode-preview" class="px-3 py-1.5 rounded-md text-xs font-medium text-sky-400 bg-slate-800 flex items-center space-x-1.5 transition">
+                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                        <span>Live Preview Simulator</span>
+                    </button>
+                    <button onclick="setViewMode('code')" id="btn-mode-code" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 transition">
+                        <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                        <span>XML & Python Inspector</span>
+                    </button>
+                    <button onclick="setViewMode('files')" id="btn-mode-files" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 transition">
+                        <i data-lucide="folder-tree" class="w-3.5 h-3.5"></i>
+                        <span>Addon Dateibaum</span>
+                    </button>
+                </div>
+
+                <!-- Screen Type Switcher -->
+                <div id="preview-screen-selector" class="flex items-center space-x-2">
+                    <span class="text-xs text-slate-400 font-medium hidden sm:inline">Kodi Screen:</span>
+                    <select id="screenSelect" onchange="updatePreviewScreen(this.value)" class="bg-slate-900 text-xs text-slate-200 rounded-lg px-2.5 py-1.5 border border-slate-700 focus:outline-none focus:border-sky-500">
+                        <option value="home">Home Hub / Dashboard (Home.xml)</option>
+                        <option value="list">VOD Media Grid (MyVideoNav.xml)</option>
+                        <option value="iptv">IPTV / Live TV EPG (Guide.xml)</option>
+                        <option value="music">Music Player Controls (Music.xml)</option>
+                        <option value="info">Info Dialog (DialogInfo.xml)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- VIEW 1: INTERACTIVE PREVIEW SIMULATOR -->
+            <div id="view-preview" class="flex-1 p-4 md:p-6 flex items-center justify-center overflow-auto bg-slate-950 relative">
+                
+                <!-- TV Screen Container -->
+                <div class="w-full max-w-5xl aspect-video bg-slate-900 rounded-2xl border-4 border-slate-800 shadow-2xl overflow-hidden relative flex flex-col justify-between kodi-preview-bg" id="kodi-viewport" style="background-image: linear-gradient(rgba(15,23,42,0.85), rgba(15,23,42,0.85)), url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop');">
+                    
+                    <!-- Top Status Bar -->
+                    <div id="pv-topbar" class="p-4 flex justify-between items-center z-10">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-black tracking-wider text-sm bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300" id="pv-title">FUSION ADDON</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800/80 text-sky-400 border border-sky-500/20" id="pv-screen-tag">Home</span>
+                        </div>
+                        
+                        <!-- Top Header Custom Buttons Container -->
+                        <div class="flex items-center space-x-2" id="pv-header-buttons">
+                            <!-- Header buttons render here -->
+                        </div>
+
+                        <div class="flex items-center space-x-4 text-xs font-mono text-slate-300">
+                            <span class="flex items-center gap-1"><i data-lucide="cloud-sun" class="w-3.5 h-3.5 text-sky-400"></i> 22°C</span>
+                            <span>21:15</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Preview Screen Area -->
+                    <div id="pv-dynamic-content" class="flex-1 px-6 py-2 flex gap-6 overflow-hidden z-10">
+                        <!-- Content render target -->
+                    </div>
+
+                    <!-- Footer Info Bar -->
+                    <div class="p-3 bg-slate-950/80 border-t border-slate-800/60 flex justify-between items-center z-10 text-[11px] text-slate-400">
+                        <div class="flex items-center space-x-4">
+                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">OK</kbd> Edit Action</span>
+                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">C</kbd> Context</span>
+                            <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-[9px] text-slate-300">Back</kbd> Return</span>
+                        </div>
+
+                        <div id="pv-overlay-actions" class="flex items-center space-x-2">
+                            <!-- Overlay actions render here -->
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-0.5 bg-sky-500/10 text-sky-400 font-mono rounded border border-sky-500/20 text-[10px]" id="pv-mode-badge">Python Addon Mode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: XML & PYTHON CODE INSPECTOR -->
+            <div id="view-code" class="flex-1 flex flex-col hidden bg-slate-950">
+                <div class="bg-slate-900 px-4 py-2 flex items-center justify-between border-b border-slate-800 overflow-x-auto">
+                    <div class="flex space-x-2 py-1" id="code-file-tabs">
+                        <!-- Tabs inserted dynamically -->
+                    </div>
+                    <button onclick="copyCurrentCode()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5 transition whitespace-nowrap">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        <span>Code kopieren</span>
+                    </button>
+                </div>
+                <div class="flex-1 p-4 overflow-auto font-mono text-xs text-sky-300 bg-slate-950/90">
+                    <pre><code id="code-display">Generiere Code...</code></pre>
+                </div>
+            </div>
+
+            <!-- VIEW 3: FILE EXPLORER SIMULATION -->
+            <div id="view-files" class="flex-1 p-6 hidden overflow-auto bg-slate-950">
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-semibold text-slate-200">Vollständige Kodi Addon & Skin Verzeichnisstruktur</h3>
+                        <span class="text-xs text-sky-400 font-mono" id="zip-structure-id">plugin.video.myfusion.zip</span>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2 font-mono text-xs">
+                        <div class="flex items-center space-x-2 text-sky-400">
+                            <i data-lucide="folder" class="w-4 h-4"></i>
+                            <span id="folder-root-name">plugin.video.myfusion/</span>
+                        </div>
+                        <div class="pl-6 space-y-1.5 text-slate-300">
+                            <div class="flex items-center space-x-2 text-emerald-400"><i data-lucide="file-code" class="w-3.5 h-3.5"></i><span>addon.xml</span></div>
+                            <div class="flex items-center space-x-2 text-amber-400"><i data-lucide="file-code" class="w-3.5 h-3.5"></i><span>addon.py</span></div>
+                            <div class="flex items-center space-x-2 text-amber-400"><i data-lucide="file-code" class="w-3.5 h-3.5"></i><span>main.py</span></div>
+                            <div class="flex items-center space-x-2"><i data-lucide="folder" class="w-3.5 h-3.5 text-sky-400"></i><span>resources/</span></div>
+                            <div class="pl-6 space-y-1 text-slate-400">
+                                <div>├── settings.xml</div>
+                                <div>└── lib/</div>
+                                <div class="pl-6">└── plugin.py</div>
+                            </div>
+                            <div class="flex items-center space-x-2"><i data-lucide="folder" class="w-3.5 h-3.5 text-sky-400"></i><span>colors/</span></div>
+                            <div class="pl-6 text-slate-400">└── defaults.xml</div>
+                            <div class="flex items-center space-x-2"><i data-lucide="folder" class="w-3.5 h-3.5 text-sky-400"></i><span>font/</span></div>
+                            <div class="pl-6 text-slate-400">└── font.xml</div>
+                            <div class="flex items-center space-x-2"><i data-lucide="folder" class="w-3.5 h-3.5 text-sky-400"></i><span>xml/</span></div>
+                            <div class="pl-6 space-y-1 text-slate-400">
+                                <div>├── Includes.xml</div>
+                                <div>├── Home.xml</div>
+                                <div>├── MyVideoNav.xml</div>
+                                <div>├── Guide.xml</div>
+                                <div>└── Music.xml</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ACTION & BUTTON EDITOR MODAL -->
+    <div id="actionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-sky-400"></i> Kodi Action & Button Editor
+                </h3>
+                <button onclick="closeActionEditor()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <input type="hidden" id="modal-btn-id" value="">
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Button Titel / Label</label>
+                        <input type="text" id="modal-btn-label" value="VOD Streaming Hub" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Lucide Icon</label>
+                        <select id="modal-btn-icon" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                            <option value="play-circle">play-circle</option>
+                            <option value="film">film</option>
+                            <option value="tv">tv</option>
+                            <option value="music">music</option>
+                            <option value="grid">grid</option>
+                            <option value="star">star</option>
+                            <option value="settings">settings</option>
+                            <option value="zap">zap</option>
+                            <option value="heart">heart</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Kodi Ziel-Screen</label>
+                        <select id="modal-btn-screen" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                            <option value="home">Home (Home.xml)</option>
+                            <option value="list">VOD Grid (MyVideoNav.xml)</option>
+                            <option value="iptv">IPTV Guide (Guide.xml)</option>
+                            <option value="music">Music Player (Music.xml)</option>
+                            <option value="info">Dialog Info (DialogInfo.xml)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Skin Platzierung / Sektion</label>
+                        <select id="modal-btn-section" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                            <option value="sidebar">Sidebar Menü</option>
+                            <option value="content">Content Grid / Tiles</option>
+                            <option value="header">Top Header Bar</option>
+                            <option value="overlay">Footer Overlay Bar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Kodi Action / Builtin Typ</label>
+                    <select id="modal-btn-action" onchange="syncRouteWithActionType()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-sky-300 font-mono mb-2">
+                        <option value="RunPlugin">RunPlugin(plugin://...)</option>
+                        <option value="PlayMedia">PlayMedia(...)</option>
+                        <option value="Container.Update">Container.Update(...)</option>
+                        <option value="ActivateWindow">ActivateWindow(...)</option>
+                        <option value="PlayerControl">PlayerControl(...)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Action Befehl / Route Parameter</label>
+                    <input type="text" id="modal-btn-route" value="plugin://plugin.video.myfusion/?action=vod" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-sky-300 font-mono focus:outline-none focus:border-sky-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Button Akzentfarbe</label>
+                        <input type="color" id="modal-btn-color" value="#38bdf8" class="w-full h-8 rounded bg-slate-950 border border-slate-800 cursor-pointer">
+                    </div>
+                    <div class="flex items-end pb-1">
+                        <button onclick="deleteButtonFromModal()" id="btn-modal-delete" class="w-full py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/40 text-xs font-semibold rounded-lg transition flex items-center justify-center space-x-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <span>Button Löschen</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+                <button onclick="closeActionEditor()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg hover:bg-slate-700">Abbrechen</button>
+                <button onclick="saveActionEditor()" class="px-4 py-2 bg-sky-500 text-slate-950 text-xs font-bold rounded-lg hover:bg-sky-400">Action & Button Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUILTIN COMMAND EXPLORER MODAL -->
+    <div id="builtinModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i> Kodi Builtin Command & Property Explorer
+                </h3>
+                <button onclick="closeBuiltinExplorer()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div>
+                <input type="text" id="builtinSearch" placeholder="Suche nach $INFO, $VAR, RunPlugin, PlayMedia..." oninput="filterBuiltins()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+            </div>
+            <div class="max-h-60 overflow-y-auto space-y-2 text-xs font-mono" id="builtinList">
+                <!-- Builtin Items -->
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeBuiltinExplorer()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg hover:bg-slate-700">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-sky-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i data-lucide="check-circle" class="w-5 h-5 text-sky-400"></i>
+        <span id="toast-msg" class="text-xs font-medium">Erfolgreich ausgeführt</span>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        const state = {
+            fusionMode: 'addon_skin', // 'skin' or 'addon_skin'
+            kodiVersion: '20',
+            meta: {
+                id: 'plugin.video.myfusion',
+                name: 'My Fusion Media Addon',
+                author: 'KodiDevTeam',
+                version: '1.2.0',
+                desc: 'Intelligentes Kodi Addon mit integriertem High-Performance Skin.'
+            },
+            template: 'vod',
+            style: {
+                primaryColor: '#0284c7',
+                focusColor: '#38bdf8',
+                bgColor: '#0f172a',
+                opacity: 85,
+                radius: 12,
+                spacing: 8,
+                font: 'sans-serif'
+            },
+            currentScreen: 'home',
+            activeCodeFile: 'addon.xml',
+            buttonFilterScreen: 'all',
+            // Default initial custom buttons pool
+            buttons: [
+                {
+                    id: 'btn_vod_hub',
+                    label: 'VOD Catalog (4K)',
+                    screen: 'home',
+                    section: 'content',
+                    actionType: 'RunPlugin',
+                    route: 'plugin://plugin.video.myfusion/?action=vod',
+                    icon: 'film',
+                    color: '#38bdf8'
+                },
+                {
+                    id: 'btn_iptv_epg',
+                    label: 'Live TV Guide',
+                    screen: 'home',
+                    section: 'sidebar',
+                    actionType: 'RunPlugin',
+                    route: 'plugin://plugin.video.myfusion/?action=iptv',
+                    icon: 'tv',
+                    color: '#10b981'
+                },
+                {
+                    id: 'btn_music_player',
+                    label: 'Music Player',
+                    screen: 'home',
+                    section: 'sidebar',
+                    actionType: 'PlayerControl',
+                    route: 'PlayerControl(Play)',
+                    icon: 'music',
+                    color: '#a855f7'
+                },
+                {
+                    id: 'btn_matrix_play',
+                    label: 'The Matrix 4K',
+                    screen: 'list',
+                    section: 'content',
+                    actionType: 'PlayMedia',
+                    route: 'plugin://plugin.video.myfusion/?action=play&id=matrix',
+                    icon: 'play-circle',
+                    color: '#38bdf8'
+                },
+                {
+                    id: 'btn_quick_settings',
+                    label: 'Setup',
+                    screen: 'home',
+                    section: 'header',
+                    actionType: 'ActivateWindow',
+                    route: 'ActivateWindow(addonsettings)',
+                    icon: 'settings',
+                    color: '#f59e0b'
+                }
+            ]
+        };
+
+        const guiVersions = { '19': '5.15.0', '20': '5.16.0', '21': '5.17.0' };
+        const pyVersions = { '19': '3.8', '20': '3.10', '21': '3.11' };
+
+        const builtinsData = [
+            { cmd: '$INFO[ListItem.Label]', desc: 'Gibt das Label des aktuellen Listenelements aus.' },
+            { cmd: '$INFO[ListItem.Plot]', desc: 'Beschreibung / Handlung des Medienelements.' },
+            { cmd: '$INFO[ListItem.Icon]', desc: 'Pfad zum Poster oder Cover Icon.' },
+            { cmd: 'RunPlugin(plugin://...)', desc: 'Führt einen Python Addon Plugin Befehl aus.' },
+            { cmd: 'PlayMedia(path)', desc: 'Startet die Wiedergabe einer Mediendatei oder Stream-URL.' },
+            { cmd: 'Container.Update(path)', desc: 'Navigiert zu einem neuen Verzeichnis oder Fenster.' },
+            { cmd: 'ActivateWindow(window_id)', desc: 'Öffnet ein spezifisches Kodi GUI Fenster.' },
+            { cmd: 'PlayerControl(Play)', desc: 'Steuert den Medienplayer (Play, Pause, Next, Prev).' },
+            { cmd: 'SetProperty(key,value,window)', desc: 'Setzt eine temporäre Kodi Window Eigenschaft.' },
+            { cmd: 'Dialog.Close(all,true)', desc: 'Schließt alle aktiven Dialogfenster.' }
+        ];
+
+        window.onload = function() {
+            lucide.createIcons();
+            updateConfig();
+            renderButtonsList();
+            renderPreview();
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                t.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function switchTab(tabId) {
+            ['fusion', 'buttons', 'templates', 'style', 'actions'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('text-sky-400', 'border-sky-500', 'bg-slate-900/50');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-400', 'border-transparent');
+            });
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('text-sky-400', 'border-sky-500', 'bg-slate-900/50');
+            activeBtn.classList.remove('text-slate-400', 'border-transparent');
+        }
+
+        function setViewMode(mode) {
+            ['preview', 'code', 'files'].forEach(m => {
+                document.getElementById(`view-${m}`).classList.add('hidden');
+                document.getElementById(`btn-mode-${m}`).classList.remove('text-sky-400', 'bg-slate-800');
+                document.getElementById(`btn-mode-${m}`).classList.add('text-slate-400');
+            });
+            document.getElementById(`view-${mode}`).classList.remove('hidden');
+            document.getElementById(`btn-mode-${mode}`).classList.add('text-sky-400', 'bg-slate-800');
+            document.getElementById(`btn-mode-${mode}`).classList.remove('text-slate-400');
+
+            const screenSelector = document.getElementById('preview-screen-selector');
+            screenSelector.style.display = (mode === 'preview') ? 'flex' : 'none';
+
+            if (mode === 'code') {
+                renderCodeTabs();
+                renderCodeDisplay();
+            }
+        }
+
+        function setFusionMode(mode) {
+            state.fusionMode = mode;
+            if (mode === 'skin') {
+                state.meta.id = 'skin.myfusion';
+                document.getElementById('mode-skin').className = "p-3.5 border rounded-xl border-sky-500 bg-sky-500/10 text-left transition flex flex-col justify-between gap-2";
+                document.getElementById('mode-addon').className = "p-3.5 border rounded-xl border-slate-700 bg-slate-800/40 text-left transition flex flex-col justify-between gap-2";
+                document.getElementById('pv-mode-badge').innerText = "Pure Skin Mode";
+            } else {
+                state.meta.id = 'plugin.video.myfusion';
+                document.getElementById('mode-addon').className = "p-3.5 border rounded-xl border-sky-500 bg-sky-500/10 text-left transition flex flex-col justify-between gap-2";
+                document.getElementById('mode-skin').className = "p-3.5 border rounded-xl border-slate-700 bg-slate-800/40 text-left transition flex flex-col justify-between gap-2";
+                document.getElementById('pv-mode-badge').innerText = "Python Addon Mode";
+            }
+            document.getElementById('meta-id').value = state.meta.id;
+            updateConfig();
+        }
+
+        function setKodiVersion(v) {
+            state.kodiVersion = v;
+            ['19', '20', '21'].forEach(ver => {
+                const btn = document.getElementById(`kodi-v${ver}`);
+                if (ver === v) {
+                    btn.className = "p-2.5 border rounded-lg border-sky-500 bg-sky-500/10 text-center transition";
+                } else {
+                    btn.className = "p-2.5 border rounded-lg border-slate-700 bg-slate-800/50 text-center transition";
+                }
+            });
+            updateConfig();
+        }
+
+        function selectTemplate(tpl) {
+            state.template = tpl;
+            ['vod', 'iptv', 'music', 'hub'].forEach(t => {
+                const el = document.getElementById(`tpl-${t}`);
+                if (t === tpl) {
+                    el.className = "p-3.5 border border-sky-500 bg-sky-500/10 rounded-xl cursor-pointer transition hover:border-sky-400 flex items-start space-x-3";
+                } else {
+                    el.className = "p-3.5 border border-slate-800 bg-slate-950/40 rounded-xl cursor-pointer transition hover:border-slate-700 flex items-start space-x-3";
+                }
+            });
+            renderPreview();
+        }
+
+        function updateConfig() {
+            state.meta.id = document.getElementById('meta-id').value || 'plugin.video.fusion';
+            state.meta.name = document.getElementById('meta-name').value || 'Fusion Addon';
+            state.meta.author = document.getElementById('meta-author').value || 'Developer';
+            state.meta.version = document.getElementById('meta-version').value || '1.0.0';
+
+            state.style.primaryColor = document.getElementById('cfg-primaryColor').value;
+            state.style.focusColor = document.getElementById('cfg-focusColor').value;
+            state.style.bgColor = document.getElementById('cfg-bgColor').value;
+            state.style.opacity = document.getElementById('cfg-opacity').value;
+            state.style.radius = document.getElementById('cfg-radius').value;
+
+            document.getElementById('val-opacity').innerText = `${state.style.opacity}%`;
+            document.getElementById('val-radius').innerText = `${state.style.radius}px`;
+            document.getElementById('folder-root-name').innerText = `${state.meta.id}/`;
+            document.getElementById('zip-structure-id').innerText = `${state.meta.id}.zip`;
+
+            renderPreview();
+        }
+
+        function applyPreset(p) {
+            const presets = {
+                slate: { primary: '#0284c7', focus: '#38bdf8', bg: '#0f172a' },
+                cyberpunk: { primary: '#d946ef', focus: '#22d3ee', bg: '#180828' },
+                confluence: { primary: '#1e40af', focus: '#60a5fa', bg: '#020617' },
+                material: { primary: '#2563eb', focus: '#38bdf8', bg: '#0f172a' },
+                matrix: { primary: '#15803d', focus: '#4ade80', bg: '#052e16' }
+            };
+            if (presets[p]) {
+                document.getElementById('cfg-primaryColor').value = presets[p].primary;
+                document.getElementById('cfg-focusColor').value = presets[p].focus;
+                document.getElementById('cfg-bgColor').value = presets[p].bg;
+                updateConfig();
+            }
+        }
+
+        function updatePreviewScreen(s) {
+            state.currentScreen = s;
+            renderPreview();
+        }
+
+        /* DYNAMIC BUTTON MANAGEMENT LOGIC */
+        function createNewButton(targetScreen = null, targetSection = 'content') {
+            const newId = 'btn_' + Date.now().toString().slice(-6);
+            const newBtn = {
+                id: newId,
+                label: 'Neuer Action Button',
+                screen: targetScreen || state.currentScreen,
+                section: targetSection,
+                actionType: 'RunPlugin',
+                route: `plugin://${state.meta.id}/?action=custom_${newId}`,
+                icon: 'zap',
+                color: state.style.focusColor
+            };
+            state.buttons.push(newBtn);
+            renderButtonsList();
+            renderPreview();
+            openActionEditor(newId);
+            showToast("Neuer Button erstellt! Konfiguriere die Aktion.");
+        }
+
+        function filterButtonsByScreen(sc) {
+            state.buttonFilterScreen = sc;
+            const container = document.getElementById('button-screen-filter');
+            Array.from(container.children).forEach(btn => {
+                btn.className = "btn-filter-tag px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200";
+            });
+            event.target.className = "btn-filter-tag active px-2.5 py-1 rounded-md text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40";
+            renderButtonsList();
+        }
+
+        function renderButtonsList() {
+            const container = document.getElementById('buttons-list');
+            const list = state.buttonFilterScreen === 'all' 
+                ? state.buttons 
+                : state.buttons.filter(b => b.screen === state.buttonFilterScreen);
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center border border-dashed border-slate-800 rounded-xl bg-slate-950/40 space-y-2">
+                        <i data-lucide="mouse-pointer-click" class="w-8 h-8 text-slate-600 mx-auto"></i>
+                        <p class="text-xs text-slate-400">Keine Buttons für diesen Screen Filter gefunden.</p>
+                        <button onclick="createNewButton()" class="text-xs text-sky-400 hover:underline font-semibold">+ Jetzt Button hinzufügen</button>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = list.map(b => `
+                <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between gap-3 group transition">
+                    <div class="flex items-center space-x-3 flex-1 min-w-0">
+                        <div class="p-2 rounded-lg bg-slate-800 text-sky-400 border border-slate-700" style="color: ${b.color}">
+                            <i data-lucide="${b.icon || 'zap'}" class="w-4 h-4"></i>
+                        </div>
+                        <div class="truncate">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-bold text-slate-100 truncate">${b.label}</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-mono">${b.screen}</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-400 font-mono">${b.section}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-500 font-mono truncate block">${b.actionType}: ${b.route}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button onclick="openActionEditor('${b.id}')" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-sky-400 transition" title="Button bearbeiten">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="deleteButton('${b.id}')" class="p-1.5 hover:bg-rose-500/20 rounded-lg text-slate-400 hover:text-rose-400 transition" title="Button löschen">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function deleteButton(id) {
+            state.buttons = state.buttons.filter(b => b.id !== id);
+            renderButtonsList();
+            renderPreview();
+            showToast("Button entfernt.");
+        }
+
+        function openActionEditor(buttonId) {
+            const modal = document.getElementById('actionModal');
+            const btn = state.buttons.find(b => b.id === buttonId);
+
+            if (btn) {
+                document.getElementById('modal-btn-id').value = btn.id;
+                document.getElementById('modal-btn-label').value = btn.label;
+                document.getElementById('modal-btn-screen').value = btn.screen;
+                document.getElementById('modal-btn-section').value = btn.section;
+                document.getElementById('modal-btn-action').value = btn.actionType;
+                document.getElementById('modal-btn-route').value = btn.route;
+                document.getElementById('modal-btn-icon').value = btn.icon || 'zap';
+                document.getElementById('modal-btn-color').value = btn.color || state.style.focusColor;
+                document.getElementById('btn-modal-delete').style.display = 'flex';
+            } else {
+                // If opening editor without existing button
+                document.getElementById('modal-btn-id').value = '';
+                document.getElementById('btn-modal-delete').style.display = 'none';
+            }
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeActionEditor() {
+            document.getElementById('actionModal').classList.add('hidden');
+        }
+
+        function syncRouteWithActionType() {
+            const actionType = document.getElementById('modal-btn-action').value;
+            const routeInput = document.getElementById('modal-btn-route');
+            if (actionType === 'RunPlugin' && !routeInput.value.startsWith('plugin://')) {
+                routeInput.value = `plugin://${state.meta.id}/?action=custom_route`;
+            } else if (actionType === 'PlayerControl') {
+                routeInput.value = 'PlayerControl(Play)';
+            } else if (actionType === 'ActivateWindow') {
+                routeInput.value = 'ActivateWindow(videos)';
+            }
+        }
+
+        function saveActionEditor() {
+            const id = document.getElementById('modal-btn-id').value;
+            const label = document.getElementById('modal-btn-label').value || 'Unbenannter Button';
+            const screen = document.getElementById('modal-btn-screen').value;
+            const section = document.getElementById('modal-btn-section').value;
+            const actionType = document.getElementById('modal-btn-action').value;
+            const route = document.getElementById('modal-btn-route').value;
+            const icon = document.getElementById('modal-btn-icon').value;
+            const color = document.getElementById('modal-btn-color').value;
+
+            if (id) {
+                const btn = state.buttons.find(b => b.id === id);
+                if (btn) {
+                    btn.label = label;
+                    btn.screen = screen;
+                    btn.section = section;
+                    btn.actionType = actionType;
+                    btn.route = route;
+                    btn.icon = icon;
+                    btn.color = color;
+                }
+            } else {
+                state.buttons.push({
+                    id: 'btn_' + Date.now().toString().slice(-6),
+                    label, screen, section, actionType, route, icon, color
+                });
+            }
+
+            closeActionEditor();
+            renderButtonsList();
+            renderPreview();
+            showToast("Action & Button Konfiguration gespeichert!");
+        }
+
+        function deleteButtonFromModal() {
+            const id = document.getElementById('modal-btn-id').value;
+            if (id) {
+                deleteButton(id);
+                closeActionEditor();
+            }
+        }
+
+        /* PREVIEW RENDERING WITH DYNAMIC BUTTONS */
+        function renderPreview() {
+            document.getElementById('pv-title').innerText = state.meta.name.toUpperCase();
+            document.getElementById('pv-screen-tag').innerText = state.currentScreen.toUpperCase();
+
+            const viewport = document.getElementById('kodi-viewport');
+            viewport.style.borderRadius = `${state.style.radius}px`;
+
+            const contentArea = document.getElementById('pv-dynamic-content');
+            const headerBtnsArea = document.getElementById('pv-header-buttons');
+            const overlayBtnsArea = document.getElementById('pv-overlay-actions');
+
+            // Get buttons for current active screen
+            const activeScreenButtons = state.buttons.filter(b => b.screen === state.currentScreen);
+
+            // Render Header Buttons
+            const headerBtns = activeScreenButtons.filter(b => b.section === 'header');
+            headerBtnsArea.innerHTML = headerBtns.map(b => `
+                <button onclick="openActionEditor('${b.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-200 hover:border-sky-400 flex items-center space-x-1.5 transition" style="border-left-color: ${b.color}">
+                    <i data-lucide="${b.icon || 'zap'}" class="w-3.5 h-3.5" style="color:${b.color}"></i>
+                    <span>${b.label}</span>
+                </button>
+            `).join('') + `
+                <button onclick="createNewButton('${state.currentScreen}', 'header')" class="p-1 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition" title="Header Button hinzufügen">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                </button>`;
+
+            // Render Overlay Footer Buttons
+            const overlayBtns = activeScreenButtons.filter(b => b.section === 'overlay');
+            overlayBtnsArea.innerHTML = overlayBtns.map(b => `
+                <button onclick="openActionEditor('${b.id}')" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:text-sky-400 flex items-center space-x-1 transition">
+                    <i data-lucide="${b.icon || 'zap'}" class="w-3 h-3" style="color:${b.color}"></i>
+                    <span>${b.label}</span>
+                </button>
+            `).join('');
+
+            // Render Main Content Layouts depending on Screen
+            const sidebarBtns = activeScreenButtons.filter(b => b.section === 'sidebar');
+            const contentBtns = activeScreenButtons.filter(b => b.section === 'content');
+
+            if (state.currentScreen === 'home') {
+                contentArea.innerHTML = `
+                    <!-- Left Navigation Sidebar -->
+                    <div class="w-56 bg-slate-950/80 rounded-xl border border-slate-800 p-3 flex flex-col justify-between backdrop-blur-md">
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 block mb-2">Hauptmenü</span>
+                            ${sidebarBtns.map(b => `
+                                <div onclick="openActionEditor('${b.id}')" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-sky-500/50 flex items-center space-x-2.5 cursor-pointer group transition">
+                                    <i data-lucide="${b.icon || 'circle'}" class="w-4 h-4" style="color: ${b.color}"></i>
+                                    <span class="text-xs font-semibold text-slate-200 group-hover:text-sky-400">${b.label}</span>
+                                </div>
+                            `).join('')}
+                            <button onclick="createNewButton('home', 'sidebar')" class="w-full mt-2 p-2 rounded-lg border border-dashed border-slate-800 hover:border-sky-500/50 text-slate-500 hover:text-sky-400 text-xs font-medium flex items-center justify-center space-x-1 transition">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Menü Button Hinzufügen</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Dynamic Content Tiles Grid -->
+                    <div class="flex-1 flex flex-col space-y-4">
+                        <div class="flex-1 bg-slate-900/60 rounded-2xl border border-slate-800/80 p-4 relative overflow-hidden backdrop-blur-md flex flex-col justify-end">
+                            <div class="space-y-2 z-10">
+                                <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 text-[10px] font-bold border border-sky-500/30">FEATURED HUB</span>
+                                <h2 class="text-2xl font-black text-white">VOD Streaming Matrix 4K</h2>
+                                <p class="text-xs text-slate-300 max-w-lg">Integrierter High-Performance Skin Generator für Kodi mit automatischer Python Routen Synchronisation.</p>
+                            </div>
+                        </div>
+
+                        <!-- Content Grid Buttons -->
+                        <div class="grid grid-cols-3 gap-3">
+                            ${contentBtns.map(b => `
+                                <div onclick="openActionEditor('${b.id}')" class="p-3 bg-slate-900/80 border border-slate-800 rounded-xl hover:border-sky-500 transition cursor-pointer flex items-center space-x-3 group shadow-lg">
+                                    <div class="p-2 bg-slate-800 rounded-lg group-hover:bg-sky-500/20 transition">
+                                        <i data-lucide="${b.icon || 'film'}" class="w-5 h-5" style="color: ${b.color}"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-400 truncate">${b.label}</h4>
+                                        <p class="text-[9px] text-slate-500 font-mono truncate">${b.actionType}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div onclick="createNewButton('home', 'content')" class="p-3 border border-dashed border-slate-800 rounded-xl hover:border-sky-500 transition cursor-pointer flex items-center justify-center space-x-2 text-slate-500 hover:text-sky-400">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span class="text-xs font-bold">Content Tile Hinzufügen</span>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (state.currentScreen === 'list') {
+                contentArea.innerHTML = `
+                    <div class="flex-1 flex gap-4">
+                        <div class="w-1/3 bg-slate-950/80 rounded-xl border border-slate-800 p-3 space-y-2">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase px-1">Media Grid Actions</span>
+                            ${activeScreenButtons.map(b => `
+                                <div onclick="openActionEditor('${b.id}')" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-sky-400 cursor-pointer flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-slate-200">${b.label}</span>
+                                    <i data-lucide="${b.icon || 'play'}" class="w-4 h-4" style="color:${b.color}"></i>
+                                </div>
+                            `).join('')}
+                            <button onclick="createNewButton('list', 'content')" class="w-full p-2 border border-dashed border-slate-800 rounded-lg text-slate-500 hover:text-sky-400 text-xs font-medium flex items-center justify-center gap-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Action Hinzufügen
+                            </button>
+                        </div>
+                        <div class="flex-1 bg-slate-900/60 rounded-xl border border-slate-800 p-4 flex flex-col justify-center items-center text-center">
+                            <i data-lucide="film" class="w-12 h-12 text-sky-400 mb-2"></i>
+                            <h3 class="text-sm font-bold text-slate-200">Kodi MyVideoNav Grid View</h3>
+                            <p class="text-xs text-slate-400 max-w-sm mt-1">Interaktive Vorschau des VOD/Serien-Katalogs mit verknüpften Python Play-Aktionen.</p>
+                        </div>
+                    </div>`;
+            } else {
+                contentArea.innerHTML = `
+                    <div class="flex-1 bg-slate-900/80 rounded-xl border border-slate-800 p-6 flex flex-col items-center justify-center text-center space-y-4">
+                        <div class="p-4 bg-sky-500/10 rounded-full text-sky-400 border border-sky-500/20">
+                            <i data-lucide="monitor" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-100">${state.currentScreen.toUpperCase()} Screen Designer</h3>
+                            <p class="text-xs text-slate-400 max-w-md mt-1">Konfigurierte Custom Buttons für diesen Screen: ${activeScreenButtons.length}</p>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-2">
+                            ${activeScreenButtons.map(b => `
+                                <button onclick="openActionEditor('${b.id}')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold text-slate-200 hover:border-sky-400 flex items-center space-x-1.5">
+                                    <i data-lucide="${b.icon || 'zap'}" class="w-3.5 h-3.5" style="color:${b.color}"></i>
+                                    <span>${b.label}</span>
+                                </button>
+                            `).join('')}
+                            <button onclick="createNewButton('${state.currentScreen}', 'content')" class="px-3 py-1.5 bg-sky-500 text-slate-950 font-bold rounded-lg text-xs flex items-center space-x-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Button Hinzufügen</span>
+                            </button>
+                        </div>
+                    </div>`;
+            }
+
+            lucide.createIcons();
+        }
+
+        /* CODE GENERATION ENGINE INCLUDING DYNAMIC BUTTONS */
+        function renderCodeTabs() {
+            const tabsContainer = document.getElementById('code-file-tabs');
+            const files = state.fusionMode === 'addon_skin' 
+                ? ['addon.xml', 'addon.py', 'main.py', 'Includes.xml', 'Home.xml', 'MyVideoNav.xml']
+                : ['addon.xml', 'Includes.xml', 'Home.xml', 'MyVideoNav.xml'];
+
+            tabsContainer.innerHTML = files.map(f => `
+                <button onclick="switchCodeFile('${f}')" class="px-3 py-1 rounded-md text-xs font-mono transition ${state.activeCodeFile === f ? 'bg-sky-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}">
+                    ${f}
+                </button>
+            `).join('');
+        }
+
+        function switchCodeFile(f) {
+            state.activeCodeFile = f;
+            renderCodeTabs();
+            renderCodeDisplay();
+        }
+
+        function renderCodeDisplay() {
+            const display = document.getElementById('code-display');
+            display.innerText = generateCodeForFile(state.activeCodeFile);
+        }
+
+        function generateCodeForFile(fileName) {
+            const guiVer = guiVersions[state.kodiVersion];
+            const pyVer = pyVersions[state.kodiVersion];
+
+            if (fileName === 'addon.xml') {
+                return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="${state.meta.id}" name="${state.meta.name}" version="${state.meta.version}" provider-name="${state.meta.author}">
+    <requires>
+        <import addon="xbmc.python" version="${pyVer}.0"/>
+        <import addon="xbmc.gui" version="${guiVer}"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video audio</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de">${state.meta.name} Fusion Engine</summary>
+        <description lang="de">${state.meta.desc}</description>
+        <platform>all</platform>
+    </extension>
+</addon>`;
+            }
+
+            if (fileName === 'main.py') {
+                const buttonRoutes = state.buttons.map(b => `    elif action == '${b.id}':
+        # Custom Action handler for ${b.label}
+        xbmcgui.Dialog().notification('${b.label}', 'Executing ${b.actionType}', xbmcgui.NOTIFICATION_INFO, 2000)
+        ${b.actionType === 'PlayMedia' ? `xbmc.Player().play('${b.route}')` : `xbmcexecute("${b.route}")`}`).join('\n');
+
+                return `import sys
+import xbmc
+import xbmcgui
+import xbmcplugin
+from urllib.parse import parse_qsl
+
+def router(paramstring):
+    params = dict(parse_qsl(paramstring[1:]))
+    action = params.get('action')
+    
+    if not action:
+        # Default Catalog Landing Page
+        list_root_menu()
+${buttonRoutes}
+    else:
+        xbmcgui.Dialog().ok("Fusion Engine", f"Action execution: {action}")
+
+def list_root_menu():
+    # Dynamisch generiertes Kodi Menu
+    pass
+
+if __name__ == '__main__':
+    router(sys.argv[2])`;
+            }
+
+            if (fileName === 'Home.xml') {
+                const homeButtons = state.buttons.filter(b => b.screen === 'home');
+                const xmlControls = homeButtons.map((b, idx) => `
+        <!-- Custom Dynamic Button: ${b.label} -->
+        <control type="button" id="${3000 + idx}">
+            <left>${100 + (idx % 3) * 220}</left>
+            <top>${200 + Math.floor(idx / 3) * 60}</top>
+            <width>200</width>
+            <height>50</height>
+            <label>${b.label}</label>
+            <font>font13</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <focusedcolor>${b.color.replace('#', 'FF')}</focusedcolor>
+            <onclick>${b.actionType === 'RunPlugin' ? `RunPlugin(${b.route})` : b.route}</onclick>
+        </control>`).join('\n');
+
+                return `<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <defaultcontrol always="true">3000</defaultcontrol>
+    <controls>
+        <!-- Background Overlay -->
+        <control type="image">
+            <depth>Background</depth>
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture background="true">special://skin/backgrounds/default.jpg</texture>
+        </control>
+
+        <!-- Dynamisch generierte Skin Buttons -->
+${xmlControls}
+    </controls>
+</window>`;
+            }
+
+            if (fileName === 'Includes.xml') {
+                return `<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+    <include name="GlobalColors">
+        <primaryColor>${state.style.primaryColor}</primaryColor>
+        <focusColor>${state.style.focusColor}</focusColor>
+        <bgColor>${state.style.bgColor}</bgColor>
+    </include>
+</includes>`;
+            }
+
+            return `<!-- XML / Code Generator Placeholder für ${fileName} -->`;
+        }
+
+        function copyCurrentCode() {
+            const code = generateCodeForFile(state.activeCodeFile);
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast(`${state.activeCodeFile} in die Zwischenablage kopiert!`);
+        }
+
+        /* ZIP EXPORT LOGIC */
+        function exportAsZip() {
+            if (typeof JSZip === 'undefined') {
+                showToast("ZIP Bibliothek lädt noch...");
+                return;
+            }
+            const zip = new JSZip();
+            const root = zip.folder(state.meta.id);
+
+            root.file("addon.xml", generateCodeForFile('addon.xml'));
+            root.file("addon.py", "# Fusion Addon Entry Point\nimport main\n");
+            root.file("main.py", generateCodeForFile('main.py'));
+
+            const xmlFolder = root.folder("xml");
+            xmlFolder.file("Home.xml", generateCodeForFile('Home.xml'));
+            xmlFolder.file("Includes.xml", generateCodeForFile('Includes.xml'));
+
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(content);
+                a.download = `${state.meta.id}-${state.meta.version}.zip`;
+                a.click();
+                showToast("Kodi Addon & Skin ZIP erfolgreich erstellt!");
+            });
+        }
+
+        /* BUILTIN EXPLORER MODAL LOGIC */
+        function openBuiltinExplorer() {
+            document.getElementById('builtinModal').classList.remove('hidden');
+            filterBuiltins();
+            lucide.createIcons();
+        }
+
+        function closeBuiltinExplorer() {
+            document.getElementById('builtinModal').classList.add('hidden');
+        }
+
+        function filterBuiltins() {
+            const query = document.getElementById('builtinSearch').value.toLowerCase();
+            const list = document.getElementById('builtinList');
+            const filtered = builtinsData.filter(b => b.cmd.toLowerCase().includes(query) || b.desc.toLowerCase().includes(query));
+
+            list.innerHTML = filtered.map(b => `
+                <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 hover:border-sky-500 cursor-pointer flex justify-between items-center group transition" onclick="copyBuiltin('${b.cmd}')">
+                    <div>
+                        <span class="text-sky-400 font-bold block">${b.cmd}</span>
+                        <span class="text-[11px] text-slate-400 block mt-0.5">${b.desc}</span>
+                    </div>
+                    <i data-lucide="copy" class="w-4 h-4 text-slate-500 group-hover:text-sky-400"></i>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function copyBuiltin(cmd) {
+            const textarea = document.createElement('textarea');
+            textarea.value = cmd;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast(`Befehl kopiert: ${cmd}`);
+            closeBuiltinExplorer();
+        }
+    </script>
+</body>
+</html>
