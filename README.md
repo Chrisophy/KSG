@@ -1,105 +1,80 @@
-# 🧩 Kodi Skin Generator
+# 🔌 Kodi Video-Addon Generator v8.0 Pro
 
-**Baue dein eigenes Kodi-Menü per Drag & Drop – ohne eine Zeile Code zu schreiben.**
+**Baue dein eigenes Kodi-Video-Addon mit individuellem Vollbild-Menü – ohne eine Zeile Code zu schreiben.**
 
-→ https://chrisophy.github.io/KSG ←
+→ [Online-Tool öffnen](https://chrisophy.github.io/KSG) ←
 
-Der Kodi Skin Generator ist ein Ein-Datei-Werkzeug für den Browser. Du ziehst Buttons, Texte und Poster auf eine Leinwand, wählst für jeden Button einen fertigen Kodi-Befehl aus einer Liste und exportierst alles als installierbare ZIP-Datei für Kodi. Gedacht für Einsteiger, aber mit genug Optionen für Profis.
+Der **Kodi Video-Addon Generator** ist ein vollwertiges Web-Tool in einer einzigen Datei. Mit ihm erstellst du ein echtes Video-Addon (`plugin.video...`), dessen Startmenü (`home.xml`) du frei auf einer 1920×1080 Canvas gestalten kannst. Beim Öffnen des Addons in Kodi erscheint dein Menü im Vollbild und ersetzt die Standardansicht.
 
-> 🇩🇪 Oberfläche und Anleitung auf Deutsch · 📱 funktioniert mit Maus und Touch · 🔒 alles läuft lokal in deinem Browser
+> 🇩🇪 Deutsche Benutzeroberfläche & Anleitung · 📱 Funktioniert mit Maus, Keyboard & Touch · 🔒 Läuft zu 100 % lokal in deinem Browser
 
 ---
 
-## ✨ Funktionen
+## ✨ Funktionen & Highlights
 
-- **Visueller Editor** auf einer 1920×1080-Leinwand: Elemente verschieben, in der Größe ändern, duplizieren, Raster-Einrasten, Rückgängig
-- **Skin oder Addon:** entweder eine eigene Oberfläche (Skin) oder ein Menü im Video-Bereich (Video-Addon)
-- **📚 Befehlsliste** mit rund 70 Kodi-Befehlen in verständlichem Deutsch (Navigation, Wiedergabe, Lautstärke, Einstellungen, System, Addons) – mit Suche und Kategorien. Ein Tipp genügt, um einen Befehl in einen Button einzusetzen
-- **Mehrere Seiten** mit Seiten-Verknüpfung, Seiten duplizieren, Zurück-Buttons
-- **Testmodus:** Buttons ausprobieren, bevor du exportierst
-- **✔ Prüfen:** findet Buttons ohne Aktion, fehlende Video-Adressen, Platzhalter und unerreichbare Seiten
-- **Vorlagen:** Streaming-Hub, Live TV, Musik-Player oder leeres Projekt
-- **Design:** fertige Farbthemen, eigene Farben, eigenes Hintergrundbild
-- **Bilder fürs Addon:** eigenes **Icon**, **Fanart** und bis zu 8 **Screenshots** – automatisch ins Addon und in die `addon.xml` eingetragen (ohne eigene Bilder werden Icon und Fanart automatisch erzeugt)
-- **📁 Ordner & Dateien:** eigene Ordner anlegen, Dateien hinzufügen oder Textdateien direkt schreiben – alles landet in der ZIP
-- **Werkzeuge:** Buttons mittig ordnen, gleiche Größe für alle Buttons
-- **Projekt speichern und laden** (JSON-Backup) plus automatisches Merken im Browser
-- **Unterstützt Kodi 19 (Matrix), 20 (Nexus) und 21 (Omega)**
+- **Visueller Menü-Editor:** 1920×1080-Leinwand mit Drag & Drop, Touch-Unterstützung, frei skalierbaren Elementen, Ausrichthilfen, Raster-Einrasten (Snap) und mehrstufigem Undo/Redo (`Strg+Z`).
+- **Anklickbare Bilder & Design-Elemente:** Füge eigene Bilder, Poster-Platzhalter, Farbflächen und Buttons ein. Bilder können rein dekorativ sein oder eigene Klick-Aktionen erhalten.
+- **📚 Befehlsliste:** Über 70 vorgefertigte Kodi-Befehle (Navigation, Wiedergabe, Lautstärke, Systemsteuerung, Addon-Starts) sortiert nach Kategorien und mit Schnellsuche.
+- **Mehrseitige Menüs:** Erstelle komplexe Menüstrukturen mit Unterseiten, dynamischer Seitenverknüpfung und automatischer Navigation für Fernbedienungen.
+- **▶ Testmodus & ✔ Prüfen:** Teste Seitenwechsel und Befehle direkt im Browser. Die Prüffunktion deckt fehlende Links, leere Video-URLs, unvollständige Befehle oder verwaiste Seiten auf.
+- **Addon-Assets & Metadata:** Eigenes **Icon**, **Fanart** und bis zu 8 **Screenshots** verwalten, die direkt in die `addon.xml` und die ZIP-Struktur eingepflegt werden.
+- **📁 Integrierter Dateimanager:** Eigene Ordnerstrukturen anlegen, Dateien per Drag & Drop hinzufügen oder Textdateien (z. B. `settings.xml`) direkt im Generator schreiben.
+- **Flexibles Projektmanagement:** Automatische Speicherung im Browser sowie lokaler Export und Import über JSON-Dateien.
+- **Kompatibilität:** Generiert valide Addon-Pakete für Kodi 19 (Matrix), 20 (Nexus) und 21 (Omega).
 
 ---
 
 ## 🚀 Schnellstart
 
-1. Datei `kodi_skin_generator_v6.html` im Browser öffnen (am besten Chrome, Edge, Firefox oder Safari).
-2. Projektnamen vergeben und **Skin** oder **Addon** wählen.
-3. Elemente hinzufügen, verschieben, Buttons beschriften.
-4. Bei jedem Button über **📚 Befehlsliste** festlegen, was beim Klick passiert.
-5. Optional: Icon, Fanart und Screenshots auswählen.
-6. **✔ Prüfen**, dann **⬇ ZIP exportieren**.
-7. In Kodi: **Einstellungen → Addons → Aus ZIP-Datei installieren**.
+1. Öffne die Datei `index.html` in einem modernen Browser (Chrome, Edge, Firefox, Safari).
+2. Vergabe einen **Projektnamen** unter **1 · Projekt** (die technische ID `plugin.video...` wird automatisch gebildet).
+3. Füge über **2 · Hinzufügen** Buttons, Texte oder **eigene Bilder** hinzu und positioniere sie auf der Leinwand.
+4. Markiere ein Element und wähle über **📚 Befehlsliste** eine Aktion aus (z. B. Öffnen von Unterseiten, Abspielen von Streams oder Ausführen von Kodi-Befehlen).
+5. Lade unter **5 · Addon-Bilder & Dateien** dein Icon und Fanart hoch.
+6. Klicke auf **✔ Prüfen** und danach auf **⬇ ZIP exportieren**.
+7. In Kodi: **Einstellungen → Addons → Aus ZIP-Datei installieren** wählen. Dein Addon ist nun unter **Addons → Video-Addons** verfügbar.
 
-Die ausführliche Schritt-für-Schritt-Anleitung findest du in der [ANLEITUNG.md](ANLEITUNG.md).
-
-### Als Webseite nutzen (GitHub Pages)
-
-Benenne die HTML-Datei in `index.html` um und aktiviere unter **Settings → Pages** dein Repository als Webseite. Dann kann jeder das Tool direkt über einen Link öffnen.
+Eine ausführliche Anleitung findest du in der [Anleitung.md](Anleitung.md).
 
 ---
 
-## 🎨 Skin oder Addon – was ist besser?
+## 📦 Inhalt der generierten ZIP-Datei
 
-| | 🎨 Skin | 🔌 Addon |
-|---|---|---|
-| Was entsteht | eigene Oberfläche, ersetzt das Kodi-Design | Menü im Bereich *Addons → Video-Addons* |
-| Poster und Flächen | werden angezeigt | werden nicht angezeigt, nur Buttons als Menü-Einträge |
-| Risiko | enthält nur die Seiten, die du gebaut hast | sehr unkompliziert |
-| Empfehlung | zum Experimentieren und für Fortgeschrittene | **für Einsteiger der einfachste Weg** |
+Das exportierte ZIP-Paket entspricht der offiziellen Kodi-Addon-Struktur:
 
----
-
-## 📦 Was steckt in der exportierten ZIP?
-
-**Addon**
-```
-plugin.video.deinname/
+```text
+plugin.video.deinprojekt/
 ├── addon.xml
 ├── addon.py
+├── pages.json
 ├── icon.png
 ├── fanart.jpg
-├── resources/screenshot-01.jpg …
-└── (deine eigenen Ordner und Dateien)
+├── resources/
+│   ├── screenshot-01.jpg …
+│   └── skins/
+│       └── Default/
+│           ├── 1080i/
+│           │   ├── home.xml
+│           │   ├── page_1.xml …
+│           │   └── (weitere Unterseiten)
+│           └── media/
+│               ├── white.png
+│               ├── background.jpg (optional)
+│               └── img_*.png / img_*.jpg (eigene Bilder)
+└── (deine manuell hinzugefügten Ordner und Dateien)
 ```
-
-**Skin**
-```
-skin.deinname/
-├── addon.xml
-├── icon.png
-├── fanart.jpg
-├── 1080i/   (Home.xml, weitere Seiten, Includes.xml, Font.xml)
-├── media/   (white.png, optional background.jpg)
-├── resources/screenshot-01.jpg …
-└── (deine eigenen Ordner und Dateien)
-```
-
----
-
-## ⚠️ Hinweise
-
-- **Internet nötig beim Öffnen:** Das Tool lädt Tailwind CSS und JSZip von einem CDN. Wer es komplett offline nutzen möchte, kann beide Bibliotheken lokal einbinden.
-- **Skin-Umfang:** Ein exportierter Skin enthält nur die Seiten aus dem Generator. Kodi-Standardfenster (z.B. Bibliothek, Wiedergabe-Oberfläche) bringt er nicht mit. Für ein Menü, das sicher funktioniert, ist der Addon-Modus die robustere Wahl.
-- **Emojis in Buttons** werden nur in der Vorschau angezeigt, Kodi-Schriften zeigen sie oft nicht.
-- **Einige Befehle** hängen von deiner Installation ab, z.B. Live TV und TV-Programm brauchen ein PVR-Addon.
-- **Eigene Befehle** sind unter *Aktion → Kodi-Befehl* möglich, siehe [Kodi-Wiki: Built-in functions](https://kodi.wiki/view/List_of_built-in_functions).
-- Der Browser-Speicher ist begrenzt. Bei vielen großen Bildern regelmäßig **💾 Speichern** (JSON-Backup) nutzen.
 
 ---
 
 ## 🛠 Technik
 
-Reines HTML, CSS und JavaScript in einer einzigen Datei. Genutzt werden [Tailwind CSS](https://tailwindcss.com/) und [JSZip](https://stuk.github.io/jszip/). Es werden keine Daten an einen Server gesendet.
+Das Tool besteht aus einer einzigen HTML-Datei ohne Server-Backends:
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **ZIP-Erstellung:** [JSZip](https://stuk.github.io/jszip/)
+- **Laufzeit in Kodi:** Python 3 (`xbmc.python` v3.0.0+) und Kodi `WindowXML`-GUI.
 
 ---
 
-## 📄 IT('s) Possible
+## 📄 Lizenz & Credits
 
+Erstellt von **IT('s) Possible**. Freie Nutzung unter GPL-2.0-or-later.
