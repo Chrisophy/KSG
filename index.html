@@ -1,12 +1,16 @@
-<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-4 
-RECHTLICHER HINWEIS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
-Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern, Umschreiben oder die unautorisierte Weiterverbreitung des Codes ist strengstens untersagt.-->
+<!-- Kodi Video-Addon Generator · Copyright (c) 2026 Team IT('s) Possible · Version 2026.10.22-5 (v8.1 Final)
+KOSTENLOS FÜR DIE KODI-COMMUNITY: Dieses Werkzeug darf von allen – Anfängern wie Profis – kostenlos genutzt werden.
+VERKAUF VERBOTEN: Der Verkauf, die kostenpflichtige Weitergabe oder jede andere kommerzielle Verwertung dieses Werkzeugs
+(auch kopiert, verändert, umbenannt oder als Teil eines anderen Produkts) ist ausdrücklich untersagt.
+Weitergabe ist nur kostenlos, unverändert und mit diesem Hinweis erlaubt. Das Verändern und Ausgeben als eigenes Werk ist untersagt.
+Die mit diesem Werkzeug erstellten Addons gehören ihren jeweiligen Erstellern.
+HAFTUNGSAUSSCHLUSS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. Nutzung auf eigene Gefahr. -->
 <!DOCTYPE html>
 <html lang="de" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kodi Video-Addon Generator v8.1 Pro</title>
+  <title>Kodi Video-Addon Generator v8.1 Final</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -58,7 +62,8 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     <div>
       <h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">
         🔌 Kodi Video-Addon Generator by IT('s) Possible 
-        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.1 Pro</span>
+        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.1 Final</span>
+        <span class="text-[10px] text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5 ml-1">💚 Gratis · nicht zum Verkauf</span>
       </h1>
       <p class="text-[11px] text-slate-400">Gestalte das Menü deines Addons (home.xml) mit Buttons und Bildern und exportiere alles als installierbare ZIP.</p>
     </div>
@@ -148,6 +153,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
 
       <input type="file" id="f-pic" accept="image/*" multiple class="hidden" onchange="addPics(this)">
       <input type="file" id="f-picrep" accept="image/*" class="hidden" onchange="replacePic(this)">
+      <input type="file" id="f-pbg" accept="image/*" class="hidden" onchange="setPageBg(this)">
       <input type="file" id="f-bimg" accept="image/*" class="hidden" onchange="setBtnImg(this)">
       
       <p class="hint mt-3 mb-1">Schnell-Buttons (Aktion schon eingestellt):</p>
@@ -285,6 +291,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       Violett: ['#7c3aed', '#c4b5fd', '#1e1033'],
       Monochrom: ['#475569', '#f8fafc', '#0b0f14']
     };
+    const VIS = [['', 'Immer'], ['Player.HasMedia', 'Nur wenn etwas läuft'], ['!Player.HasMedia', 'Nur wenn nichts läuft'], ['Player.HasVideo', 'Nur wenn ein Video läuft'], ['Player.HasAudio', 'Nur wenn Musik läuft'], ['Player.Paused', 'Nur bei Pause'], ['System.InternetState', 'Nur mit Internet'], ['!System.InternetState', 'Nur ohne Internet']];
     const TYPES = { button: 'Button', text: 'Text', image: 'Poster-Platzhalter', box: 'Fläche', pic: 'Bild', prog: 'Fortschrittsbalken', art: 'Cover (läuft gerade)' };
     const ACTS = [
       ['none', 'Nichts (nur Optik)'], ['page', 'Andere Seite öffnen'], ['addon', 'Anderes Addon öffnen'],
@@ -460,8 +467,9 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       h: type === 'text' ? 80 : type === 'image' ? 450 : type === 'box' ? 300 : type === 'pic' ? 400 : type === 'prog' ? 40 : type === 'art' ? 400 : 100,
       label: type === 'button' ? 'Neuer Button' : type === 'text' ? 'Text hier' : '',
       icon: '', color: null, img: null, fit: 'keep', act: { t: 'none', v: '' },
-      rad: null, bw: 0, bc: '#ffffff', op: 100, al: type === 'button' ? 'center' : 'left', tc: '', bimg: null, lock: false
-    }, o);
+      rad: null, bw: 0, bc: '#ffffff', op: 100, al: type === 'button' ? 'center' : 'left', tc: '', bimg: null, lock: false,
+      src: '', vis: '', pin: '', ask: ''
+    }, type === 'image' ? { fit: 'scale' } : {}, o);
 
     const btn = (label, icon, x, y, t, v = '', extra = {}) => mk('button', Object.assign({ label, icon, x, y, w: 420, h: 110, act: { t, v } }, extra));
 
@@ -498,7 +506,9 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         if (e.tc == null) e.tc = '';
         if (e.bimg === undefined) e.bimg = null;
         e.lock = !!e.lock;
+        if (e.src == null) e.src = ''; if (e.vis == null) e.vis = ''; if (e.pin == null) e.pin = ''; if (e.ask == null) e.ask = '';
       }));
+      S.pages.forEach(p => { if (p.bg === undefined) p.bg = null; if (p.bgImg === undefined) p.bgImg = null; });
       if (S.cur >= S.pages.length) S.cur = 0;
       gcImgs();
     }
@@ -511,7 +521,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     const page = () => S.pages[S.cur];
     const sel = () => page().els.find(e => e.id === S.sel);
-    const canAct = () => { const e = sel(); return !!e && (e.type === 'button' || e.type === 'pic'); };
+    const canAct = () => !!sel();
+    const hasAct = e => !!(e && e.act && e.act.t !== 'none');
     const slug = s => (s || 'projekt').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, '').slice(0, 30) || 'projekt';
     const addonId = () => 'plugin.video.' + slug(S.meta.name);
     const snapV = v => S.snap ? Math.round(v / 20) * 20 : Math.round(v);
@@ -603,9 +614,26 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       fc();
     }
 
+    // Hintergrund einer Seite: eigenes Bild > eigene Farbe > Hintergrundbild des Designs > Designfarbe
+    const pageBg = p => p.bgImg ? { i: p.bgImg, c: p.bg || S.theme.bg } : p.bg ? { i: null, c: p.bg } : { i: S.bgImg, c: S.theme.bg };
+
+    function showPageBg() {
+      const p = page();
+      modal(`<div class="flex justify-between items-center mb-2"><b>🎨 Hintergrund der Seite „${esc(p.name)}“</b><button class="btn" onclick="closeModal()">Schließen</button></div>
+        <p class="hint mb-3">Jede Seite kann einen eigenen Hintergrund haben. Ohne eigene Wahl gilt der Hintergrund aus „3 · Design“.</p>
+        <label class="l">Eigene Farbe</label><div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${p.bg || S.theme.bg}" oninput="page().bg=this.value;renderStage();save()"><span class="hint">${p.bg ? 'eigene Farbe aktiv' : 'noch Design-Farbe'}</span></div>
+        <label class="l">Eigenes Bild</label><button class="btn w-full" onclick="$('f-pbg').click()">🖼 ${p.bgImg ? 'Anderes Bild wählen' : 'Bild wählen'}</button>
+        <button class="btn w-full mt-3" onclick="page().bg=null;page().bgImg=null;closeModal();renderAll();toast('Seite nutzt wieder den Design-Hintergrund.')">↺ Wie im Design</button>`);
+    }
+    function setPageBg(inp) { const f = inp.files[0]; inp.value = ''; if (!f) return; loadImgFile(f, im => { hpush(true); page().bgImg = coverCanvas(im, 1920, 1080).toDataURL('image/jpeg', .8); closeModal(); renderAll(); toast('Hintergrund der Seite gesetzt'); }); }
+    function movePage(d) {
+      const i = S.cur, j = i + d; if (i === 0 || j < 1 || j >= S.pages.length) return;
+      hpush(true); const t = S.pages[i]; S.pages[i] = S.pages[j]; S.pages[j] = t; S.cur = j; if (S.pv) pvReset(); renderAll();
+    }
+
     function renderPages() {
       $('pages').innerHTML = S.pages.map((p, i) => `<button class="btn ${i === S.cur ? 'pri' : ''}" onclick="gotoPage(${i})">${i === 0 ? '🏠 ' : ''}${esc(p.name)}</button>`).join('') +
-        `<button class="btn" onclick="addPage()">＋ Seite</button><button class="btn" onclick="renamePage()">✏ Umbenennen</button>${S.cur > 0 ? '<button class="btn" onclick="delPage()">🗑 Seite löschen</button>' : ''}`;
+        `<button class="btn" onclick="addPage()">＋ Seite</button><button class="btn" onclick="renamePage()">✏ Umbenennen</button><button class="btn" onclick="showPageBg()">🎨 Hintergrund</button>${S.cur > 1 ? '<button class="btn" aria-label="Seite nach links" onclick="movePage(-1)">◀</button>' : ''}${S.cur > 0 && S.cur < S.pages.length - 1 ? '<button class="btn" aria-label="Seite nach rechts" onclick="movePage(1)">▶</button>' : ''}${S.cur > 0 ? '<button class="btn" onclick="delPage()">🗑 Seite löschen</button>' : ''}`;
     }
 
     function fit() {
@@ -621,6 +649,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     new ResizeObserver(() => fit()).observe($('wrap'));
 
     const radPct = e => e.type === 'prog' ? 0 : e.rad != null ? e.rad : e.type === 'button' ? S.theme.rad : (e.type === 'box' || e.type === 'image' || e.type === 'art') ? Math.round(S.theme.rad * .4) : 0;
+    const imgSrc = e => (e.type === 'pic' || e.type === 'image') ? (S.imgs[e.img] ? { pv: S.imgs[e.img].d, k: picName(e.img) } : e.src && e.src.trim() ? { pv: /^(https?:|data:)/i.test(e.src.trim()) ? e.src.trim() : '', k: e.src.trim() } : null) : null;
+    const cssUrl = u => "url('" + esc(String(u).replace(/'/g, '%27').replace(/[\r\n]/g, '')) + "')";
     const baseCol = e => e.color || (e.type === 'box' || e.type === 'image' || e.type === 'art' ? '#334155' : e.type === 'prog' ? S.theme.focus : S.theme.primary);
     const radPx = e => Math.round(Math.min(e.w, e.h) / 2 * Math.max(0, Math.min(100, radPct(e))) / 100);
     const opOf = e => e.op == null ? 100 : e.op;
@@ -629,8 +659,9 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     function renderStage() {
       const st = $('stage'); st.className = (S.pv ? 'pv ' : '') + (S.snap ? '' : 'nogrid');
-      st.style.backgroundColor = S.theme.bg; st.style.setProperty('--f', S.theme.focus);
-      st.style.backgroundImage = S.bgImg ? `url(${S.bgImg})` : ''; st.style.backgroundSize = S.bgImg ? 'cover' : '';
+      const pb = pageBg(page());
+      st.style.backgroundColor = pb.c; st.style.setProperty('--f', S.theme.focus);
+      st.style.backgroundImage = pb.i ? `url(${pb.i})` : ''; st.style.backgroundSize = pb.i ? 'cover' : '';
       st.innerHTML = page().els.map(e => {
         const on = !S.pv && e.id === S.sel;
         const c = baseCol(e);
@@ -650,15 +681,16 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           cls += ' t'; ls = e.label; txt = esc(liveTxt(ls)); lstyle = `opacity:${op};`;
         }
         else if (e.type === 'image') {
+          const is = imgSrc(e);
           s += `font-size:${Math.min(40, e.w * .14)}px;`;
-          bg = `<div class="bgl" style="background:${rgba(c, op * .9)};${rs}"></div>`;
-          ls = '🖼 ' + (e.label || ''); txt = esc(ls);
+          if (is && is.pv) bg = `<div class="bgl" style="background:${rgba(c, op * .9)} ${cssUrl(is.pv)} center/${fitCss} no-repeat;${rs}"></div>`;
+          else { bg = `<div class="bgl" style="background:${rgba(c, op * .9)};${rs}"></div>`; ls = (is ? '🌐 ' : '🖼 ') + (e.label || (is ? 'Bild aus Kodi' : '')); txt = esc(ls); }
         }
         else if (e.type === 'pic') {
-          const im = S.imgs[e.img];
-          if (im) bg = `<div class="bgl" style="background:url('${im.d}') center/${fitCss} no-repeat;opacity:${op};${rs}"></div>`;
+          const is = imgSrc(e);
+          if (is && is.pv) bg = `<div class="bgl" style="background:${cssUrl(is.pv)} center/${fitCss} no-repeat;opacity:${op};${rs}"></div>`;
+          else if (is) { bg = `<div class="bgl" style="background:#334155;${rs}"></div>`; s += 'font-size:30px;'; txt = '🌐 Bild aus Kodi'; }
           else { bg = `<div class="bgl" style="background:#334155;${rs}"></div>`; s += 'font-size:36px;'; txt = '🖼 Bild fehlt'; }
-          if (e.act && e.act.t !== 'none') cls += ' pa';
         }
         else if (e.type === 'prog') {
           bg = `<div class="bgl" style="background:${rgba(c, op * .3)};"></div><div class="bgl" style="background:${rgba(c, op)};right:60%;"></div>`;
@@ -669,6 +701,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           ls = '🎵'; txt = '🎵';
         }
         else bg = `<div class="bgl" style="background:${rgba(c, op * .85)};${rs}"></div>`;
+        if (e.type !== 'button' && hasAct(e) && !cls.includes(' pa')) cls += ' pa';
         const bdr = bw > 0 ? `<div class="bdr" style="border:${bw}px solid ${e.bc || '#ffffff'};${rs}"></div>` : '';
         const lbl = txt ? `<span class="lb"${isLive(ls) ? ` data-ls="${esc(ls)}"` : ''}${lstyle ? ` style="${lstyle}"` : ''}>${txt}</span>` : '';
         return `<div class="${cls}${on ? ' sel' : ''}" data-id="${e.id}" style="${s}">${bg}${bdr}${lbl}${on ? '<div class="rz" data-rz="1"></div>' : ''}</div>`;
@@ -705,8 +738,10 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         if (isBtn || isTxt) h += field('Textausrichtung', `<select class="inp" onchange="setP('al',this.value)">${[['left', 'Links'], ['center', 'Mittig'], ['right', 'Rechts']].map(a => `<option value="${a[0]}" ${(e.al || (isBtn ? 'center' : 'left')) === a[0] ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`);
         if (isBtn) h += colF('Textfarbe', 'tc', e.tc || '#ffffff', "''");
 
-        if (isPic) {
-          h += `<label class="l">Bild</label><button class="btn w-full" onclick="$('f-picrep').click()">🔄 Anderes Bild wählen</button>`;
+        if (isPic || e.type === 'image') {
+          const own = !!S.imgs[e.img];
+          h += `<label class="l">${isPic ? 'Bild' : 'Poster-Bild'}</label><div class="flex gap-2"><button class="btn flex-1" onclick="$('f-picrep').click()">🖼 ${own ? 'Anderes Bild wählen' : 'Bild vom Gerät wählen'}</button>${own && !isPic ? '<button class="btn" aria-label="Poster-Bild entfernen" onclick="noPic()">✖</button>' : ''}</div>`;
+          h += field('…oder Bild-Adresse (Internet oder Kodi)', `<input class="inp" value="${esc(e.src || '')}" oninput="setP('src',this.value)" placeholder="https://…/poster.jpg">`, own ? 'Ein eigenes Bild vom Gerät hat Vorrang vor der Adresse.' : 'Kodi lädt das Bild beim Öffnen. Profis können auch Kodi-Pfade wie <code>special://…</code> oder <code>$INFO[…]</code> nutzen.');
           h += fitSel(e);
         } else if (isBtn) {
           h += `<label class="l">Eigenes Bild als Button-Hintergrund</label><div class="flex gap-2"><button class="btn flex-1" onclick="$('f-bimg').click()">🖼 ${hasBimg ? 'Anderes Bild wählen' : 'Bild wählen'}</button>${hasBimg ? '<button class="btn" aria-label="Button-Bild entfernen" onclick="noBtnImg()">✖</button>' : ''}</div>`;
@@ -729,15 +764,24 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
         }
 
         h += `<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x', 'y', 'w', 'h'].map(k => `<div><span class="hint">${k === 'w' ? 'Breite' : k === 'h' ? 'Höhe' : k.toUpperCase()}</span><input data-pf="${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div> <div class="grid grid-cols-2 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder(true)">⬆ nach vorn</button><button class="btn" onclick="zOrder(false)">⬇ nach hinten</button></div>
+          <label class="l">👁 Wann sichtbar? (in Kodi)</label><select class="inp" onchange="if(this.value!=='__c'){setP('vis',this.value);renderProps()}">${VIS.map(v => `<option value="${esc(v[0])}" ${v[0] === (e.vis || '') ? 'selected' : ''}>${v[1]}</option>`).join('')}<option value="__c" ${VIS.some(v => v[0] === (e.vis || '')) ? '' : 'selected'}>Eigene Bedingung (Profis)</option></select>
+          ${VIS.some(v => v[0] === (e.vis || '')) ? '' : `<input class="inp mt-1" value="${esc(e.vis || '')}" oninput="setP('vis',this.value)" placeholder="z.B. System.HasAddon(plugin.video.youtube)">`}
+          <p class="hint">${e.vis ? 'In der Vorschau immer sichtbar – Kodi blendet es je nach Bedingung ein oder aus.' : 'Ein Element kann sich z.B. nur zeigen, wenn gerade etwas läuft.'}</p>
           <label class="flex items-center gap-2 text-xs text-slate-300 mt-3 cursor-pointer"><input type="checkbox" ${e.lock ? 'checked' : ''} onchange="setP('lock',this.checked);renderProps()"> 🔒 Sperren (nicht mehr versehentlich verschiebbar)</label>`;
 
-        if (isBtn || isPic) {
+        {
           const known = e.act.t === 'custom' && LIB.find(x => x.v === e.act.v);
-          h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${isPic ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
+          h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${isBtn ? 'Was passiert beim Klick?' : 'Funktion beim Anklicken (optional)'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
           if (e.act.t === 'page') h += `<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q => `<option value="${q.id}" ${q.id === e.act.v ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select>`;
           else if (ACTHINT[e.act.t] && e.act.t !== 'back' && e.act.t !== 'mysettings') h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
           if (known) h += `<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
-          h += `<p class="hint">${ACTHINT[e.act.t] || (isPic ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
+          h += `<p class="hint">${ACTHINT[e.act.t] || (isBtn ? 'Dieser Button macht nichts, außer gut auszusehen.' : 'Dieses Element ist nur Deko. Wähle eine Aktion, dann kann man es mit Maus oder Fernbedienung anklicken – egal ob Text, Bild, Poster, Fläche oder Cover.')}</p>`;
+          if (hasAct(e)) h += `<details class="mt-2"${e.pin || e.ask ? ' open' : ''}><summary class="hint cursor-pointer">🔐 Schutz (optional)</summary>
+            <label class="l">PIN-Sperre (Kindersicherung)</label><input class="inp" inputmode="numeric" maxlength="8" value="${esc(e.pin || '')}" oninput="setP('pin',this.value.replace(/\\D/g,''))" placeholder="z.B. 1234 – leer = keine Sperre">
+            <p class="hint">Vor der Aktion fragt Kodi nach diesem PIN. Einfacher Schutz vor Kindern, kein echtes Passwort.</p>
+            <label class="l">Sicherheitsfrage</label><input class="inp" value="${esc(e.ask || '')}" oninput="setP('ask',this.value)" placeholder="z.B. Kodi wirklich beenden?">
+            <p class="hint">Kodi fragt vorher mit Ja / Nein. Leer = keine Frage.</p></details>`;
+          h += '</div>';
         }
       }
       p.innerHTML = h;
@@ -859,9 +903,10 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     }
 
     function replacePic(inp) {
-      const e = sel(), f = inp.files[0]; inp.value = ''; if (!f || !e || e.type !== 'pic') return;
-      loadImgFile(f, im => { hpush(true); const o = prepImg(im, f.type), id = uid(); S.imgs[id] = o; e.img = id; e.h = Math.max(40, Math.min(1080 - e.y, Math.round(e.w * o.h / o.w))); renderStage(); renderProps(); save(); toast('Bild ersetzt'); });
+      const e = sel(), f = inp.files[0]; inp.value = ''; if (!f || !e || (e.type !== 'pic' && e.type !== 'image')) return;
+      loadImgFile(f, im => { hpush(true); const o = prepImg(im, f.type, e.type === 'image' ? 1000 : 0), id = uid(); S.imgs[id] = o; e.img = id; if (e.type === 'pic') e.h = Math.max(40, Math.min(1080 - e.y, Math.round(e.w * o.h / o.w))); renderStage(); renderProps(); save(); toast(e.type === 'image' ? 'Poster-Bild gesetzt' : 'Bild ersetzt'); });
     }
+    function noPic() { const e = sel(); if (!e) return; hpush(true); e.img = null; renderStage(); renderProps(); save(); }
 
     function setIcon(inp) { const f = inp.files[0]; inp.value = ''; if (!f) return; loadImgFile(f, im => { S.assets.icon = coverCanvas(im, 512, 512).toDataURL('image/png'); renderLeft(); save(); toast('Icon gesetzt'); }); }
     function setFanart(inp) { const f = inp.files[0]; inp.value = ''; if (!f) return; loadImgFile(f, im => { S.assets.fanart = coverCanvas(im, 1920, 1080).toDataURL('image/jpeg', .85); renderLeft(); save(); toast('Fanart gesetzt'); }); }
@@ -1077,7 +1122,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     function dupPage() {
       const c = JSON.parse(JSON.stringify(page())); c.id = uid(); c.name = c.name + ' (Kopie)';
-      c.els.forEach(e => e.id = uid()); S.pages.push(c); S.cur = S.pages.length - 1; S.sel = null; renderAll(); toast('Seite dupliziert.');
+      hpush(true); c.els.forEach(e => e.id = uid()); S.pages.push(c); S.cur = S.pages.length - 1; S.sel = null; renderAll(); toast('Seite dupliziert.');
     }
 
     function renamePage() { const n = prompt('Neuer Name?', page().name); if (n) { page().name = n; renderAll(); } }
@@ -1088,7 +1133,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       S.cur = 0; S.sel = null; renderAll();
     }
 
-    function togglePv() { S.pv = !S.pv; S.sel = null; if (S.pv) pvReset(); renderAll(); if (S.pv) toast('Testmodus: Klicke auf Buttons und Bilder, um die Aktionen auszuprobieren.'); }
+    function togglePv() { S.pv = !S.pv; S.sel = null; if (S.pv) pvReset(); renderAll(); if (S.pv) toast('Testmodus: Klicke auf Buttons und alle anklickbaren Elemente, um die Aktionen auszuprobieren.'); }
 
     function arrange() {
       const b = page().els.filter(e => e.type === 'button').sort((a, c) => a.y - c.y || a.x - c.x); if (!b.length) return toast('Auf dieser Seite gibt es keine Buttons.');
@@ -1107,7 +1152,12 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     const stage = $('stage');
     stage.addEventListener('pointerdown', ev => {
       const t = ev.target.closest('[data-id]');
-      if (S.pv) { if (t) runAct(page().els.find(e => e.id === t.dataset.id)); return; }
+      if (S.pv) {
+        const r = stage.getBoundingClientRect(), px = (ev.clientX - r.left) / scale, py = (ev.clientY - r.top) / scale;
+        const hit = [...page().els].reverse().find(e => (e.type === 'button' || hasAct(e)) && px >= e.x && px <= e.x + e.w && py >= e.y && py <= e.y + e.h);
+        if (hit) runAct(hit); else if (t) runAct(page().els.find(e => e.id === t.dataset.id));
+        return;
+      }
       if (!t) { S.sel = null; renderStage(); renderProps(); return; }
       const e = page().els.find(x => x.id === t.dataset.id); S.sel = e.id;
       drag = e.lock ? null : { e, rz: !!ev.target.dataset.rz, sx: ev.clientX, sy: ev.clientY, ox: e.x, oy: e.y, ow: e.w, oh: e.h, moved: false };
@@ -1167,16 +1217,21 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function actSpec(e) {
       const a = e.act || { t: 'none' };
       if (a.t === 'none') return null;
-      if (a.t === 'page') return { k: 'page', v: a.v };
-      if (a.t === 'back') return { k: 'back' };
-      const c = actCmd(e);
-      return c ? { k: 'cmd', c, close: needClose(c) } : null;
+      let s;
+      if (a.t === 'page') s = { k: 'page', v: a.v };
+      else if (a.t === 'back') s = { k: 'back' };
+      else { const c = actCmd(e); s = c ? { k: 'cmd', c, close: needClose(c) } : null; }
+      if (s && e.pin && /^\d{1,8}$/.test(e.pin)) s.pin = e.pin;
+      if (s && e.ask && e.ask.trim()) s.ask = e.ask.trim();
+      return s;
     }
 
     function runAct(e) {
-      if (!e || (e.type !== 'button' && e.type !== 'pic')) return;
-      const a = e.act;
+      if (!e) return;
+      const a = e.act || { t: 'none' };
       if (a.t === 'none') { if (e.type === 'button') toast('Dieser Button hat keine Aktion.'); return; }
+      if (e.pin) { const v = prompt('🔒 PIN eingeben (so fragt Kodi auch):'); if (v === null) return; if (v !== e.pin) return toast('Falscher PIN – Aktion abgebrochen.'); }
+      if (e.ask && !confirm(e.ask)) return;
       if (a.t === 'page') {
         const i = S.pages.findIndex(p => p.id === a.v);
         if (i < 0) return toast('Die Ziel-Seite gibt es nicht mehr.');
@@ -1193,16 +1248,17 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       toast(c ? `Kodi würde ausführen: ${c}${needClose(c) ? ' (das Menü schließt sich vorher)' : ''}` : 'Diese Aktion ist noch nicht ausgefüllt.');
     }
 
-    const focusables = p => p.els.filter(e => e.type === 'button' || (e.type === 'pic' && e.act && e.act.t !== 'none'));
+    const focusables = p => p.els.filter(e => e.type === 'button' || hasAct(e));
 
     function check() {
       const r = [];
       S.pages.forEach((p, i) => {
         p.els.forEach(e => {
           if (e.type === 'button' && e.bimg && !S.imgs[e.bimg]) r.push(['w', `Auf Seite „${p.name}“ fehlt das Hintergrundbild eines Buttons.`]);
-          if (e.type === 'pic' && !S.imgs[e.img]) r.push(['w', `Auf Seite „${p.name}“ fehlt die Bilddatei eines Bildes.`]);
-          if (e.type !== 'button' && e.type !== 'pic') return;
-          const a = e.act, n = `„${e.label || 'Bild'}“ (Seite ${p.name})`;
+          if (e.type === 'pic' && !S.imgs[e.img] && !e.src) r.push(['w', `Auf Seite „${p.name}“ fehlt die Bilddatei eines Bildes.`]);
+          if (e.type !== 'button' && !hasAct(e)) return;
+          const a = e.act, n = `„${e.label || TYPES[e.type]}“ (Seite ${p.name})`;
+          if (e.pin && !/^\d{1,8}$/.test(e.pin)) r.push(['w', `${n}: Der PIN darf nur aus 1–8 Ziffern bestehen.`]);
           if (a.t === 'none') { if (e.type === 'button') r.push(['i', `${n} hat noch keine Aktion.`]); }
           else if (a.t === 'play' && (!a.v || a.v === 'https://')) r.push(['w', `${n}: Es fehlt die Video-Adresse.`]);
           else if ((a.t === 'addon' || a.t === 'custom') && !a.v) r.push(['w', `${n}: Es fehlt der Befehl bzw. die Adresse.`]);
@@ -1212,10 +1268,10 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           else if (a.t === 'addonfile' && !S.files.some(f => cleanPath(f.p) === cleanPath(a.v))) r.push(['w', `${n}: Die Datei „${a.v}“ gibt es unter „📁 Ordner & Dateien“ nicht.`]);
           else if (a.t === 'mysettings' && !S.settings.length) r.push(['w', `${n}: Du hast noch keine Addon-Einstellungen angelegt („⚙ Einstellungen deines Addons bauen“).`]);
         });
-        if (!focusables(p).length) r.push(['w', `Seite „${p.name}“ hat keinen anklickbaren Button oder Bild – damit kann man sie in Kodi nicht bedienen.`]);
-        if (i > 0 && !S.pages.some(q => q.els.some(e => (e.type === 'button' || e.type === 'pic') && e.act && e.act.t === 'page' && e.act.v === p.id))) r.push(['w', `Seite „${p.name}“ ist nicht erreichbar – nichts führt dorthin.`]);
+        if (!focusables(p).length) r.push(['w', `Seite „${p.name}“ hat kein anklickbares Element – damit kann man sie in Kodi nicht bedienen.`]);
+        if (i > 0 && !S.pages.some(q => q.els.some(e => e.act && e.act.t === 'page' && e.act.v === p.id))) r.push(['w', `Seite „${p.name}“ ist nicht erreichbar – nichts führt dorthin.`]);
       });
-      if (S.pages.some(p => p.els.some(e => e.type === 'image'))) r.push(['i', 'Poster-Platzhalter werden als farbige Flächen exportiert. Für echte Bilder nimm „Eigenes Bild einfügen“.']);
+      if (S.pages.some(p => p.els.some(e => e.type === 'image' && !imgSrc(e)))) r.push(['i', 'Poster ohne Bild werden als farbige Flächen exportiert. Markiere ein Poster und wähle rechts ein Bild oder eine Internet-Adresse.']);
       if (!S.assets.icon) r.push(['i', 'Du hast kein eigenes Icon gewählt – es wird automatisch ein einfaches erzeugt.']);
       if (!S.meta.name.trim()) r.push(['w', 'Dein Projekt hat noch keinen Namen.']);
       return r;
@@ -1265,7 +1321,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       return s;
     }
 
-    const fid = (p, e) => (e.type === 'pic' ? 1000 : 100) + p.els.indexOf(e);
+    const fid = (p, e) => (e.type === 'button' ? 100 : 1000) + p.els.indexOf(e);
 
     let TX = {};
     const hexA = (c, a) => Math.round(Math.max(0, Math.min(100, a)) * 2.55).toString(16).padStart(2, '0').toUpperCase() + c.slice(1).toUpperCase();
@@ -1311,7 +1367,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     function winXml(p) {
       const foc = focusables(p), id = e => fid(p, e), FC = S.theme.focus.slice(1).toUpperCase();
-      const ctr = p.els.map((e, idx) => {
+      const one = (e, idx) => {
         const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`;
         const c = baseCol(e);
         const r = radPx(e), bw = bwOf(e), op = opOf(e), t0 = tex(r, 0);
@@ -1329,12 +1385,11 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           return ` ${head}<textcolor>${tcol}</textcolor><focusedcolor>FF000000</focusedcolor>${mid}<texturenofocus colordiffuse="${hexA(c, op)}"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="${hex(S.theme.focus)}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>${ring}`;
         }
         if (e.type === 'text') return ` <control type="label" id="${100 + idx}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>${hexA(e.color || '#ffffff', op)}</textcolor><align>${e.al || 'left'}</align><aligny>center</aligny></control>`;
-        if (e.type === 'pic') {
-          if (!S.imgs[e.img]) return ` <!-- Bild fehlt: ${idx} -->`;
+        if (e.type === 'pic' || (e.type === 'image' && imgSrc(e))) {
+          const is = imgSrc(e);
+          if (!is) return ` <!-- Bild fehlt: ${idx} -->`;
           const m = maskTex(e.w, e.h, r);
-          let x = ` <control type="image" id="${100 + idx}">${pos}<aspectratio>${ASP[e.fit] || 'keep'}</aspectratio>${op < 100 ? `<colordiffuse>${hexA('#ffffff', op)}</colordiffuse>` : ''}<texture${m ? ` diffuse="${m}"` : ''}>${picName(e.img)}</texture></control>`;
-          if (e.act && e.act.t !== 'none') x += `\n <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="55${FC}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>`;
-          return x + ring;
+          return ` <control type="image" id="${100 + idx}">${pos}<aspectratio>${ASP[e.fit] || 'keep'}</aspectratio>${op < 100 ? `<colordiffuse>${hexA('#ffffff', op)}</colordiffuse>` : ''}<texture${m ? ` diffuse="${m}"` : ''}${is.k.startsWith('img_') ? '' : ' background="true"'}>${esc(is.k)}</texture></control>${ring}`;
         }
         if (e.type === 'prog') return ` <control type="progress" id="${100 + idx}">${pos}<texturebg colordiffuse="${hexA(c, Math.round(op * .3))}">white.png</texturebg><midtexture colordiffuse="${hexA(c, op)}">white.png</midtexture><info>Player.Progress</info></control>`;
         if (e.type === 'art') {
@@ -1342,9 +1397,19 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
           return ` <control type="image" id="${100 + idx}">${pos}<aspectratio>keep</aspectratio>${op < 100 ? `<colordiffuse>${hexA('#ffffff', op)}</colordiffuse>` : ''}<texture${m ? ` diffuse="${m}"` : ''}>$INFO[Player.Art(thumb)]</texture></control>${ring}`;
         }
         return ` <control type="image" id="${100 + idx}">${pos}<texture${brd(t0)} colordiffuse="${hexA(c, op)}">${t0.f}</texture></control>${ring}`;
+      };
+      const ctr = p.els.map((e, idx) => {
+        let x = one(e, idx);
+        if (e.type !== 'button' && hasAct(e)) {
+          const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`, t0 = tex(e.type === 'text' ? 0 : radPx(e), 0);
+          x += `\n <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="55${FC}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>`;
+        }
+        if (e.vis && e.vis.trim()) { const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`; x = x.split(pos).join(pos + `<visible>${esc(e.vis.trim())}</visible>`); }
+        return x;
       }).join('\n');
 
-      const bgTex = S.bgImg ? '<aspectratio>scale</aspectratio><texture>background.jpg</texture>' : `<texture colordiffuse="${hex(S.theme.bg)}">white.png</texture>`;
+      const pi = S.pages.indexOf(p), pb = pageBg(p);
+      const bgTex = p.bgImg ? `<aspectratio>scale</aspectratio><texture>bg_page_${pi}.jpg</texture>` : pb.i ? '<aspectratio>scale</aspectratio><texture>background.jpg</texture>' : `<texture colordiffuse="${hex(pb.c)}">white.png</texture>`;
       const first = [...foc].sort((a, c) => a.y - c.y || a.x - c.x)[0];
       return `<?xml version="1.0" encoding="UTF-8"?>\n<window>\n <defaultcontrol always="true">${first ? id(first) : 100}</defaultcontrol>${animXml()}\n <controls>\n <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>\n${ctr}\n </controls>\n</window>`;
     }
@@ -1362,8 +1427,9 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       if (S.settings.length) F['resources/settings.xml'] = settingsXml();
       F[MEDIA + 'white.png'] = { b64: mkWhite() };
       if (S.bgImg) F[MEDIA + 'background.jpg'] = { b64: b64(S.bgImg) };
+      S.pages.forEach((p, i) => { if (p.bgImg) F[MEDIA + `bg_page_${i}.jpg`] = { b64: b64(p.bgImg) }; });
       const used = new Set();
-      S.pages.forEach(p => p.els.forEach(e => { if (e.type === 'pic' && S.imgs[e.img]) used.add(e.img); if (e.type === 'button' && e.bimg && S.imgs[e.bimg]) used.add(e.bimg); }));
+      S.pages.forEach(p => p.els.forEach(e => { if ((e.type === 'pic' || e.type === 'image') && S.imgs[e.img]) used.add(e.img); if (e.type === 'button' && e.bimg && S.imgs[e.bimg]) used.add(e.bimg); }));
       used.forEach(k => { F[MEDIA + picName(k)] = { b64: b64(S.imgs[k].d) }; });
       S.pages.forEach((p, i) => { F['resources/skins/Default/1080i/' + (i === 0 ? 'home.xml' : `page_${i}.xml`)] = winXml(p); });
       Object.keys(TX).forEach(n => { F[MEDIA + n] = { b64: mkTex(TX[n]) }; });
@@ -1395,6 +1461,19 @@ PAGES = dict((p['id'], p) for p in CONFIG.get('pages', []))
 ACTIONS = CONFIG.get('actions', {})
 ROOT = CONFIG.get('start') or (CONFIG['pages'][0]['id'] if CONFIG.get('pages') else None)
 
+def allowed(act):
+    pin = act.get('pin')
+    if pin:
+        code = xbmcgui.Dialog().numeric(0, 'PIN eingeben')
+        if code != pin:
+            if code:
+                xbmcgui.Dialog().notification(ADDON_NAME, 'Falscher PIN', xbmcgui.NOTIFICATION_WARNING, 3000)
+            return False
+    ask = act.get('ask')
+    if ask and not xbmcgui.Dialog().yesno(ADDON_NAME, ask):
+        return False
+    return True
+
 class MenuWindow(xbmcgui.WindowXML):
     page_id = None
     result = None
@@ -1402,6 +1481,7 @@ class MenuWindow(xbmcgui.WindowXML):
     def onClick(self, control_id):
         act = ACTIONS.get(self.page_id, {}).get(str(control_id))
         if not act: return
+        if not allowed(act): return
         kind = act.get('k')
         if kind == 'page':
             self.result = ('page', act.get('v'))
@@ -1552,7 +1632,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal')) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Deine damit gebauten Addons gehören dir.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
