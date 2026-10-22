@@ -1,4 +1,4 @@
-# 📖 Anleitung – Kodi Skin Generator
+# 📖 Anleitung – Kodi Skin Generator by IT('s) Possible
 
 So baust du dein eigenes Kodi-Menü in wenigen Minuten. Du brauchst keine Programmierkenntnisse.
 
