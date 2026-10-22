@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kodi Video-Addon Generator v8.1</title>
+  <title>Kodi Plugin-Video-Addon Generator v8.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -79,7 +79,7 @@
   <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-40">
     <div>
       <h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">
-        🔌 Kodi Video-Addon Generator by IT('s) Possible 
+        🔌 Kodi Plugin-Video-Addon Generator by IT('s) Possible 
         <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.1</span>
         <span class="text-[10px] text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5 ml-1">💚 Gratis · nicht zum Verkauf</span>
       </h1>
@@ -349,9 +349,9 @@
       addon: 'Adresse des Addons, z.B. plugin://plugin.video.youtube/',
       play: 'Internet-Adresse (https://…) oder Dateipfad des Videos.',
       custom: 'Am einfachsten über „Befehlsliste“. Profis können hier selbst etwas eintragen.',
-      back: 'Geht zur vorherigen Seite. Auf der Startseite schließt es das Addon.',
+      back: 'Geht zur vorherigen Seite. Auf der Startseite schließt es das Addon (zurück zur Kodi-Startseite).',
       home: 'Springt direkt zur Startseite dieses Addons – egal wie tief man drin ist.',
-      exit: 'Schließt das Addon komplett, egal auf welcher Seite man gerade ist.',
+      exit: 'Schließt das Addon komplett und kehrt zur Kodi-Startseite zurück – egal auf welcher Seite man gerade ist.',
       mysettings: 'Öffnet die Einstellungen, die du unter „⚙ Einstellungen deines Addons bauen“ angelegt hast.',
       addonfile: 'Pfad im Addon, z.B. resources/playlist.m3u (Datei vorher unter „📁 Ordner & Dateien“ anlegen).',
       py: 'Name einer Funktion aus resources/lib/custom.py, z.B. hallo (im 🛠 Modding „Python-Hooks“ einschalten).'
@@ -359,6 +359,9 @@
     const QUICK = [['🎬 Filme', 'page'], ['📺 Live TV', 'page'], ['🎵 Musik', 'page'], ['⚙ Einstellungen', 'settings'], ['🔧 Addon-Optionen', 'mysettings'], ['⏯ Play/Pause', 'playpause'], ['⬅ Zurück', 'back']];
     const CLOSE_CMDS = ['activatewindow', 'replacewindow', 'runaddon', 'runscript', 'runplugin', 'playmedia', 'quit', 'restartapp', 'reboot', 'powerdown', 'suspend', 'hibernate', 'shutdown', 'activatescreensaver'];
     const needClose = c => { const s = String(c || '').trim().toLowerCase(); return CLOSE_CMDS.some(x => s.startsWith(x)); };
+    // Nach diesen Befehlen kehrt das Addon NICHT ins Menü zurück (Kodi-Startseite, Beenden, Neustart …)
+    const NO_RETURN = ['activatewindow(home', 'replacewindow(home', 'activatewindow(10000', 'replacewindow(10000', 'quit', 'restartapp', 'reboot', 'powerdown', 'suspend', 'hibernate', 'shutdown', 'activatescreensaver'];
+    const noReturn = c => { const s = String(c || '').trim().toLowerCase().replace(/\s+/g, ''); return NO_RETURN.some(x => s.startsWith(x)); };
 
     const JC = { left: 'flex-start', center: 'center', right: 'flex-end' };
     const ASP = { stretch: 'stretch', keep: 'keep', scale: 'scale' };
@@ -590,7 +593,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
 
     const btn = (label, icon, x, y, t, v = '', extra = {}) => mk('button', Object.assign({ label, icon, x, y, w: 420, h: 110, act: { t, v } }, extra));
 
-    const defMod = () => ({ fzoom: false, zoom: 106, stagger: false, shadow: false, font: 'font13', ftc: '#000000', swOn: '#22c55e', grid: 20, confirmExit: false, remember: false, deeplinks: true, autostart: false, autoDelay: 5, autoDef: false, bgmOn: false, bgm: '', bgmIdle: true, bgmStop: true, hooks: false, debug: false, keys: [] });
+    const defMod = () => ({ fzoom: false, zoom: 106, stagger: false, shadow: false, font: 'font13', ftc: '#000000', swOn: '#22c55e', grid: 20, confirmExit: false, remember: false, deeplinks: true, homeExit: true, retMenu: true, autostart: false, autoDelay: 5, autoDef: false, bgmOn: false, bgm: '', bgmIdle: true, bgmStop: true, hooks: false, debug: false, keys: [] });
     const defUi = () => ({ ids: false, guides: false, safe: false });
 
     function tpl(name) {
@@ -1688,14 +1691,15 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       }
       if (a.t === 'back') {
         if (pvNav.length > 1) { pvNav.pop(); S.cur = pvNav[pvNav.length - 1]; renderAll(); }
-        else toast('Zurück: Hier würde sich das Addon schließen' + (S.mod.confirmExit ? ' (vorher kommt die Rückfrage).' : '.'));
+        else toast('Zurück: Hier würde sich das Addon schließen' + (S.mod.confirmExit ? ' (vorher kommt die Rückfrage)' : '') + (S.mod.homeExit ? ' – danach Kodi-Startseite.' : '.'));
         return;
       }
       if (a.t === 'home') { if (S.cur !== 0) { pvNav = [0]; S.cur = 0; renderAll(); } return; }
-      if (a.t === 'exit') return toast('Hier würde sich das Addon komplett schließen.');
+      if (a.t === 'exit') return toast('Hier würde sich das Addon komplett schließen' + (S.mod.homeExit ? ' – danach Kodi-Startseite.' : '.'));
       if (a.t === 'py') return toast(S.mod.hooks ? `Kodi würde custom.${a.v || '?'}(window) aufrufen.` : 'Python-Hooks sind aus – im 🛠 Modding einschalten.');
       const c = cmdOf(a);
-      toast(c ? `Kodi würde ausführen: ${c}${needClose(c) ? ' (das Menü schließt sich vorher)' : ''}` : 'Diese Aktion ist noch nicht ausgefüllt.');
+      const after = !needClose(c) ? '' : (S.mod.retMenu && !noReturn(c)) ? ' (das Menü schließt sich vorher und kommt mit Zurück bzw. nach dem Video wieder)' : ' (das Menü schließt sich, das Addon endet)';
+      toast(c ? `Kodi würde ausführen: ${c}${after}` : 'Diese Aktion ist noch nicht ausgefüllt.');
     }
 
     function runAct(e) {
@@ -2033,11 +2037,12 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
 
     // ================= Python-Dateien des Addons =================
     const ADDON_PY = `# -*- coding: utf-8 -*-
-# Erzeugt mit dem Kodi Video-Addon Generator v8.1 (Modding Edition)
+# Erzeugt mit dem Kodi Plugin-Video-Addon Generator
 # Die Seiten, Aktionen, Listen und Schalter stehen in pages.json.
 import os
 import sys
 import json
+import time
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -2064,8 +2069,12 @@ LISTS = CONFIG.get('lists', {})
 SWITCHES = CONFIG.get('switches', {})
 KEYS = CONFIG.get('keys', {})
 CLOSE_CMDS = tuple(c.lower() for c in CONFIG.get('close', []))
+NO_RETURN = tuple(c.lower() for c in CONFIG.get('noreturn', []))
 ROOT = CONFIG.get('start') or (CONFIG['pages'][0]['id'] if CONFIG.get('pages') else None)
-HOME = xbmcgui.Window(10000)
+HOME_ID = 10000
+HOME = xbmcgui.Window(HOME_ID)
+RUN_KEY = 'kfe.run.' + ADDON_ID
+TOKEN = '%.6f' % time.time()
 BACK_ACTIONS = (10, 92)
 DIR_WINDOWS = {'music': 'Music', 'pictures': 'Pictures', 'programs': 'Programs'}
 
@@ -2117,6 +2126,60 @@ def rpc(method, params):
 
 def needs_close(cmd):
     return bool(CLOSE_CMDS) and cmd.strip().lower().startswith(CLOSE_CMDS)
+
+
+# ---------- Kodi-Startseite und Rückkehr ins Menü ----------
+def no_return(cmd):
+    """Befehle, nach denen das Addon endet (z.B. Kodi-Startseite, Beenden, Neustart)."""
+    c = cmd.strip().lower().replace(' ', '')
+    return bool(NO_RETURN) and c.startswith(NO_RETURN)
+
+
+def still_ours():
+    """False, sobald das Addon ein zweites Mal gestartet wurde (die neue Instanz übernimmt)."""
+    return HOME.getProperty(RUN_KEY) == TOKEN
+
+
+def modal_open():
+    return xbmc.getCondVisibility('System.HasActiveModalDialog')
+
+
+def go_home(wait=True):
+    """Zur Kodi-Startseite wechseln. ReplaceWindow entfernt Kodis Video-Ansicht aus dem Verlauf."""
+    if xbmcgui.getCurrentWindowId() == HOME_ID:
+        return
+    log('Wechsle zur Kodi-Startseite')
+    xbmc.executebuiltin('ReplaceWindow(home)')
+    if not wait:
+        return
+    monitor = xbmc.Monitor()
+    for _ in range(60):
+        if xbmcgui.getCurrentWindowId() == HOME_ID or monitor.waitForAbort(0.05):
+            break
+
+
+def wait_return(base):
+    """Wartet, bis man aus einem Kodi-Fenster oder Video wieder zurück ist.
+
+    True = Menü wieder öffnen, False = Addon beenden (Kodi schließt
+    oder das Addon wurde inzwischen neu gestartet).
+    """
+    monitor = xbmc.Monitor()
+    away = False
+    for _ in range(80):  # bis zu 4 Sekunden auf das neue Fenster / Video warten
+        if monitor.waitForAbort(0.05) or not still_ours():
+            return False
+        if xbmcgui.getCurrentWindowId() != base or modal_open():
+            away = True
+            break
+    while away:
+        if monitor.waitForAbort(0.25) or not still_ours():
+            return False
+        if xbmcgui.getCurrentWindowId() == base and not modal_open():
+            if monitor.waitForAbort(0.4) or not still_ours():
+                return False
+            away = xbmcgui.getCurrentWindowId() != base or modal_open()
+    return True
 
 
 # ---------- Ein/Aus-Schalter ----------
@@ -2390,9 +2453,9 @@ def open_page(page_id):
     return result
 
 
-def run(stack):
+def run(stack, base):
+    """Zeigt die Seiten. Rückgabe: (Befehl für danach, zur Kodi-Startseite?)."""
     monitor = xbmc.Monitor()
-    pending = None
     while stack and not monitor.abortRequested():
         page_id = stack[-1]
         if page_id not in PAGES:
@@ -2408,7 +2471,7 @@ def run(stack):
         elif kind == 'home':
             del stack[1:]
         elif kind == 'exit':
-            break
+            return None, True
         elif kind == 'page':
             target = result[1]
             if target not in PAGES:
@@ -2418,9 +2481,16 @@ def run(stack):
             else:
                 stack.append(target)
         elif kind == 'cmd':
-            pending = result[1]
-            break
-    return pending
+            cmd = result[1]
+            if not OPTS.get('return_menu') or no_return(cmd):
+                return cmd, False
+            # Kodi-Fenster oder Video öffnen und danach wieder ins Menü zurückkehren
+            log('Fuehre aus, danach zurueck ins Menue: %s' % cmd)
+            xbmc.sleep(100)
+            xbmc.executebuiltin(cmd)
+            if not wait_return(base):
+                return None, False
+    return None, not monitor.abortRequested()
 
 
 def start_stack():
@@ -2476,23 +2546,31 @@ def main():
     if not ROOT:
         notify('Keine Seiten gefunden', xbmcgui.NOTIFICATION_ERROR)
         return
+    HOME.setProperty(RUN_KEY, TOKEN)
+    if handle >= 0 and OPTS.get('home_exit'):
+        # Aus Kodis Video-Ansicht gestartet: diese Ansicht überspringen, das Menü liegt über der Kodi-Startseite
+        go_home()
     apply_flags()
     call_hook('on_start', False)
     welcome = CONFIG.get('welcome')
     if welcome:
         notify(welcome)
     music = bgm_start()
-    pending = None
+    pending, home = None, False
     try:
-        pending = run(start_stack())
+        pending, home = run(start_stack(), xbmcgui.getCurrentWindowId())
     except Exception as exc:
         log('Fehler beim Anzeigen des Menues: %s' % exc, xbmc.LOGERROR)
         notify('Menue konnte nicht geladen werden', xbmcgui.NOTIFICATION_ERROR, 5000)
     bgm_stop(music)
     call_hook('on_exit', False)
+    if still_ours():
+        HOME.clearProperty(RUN_KEY)
     if pending:
         xbmc.sleep(150)
         xbmc.executebuiltin(pending)
+    elif home and OPTS.get('home_exit'):
+        go_home(False)
 
 
 if __name__ == '__main__':
@@ -2583,7 +2661,7 @@ if __name__ == '__main__':
     function buildFiles(raw) {
       const id = addonId(), m = S.meta, A = S.assets, M = S.mod, F = {}, pad = n => String(n + 1).padStart(2, '0'); TX = {};
       const shots = A.shots.map((d, i) => `resources/screenshot-${pad(i)}.jpg`);
-      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
+      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Plugin-Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
       
       F['icon.png'] = { b64: A.icon ? b64(A.icon) : mkImg(512, 512, 'image/png', 1) };
       F['fanart.jpg'] = { b64: A.fanart ? b64(A.fanart) : S.bgImg ? b64(S.bgImg) : mkImg(1920, 1080, 'image/jpeg', .12) };
@@ -2635,7 +2713,9 @@ if __name__ == '__main__':
         pages: S.pages.map((p, i) => { const f = firstFoc(p); return { id: p.id, name: p.name, file: i === 0 ? 'home.xml' : `page_${i}.xml`, dlg: !!p.dlg, focus: f ? fid(p, f) : null }; }),
         actions, lists, switches, keys,
         close: CLOSE_CMDS,
+        noreturn: NO_RETURN,
         opts: {
+          home_exit: !!M.homeExit, return_menu: !!M.retMenu,
           confirm_exit: !!M.confirmExit, remember: !!M.remember, deeplinks: !!M.deeplinks, hooks: !!M.hooks, debug: !!M.debug,
           bgm: M.bgmOn && bg ? (/^[a-z]+:/i.test(bg) ? bg : cleanPath(bg)) : '', bgm_idle: !!M.bgmIdle, bgm_stop: !!M.bgmStop
         }
@@ -2818,7 +2898,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Deine damit gebauten Addons gehören dir.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Deine damit gebauten Addons gehören dir.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
@@ -2875,6 +2955,8 @@ if __name__ == '__main__':
         </div>
         <div>
           <div class="sec">🧭 Verhalten in Kodi</div>
+          ${tgM('mod', 'homeExit', '🏠 Beenden führt zur Kodi-Startseite', 'Wer das Addon verlässt (Zurück auf der Startseite oder „Addon komplett schließen“), landet auf der Kodi-Startseite – nicht in Kodis Video-Ansicht. Diese Ansicht wird auch beim Start übersprungen.')}
+          ${tgM('mod', 'retMenu', '↩ Nach Kodi-Fenstern zurück ins Menü', 'Öffnet ein Button ein Kodi-Fenster (z.B. Filme, ein anderes Addon) oder spielt ein Video, kommt man mit Zurück bzw. nach dem Video wieder in dein Menü – statt in Kodis Ansicht hängenzubleiben.')}
           ${tgM('mod', 'confirmExit', '❓ Beim Verlassen nachfragen', '„Zurück“ auf der Startseite fragt erst „Addon wirklich verlassen?“.')}
           ${tgM('mod', 'remember', '🧠 Letzte Seite merken', 'Das Addon öffnet sich wieder dort, wo man es verlassen hat.')}
           ${tgM('mod', 'deeplinks', '🔗 Direkt-Links erlauben', 'Jede Seite lässt sich direkt öffnen – z.B. als Kodi-Favorit. Links stehen im „🔍 Inspektor“.')}
