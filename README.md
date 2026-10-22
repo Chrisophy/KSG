@@ -76,5 +76,11 @@ Das Tool besteht aus einer einzigen HTML-Datei ohne Server-Backends:
 ---
 
 ## 📄 Lizenz & Credits
-
+# Copyright (c) 2026 Team IT('s) Possible. All rights reserved.
+# Version 2026.10.22
+# RECHTLICHER HINWEIS:
+# Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
+# Dieser Code ist das geistige Eigentum der Autoren.
+# Das Modifizieren, Verändern, Umschreiben oder die unautorisierte 
+# Weiterverbreitung des Codes ist strengstens untersagt.
 Erstellt von **IT('s) Possible**. Freie Nutzung unter GPL-2.0-or-later.

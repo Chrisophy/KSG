@@ -137,3 +137,12 @@ Klicke auf **📁 Ordner & Dateien verwalten**:
 | **Entf / Rücktaste** | Markiertes Element löschen |
 | **Strg + D** | Markiertes Element duplizieren |
 | **Strg + Z** | Letzte Aktion rückgängig machen |
+
+
+# Copyright (c) 2026 Team IT('s) Possible. All rights reserved.
+# Version 2026.10.22
+# RECHTLICHER HINWEIS:
+# Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
+# Dieser Code ist das geistige Eigentum der Autoren.
+# Das Modifizieren, Verändern, Umschreiben oder die unautorisierte 
+# Weiterverbreitung des Codes ist strengstens untersagt.
