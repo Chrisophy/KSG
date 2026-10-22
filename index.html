@@ -1,4 +1,4 @@
-<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22 
+<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22-2 
 RECHTLICHER HINWEIS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
 Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern, Umschreiben oder die unautorisierte Weiterverbreitung des Codes ist strengstens untersagt.-->
 <!DOCTYPE html>
@@ -6,7 +6,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kodi Video-Addon Generator v8.0 Pro</title>
+  <title>Kodi Video-Addon Generator v8.1 Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oiz/RK654AGN689p5UsL19aae8/fcf14a51A9e12vHFf8a6H2g1344Bef9b8oMvM0+8F6kU5C2d38w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
@@ -28,15 +28,23 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; touch-action: none; overflow: hidden; background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px); background-size: 40px 40px; }
     #stage.nogrid { background-image: none; }
     
-    .el { position: absolute; display: flex; align-items: center; justify-content: center; color: #fff; font-family: Arial, sans-serif; cursor: move; box-sizing: border-box; overflow: hidden; text-align: center; touch-action: none; }
+    .el { position: absolute; display: flex; align-items: center; justify-content: center; color: #fff; font-family: Arial, sans-serif; cursor: move; box-sizing: border-box; text-align: center; touch-action: none; isolation: isolate; }
+    .el .bgl, .el .bdr { position: absolute; inset: 0; pointer-events: none; }
+    .el .bgl { z-index: 0; }
+    .el .bdr { z-index: 3; box-sizing: border-box; }
+    .el .lb { position: relative; z-index: 2; max-width: 100%; overflow: hidden; padding: 0 .4em; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; }
+    .el.t .lb { padding: 0; }
     .el.sel { outline: 6px solid #fff; outline-offset: 4px; z-index: 5; }
-    
+
     .pv .el { cursor: pointer; }
-    .pv .b:hover { background: var(--f) !important; color: #000; }
-    .pv .pa:hover::after { content: ''; position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: var(--f); opacity: .35; }
-    
-    .rz { position: absolute; right: 0; bottom: 0; width: 44px; height: 44px; background: #fff; opacity: .9; cursor: nwse-resize; border-radius: 12px 0 0 0; }
-    
+    .pv .b:hover .bgl { background: var(--f) !important; opacity: 1 !important; }
+    .pv .b:hover { color: #000 !important; }
+    .pv .pa:hover::after { content: ''; position: absolute; inset: 0; background: var(--f); opacity: .35; border-radius: inherit; z-index: 1; pointer-events: none; }
+
+    .rz { position: absolute; right: -10px; bottom: -10px; width: 44px; height: 44px; background: #fff; opacity: .9; cursor: nwse-resize; border-radius: 12px; z-index: 6; }
+
+    input[type=range] { accent-color: #0ea5e9; }
+
     label.l { display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin: 10px 0 3px; }
     .hint { font-size: 10.5px; color: #64748b; margin-top: 2px; }
     
@@ -51,7 +59,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     <div>
       <h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">
         🔌 Kodi Video-Addon Generator by IT('s) Possible 
-        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.0 Pro</span>
+        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.1 Pro</span>
       </h1>
       <p class="text-[11px] text-slate-400">Gestalte das Menü deines Addons (home.xml) mit Buttons und Bildern und exportiere alles als installierbare ZIP.</p>
     </div>
@@ -60,6 +68,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       <button class="btn" onclick="showHelp()">❓ So geht's</button>
       <button class="btn" onclick="showTpl()">📂 Vorlagen</button>
       <button class="btn" onclick="undo()">↩ Rückgängig</button>
+      <button class="btn" onclick="redo()">↪ Wiederholen</button>
       <button class="btn" id="btn-pv" onclick="togglePv()">▶ Testen</button>
       <button class="btn" onclick="showCheck(false)">✔ Prüfen</button>
       <button class="btn" onclick="showCode()">&lt;/&gt; Code</button>
@@ -118,9 +127,12 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
 
       <input type="file" id="f-pic" accept="image/*" multiple class="hidden" onchange="addPics(this)">
       <input type="file" id="f-picrep" accept="image/*" class="hidden" onchange="replacePic(this)">
+      <input type="file" id="f-bimg" accept="image/*" class="hidden" onchange="setBtnImg(this)">
       
       <p class="hint mt-3 mb-1">Schnell-Buttons (Aktion schon eingestellt):</p>
       <div class="flex flex-wrap gap-1.5" id="quick"></div>
+      <p class="hint mt-3 mb-1">Live-Infos (Kodi füllt sie während der Nutzung selbst aus):</p>
+      <div class="flex flex-wrap gap-1.5" id="live"></div>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">3 · Design</h3>
       <div class="flex flex-wrap gap-1.5 mt-2" id="themes"></div>
@@ -137,6 +149,10 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       </div>
       <input type="file" id="bgf" accept="image/*" class="hidden" onchange="setBg(this)">
 
+      <label for="t-rad" class="l">Rundung aller Buttons <span id="t-rad-v" class="text-sky-400"></span></label>
+      <input type="range" id="t-rad" min="0" max="100" class="w-full" oninput="setThemeRad(this.value)">
+      <p class="hint">0 % = eckig, 100 % = Pille (komplett rund). Einzelne Elemente stellst du rechts bei „Form & Stil“ anders ein.</p>
+
       <label class="flex items-center gap-2 text-xs text-slate-300 mt-3 cursor-pointer">
         <input type="checkbox" id="snap" checked onchange="S.snap=this.checked;$('stage').classList.toggle('nogrid',!this.checked);save()"> Raster / Einrasten
       </label>
@@ -146,6 +162,9 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
         <button class="btn" onclick="arrange()">📐 Buttons mittig untereinander ordnen</button>
         <button class="btn" onclick="sameSize()">📏 Alle Buttons so groß wie markierter</button>
         <button class="btn" onclick="dupPage()">⧉ Diese Seite duplizieren</button>
+        <button class="btn" onclick="gridArrange()">🔲 Buttons im Raster anordnen …</button>
+        <button class="btn" onclick="styleAll()">🎨 Stil des markierten Buttons auf alle Buttons</button>
+        <div class="grid grid-cols-2 gap-2"><button class="btn" onclick="copyEl()">📋 Kopieren</button><button class="btn" onclick="pasteEl()">📌 Einfügen</button></div>
       </div>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">5 · Addon-Bilder & Dateien</h3>
@@ -196,10 +215,10 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
       <div id="wrap" class="shadow-2xl">
         <div id="stage"></div>
       </div>
-      <p class="hint mt-2 mb-4">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Ecke unten rechts = Größe ändern</p>
+      <p class="hint mt-2 mb-4">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Strg+Y = wiederholen · Strg+C / Strg+V = kopieren / einfügen · Ecke unten rechts = Größe ändern</p>
 
       <!-- RECHTS / UNTEN: EIGENSCHAFTEN (FÜR MOBILGERÄTE AUCH DIREKT UNTER DEM EDITOR) -->
-      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl lg:hidden">
         <h3 class="text-xs font-bold text-sky-400 uppercase mb-2">Eigenschaften des gewählten Elements</h3>
         <div id="props"></div>
       </div>
@@ -248,6 +267,27 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     const QUICK = [['🎬 Filme', 'page'], ['📺 Live TV', 'page'], ['🎵 Musik', 'page'], ['⚙ Einstellungen', 'settings'], ['⏯ Play/Pause', 'playpause'], ['⬅ Zurück', 'back']];
     const CLOSE_CMDS = ['activatewindow', 'replacewindow', 'runaddon', 'runscript', 'playmedia', 'quit', 'restartapp', 'reboot', 'powerdown', 'suspend', 'hibernate', 'shutdown', 'activatescreensaver'];
     const needClose = c => { const s = String(c || '').trim().toLowerCase(); return CLOSE_CMDS.some(x => s.startsWith(x)); };
+
+    const JC = { left: 'flex-start', center: 'center', right: 'flex-end' };
+    const ASP = { stretch: 'stretch', keep: 'keep', scale: 'scale' };
+    const LIVEOPTS = [
+      ['🕒 Uhrzeit', '$INFO[System.Time]'],
+      ['📅 Datum', '$INFO[System.Date]'],
+      ['🌡 Temperatur', '$INFO[Weather.Temperature]'],
+      ['🎵 Läuft gerade', '$INFO[Player.Title]'],
+      ['⏱ Laufzeit', '$INFO[Player.Time] / $INFO[Player.Duration]']
+    ];
+    const LIVEPV = {
+      'System.Time': () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
+      'System.Date': () => new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }),
+      'Weather.Temperature': () => '18 °C',
+      'Player.Title': () => 'Titel des Videos',
+      'Player.Time': () => '12:34',
+      'Player.Duration': () => '1:45:00'
+    };
+    const liveTxt = s => String(s ?? '').replace(/\$INFO\[([^\]]+)\]/g, (m, k) => LIVEPV[k] ? LIVEPV[k]() : '⟨' + k + '⟩');
+    const isLive = s => /\$INFO\[/.test(s || '');
+    let CLIP = null;
 
     const LIB = `Navigation|🏠|Startseite|ActivateWindow(home)|Zurück zum Kodi-Hauptmenü
 Navigation|🎬|Filme-Bibliothek|ActivateWindow(videos,videodb://movies/titles/,return)|Alle Filme deiner Bibliothek
@@ -314,7 +354,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     const CATS = ['Alle', ...new Set(LIB.map(x => x.c))];
     let L = { q: '', c: 'Alle' }, FD = '';
-    let S, hist = [], lastH = 0, drag = null, scale = 1, saveWarned = false, pvNav = [0];
+    let S, hist = [], redoS = [], lastH = 0, drag = null, scale = 1, saveWarned = false, pvNav = [0];
 
     function switchMobileTab(tab) {
       const aside = $('panel-aside');
@@ -340,7 +380,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       w: type === 'text' ? 600 : type === 'image' ? 300 : type === 'box' ? 500 : type === 'pic' ? 400 : 420,
       h: type === 'text' ? 80 : type === 'image' ? 450 : type === 'box' ? 300 : type === 'pic' ? 400 : 100,
       label: type === 'button' ? 'Neuer Button' : type === 'text' ? 'Text hier' : '',
-      icon: '', color: null, img: null, fit: 'keep', act: { t: 'none', v: '' }
+      icon: '', color: null, img: null, fit: 'keep', act: { t: 'none', v: '' },
+      rad: null, bw: 0, bc: '#ffffff', op: 100, al: type === 'button' ? 'center' : 'left', tc: '', bimg: null, lock: false
     }, o);
 
     const btn = (label, icon, x, y, t, v = '', extra = {}) => mk('button', Object.assign({ label, icon, x, y, w: 420, h: 110, act: { t, v } }, extra));
@@ -357,7 +398,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       return [p('home', 'Start', [mk('text', { label: 'Mein Menü', x: 120, y: 90, w: 800, h: 110 }), btn('Mein erster Button', '⭐', 120, 300, 'none')])];
     }
 
-    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2] }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
+    const newState = n => ({ mode: 'addon', kodi: '20', snap: true, meta: { name: 'Mein Kodi Projekt', author: 'Ich', ver: '1.0.0', desc: '', lic: 'GPL-2.0-or-later' }, theme: { primary: THEMES.Standard[0], focus: THEMES.Standard[1], bg: THEMES.Standard[2], rad: 35 }, bgImg: null, assets: { icon: null, fanart: null, shots: [] }, imgs: {}, files: [], folders: [], pages: tpl(n || 'stream'), cur: 0, sel: null, pv: false });
 
     function norm() {
       S.mode = 'addon'; S.pv = false; S.sel = null; S.bgImg = S.bgImg || null;
@@ -365,14 +406,26 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       S.assets = Object.assign({ icon: null, fanart: null, shots: [] }, S.assets || {});
       S.assets.shots = S.assets.shots || [];
       S.files = S.files || []; S.folders = S.folders || []; S.imgs = S.imgs || {};
-      S.pages.forEach(p => p.els.forEach(e => { if (!e.act) e.act = { t: 'none', v: '' }; if (!e.fit) e.fit = 'keep'; }));
+      if (S.theme.rad == null) S.theme.rad = 35;
+      S.pages.forEach(p => p.els.forEach(e => {
+        if (!e.act) e.act = { t: 'none', v: '' };
+        if (!e.fit) e.fit = 'keep';
+        if (e.rad === undefined) e.rad = null;
+        if (e.bw == null) e.bw = 0;
+        if (!e.bc) e.bc = '#ffffff';
+        if (e.op == null) e.op = 100;
+        if (!e.al) e.al = e.type === 'button' ? 'center' : 'left';
+        if (e.tc == null) e.tc = '';
+        if (e.bimg === undefined) e.bimg = null;
+        e.lock = !!e.lock;
+      }));
       if (S.cur >= S.pages.length) S.cur = 0;
       gcImgs();
     }
 
     function gcImgs() {
       const u = new Set();
-      S.pages.forEach(p => p.els.forEach(e => { if (e.img) u.add(e.img); }));
+      S.pages.forEach(p => p.els.forEach(e => { if (e.img) u.add(e.img); if (e.bimg) u.add(e.bimg); }));
       Object.keys(S.imgs).forEach(k => { if (!u.has(k)) delete S.imgs[k]; });
     }
 
@@ -396,13 +449,23 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       if (force || n - lastH > 700) {
         hist.push(JSON.stringify(S.pages));
         if (hist.length > 60) hist.shift();
+        redoS = [];
         lastH = n;
       }
     }
 
     function undo() {
       if (!hist.length) return toast('Nichts zum Rückgängig machen');
+      redoS.push(JSON.stringify(S.pages));
       S.pages = JSON.parse(hist.pop());
+      if (S.cur >= S.pages.length) S.cur = 0;
+      S.sel = null; renderAll();
+    }
+
+    function redo() {
+      if (!redoS.length) return toast('Nichts zum Wiederholen');
+      hist.push(JSON.stringify(S.pages));
+      S.pages = JSON.parse(redoS.pop());
       if (S.cur >= S.pages.length) S.cur = 0;
       S.sel = null; renderAll();
     }
@@ -445,6 +508,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function renderLeft() {
       $('m-name').value = S.meta.name; $('m-author').value = S.meta.author; $('m-ver').value = S.meta.ver; $('m-desc').value = S.meta.desc || ''; $('m-lic').value = S.meta.lic || ''; $('m-kodi').value = S.kodi; $('m-id').textContent = addonId();
       ['primary', 'focus', 'bg'].forEach(k => $('t-' + k).value = S.theme[k]);
+      $('t-rad').value = S.theme.rad; $('t-rad-v').textContent = S.theme.rad + ' %';
+      $('live').innerHTML = LIVEOPTS.map((q, i) => `<button class="btn" onclick="addLive(${i})">${q[0]}</button>`).join('');
       $('snap').checked = S.snap; $('stage').classList.toggle('nogrid', !S.snap);
       $('themes').innerHTML = Object.keys(THEMES).map(n => `<button class="btn" onclick="applyTheme('${n}')">${n}</button>`).join('');
       $('quick').innerHTML = QUICK.map((q, i) => `<button class="btn" onclick="quickAdd(${i})">${q[0]}</button>`).join('');
@@ -474,55 +539,194 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     // Automatischer Resize-Observer für absolut stabile Skalierung
     new ResizeObserver(() => fit()).observe($('wrap'));
 
+    const radPct = e => e.rad != null ? e.rad : e.type === 'button' ? S.theme.rad : (e.type === 'box' || e.type === 'image') ? Math.round(S.theme.rad * .4) : 0;
+    const radPx = e => Math.round(Math.min(e.w, e.h) / 2 * Math.max(0, Math.min(100, radPct(e))) / 100);
+    const opOf = e => e.op == null ? 100 : e.op;
+    const bwOf = e => e.bw || 0;
+    const rgba = (c, a) => { const n = parseInt(String(c).slice(1), 16) || 0; return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+
     function renderStage() {
       const st = $('stage'); st.className = (S.pv ? 'pv ' : '') + (S.snap ? '' : 'nogrid');
       st.style.backgroundColor = S.theme.bg; st.style.setProperty('--f', S.theme.focus);
       st.style.backgroundImage = S.bgImg ? `url(${S.bgImg})` : ''; st.style.backgroundSize = S.bgImg ? 'cover' : '';
       st.innerHTML = page().els.map(e => {
+        const on = !S.pv && e.id === S.sel;
         const c = e.color || (e.type === 'box' || e.type === 'image' ? '#334155' : S.theme.primary);
-        let s = `left:${e.x}px;top:${e.y}px;width:${e.w}px;height:${e.h}px;`, cls = 'el', inner = '';
-        if (e.type === 'button') { s += `background:${c};border-radius:18px;font-size:${Math.min(46, e.h * .4)}px;font-weight:600;`; cls += ' b'; inner = esc((e.icon ? e.icon + ' ' : '') + e.label); }
-        else if (e.type === 'text') { s += `font-size:${e.h * .6}px;font-weight:700;justify-content:flex-start;text-align:left;color:${e.color || '#fff'};`; inner = esc(e.label); }
-        else if (e.type === 'image') { s += `background:${c};border-radius:14px;font-size:${Math.min(40, e.w * .14)}px;opacity:.9;`; inner = '🖼 ' + esc(e.label || ''); }
+        const r = radPx(e), bw = bwOf(e), op = opOf(e) / 100;
+        const fitCss = { stretch: '100% 100%', keep: 'contain', scale: 'cover' }[e.fit] || 'contain';
+        const rs = `border-radius:${r}px;`;
+        let s = `left:${e.x}px;top:${e.y}px;width:${e.w}px;height:${e.h}px;${rs}`, cls = 'el', bg = '', txt = '', ls = '', lstyle = '';
+        if (e.type === 'button') {
+          const bim = e.bimg && S.imgs[e.bimg];
+          s += `font-size:${Math.min(46, e.h * .4)}px;font-weight:600;color:${e.tc || '#fff'};justify-content:${JC[e.al || 'center']};`;
+          if (bim) { cls += ' bi pa'; bg = `<div class="bgl" style="background:url('${bim.d}') center/${fitCss} no-repeat;opacity:${op};${rs}"></div>`; }
+          else { cls += ' b'; bg = `<div class="bgl" style="background:${rgba(c, op)};${rs}"></div>`; }
+          ls = (e.icon ? e.icon + ' ' : '') + e.label; txt = esc(liveTxt(ls));
+        }
+        else if (e.type === 'text') {
+          s += `font-size:${e.h * .6}px;font-weight:700;color:${e.color || '#fff'};justify-content:${JC[e.al || 'left']};`;
+          cls += ' t'; ls = e.label; txt = esc(liveTxt(ls)); lstyle = `opacity:${op};`;
+        }
+        else if (e.type === 'image') {
+          s += `font-size:${Math.min(40, e.w * .14)}px;`;
+          bg = `<div class="bgl" style="background:${rgba(c, op * .9)};${rs}"></div>`;
+          ls = '🖼 ' + (e.label || ''); txt = esc(ls);
+        }
         else if (e.type === 'pic') {
-          const im = S.imgs[e.img], sz = { stretch: '100% 100%', keep: 'contain', scale: 'cover' }[e.fit] || 'contain';
-          if (im) s += `background:url('${im.d}') center/${sz} no-repeat;`; else { s += 'background:#334155;font-size:36px;'; inner = '🖼 Bild fehlt'; }
+          const im = S.imgs[e.img];
+          if (im) bg = `<div class="bgl" style="background:url('${im.d}') center/${fitCss} no-repeat;opacity:${op};${rs}"></div>`;
+          else { bg = `<div class="bgl" style="background:#334155;${rs}"></div>`; s += 'font-size:36px;'; txt = '🖼 Bild fehlt'; }
           if (e.act && e.act.t !== 'none') cls += ' pa';
         }
-        else s += `background:${c};border-radius:14px;opacity:.85;`;
-        const on = !S.pv && e.id === S.sel;
-        return `<div class="${cls}${on ? ' sel' : ''}" data-id="${e.id}" style="${s}">${inner}${on ? '<div class="rz" data-rz="1"></div>' : ''}</div>`;
+        else bg = `<div class="bgl" style="background:${rgba(c, op * .85)};${rs}"></div>`;
+        const bdr = bw > 0 ? `<div class="bdr" style="border:${bw}px solid ${e.bc || '#ffffff'};${rs}"></div>` : '';
+        const lbl = txt ? `<span class="lb"${isLive(ls) ? ` data-ls="${esc(ls)}"` : ''}${lstyle ? ` style="${lstyle}"` : ''}>${txt}</span>` : '';
+        return `<div class="${cls}${on ? ' sel' : ''}" data-id="${e.id}" style="${s}">${bg}${bdr}${lbl}${on ? '<div class="rz" data-rz="1"></div>' : ''}</div>`;
       }).join('');
     }
 
+    // Live-Infos (Uhrzeit usw.) in der Vorschau jede Sekunde aktualisieren
+    setInterval(() => {
+      document.querySelectorAll('#stage [data-ls]').forEach(n => { const t = liveTxt(n.dataset.ls); if (n.textContent !== t) n.textContent = t; });
+    }, 1000);
+
     function field(l, h, hint) { return `<label class="l">${l}</label>${h}${hint ? `<p class="hint">${hint}</p>` : ''}`; }
+
+    function sld(k, min, max, val, suf) {
+      return `<div class="flex items-center gap-2"><input type="range" min="${min}" max="${max}" value="${val}" class="flex-1" oninput="setP('${k}',+this.value);this.nextElementSibling.textContent=this.value+'${suf}'"><span class="hint" style="width:46px;text-align:right">${val}${suf}</span></div>`;
+    }
+
+    const colF = (l, k, val, defJs) => field(l, `<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${val}" oninput="setP('${k}',this.value)"><button class="btn" onclick="setP('${k}',${defJs});renderProps()">Standard</button></div>`);
+
+    const fitSel = e => field('Bildanpassung', `<select class="inp" onchange="setP('fit',this.value)"><option value="keep" ${e.fit === 'keep' ? 'selected' : ''}>Ganzes Bild zeigen (Seitenverhältnis behalten)</option><option value="scale" ${e.fit === 'scale' ? 'selected' : ''}>Fläche füllen (Rand wird abgeschnitten)</option><option value="stretch" ${e.fit === 'stretch' ? 'selected' : ''}>Strecken auf die Fläche</option></select>`);
 
     function renderProps() {
       const e = sel(), p = $('props'), pLg = $('props-lg');
       let h = '';
       if (!e) { h = '<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button><button class="btn w-full mt-2" onclick="$(\'f-pic\').click()">🖼 Eigenes Bild einfügen</button>'; }
       else {
-        h = `<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}</b><div class="flex gap-1"><button class="btn" onclick="dupEl()">⧉</button><button class="btn" onclick="delEl()">🗑</button></div></div>`;
-        if (e.type !== 'box' && e.type !== 'pic') h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
-        if (e.type === 'button') h += field('Symbol (Emoji)', `<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`, 'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
-        if (e.type === 'pic') {
+        const isBtn = e.type === 'button', isPic = e.type === 'pic', isTxt = e.type === 'text', hasBimg = isBtn && !!e.bimg;
+        h = `<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}${e.lock ? ' 🔒' : ''}</b><div class="flex gap-1"><button class="btn" aria-label="Kopieren" onclick="copyEl()">📋</button><button class="btn" aria-label="Duplizieren" onclick="dupEl()">⧉</button><button class="btn" aria-label="Löschen" onclick="delEl()">🗑</button></div></div>`;
+        if (e.type !== 'box' && !isPic) h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
+        if (isBtn || isTxt) h += `<select class="inp mt-1" onchange="insLive(this.value);this.value=''"><option value="">➕ Live-Info einfügen …</option>${LIVEOPTS.map((q, i) => `<option value="${i}">${q[0]}</option>`).join('')}</select><p class="hint">Live-Infos füllt Kodi während der Nutzung selbst aus (Uhr, Datum, Wetter, Titel).</p>`;
+        if (isBtn) h += field('Symbol (Emoji)', `<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`, 'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
+        if (isBtn || isTxt) h += field('Textausrichtung', `<select class="inp" onchange="setP('al',this.value)">${[['left', 'Links'], ['center', 'Mittig'], ['right', 'Rechts']].map(a => `<option value="${a[0]}" ${(e.al || (isBtn ? 'center' : 'left')) === a[0] ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`);
+        if (isBtn) h += colF('Textfarbe', 'tc', e.tc || '#ffffff', "''");
+
+        if (isPic) {
           h += `<label class="l">Bild</label><button class="btn w-full" onclick="$('f-picrep').click()">🔄 Anderes Bild wählen</button>`;
-          h += field('Bildanpassung', `<select class="inp" onchange="setP('fit',this.value)"><option value="keep" ${e.fit === 'keep' ? 'selected' : ''}>Ganzes Bild zeigen (Seitenverhältnis behalten)</option><option value="scale" ${e.fit === 'scale' ? 'selected' : ''}>Fläche füllen (Rand wird abgeschnitten)</option><option value="stretch" ${e.fit === 'stretch' ? 'selected' : ''}>Strecken auf die Fläche</option></select>`);
-        } else h += field('Farbe', `<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.color || (e.type === 'text' ? '#ffffff' : S.theme.primary)}" oninput="setP('color',this.value)"><button class="btn" onclick="setP('color',null);renderProps()">Standard</button></div>`);
-        
-        h += `<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x', 'y', 'w', 'h'].map(k => `<div><span class="hint">${k === 'w' ? 'Breite' : k === 'h' ? 'Höhe' : k.toUpperCase()}</span><input id="p-${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div> <div class="grid grid-cols-3 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder()">⬆ nach vorn</button></div>`;
-        
-        if (e.type === 'button' || e.type === 'pic') {
+          h += fitSel(e);
+        } else if (isBtn) {
+          h += `<label class="l">Eigenes Bild als Button-Hintergrund</label><div class="flex gap-2"><button class="btn flex-1" onclick="$('f-bimg').click()">🖼 ${hasBimg ? 'Anderes Bild wählen' : 'Bild wählen'}</button>${hasBimg ? '<button class="btn" aria-label="Button-Bild entfernen" onclick="noBtnImg()">✖</button>' : ''}</div>`;
+          if (hasBimg) h += fitSel(e);
+          else h += '<p class="hint">Der Button bekommt statt der Farbe ein Bild. Beschriftung kannst du leeren, wenn das Bild alleine wirken soll.</p>';
+        }
+        if (!isPic && !hasBimg) h += colF(isTxt ? 'Textfarbe' : 'Farbe', 'color', e.color || (isTxt ? '#ffffff' : S.theme.primary), 'null');
+
+        if (!isTxt) {
+          h += `<div class="mt-4 p-3 rounded-xl border border-slate-700 bg-slate-950/40"><b class="text-xs text-sky-400">🔘 Form & Stil</b>
+            <div class="flex flex-wrap gap-1.5 mt-2"><button class="btn" onclick="preset('square')">▢ Eckig</button><button class="btn" onclick="preset('round')">▢ Abgerundet</button><button class="btn" onclick="preset('pill')">💊 Pille</button><button class="btn" onclick="preset('outline')">◻ Nur Rahmen</button><button class="btn" onclick="preset('glass')">🪟 Glas</button></div>
+            <label class="l">Rundung der Ecken</label>${sld('rad', 0, 100, radPct(e), ' %')}
+            <div class="flex items-center justify-between"><p class="hint">0 % = eckig · 100 % = Pille${e.rad == null ? ' (Standard aus Design)' : ''}</p>${e.rad != null ? '<button class="btn" onclick="setP(\'rad\',null);renderProps()">Standard</button>' : ''}</div>
+            <label class="l">Rahmen (Dicke)</label>${sld('bw', 0, 20, bwOf(e), ' px')}
+            ${bwOf(e) > 0 ? `<div class="flex gap-2 mt-1"><input type="color" aria-label="Rahmenfarbe" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.bc || '#ffffff'}" oninput="setP('bc',this.value)"><span class="hint">Rahmenfarbe</span></div>` : ''}
+            <label class="l">Deckkraft</label>${sld('op', 0, 100, opOf(e), ' %')}
+            ${isPic ? '<p class="hint">Bei Bildern ist die Rundung am schönsten mit „Fläche füllen“.</p>' : ''}</div>`;
+        } else {
+          h += `<label class="l">Deckkraft</label>${sld('op', 0, 100, opOf(e), ' %')}`;
+        }
+
+        h += `<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x', 'y', 'w', 'h'].map(k => `<div><span class="hint">${k === 'w' ? 'Breite' : k === 'h' ? 'Höhe' : k.toUpperCase()}</span><input data-pf="${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div> <div class="grid grid-cols-2 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder(true)">⬆ nach vorn</button><button class="btn" onclick="zOrder(false)">⬇ nach hinten</button></div>
+          <label class="flex items-center gap-2 text-xs text-slate-300 mt-3 cursor-pointer"><input type="checkbox" ${e.lock ? 'checked' : ''} onchange="setP('lock',this.checked);renderProps()"> 🔒 Sperren (nicht mehr versehentlich verschiebbar)</label>`;
+
+        if (isBtn || isPic) {
           const known = e.act.t === 'custom' && LIB.find(x => x.v === e.act.v);
-          h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${e.type === 'pic' ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
+          h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${isPic ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
           if (e.act.t === 'page') h += `<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q => `<option value="${q.id}" ${q.id === e.act.v ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select>`;
           else if (ACTHINT[e.act.t]) h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
           if (known) h += `<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
-          h += `<p class="hint">${ACTHINT[e.act.t] || (e.type === 'pic' ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
+          h += `<p class="hint">${ACTHINT[e.act.t] || (isPic ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
         }
       }
       p.innerHTML = h;
       if (pLg) pLg.innerHTML = h;
+    }
+
+    function preset(n) {
+      const e = sel(); if (!e) return; hpush(true);
+      const P = {
+        square: { rad: 0, bw: 0, op: 100 },
+        round: { rad: 35, bw: 0, op: 100 },
+        pill: { rad: 100, bw: 0, op: 100 },
+        outline: { rad: 35, bw: 6, bc: S.theme.focus, op: 0 },
+        glass: { rad: 35, bw: 3, bc: '#ffffff', op: 35 }
+      };
+      Object.assign(e, P[n]); renderStage(); renderProps(); save();
+    }
+
+    function setThemeRad(v) { S.theme.rad = +v; $('t-rad-v').textContent = v + ' %'; renderStage(); renderProps(); save(); }
+
+    function insLive(i) {
+      const e = sel(); if (!e || i === '' || LIVEOPTS[+i] == null) return;
+      hpush(true); e.label = (e.label ? e.label + ' ' : '') + LIVEOPTS[+i][1];
+      renderStage(); renderProps(); save();
+    }
+
+    function addLive(i) { addEl('text', { label: LIVEOPTS[i][1], w: 600, h: 70 }); }
+
+    function setBtnImg(inp) {
+      const e = sel(), f = inp.files[0]; inp.value = '';
+      if (!f || !e || e.type !== 'button') return;
+      loadImgFile(f, im => {
+        hpush(true); const o = prepImg(im, f.type, 900), id = uid();
+        S.imgs[id] = o; e.bimg = id; e.fit = 'scale';
+        renderStage(); renderProps(); save(); toast('Bild für Button gesetzt');
+      });
+    }
+
+    function noBtnImg() { const e = sel(); if (!e) return; hpush(true); e.bimg = null; renderStage(); renderProps(); save(); }
+
+    function copyEl() {
+      const e = sel(); if (!e) return toast('Markiere zuerst ein Element.');
+      CLIP = JSON.parse(JSON.stringify(e));
+      toast('Kopiert – mit Strg+V oder „📌 Einfügen“ einfügen (auch auf anderen Seiten).');
+    }
+
+    function pasteEl() {
+      if (!CLIP) return toast('Es wurde noch nichts kopiert.');
+      hpush(true);
+      const c = JSON.parse(JSON.stringify(CLIP)); c.id = uid(); c.lock = false;
+      c.x = Math.max(0, Math.min(1920 - c.w, c.x + 40)); c.y = Math.max(0, Math.min(1080 - c.h, c.y + 40));
+      CLIP.x = c.x; CLIP.y = c.y;
+      if (c.act && c.act.t === 'page' && !S.pages.some(q => q.id === c.act.v)) c.act = { t: 'none', v: '' };
+      page().els.push(c); S.sel = c.id; renderStage(); renderProps(); save(); toast('Eingefügt.');
+    }
+
+    function gridArrange() {
+      const b = page().els.filter(e => e.type === 'button').sort((a, c) => a.y - c.y || a.x - c.x);
+      if (!b.length) return toast('Auf dieser Seite gibt es keine Buttons.');
+      const s = prompt('In wie vielen Spalten sollen die Buttons stehen?', b.length > 3 ? '2' : '1'); if (!s) return;
+      const cols = Math.max(1, Math.min(8, parseInt(s, 10) || 1)), gap = 30, rows = Math.ceil(b.length / cols);
+      const cw = Math.min(Math.max(...b.map(e => e.w)), Math.floor((1800 - (cols - 1) * gap) / cols)), ch = Math.max(...b.map(e => e.h));
+      const x0 = Math.round((1920 - (cols * cw + (cols - 1) * gap)) / 2), totH = rows * ch + (rows - 1) * gap, y0 = Math.max(160, Math.round((1080 - totH) / 2));
+      hpush(true);
+      b.forEach((e, i) => {
+        e.w = Math.min(e.w, cw);
+        e.x = x0 + (i % cols) * (cw + gap) + Math.round((cw - e.w) / 2);
+        e.y = Math.min(1080 - e.h, y0 + Math.floor(i / cols) * (ch + gap) + Math.round((ch - e.h) / 2));
+      });
+      renderStage(); renderProps(); save(); toast('Buttons im Raster angeordnet.');
+    }
+
+    function styleAll() {
+      const e = sel(); if (!e || e.type !== 'button') return toast('Markiere zuerst einen Button – sein Stil gilt dann für alle Buttons dieser Seite.');
+      hpush(true);
+      page().els.forEach(x => {
+        if (x.type !== 'button') return;
+        x.rad = e.rad; x.bw = e.bw; x.bc = e.bc; x.op = e.op; x.al = e.al; x.tc = e.tc;
+        if (!e.bimg && !x.bimg) x.color = e.color;
+      });
+      renderStage(); renderProps(); save(); toast('Stil auf alle Buttons dieser Seite übertragen.');
     }
 
     function showLib() {
@@ -545,8 +749,8 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       closeModal(); renderStage(); renderProps(); save(); toast('Befehl eingesetzt: ' + x.l);
     }
 
-    function prepImg(im, type) {
-      const k = Math.min(1, 1920 / im.width, 1080 / im.height), w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
+    function prepImg(im, type, mx) {
+      const k = mx ? Math.min(1, mx / im.width, mx / im.height) : Math.min(1, 1920 / im.width, 1080 / im.height), w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
       const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
       const png = /png|gif|webp|svg/i.test(type || '');
       return { d: png ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', .88), ext: png ? 'png' : 'jpg', w, h };
@@ -656,10 +860,10 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function delEl() { const e = sel(); if (!e) return; hpush(true); page().els = page().els.filter(x => x !== e); S.sel = null; renderStage(); renderProps(); save(); }
     function dupEl() { const e = sel(); if (!e) return; hpush(true); const c = JSON.parse(JSON.stringify(e)); c.id = uid(); c.x += 40; c.y += 40; page().els.push(c); S.sel = c.id; renderStage(); renderProps(); save(); }
     function center(a) { const e = sel(); if (!e) return; hpush(true); if (a === 'x') e.x = Math.round((1920 - e.w) / 2); else e.y = Math.round((1080 - e.h) / 2); renderStage(); renderProps(); save(); }
-    function zOrder() { const e = sel(); if (!e) return; hpush(true); page().els = page().els.filter(x => x !== e).concat(e); renderStage(); save(); }
+    function zOrder(front = true) { const e = sel(); if (!e) return; hpush(true); const rest = page().els.filter(x => x !== e); page().els = front ? rest.concat(e) : [e].concat(rest); renderStage(); save(); toast(front ? 'Nach vorn gebracht.' : 'Nach hinten gesetzt.'); }
     function setMeta(k, v) { S.meta[k] = v; $('m-id').textContent = addonId(); save(); }
     function setTheme(k, v) { S.theme[k] = v; renderStage(); save(); }
-    function applyTheme(n) { const t = THEMES[n]; S.theme = { primary: t[0], focus: t[1], bg: t[2] }; renderAll(); }
+    function applyTheme(n) { const t = THEMES[n]; S.theme = { primary: t[0], focus: t[1], bg: t[2], rad: S.theme.rad }; renderAll(); }
     function gotoPage(i) { S.cur = i; S.sel = null; if (S.pv) pvReset(); renderAll(); }
 
     function addPage() {
@@ -703,7 +907,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       if (S.pv) { if (t) runAct(page().els.find(e => e.id === t.dataset.id)); return; }
       if (!t) { S.sel = null; renderStage(); renderProps(); return; }
       const e = page().els.find(x => x.id === t.dataset.id); S.sel = e.id;
-      drag = { e, rz: !!ev.target.dataset.rz, sx: ev.clientX, sy: ev.clientY, ox: e.x, oy: e.y, ow: e.w, oh: e.h, moved: false };
+      drag = e.lock ? null : { e, rz: !!ev.target.dataset.rz, sx: ev.clientX, sy: ev.clientY, ox: e.x, oy: e.y, ow: e.w, oh: e.h, moved: false };
       stage.setPointerCapture(ev.pointerId); renderStage(); renderProps();
       ev.preventDefault();
     });
@@ -718,7 +922,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       
       const t = stage.querySelector(`[data-id="${e.id}"]`);
       if (t) { t.style.left = e.x + 'px'; t.style.top = e.y + 'px'; t.style.width = e.w + 'px'; t.style.height = e.h + 'px'; }
-      ['x', 'y', 'w', 'h'].forEach(f => { const i = $('p-' + f); if (i) i.value = e[f]; });
+      ['x', 'y', 'w', 'h'].forEach(f => document.querySelectorAll('[data-pf="' + f + '"]').forEach(i => { i.value = e[f]; }));
       ev.preventDefault();
     });
 
@@ -726,13 +930,17 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     document.addEventListener('keydown', ev => {
       if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+      const mod = ev.ctrlKey || ev.metaKey, k = ev.key.toLowerCase();
+      if (mod && k === 'z' && !ev.shiftKey) { ev.preventDefault(); undo(); return; }
+      if (mod && (k === 'y' || (k === 'z' && ev.shiftKey))) { ev.preventDefault(); redo(); return; }
+      if (mod && k === 'v') { ev.preventDefault(); pasteEl(); return; }
       const e = sel();
-      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); undo(); return; }
       if (!e) return;
-      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'd') { ev.preventDefault(); dupEl(); return; }
+      if (mod && k === 'c') { ev.preventDefault(); copyEl(); return; }
+      if (mod && k === 'd') { ev.preventDefault(); dupEl(); return; }
       if (ev.key === 'Delete' || ev.key === 'Backspace') { delEl(); return; }
       const st = ev.shiftKey ? 100 : 20, m = { ArrowLeft: ['x', -st], ArrowRight: ['x', st], ArrowUp: ['y', -st], ArrowDown: ['y', st] }[ev.key];
-      if (m) { ev.preventDefault(); hpush(); e[m[0]] += m[1]; renderStage(); renderProps(); save(); }
+      if (m) { ev.preventDefault(); if (e.lock) return toast('🔒 Dieses Element ist gesperrt.'); hpush(); e[m[0]] += m[1]; renderStage(); renderProps(); save(); }
     });
 
     function actCmd(e) {
@@ -785,6 +993,7 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       const r = [];
       S.pages.forEach((p, i) => {
         p.els.forEach(e => {
+          if (e.type === 'button' && e.bimg && !S.imgs[e.bimg]) r.push(['w', `Auf Seite „${p.name}“ fehlt das Hintergrundbild eines Buttons.`]);
           if (e.type === 'pic' && !S.imgs[e.img]) r.push(['w', `Auf Seite „${p.name}“ fehlt die Bilddatei eines Bildes.`]);
           if (e.type !== 'button' && e.type !== 'pic') return;
           const a = e.act, n = `„${e.label || 'Bild'}“ (Seite ${p.name})`;
@@ -849,29 +1058,85 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
 
     const fid = (p, e) => (e.type === 'pic' ? 1000 : 100) + p.els.indexOf(e);
 
+    let TX = {};
+    const hexA = (c, a) => Math.round(Math.max(0, Math.min(100, a)) * 2.55).toString(16).padStart(2, '0').toUpperCase() + c.slice(1).toUpperCase();
+
+    // Texturen für Rundungen / Rahmen (werden beim Export als PNG erzeugt)
+    function tex(r, bw) {
+      const b = Math.max(r, bw);
+      if (b <= 0) return { f: 'white.png', b: 0 };
+      const n = bw > 0 ? `ring_${r}_${bw}.png` : `round_${r}.png`;
+      TX[n] = { k: 'round', r, bw };
+      return { f: n, b };
+    }
+    function maskTex(w, h, r) {
+      if (r <= 0) return '';
+      const n = `mask_${w}x${h}_${r}.png`;
+      TX[n] = { k: 'mask', w, h, r };
+      return n;
+    }
+    const brd = t => t.b ? ` border="${t.b},${t.b},${t.b},${t.b}"` : '';
+
+    function rrPath(x, X, Y, W, H, R) {
+      x.beginPath(); x.moveTo(X + R, Y);
+      x.arcTo(X + W, Y, X + W, Y + H, R); x.arcTo(X + W, Y + H, X, Y + H, R);
+      x.arcTo(X, Y + H, X, Y, R); x.arcTo(X, Y, X + W, Y, R); x.closePath();
+    }
+
+    function mkTex(t) {
+      const c = document.createElement('canvas');
+      if (t.k === 'mask') {
+        const k = Math.min(1, 512 / Math.max(t.w, t.h));
+        c.width = Math.max(8, Math.round(t.w * k)); c.height = Math.max(8, Math.round(t.h * k));
+        const x = c.getContext('2d'); x.fillStyle = '#ffffff';
+        rrPath(x, 0, 0, c.width, c.height, Math.min(t.r * k, c.width / 2, c.height / 2)); x.fill();
+      } else {
+        const b = Math.max(t.r, t.bw), s = Math.max(16, 2 * b + 8);
+        c.width = c.height = s;
+        const x = c.getContext('2d'); x.fillStyle = '#ffffff'; x.strokeStyle = '#ffffff';
+        if (t.bw > 0) { x.lineWidth = t.bw; rrPath(x, t.bw / 2, t.bw / 2, s - t.bw, s - t.bw, Math.max(0, t.r - t.bw / 2)); x.stroke(); }
+        else { rrPath(x, 0, 0, s, s, t.r); x.fill(); }
+      }
+      return b64(c.toDataURL('image/png'));
+    }
+
     function winXml(p) {
-      const foc = focusables(p), id = e => fid(p, e);
+      const foc = focusables(p), id = e => fid(p, e), FC = S.theme.focus.slice(1).toUpperCase();
       const ctr = p.els.map((e, idx) => {
-        const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`, c = hex(e.color || (e.type === 'box' || e.type === 'image' ? '#334155' : S.theme.primary));
-        if (e.type === 'button') return ` <control type="button" id="${id(e)}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>FFFFFFFF</textcolor><focusedcolor>FF000000</focusedcolor><align>center</align><aligny>center</aligny><texturenofocus colordiffuse="${c}">white.png</texturenofocus><texturefocus colordiffuse="${hex(S.theme.focus)}">white.png</texturefocus>${nav(foc, e, id)}</control>`;
-        if (e.type === 'text') return ` <control type="label" id="${100 + idx}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>${hex(e.color || '#ffffff')}</textcolor><aligny>center</aligny></control>`;
+        const pos = `<left>${e.x}</left><top>${e.y}</top><width>${e.w}</width><height>${e.h}</height>`;
+        const c = e.color || (e.type === 'box' || e.type === 'image' ? '#334155' : S.theme.primary);
+        const r = radPx(e), bw = bwOf(e), op = opOf(e), t0 = tex(r, 0);
+        let ring = '';
+        if (bw > 0) { const rt = tex(r, bw); ring = `\n <control type="image" id="${2000 + idx}">${pos}<texture${brd(rt)} colordiffuse="${hex(e.bc || '#ffffff')}">${rt.f}</texture></control>`; }
+
+        if (e.type === 'button') {
+          const al = e.al || 'center', off = al === 'center' ? '' : '<textoffsetx>30</textoffsetx>', tcol = hex(e.tc || '#ffffff');
+          const head = `<control type="button" id="${id(e)}">${pos}<label>${esc(e.label)}</label><font>font13</font>`;
+          const mid = `<align>${al}</align><aligny>center</aligny>${off}`;
+          if (e.bimg && S.imgs[e.bimg]) {
+            const m = maskTex(e.w, e.h, r);
+            return ` <control type="image" id="${4000 + idx}">${pos}<aspectratio>${ASP[e.fit] || 'scale'}</aspectratio><colordiffuse>${hexA('#ffffff', op)}</colordiffuse><texture${m ? ` diffuse="${m}"` : ''}>${picName(e.bimg)}</texture></control>\n ${head}<textcolor>${tcol}</textcolor><focusedcolor>${tcol}</focusedcolor>${mid}<texturenofocus colordiffuse="00FFFFFF"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="66${FC}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>${ring}`;
+          }
+          return ` ${head}<textcolor>${tcol}</textcolor><focusedcolor>FF000000</focusedcolor>${mid}<texturenofocus colordiffuse="${hexA(c, op)}"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="${hex(S.theme.focus)}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>${ring}`;
+        }
+        if (e.type === 'text') return ` <control type="label" id="${100 + idx}">${pos}<label>${esc(e.label)}</label><font>font13</font><textcolor>${hexA(e.color || '#ffffff', op)}</textcolor><align>${e.al || 'left'}</align><aligny>center</aligny></control>`;
         if (e.type === 'pic') {
           if (!S.imgs[e.img]) return ` <!-- Bild fehlt: ${idx} -->`;
-          const asp = { stretch: 'stretch', keep: 'keep', scale: 'scale' }[e.fit] || 'keep';
-          let x = ` <control type="image" id="${100 + idx}">${pos}<aspectratio>${asp}</aspectratio><texture>${picName(e.img)}</texture></control>`;
-          if (e.act && e.act.t !== 'none') x += `\n <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus><texturefocus colordiffuse="55${S.theme.focus.slice(1).toUpperCase()}">white.png</texturefocus>${nav(foc, e, id)}</control>`;
-          return x;
+          const m = maskTex(e.w, e.h, r);
+          let x = ` <control type="image" id="${100 + idx}">${pos}<aspectratio>${ASP[e.fit] || 'keep'}</aspectratio>${op < 100 ? `<colordiffuse>${hexA('#ffffff', op)}</colordiffuse>` : ''}<texture${m ? ` diffuse="${m}"` : ''}>${picName(e.img)}</texture></control>`;
+          if (e.act && e.act.t !== 'none') x += `\n <control type="button" id="${id(e)}">${pos}<label></label><texturenofocus colordiffuse="00FFFFFF"${brd(t0)}>${t0.f}</texturenofocus><texturefocus colordiffuse="55${FC}"${brd(t0)}>${t0.f}</texturefocus>${nav(foc, e, id)}</control>`;
+          return x + ring;
         }
-        return ` <control type="image" id="${100 + idx}">${pos}<texture colordiffuse="${c}">white.png</texture></control>`;
+        return ` <control type="image" id="${100 + idx}">${pos}<texture${brd(t0)} colordiffuse="${hexA(c, op)}">${t0.f}</texture></control>${ring}`;
       }).join('\n');
-      
+
       const bgTex = S.bgImg ? '<aspectratio>scale</aspectratio><texture>background.jpg</texture>' : `<texture colordiffuse="${hex(S.theme.bg)}">white.png</texture>`;
       const first = [...foc].sort((a, c) => a.y - c.y || a.x - c.x)[0];
       return `<?xml version="1.0" encoding="UTF-8"?>\n<window>\n <defaultcontrol always="true">${first ? id(first) : 100}</defaultcontrol>\n <animation effect="fade" time="200">WindowOpen</animation>\n <controls>\n <control type="image" id="99"><left>0</left><top>0</top><width>1920</width><height>1080</height>${bgTex}</control>\n${ctr}\n </controls>\n</window>`;
     }
 
     function buildFiles() {
-      const id = addonId(), m = S.meta, A = S.assets, F = {}, pad = n => String(n + 1).padStart(2, '0');
+      const id = addonId(), m = S.meta, A = S.assets, F = {}, pad = n => String(n + 1).padStart(2, '0'); TX = {};
       const shots = A.shots.map((d, i) => `resources/screenshot-${pad(i)}.jpg`);
       const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
       
@@ -883,9 +1148,10 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       F[MEDIA + 'white.png'] = { b64: mkWhite() };
       if (S.bgImg) F[MEDIA + 'background.jpg'] = { b64: b64(S.bgImg) };
       const used = new Set();
-      S.pages.forEach(p => p.els.forEach(e => { if (e.type === 'pic' && S.imgs[e.img]) used.add(e.img); }));
+      S.pages.forEach(p => p.els.forEach(e => { if (e.type === 'pic' && S.imgs[e.img]) used.add(e.img); if (e.type === 'button' && e.bimg && S.imgs[e.bimg]) used.add(e.bimg); }));
       used.forEach(k => { F[MEDIA + picName(k)] = { b64: b64(S.imgs[k].d) }; });
       S.pages.forEach((p, i) => { F['resources/skins/Default/1080i/' + (i === 0 ? 'home.xml' : `page_${i}.xml`)] = winXml(p); });
+      Object.keys(TX).forEach(n => { F[MEDIA + n] = { b64: mkTex(TX[n]) }; });
       
       const actions = {};
       S.pages.forEach(p => { const mp = {}; focusables(p).forEach(e => { const s = actSpec(e); if (s) mp[fid(p, e)] = s; }); actions[p.id] = mp; });
@@ -1019,13 +1285,13 @@ if __name__ == '__main__':
     function importJson(inp) {
       const f = inp.files[0]; if (!f) return;
       const r = new FileReader();
-      r.onload = () => { try { const d = JSON.parse(r.result); if (!d.pages) throw 0; S = d; norm(); hist = []; renderAll(); fit(); toast('Projekt geladen'); } catch (e) { toast('Datei konnte nicht gelesen werden'); } };
+      r.onload = () => { try { const d = JSON.parse(r.result); if (!d.pages) throw 0; S = d; norm(); hist = []; redoS = []; renderAll(); fit(); toast('Projekt geladen'); } catch (e) { toast('Datei konnte nicht gelesen werden'); } };
       r.readAsText(f); inp.value = '';
     }
 
     function newProject() {
       if (!confirm('Wirklich ein neues Projekt starten? Nicht gespeicherte Änderungen gehen verloren!')) return;
-      localStorage.removeItem('kfe5'); localStorage.removeItem('kfe4'); S = newState('stream'); norm(); hist = []; renderAll(); fit(); toast('Neues Projekt gestartet!');
+      localStorage.removeItem('kfe5'); localStorage.removeItem('kfe4'); S = newState('stream'); norm(); hist = []; redoS = []; renderAll(); fit(); toast('Neues Projekt gestartet!');
     }
 
     function modal(h) { $('modal-in').innerHTML = h; $('modal').classList.remove('hidden'); }
@@ -1033,14 +1299,14 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal')) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <button class="btn pri mt-5" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
       modal(`<h3 class="font-bold text-lg mb-1">Mit einer Vorlage starten</h3><p class="hint mb-3">Achtung: ersetzt Seiten und Elemente. Bilder, Dateien und Einstellungen bleiben erhalten.</p> <div class="grid sm:grid-cols-2 gap-3">${[['stream', '🎬 Streaming-Hub', 'Startseite, Filme, Live TV'], ['live', '📺 Live TV', 'Senderliste mit Abspiel-Buttons'], ['music', '🎵 Musik-Player', 'Play, Weiter, Stopp'], ['empty', '📄 Leer', 'Nur ein Button']].map(t => `<button class="btn text-left p-4" onclick="loadTpl('${t[0]}')"><b class="block text-sm">${t[1]}</b><span class="text-[11px] text-slate-400">${t[2]}</span></button>`).join('')}</div> <button class="btn mt-4" onclick="closeModal()">Abbrechen</button>`);
     }
 
-    function loadTpl(n) { const keep = { meta: S.meta, mode: S.mode, kodi: S.kodi, theme: S.theme, bgImg: S.bgImg, assets: S.assets, files: S.files, folders: S.folders }; S = Object.assign(newState(n), keep); norm(); hist = []; closeModal(); renderAll(); fit(); }
+    function loadTpl(n) { const keep = { meta: S.meta, mode: S.mode, kodi: S.kodi, theme: S.theme, bgImg: S.bgImg, assets: S.assets, files: S.files, folders: S.folders }; S = Object.assign(newState(n), keep); norm(); hist = []; redoS = []; closeModal(); renderAll(); fit(); }
 
     (function init() {
       try { const d = JSON.parse(localStorage.getItem('kfe5') || localStorage.getItem('kfe4')); if (d && d.pages) S = d; } catch (e) {}
