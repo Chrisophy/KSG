@@ -1,6 +1,6 @@
-# 📖 Handbuch – Kodi Plugin-Video-Addon Generator v8.1 by IT('s) Possible
+# 📖 Handbuch – Kodi Video-Addon Generator v8.1 by IT('s) Possible
 
-Mit dem **Kodi Plugin-Video-Addon Generator** baust du ein funktionierendes Kodi-Video-Addon (`plugin.video.…`) mit einem komplett selbst gestalteten Vollbild-Menü (`home.xml`). Programmierkenntnisse brauchst du nicht – wer sie hat, bekommt in der **🛠 Modding-Werkstatt** volle Kontrolle bis ins letzte Detail.
+Mit dem **Kodi Video-Addon Generator** baust du ein funktionierendes Kodi-Video-Addon (`plugin.video.…`) mit einem komplett selbst gestalteten Vollbild-Menü (`home.xml`). Programmierkenntnisse brauchst du nicht – wer sie hat, bekommt in der **🛠 Modding-Werkstatt** volle Kontrolle bis ins letzte Detail.
 
 > 💚 Das Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Die damit gebauten Addons gehören dir.
 
