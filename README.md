@@ -2,6 +2,8 @@
 
 **Baue dein eigenes Kodi-Menü per Drag & Drop – ohne eine Zeile Code zu schreiben.**
 
+→ https://chrisophy.github.io/KSG ←
+
 Der Kodi Skin Generator ist ein Ein-Datei-Werkzeug für den Browser. Du ziehst Buttons, Texte und Poster auf eine Leinwand, wählst für jeden Button einen fertigen Kodi-Befehl aus einer Liste und exportierst alles als installierbare ZIP-Datei für Kodi. Gedacht für Einsteiger, aber mit genug Optionen für Profis.
 
 > 🇩🇪 Oberfläche und Anleitung auf Deutsch · 📱 funktioniert mit Maus und Touch · 🔒 alles läuft lokal in deinem Browser
