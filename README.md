@@ -99,12 +99,5 @@ Reines HTML, CSS und JavaScript in einer einzigen Datei. Genutzt werden [Tailwin
 
 ---
 
-## 📄 Lizenz
+## 📄 IT('s) Possible
 
-Lege hier deine Lizenz fest (z.B. MIT oder GPL-3.0) und füge eine `LICENSE`-Datei zum Repository hinzu.
-
----
-
-## 🤝 Mitmachen
-
-Fehler gefunden oder Idee für neue Befehle in der Liste? Eröffne gern ein **Issue** oder einen **Pull Request**.
