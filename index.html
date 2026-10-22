@@ -1,4 +1,4 @@
-<!-- Kodi Skin Generator Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22 
+<!-- Kodi Video-Addon Generatorr Copyright (c) 2026 Team IT('s) Possible. All rights reserved. Version 2026.10.22 
 RECHTLICHER HINWEIS: Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
 Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern, Umschreiben oder die unautorisierte Weiterverbreitung des Codes ist strengstens untersagt.-->
 <!DOCTYPE html>
@@ -23,6 +23,8 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     .pri { background: linear-gradient(90deg, #0ea5e9, #2563eb); border: 0; color: #fff; font-weight: 600; }
     .pri:hover { background: linear-gradient(90deg, #0284c7, #1d4ed8); }
     
+    #wrap { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; background: #0f172a; border-radius: 12px; border: 2px solid #1e293b; }
+
     #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; touch-action: none; overflow: hidden; background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px); background-size: 40px 40px; }
     #stage.nogrid { background-image: none; }
     
@@ -65,7 +67,7 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     </div>
   </header>
 
-  <!-- Mobile Ansichts-Umschaltung (nur auf kleinen Bildschirmen sichtbar) -->
+  <!-- Mobile Ansichts-Umschaltung -->
   <div class="flex lg:hidden bg-slate-900 border-b border-slate-800 p-2 gap-2 sticky top-[57px] z-30">
     <button id="tab-btn-main" class="btn flex-1 pri" onclick="switchMobileTab('main')">📱 Vorschau & Seiten</button>
     <button id="tab-btn-aside" class="btn flex-1" onclick="switchMobileTab('aside')">⚙️ Einstellungen & Werkzeuge</button>
@@ -189,18 +191,24 @@ Dieser Code ist das geistige Eigentum der Autoren. Das Modifizieren, Verändern,
     </aside>
 
     <!-- MITTE: EDITOR BÜHNE -->
-    <main id="panel-main" class="flex-1 p-3 md:p-5 min-w-0 flex flex-col block lg:flex">
+    <main id="panel-main" class="flex-1 p-3 md:p-5 min-w-0 flex flex-col">
       <div class="flex flex-wrap items-center gap-2 mb-3" id="pages"></div>
-      <div id="wrap" class="relative w-full rounded-xl border-2 border-slate-800 overflow-hidden shadow-2xl bg-slate-900 flex-1">
+      <div id="wrap" class="shadow-2xl">
         <div id="stage"></div>
       </div>
-      <p class="hint mt-2">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Ecke unten rechts = Größe ändern</p>
+      <p class="hint mt-2 mb-4">Tipp: Pfeiltasten = verschieben · Entf = löschen · Strg+Z = rückgängig · Strg+D = duplizieren · Ecke unten rechts = Größe ändern</p>
+
+      <!-- RECHTS / UNTEN: EIGENSCHAFTEN (FÜR MOBILGERÄTE AUCH DIREKT UNTER DEM EDITOR) -->
+      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+        <h3 class="text-xs font-bold text-sky-400 uppercase mb-2">Eigenschaften des gewählten Elements</h3>
+        <div id="props"></div>
+      </div>
     </main>
 
-    <!-- RECHTS: EIGENSCHAFTEN -->
-    <aside class="lg:w-80 shrink-0 bg-slate-900/80 border-l border-slate-800 p-4 lg:h-[calc(100vh-57px)] overflow-y-auto">
+    <!-- RECHTS: EIGENSCHAFTEN FÜR GROSSE BILDSCHIRME -->
+    <aside id="panel-props-lg" class="hidden lg:block lg:w-80 shrink-0 bg-slate-900/80 border-l border-slate-800 p-4 lg:h-[calc(100vh-57px)] overflow-y-auto">
       <h3 class="text-xs font-bold text-sky-400 uppercase mb-2">Eigenschaften</h3>
-      <div id="props"></div>
+      <div id="props-lg"></div>
     </aside>
   </div>
 
@@ -308,7 +316,6 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     let L = { q: '', c: 'Alle' }, FD = '';
     let S, hist = [], lastH = 0, drag = null, scale = 1, saveWarned = false, pvNav = [0];
 
-    // Mobile Tab Schaltung
     function switchMobileTab(tab) {
       const aside = $('panel-aside');
       const main = $('panel-main');
@@ -456,12 +463,16 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     }
 
     function fit() {
-      const w = $('wrap').clientWidth;
+      const wrap = $('wrap');
+      if (!wrap) return;
+      const w = wrap.clientWidth;
       if (!w) return;
       scale = w / 1920;
       $('stage').style.transform = `scale(${scale})`;
-      $('wrap').style.height = (1080 * scale) + 'px';
     }
+
+    // Automatischer Resize-Observer für absolut stabile Skalierung
+    new ResizeObserver(() => fit()).observe($('wrap'));
 
     function renderStage() {
       const st = $('stage'); st.className = (S.pv ? 'pv ' : '') + (S.snap ? '' : 'nogrid');
@@ -487,27 +498,31 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
     function field(l, h, hint) { return `<label class="l">${l}</label>${h}${hint ? `<p class="hint">${hint}</p>` : ''}`; }
 
     function renderProps() {
-      const e = sel(), p = $('props');
-      if (!e) { p.innerHTML = '<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button><button class="btn w-full mt-2" onclick="$(\'f-pic\').click()">🖼 Eigenes Bild einfügen</button>'; return; }
-      let h = `<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}</b><div class="flex gap-1"><button class="btn" onclick="dupEl()">⧉</button><button class="btn" onclick="delEl()">🗑</button></div></div>`;
-      if (e.type !== 'box' && e.type !== 'pic') h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
-      if (e.type === 'button') h += field('Symbol (Emoji)', `<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`, 'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
-      if (e.type === 'pic') {
-        h += `<label class="l">Bild</label><button class="btn w-full" onclick="$('f-picrep').click()">🔄 Anderes Bild wählen</button>`;
-        h += field('Bildanpassung', `<select class="inp" onchange="setP('fit',this.value)"><option value="keep" ${e.fit === 'keep' ? 'selected' : ''}>Ganzes Bild zeigen (Seitenverhältnis behalten)</option><option value="scale" ${e.fit === 'scale' ? 'selected' : ''}>Fläche füllen (Rand wird abgeschnitten)</option><option value="stretch" ${e.fit === 'stretch' ? 'selected' : ''}>Strecken auf die Fläche</option></select>`);
-      } else h += field('Farbe', `<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.color || (e.type === 'text' ? '#ffffff' : S.theme.primary)}" oninput="setP('color',this.value)"><button class="btn" onclick="setP('color',null);renderProps()">Standard</button></div>`);
-      
-      h += `<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x', 'y', 'w', 'h'].map(k => `<div><span class="hint">${k === 'w' ? 'Breite' : k === 'h' ? 'Höhe' : k.toUpperCase()}</span><input id="p-${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div> <div class="grid grid-cols-3 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder()">⬆ nach vorn</button></div>`;
-      
-      if (e.type === 'button' || e.type === 'pic') {
-        const known = e.act.t === 'custom' && LIB.find(x => x.v === e.act.v);
-        h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${e.type === 'pic' ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
-        if (e.act.t === 'page') h += `<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q => `<option value="${q.id}" ${q.id === e.act.v ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select>`;
-        else if (ACTHINT[e.act.t]) h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
-        if (known) h += `<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
-        h += `<p class="hint">${ACTHINT[e.act.t] || (e.type === 'pic' ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
+      const e = sel(), p = $('props'), pLg = $('props-lg');
+      let h = '';
+      if (!e) { h = '<p class="text-sm text-slate-400">👆 Klicke ein Element im Bild an, um es zu bearbeiten – oder füge links ein neues hinzu.</p><button class="btn pri w-full mt-4" onclick="showLib()">📚 Button aus Befehlsliste erstellen</button><button class="btn w-full mt-2" onclick="$(\'f-pic\').click()">🖼 Eigenes Bild einfügen</button>'; }
+      else {
+        h = `<div class="flex justify-between items-center"><b class="text-sm">${TYPES[e.type]}</b><div class="flex gap-1"><button class="btn" onclick="dupEl()">⧉</button><button class="btn" onclick="delEl()">🗑</button></div></div>`;
+        if (e.type !== 'box' && e.type !== 'pic') h += field('Beschriftung', `<input class="inp" value="${esc(e.label)}" oninput="setP('label',this.value)">`);
+        if (e.type === 'button') h += field('Symbol (Emoji)', `<input class="inp" value="${esc(e.icon)}" maxlength="4" oninput="setP('icon',this.value)">`, 'Nur in der Vorschau sichtbar – Kodi-Schriften zeigen oft keine Emojis.');
+        if (e.type === 'pic') {
+          h += `<label class="l">Bild</label><button class="btn w-full" onclick="$('f-picrep').click()">🔄 Anderes Bild wählen</button>`;
+          h += field('Bildanpassung', `<select class="inp" onchange="setP('fit',this.value)"><option value="keep" ${e.fit === 'keep' ? 'selected' : ''}>Ganzes Bild zeigen (Seitenverhältnis behalten)</option><option value="scale" ${e.fit === 'scale' ? 'selected' : ''}>Fläche füllen (Rand wird abgeschnitten)</option><option value="stretch" ${e.fit === 'stretch' ? 'selected' : ''}>Strecken auf die Fläche</option></select>`);
+        } else h += field('Farbe', `<div class="flex gap-2"><input type="color" class="h-8 w-14 bg-transparent cursor-pointer" value="${e.color || (e.type === 'text' ? '#ffffff' : S.theme.primary)}" oninput="setP('color',this.value)"><button class="btn" onclick="setP('color',null);renderProps()">Standard</button></div>`);
+        
+        h += `<label class="l">Position & Größe (1920×1080)</label><div class="grid grid-cols-4 gap-1.5">${['x', 'y', 'w', 'h'].map(k => `<div><span class="hint">${k === 'w' ? 'Breite' : k === 'h' ? 'Höhe' : k.toUpperCase()}</span><input id="p-${k}" type="number" class="inp" value="${e[k]}" onchange="setP('${k}',+this.value)"></div>`).join('')}</div> <div class="grid grid-cols-3 gap-1.5 mt-2"><button class="btn" onclick="center('x')">↔ mittig</button><button class="btn" onclick="center('y')">↕ mittig</button><button class="btn" onclick="zOrder()">⬆ nach vorn</button></div>`;
+        
+        if (e.type === 'button' || e.type === 'pic') {
+          const known = e.act.t === 'custom' && LIB.find(x => x.v === e.act.v);
+          h += `<div class="mt-4 p-3 rounded-xl border border-sky-500/30 bg-sky-500/5"><b class="text-xs text-sky-400">⚡ ${e.type === 'pic' ? 'Funktion des Bildes (optional)' : 'Was passiert beim Klick?'}</b> <button class="btn pri w-full mt-2" onclick="showLib()">📚 Aus Befehlsliste wählen</button> <select class="inp mt-2" onchange="setAT(this.value)">${ACTS.map(a => `<option value="${a[0]}" ${a[0] === e.act.t ? 'selected' : ''}>${a[1]}</option>`).join('')}</select>`;
+          if (e.act.t === 'page') h += `<select class="inp mt-2" onchange="setA(this.value)">${S.pages.map(q => `<option value="${q.id}" ${q.id === e.act.v ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select>`;
+          else if (ACTHINT[e.act.t]) h += `<input class="inp mt-2" value="${esc(e.act.v)}" oninput="setA(this.value)" placeholder="${esc(ACTHINT[e.act.t])}">`;
+          if (known) h += `<p class="hint">✅ Gewählt: ${known.i} ${esc(known.l)} – ${esc(known.d)}</p>`;
+          h += `<p class="hint">${ACTHINT[e.act.t] || (e.type === 'pic' ? 'Dieses Bild hat keine Funktion und dient nur als Deko. Wähle eine Aktion, damit man es anklicken kann.' : 'Dieser Button macht nichts, außer gut auszusehen.')}</p></div>`;
+        }
       }
       p.innerHTML = h;
+      if (pLg) pLg.innerHTML = h;
     }
 
     function showLib() {
@@ -719,8 +734,6 @@ Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile
       const st = ev.shiftKey ? 100 : 20, m = { ArrowLeft: ['x', -st], ArrowRight: ['x', st], ArrowUp: ['y', -st], ArrowDown: ['y', st] }[ev.key];
       if (m) { ev.preventDefault(); hpush(); e[m[0]] += m[1]; renderStage(); renderProps(); save(); }
     });
-
-    window.addEventListener('resize', fit);
 
     function actCmd(e) {
       const a = e.act;
