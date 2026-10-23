@@ -3922,7 +3922,7 @@ if __name__ == '__main__':
     const defLay = () => {
       const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
       // mm: Hauptmenü als 'list' (wie Estuary) oder 'btn' (einzelne Buttons) · tm: Knöpfe oben 'group' oder 'single' · im: Dekoration
-      return { step: 10, sel: 'menu', b, mm: 'list', mb: { w: 462, h: 95, ic: 80, ip: 'left', fs: 36, al: 'left', fx: 'none', fxv: 8 }, mp: {}, tm: 'group', tp: defTp(), im: [], cd: {}, gd: false, sf: false };
+      return { step: 10, sel: 'menu', b, mm: 'list', mb: { w: 462, h: 95, ic: 80, ip: 'left', fs: 36, al: 'left', fx: 'none', fxv: 8 }, mp: {}, tm: 'group', tp: defTp(), im: [], cd: {}, gd: false, sf: false, rl: false, pn: 'off' };
     };
     let TIB = null, TIBUSY = false, TIIDX = -1, TLAYMISS = [], TLAYWARN = [];
 
@@ -3969,7 +3969,7 @@ if __name__ == '__main__':
         L.mm = L0.mm === 'btn' ? 'btn' : 'list'; L.tm = L0.tm === 'single' ? 'single' : 'group';
         const m0 = (L0.mb && typeof L0.mb === 'object') ? L0.mb : {}, d0 = L.mb;
         L.mb = { w: cl(m0.w, 60, 1900, d0.w), h: cl(m0.h, 40, 600, d0.h), ic: cl(m0.ic, 16, 300, d0.ic), ip: ['left', 'top', 'none', 'only'].includes(m0.ip) ? m0.ip : d0.ip, fs: cl(m0.fs, 16, 80, d0.fs), al: m0.al === 'center' ? 'center' : 'left', fx: ['zoom', 'lift'].includes(m0.fx) ? m0.fx : 'none', fxv: cl(m0.fxv, 2, 40, 8) };
-        L.gd = L0.gd === true; L.sf = L0.sf === true; L.rl = L0.rl === true; L.cd = {};
+        L.gd = L0.gd === true; L.sf = L0.sf === true; L.rl = L0.rl === true; L.pn = ['on', 'focus'].includes(L0.pn) ? L0.pn : 'off'; L.cd = {};
         if (L0.cd && typeof L0.cd === 'object') Object.keys(L0.cd).forEach(k => { if (typeof L0.cd[k] === 'string' && L0.cd[k]) L.cd[k] = L0.cd[k].slice(0, 300); });
         L.mp = {};
         if (L0.mp && typeof L0.mp === 'object') Object.keys(L0.mp).forEach(id => { const q = L0.mp[id]; if (q && typeof q === 'object') L.mp[id] = { x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0), w: Math.max(0, cl(q.w, 0, 3000, 0)), h: Math.max(0, cl(q.h, 0, 2000, 0)) }; });
@@ -4394,6 +4394,7 @@ if __name__ == '__main__':
           <div class="grid grid-cols-3 gap-1.5 mt-2">${num('Breite', 'w', g.w, 60, 1900)}${num('Höhe', 'h', g.h, 40, 600)}${num('Symbolgröße', 'ic', g.ic, 16, 300)}
             <div><span class="hint">Symbol</span><select class="inp" onchange="tiMbSet('ip',this.value)">${opt([['left', 'links vom Text'], ['top', 'über dem Text'], ['none', 'kein Symbol'], ['only', 'nur Symbol']], g.ip)}</select></div>${num('Schriftgröße', 'fs', g.fs, 16, 80)}
             <div><span class="hint">Text</span><select class="inp" onchange="tiMbSet('al',this.value)">${opt([['left', 'links'], ['center', 'mittig']], g.al)}</select></div>
+            <div style="grid-column:1/-1"><span class="hint">Dunkle Seitenfläche von Estuary (dort, wo sonst das Menü steht)</span><select class="inp" onchange="tiLayPn(this.value)">${opt([['off', 'weg – nie anzeigen'], ['focus', 'nur zeigen, wenn ein Menü-Button Fokus hat'], ['on', 'immer zeigen (wie Estuary)']], L.pn || 'off')}</select></div>
             <div><span class="hint">Fokus-Effekt</span><select class="inp" onchange="tiMbSet('fx',this.value)">${opt([['none', 'keiner'], ['zoom', 'vergrößern'], ['lift', 'anheben']], g.fx)}</select></div>${g.fx === 'none' ? '' : num(g.fx === 'zoom' ? 'Zoom (%)' : 'Anheben (px)', 'fxv', g.fxv, 2, 40)}</div>
           <div class="flex flex-wrap gap-1.5 mt-2 items-center"><span class="hint">Alle Buttons:</span><button class="btn" onclick="tiMbArrange('dh')" title="Abstände waagerecht angleichen">↔ verteilen</button><button class="btn" onclick="tiMbArrange('dv')" title="Abstände senkrecht angleichen">↕ verteilen</button><button class="btn" onclick="tiMbArrange('row')" title="alle auf die Höhe des ersten">≡ eine Reihe</button><button class="btn" onclick="tiMbArrange('col')" title="alle unter den ersten">‖ eine Spalte</button></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
         </div>`;
@@ -4449,6 +4450,7 @@ if __name__ == '__main__':
       if (!tiObj(L.sel)) L.sel = 'widgets';
       save(); tiRe();
     }
+    function tiLayPn(v) { S.titan.lay.pn = ['on', 'focus'].includes(v) ? v : 'off'; save(); tiRe(); }
     function tiMbSet(k, v) {
       const g = S.titan.lay.mb, lim = { w: [60, 1900], h: [40, 600], ic: [16, 300], fs: [16, 80], fxv: [2, 40] };
       if (lim[k]) { v = Math.round(+v); if (!isFinite(v)) return; g[k] = Math.max(lim[k][0], Math.min(lim[k][1], v)); } else g[k] = v;
@@ -4494,7 +4496,7 @@ if __name__ == '__main__':
       if (!n) return;
       const L = S.titan.lay;
       if (n === 'std') {
-        const fresh = defLay(); L.b = fresh.b; TTOP.forEach(x => { S.titan.top[x[0]] = true; }); L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.cd = {}; L.sel = 'menu';
+        const fresh = defLay(); L.b = fresh.b; TTOP.forEach(x => { S.titan.top[x[0]] = true; }); L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.pn = fresh.pn; L.mb = fresh.mb; L.tp = fresh.tp; L.cd = {}; L.sel = 'menu';
       } else if (n === 'blank') {
         TBLK.forEach(b => { L.b[b[0]].show = false; }); TTOP.forEach(x => { S.titan.top[x[0]] = false; }); L.im.forEach(q => { q.off = true; });
       } else if (n === 'right' && L.mm !== 'btn') {
@@ -5255,7 +5257,7 @@ if __name__ == '__main__':
       const btnM = btnM0 && btnItems.length > 0;
       if (btnM) {
         const MP = id => `String.IsEqual(Window(home).Property(titan_menu),${id})`, fnt = pickFont(LAY.mb.fs);
-        holder = xe(hd, 'control', { type: 'group' });
+        holder = xe(hd, 'control', { type: 'group', id: '9200' });
         let first = '';
         const WGRP = [], BNODES = [];
         btnItems.forEach((m, i) => {
@@ -5366,8 +5368,19 @@ if __name__ == '__main__':
         });
       };
       wrapNodes([logoNode], 'logo'); wrapNodes(incAll('TopBar'), 'clock'); if (!sglT) wrapNodes([g700], 'buttons');
-      if (!btnM) wrapNodes([list], 'menu');
-      else if (holder && LAY.b.menu.show === false) { const w0 = xe(hd, 'control', { type: 'group' }); w0.appendChild(xe(hd, 'visible', {}, 'false')); holder.parentNode.insertBefore(w0, holder); w0.appendChild(holder); }
+      if (!btnM) wrapNodes([list, ...incAll('ContentPanel')], 'menu');
+      if (btnM) {
+        // Estuary zeichnet links eine dunkle Fläche (ContentPanel) – sie gehört nicht zum Menü und bliebe sonst an der alten Stelle stehen
+        incAll('ContentPanel').forEach(n => {
+          if (!n.parentNode || LAY.pn === 'on') return;
+          if (LAY.pn !== 'focus' || LAY.b.menu.show === false) { n.parentNode.removeChild(n); return; }
+          const w = xe(hd, 'control', { type: 'group' });
+          w.appendChild(xe(hd, 'visible', {}, 'ControlGroup(9200).HasFocus'));
+          w.appendChild(xe(hd, 'animation', { effect: 'fade', start: 0, end: 100, time: 200 }, 'Visible')); w.appendChild(xe(hd, 'animation', { effect: 'fade', start: 100, end: 0, time: 200 }, 'Hidden'));
+          n.parentNode.insertBefore(w, n); w.appendChild(n);
+        });
+      }
+      if (btnM && holder && LAY.b.menu.show === false) { const w0 = xe(hd, 'control', { type: 'group' }); w0.appendChild(xe(hd, 'visible', {}, 'false')); holder.parentNode.insertBefore(w0, holder); w0.appendChild(holder); }
       wrapNodes([g2000], 'widgets'); wrapNodes(incAll('BottomBar'), 'bottom');
       // Eigene Dekoration (Bilder und Farbflächen)
       if (LAY.im.length) {
