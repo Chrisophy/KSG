@@ -643,7 +643,7 @@ System|♻|Kodi neu starten|RestartApp|Startet nur Kodi neu
 System|❌|Kodi beenden|Quit|Schließt Kodi
 System|😴|Ruhezustand|Suspend|Gerät in den Ruhezustand
 System|🔁|Gerät neu starten|Reboot|Startet das ganze Gerät neu
-System|⏻|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
+System|🔌|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
 System|⏲|Sleep-Timer 30 Minuten|AlarmClock(Schlaftimer,Quit,30,silent)|Beendet Kodi nach 30 Minuten
 System|🚫|Sleep-Timer abbrechen|CancelAlarm(Schlaftimer)|Bricht den Sleep-Timer ab
 System|🐞|Debug-Log umschalten|ToggleDebug|Ausführliches Protokoll an/aus
@@ -803,7 +803,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       const title = t => mk('text', { label: t, x: 100, y: 50, w: 900, h: 110, font: 'font45', anim: ['left'] });
       const menu = [['Filme', '🎬', 'page', 'filme'], ['Serien', '📺', 'custom', 'ActivateWindow(videos,videodb://tvshows/titles/,return)'], ['Live TV', '📡', 'page', 'tv'], ['Musik', '🎵', 'page', 'musik'], ['Info', 'ℹ', 'page', 'info']]
         .map((m, i) => btn(m[0], m[1], 100, 270 + i * 116, m[2], m[3], { w: 440, h: 96, al: 'left', anim: ['left'], adelay: i * 80 }));
-      menu.push(btn('Beenden', '⏻', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
+      menu.push(btn('Beenden', '🔌', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
       const tile = (l, cmd) => li(l, '', 'custom', cmd);
       return [
         p('home', 'Start', [
@@ -4720,13 +4720,13 @@ if __name__ == '__main__':
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
       ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
-      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
+      ['buttons', '🔌', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
       ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', true],
       ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', true],
       ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
     ];
     // Knöpfe über dem Menü, wenn sie einzeln platziert werden: [Schlüssel, Symbol, Name]
-    const TTOP = [['power', '⏻', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
+    const TTOP = [['power', '🔌', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
     const defTp = () => ({ power: { x: -8, y: 100 }, settings: { x: 172, y: 100 }, search: { x: 352, y: 100 } });
     const defLay = () => {
       const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
@@ -4983,7 +4983,7 @@ if __name__ == '__main__':
         : `<div style="position:absolute;left:94px;top:30px;height:56px;display:flex;align-items:center;gap:10px;font:700 40px Arial;letter-spacing:4px;color:${C.text}"><span style="display:inline-block;width:44px;height:44px;border-radius:10px;background:${C.focus};transform:rotate(45deg) scale(.75)"></span>KODI</div>`;
       const now = new Date();
       P.clock = `<div style="position:absolute;left:1260px;width:600px;top:22px;text-align:right;color:${C.text}"><div style="font:400 64px Arial;line-height:1">${now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div><div style="font:400 26px Arial;color:${C.grey};margin-top:6px">${now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>`;
-      const tb = [['power', '⏻'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
+      const tb = [['power', '🔌'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
       P.buttons = single ? '' : `<div style="position:absolute;left:0;top:100px;width:462px;height:110px;display:flex;justify-content:space-around;align-items:center;font-size:52px;color:${C.text}">${tb.map(x => `<span style="opacity:.85">${x[1]}</span>`).join('')}</div>`;
       const tbs = !single ? '' : tb.map(x => { const p = L.tp[x[0]]; return `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;color:${C.text};opacity:.85">${x[1]}</div>`; }).join('');
       // Hauptmenü: Liste wie Estuary oder einzelne Buttons
@@ -5208,7 +5208,7 @@ if __name__ == '__main__':
           <div class="flex flex-wrap gap-1.5 mt-2 items-center"><span class="hint">Alle Buttons:</span><button class="btn" onclick="tiMbArrange('dh')" title="Abstände waagerecht angleichen">↔ verteilen</button><button class="btn" onclick="tiMbArrange('dv')" title="Abstände senkrecht angleichen">↕ verteilen</button><button class="btn" onclick="tiMbArrange('row')" title="alle auf die Höhe des ersten">≡ eine Reihe</button><button class="btn" onclick="tiMbArrange('col')" title="alle unter den ersten">‖ eine Spalte</button></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
         </div>`;
       h += btn ? tiMbList().map(m => tiLayRow('mb:' + m.id)).join('') : tiLayRow('menu');
-      h += `<div class="card mt-3"><b class="text-xs">⏻ Knöpfe über dem Menü</b>
+      h += `<div class="card mt-3"><b class="text-xs">🔌 Knöpfe über dem Menü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${sgl ? '' : 'titb'}" onclick="tiLayTm('group')">Zusammen (Leiste)</button><button class="btn ${sgl ? 'titb' : ''}" onclick="tiLayTm('single')">Einzeln platzieren</button></div></div>`;
       h += sgl ? TTOP.map(x => tiLayRow('tb:' + x[0])).join('') : tiLayRow('buttons');
       ['widgets', 'logo', 'clock', 'bottom'].forEach(k => { h += tiLayRow(k); });
@@ -5768,7 +5768,7 @@ if __name__ == '__main__':
           <label class="l">Abdunkeln <span class="text-amber-300" id="ti-dim">${T.bg.dim} %</span></label><input type="range" min="0" max="90" value="${T.bg.dim}" class="w-full" oninput="tiSet('bg.dim',+this.value);$('ti-dim').textContent=this.value+' %'">${T.bg.img ? '' : '<p class="hint">Noch kein Bild gewählt – bis dahin bleibt das Estuary-Muster.</p>'}` : '<p class="hint mt-1">Das Muster nimmt deine Farben aus „🎨 Farben“ an.</p>'}</div>
         <div class="card mt-3"><b class="text-xs">🏷 Logo oben links</b><p class="hint mt-1">Ersetzt das Kodi-Logo auf der Startseite. Am besten ein PNG mit durchsichtigem Hintergrund im Querformat.</p>
           <div class="flex gap-2 mt-2 items-center">${T.logo ? `<img src="${T.logo}" alt="Logo" style="height:32px;max-width:120px;object-fit:contain;background:#0b1220;border-radius:6px;padding:2px">` : ''}<button class="btn flex-1" onclick="$('f-tlogo').click()">🖼 ${T.logo ? 'Anderes Logo' : 'Logo wählen'}</button>${T.logo ? '<button class="btn" onclick="tiSet(\'logo\',null,true)">✖ Kodi-Logo</button>' : ''}</div></div>
-        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '⏻ Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
+        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '🔌 Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
         <div class="card mt-3"><b class="text-xs">🔤 Schrift</b>
           <label class="l">Schriftgröße <span class="text-amber-300" id="ti-fs">${T.fontScale} %</span></label><input type="range" min="80" max="130" step="5" value="${T.fontScale}" class="w-full" oninput="tiSet('fontScale',+this.value);$('ti-fs').textContent=this.value+' %'">
           <p class="hint">Gilt für den ganzen Skin. 100 % = wie Estuary.</p>
