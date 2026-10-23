@@ -1,1220 +1,1146 @@
-# 📖 Handbuch – Kodi Video-Addon Generator v8.1 by IT('s) Possible
+# 📖 Handbuch – Kodi Video-Addon Generator v8.1x by IT('s) Possible
 
-Mit dem **Kodi Video-Addon Generator** baust du ein funktionierendes Kodi-Video-Addon (`plugin.video.…`) mit einem komplett selbst gestalteten Vollbild-Menü (`home.xml`). Programmierkenntnisse brauchst du nicht – wer sie hat, bekommt in der **🛠 Modding-Werkstatt** volle Kontrolle bis ins letzte Detail.
+Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail.
 
-> 💚 Das Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Es darf nicht verkauft werden. Die damit gebauten Addons gehören dir.
+> 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es darf nicht verkauft werden. **Die Addons, die du damit baust, gehören dir.**
+
+**Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 
 ---
 
 ## Inhalt
 
-**Teil A – Grundlagen (für alle)**
-1. [Was baust du hier eigentlich?](#1-was-baust-du-hier-eigentlich)
-2. [Bevor du startest](#2-bevor-du-startest)
-3. [Die Oberfläche im Überblick](#3-die-oberfläche-im-überblick)
-4. [Schritt 1 – Projekt anlegen](#4-schritt-1--projekt-anlegen)
-5. [Schritt 2 – Mit einer Vorlage starten](#5-schritt-2--mit-einer-vorlage-starten)
-6. [Schritt 3 – Elemente hinzufügen](#6-schritt-3--elemente-hinzufügen)
-7. [Schritt 4 – Auf der Bühne arbeiten](#7-schritt-4--auf-der-bühne-arbeiten)
-8. [Schritt 5 – Eigenschaften einstellen](#8-schritt-5--eigenschaften-einstellen)
-9. [Schritt 6 – Aktionen: Was passiert beim Klick?](#9-schritt-6--aktionen-was-passiert-beim-klick)
-10. [Schritt 7 – Seiten anlegen und verlinken](#10-schritt-7--seiten-anlegen-und-verlinken)
-11. [Schritt 8 – Design](#11-schritt-8--design)
-12. [Schritt 9 – Werkzeuge](#12-schritt-9--werkzeuge)
-13. [Schritt 10 – Addon-Bilder, Dateien und Einstellungen](#13-schritt-10--addon-bilder-dateien-und-einstellungen)
-14. [Schritt 11 – Testen, Prüfen, Editor und Export](#14-schritt-11--testen-prüfen-editor-und-export)
-15. [Schritt 12 – Installation in Kodi](#15-schritt-12--installation-in-kodi)
+**Teil A – Grundlagen**
 
-**Teil B – Die neuen Bausteine im Detail**
-16. [Liste, Kachel-Raster, Karussell und Widgets](#16-liste-kachel-raster-karussell-und-widgets)
-17. [Ein/Aus-Schalter](#17-einaus-schalter)
-18. [Regler (Lautstärke und Spulen)](#18-regler-lautstärke-und-spulen)
-19. [Textbox, Laufschrift und mehrzeiliger Text](#19-textbox-laufschrift-und-mehrzeiliger-text)
-20. [Videofenster, Visualisierung, RSS-Ticker](#20-videofenster-visualisierung-rss-ticker)
-21. [🛠 Modding pro Element](#21--modding-pro-element)
+1. [Was du baust](#k1)
+2. [Vorbereitung](#k2)
+3. [Die Oberfläche im Überblick](#k3)
+4. [Projekt anlegen](#k4)
+5. [Mit einer Vorlage starten – und das Beispiel „Mein Kino-Hub“](#k5)
+6. [Elemente hinzufügen](#k6)
+7. [Auf der Bühne arbeiten](#k7)
+8. [Die Live-Ansicht 👁](#k8)
+9. [Eigenschaften einstellen](#k9)
+10. [Aktionen beim Klick](#k10)
+11. [Seiten anlegen und verlinken](#k11)
+12. [Design](#k12)
+13. [Werkzeuge](#k13)
+14. [Addon-Bilder, Dateien und Einstellungen](#k14)
+15. [Testen, Prüfen, Editor und Export](#k15)
+16. [Installation in Kodi](#k16)
+
+**Teil B – Bausteine**
+
+17. [Widgets 🧩](#k17)
+18. [Info-Widgets und Gruppen](#k18)
+19. [Listen, Kachel-Raster und Karussell](#k19)
+20. [Ein/Aus-Schalter](#k20)
+21. [Regler](#k21)
+22. [Textbox und Laufschrift](#k22)
+23. [Videofenster, Visualisierung, RSS-Ticker](#k23)
+24. [Modding pro Element](#k24)
 
 **Teil C – Die Modding-Werkstatt**
-22. [Überblick](#22-überblick)
-23. [🎛 Schalter](#23--schalter)
-24. [🧩 Bausteine](#24--bausteine)
-25. [🧰 Werkzeuge](#25--werkzeuge)
-26. [📄 Seiten-Tuning](#26--seiten-tuning)
-27. [⌨ Tasten](#27--tasten)
-28. [🧠 Bedingungen](#28--bedingungen)
-29. [🔍 Inspektor & Links](#29--inspektor--links)
-30. [🧬 Projekt-JSON](#30--projekt-json)
+
+25. [Überblick](#k25)
+26. [Schalter](#k26)
+27. [Bausteine](#k27)
+28. [Werkzeuge](#k28)
+29. [Seiten-Tuning](#k29)
+30. [Tasten](#k30)
+31. [Bedingungen](#k31)
+32. [Inspektor und Links](#k32)
+33. [Projekt-JSON](#k33)
 
 **Teil D – Für Profis**
-31. [Was im ZIP steckt](#31-was-im-zip-steckt)
-32. [Die Kodi-IDs](#32-die-kodi-ids)
-33. [pages.json – die Schaltzentrale](#33-pagesjson--die-schaltzentrale)
-34. [Python-Hooks (custom.py)](#34-python-hooks-custompy)
-35. [Direkt-Links und Favoriten](#35-direkt-links-und-favoriten)
-36. [Merker, Zustände und Speicherorte](#36-merker-zustände-und-speicherorte)
 
-**Teil E – Rezepte (Schritt für Schritt)**
-37. [Rezepte](#37-rezepte)
+34. [Inhalt des ZIP](#k34)
+35. [Kodi-IDs](#k35)
+36. [pages.json](#k36)
+37. [Python-Hooks (custom.py)](#k37)
+38. [Direkt-Links und Favoriten](#k38)
+39. [Merker, Zustände und Speicherorte](#k39)
+40. [So füllen sich Widgets und Listen](#k40)
+
+**Teil E – Rezepte**
+
+41. [Zwölf Rezepte Schritt für Schritt](#k41)
 
 **Teil F – Hilfe**
-38. [Vorschau und Kodi – die Unterschiede](#38-vorschau-und-kodi--die-unterschiede)
-39. [Fehlerbehebung und häufige Fragen](#39-fehlerbehebung-und-häufige-fragen)
-40. [Tastenkürzel](#40-tastenkürzel)
+
+42. [Unterschiede zwischen Vorschau und Kodi](#k42)
+43. [Fehlerbehebung und häufige Fragen](#k43)
+44. [Tastenkürzel](#k44)
 
 ---
 
 # Teil A – Grundlagen
 
-## 1. Was baust du hier eigentlich?
+<a id="k1"></a>
 
-Du baust ein ganz normales **Kodi-Video-Addon**. Das Besondere: Beim Start zeigt es nicht die übliche Kodi-Liste, sondern **dein eigenes, gestaltetes Menü** im Vollbild.
+## 1. Was du baust
 
-- Es ist **kein System-Skin**. Der Kodi-Skin (z. B. Estuary) bleibt, wie er ist.
-- Dein Menü kann aus mehreren **Seiten** bestehen (Startseite = `home.xml`, weitere Seiten = `page_1.xml`, `page_2.xml` …).
-- Jedes Element kann eine **Aktion** auslösen: Seite wechseln, Video abspielen, Kodi-Befehl ausführen, anderes Addon öffnen und vieles mehr.
-- Unterstützt werden **Kodi 19 Matrix, 20 Nexus und 21 Omega**.
+Der Generator erzeugt ein ganz normales **Kodi-Video-Addon** (`plugin.video.…`). Das Besondere: Beim Öffnen zeigt es nicht Kodis übliche Ordner-Ansicht, sondern **dein eigenes, gestaltetes Menü im Vollbild** – die Startseite heißt intern `home.xml`.
 
----
+- Es ist **kein System-Skin**. Dein Kodi sieht danach genauso aus wie vorher – nur dein Addon hat ein eigenes Gesicht.
+- Dein Menü kann **mehrere Seiten** haben, Filme abspielen, Kodi-Fenster öffnen, andere Addons starten, Schalter umlegen, Widgets mit deinen Filmen zeigen und vieles mehr.
+- Wer das Addon verlässt, landet auf der **Kodi-Startseite**. Öffnet ein Button ein Kodi-Fenster oder ein Video, kommt man danach **zurück in dein Menü**.
 
-## 2. Bevor du startest
+<a id="k2"></a>
 
-- Öffne die HTML-Datei per Doppelklick in einem aktuellen Browser (Chrome, Edge, Firefox oder Safari). Am Handy oder Tablet funktioniert es auch.
-- Beim Öffnen sollte eine **Internetverbindung** bestehen, damit das Design (Tailwind CSS) geladen wird. Der **ZIP-Export braucht kein Internet** – der Generator hat einen eigenen ZIP-Schreiber eingebaut.
-- Dein Projekt wird **automatisch im Browser gespeichert**. Für ein sicheres Backup nutze **💾 Speichern** (unten links). Damit erhältst du eine `…_projekt.json`, die du jederzeit mit **📥 Laden** wieder öffnen kannst.
-- Beim ersten Start erscheint die Kurzhilfe **❓ So geht's**. Du kannst sie jederzeit oben wieder öffnen.
-- **Beenden:** Die Seite verlässt du sauber mit **🚪 Beenden**. Bei „Zurück“ im Browser oder beim Schließen des Tabs fragt der Generator vorher nach, damit nichts verloren geht.
+## 2. Vorbereitung
 
-> 💡 **Tipp:** Speichere vor größeren Umbauten (Vorlage laden, Projekt-JSON bearbeiten) immer ein Backup mit **💾 Speichern**.
+| Du brauchst | Hinweis |
+|---|---|
+| Einen aktuellen Browser | Chrome, Edge, Firefox oder Safari – auf PC, Tablet oder Handy. |
+| Internet beim Öffnen | Die Seite lädt ihr Design-Framework (Tailwind CSS) aus dem Netz. Deine Daten bleiben trotzdem im Browser. |
+| Kodi 19, 20 oder 21 | Matrix, Nexus oder Omega. |
+| Optional: Bibliothek in Kodi | Für Widgets wie „Neue Filme“ müssen deine Filme, Serien oder Musik in der Kodi-Bibliothek sein. |
 
----
+💡 **Dein Projekt wird automatisch im Browser gespeichert.** Für ein sicheres Backup nutze zusätzlich **💾 Speichern** (siehe [Kapitel 14](#k14)).
+
+<a id="k3"></a>
 
 ## 3. Die Oberfläche im Überblick
 
-### Kopfzeile
+### Am PC (breiter Bildschirm)
 
-| Button | Funktion |
+| Bereich | Inhalt |
 |---|---|
-| **🗑 Neu** | Startet ein neues Projekt (vorher Rückfrage). |
-| **❓ So geht's** | Kurzhilfe direkt im Generator. |
-| **📂 Vorlagen** | Fertige Menüs als Startpunkt (siehe Schritt 2). |
-| **↩ Rückgängig / ↪ Wiederholen** | Schritte zurücknehmen bzw. wiederholen. |
-| **▶ Testen** | Vorschau-Modus: Klicks lösen die Aktionen aus, wie in Kodi. Nochmal klicken = **✏ Bearbeiten**. |
-| **✔ Prüfen** | Sucht vergessene Aktionen, kaputte Links, fehlende Bilder, XML-Fehler usw. |
-| **💻 Editor** | Alle erzeugten Dateien von Hand ansehen und ändern. |
-| **🛠 Modding** | Öffnet die Modding-Werkstatt (Teil C). |
-| **⬇ ZIP exportieren** | Erstellt das fertige Addon als installierbare ZIP. |
-| **🚪 Beenden** | Generator sicher verlassen. |
+| **Kopfzeile oben** | 🗑 Neu · ❓ So geht's · 📂 Vorlagen · 🧩 Widgets · ↩ Rückgängig · ↪ Wiederholen · ▶ Testen · ✔ Prüfen · 💻 Editor · 🛠 Modding · ⬇ ZIP exportieren · 🚪 Beenden |
+| **Links** | Live-Ansicht-Schalter und die Bereiche 1 · Projekt, 2 · Hinzufügen, 3 · Design, 4 · Werkzeuge, 5 · Addon-Bilder & Dateien, 6 · Modding für Profis, Projekt sichern |
+| **Mitte** | Seiten-Leiste und die **Bühne** (1920×1080, so groß wie ein Full-HD-Fernseher) |
+| **Rechts** | **Eigenschaften** des markierten Elements |
 
-### Linke Seitenleiste (Einstellungen & Werkzeuge)
+### Auf Handy und Tablet
 
-1. **Projekt** – Name, Autor, Version, Beschreibung, Kodi-Version
-2. **Hinzufügen** – Elemente, Bilder, Schnell-Buttons, Live-Infos
-3. **Design** – Farbthemen, Farben, Hintergrund, Übergänge, Rundung, Raster
-4. **Werkzeuge** – Ordnen, Größen angleichen, Kopieren/Einfügen, Editor
-5. **Addon-Bilder & Dateien** – Icon, Fanart, Screenshots, Dateien, Addon-Einstellungen
-6. **Modding für Profis** – Modding-Werkstatt und die neuen Bausteine
+- Die **Kopfzeile** ist eine Reihe, die du mit dem Finger **seitlich wischst**, um alle Knöpfe zu erreichen.
+- Darunter wechselst du zwischen zwei Reitern: **📱 Vorschau & Seiten** (Bühne, Seiten, darunter die Eigenschaften) und **⚙️ Einstellungen & Werkzeuge** (alles, was am PC links steht).
+- Wenn die große Vorschau nicht zu sehen ist, zeigt dir die **👁 Live-Ansicht** dein Menü trotzdem live (siehe [Kapitel 8](#k8)).
 
-### Mitte: Seitenleiste und Bühne
+### Den Generator verlassen
 
-Oben die **Seiten-Buttons** (🏠 = Startseite, 🪟 = Dialog-Seite), darunter die **Bühne** im Format 1920 × 1080 Pixel – genau so groß wie das Menü später in Kodi.
+Nutze **🚪 Beenden**. Bei „Zurück“ im Browser oder beim Schließen des Tabs fragt der Generator vorher nach, damit nichts verloren geht.
 
-### Rechts: Eigenschaften
+<a id="k4"></a>
 
-Zeigt alle Einstellungen des **markierten** Elements. Auf dem Handy stehen die Eigenschaften direkt unter der Bühne.
+## 4. Projekt anlegen
 
-### Handy und Tablet
+Im Bereich **1 · Projekt**:
 
-Oben schaltest du zwischen **📱 Vorschau & Seiten** und **⚙️ Einstellungen & Werkzeuge** um.
-
----
-
-## 4. Schritt 1 – Projekt anlegen
-
-In der linken Leiste unter **1 · Projekt**:
-
-1. **Wie soll es heißen?** – Der Name deines Addons. Daraus entsteht automatisch die technische ID, z. B. „Mein Streaming Hub“ → `plugin.video.meinstreaminghub`.
-2. **Autor** und **Version** – Mit **＋** neben der Version erhöhst du sie um 1 (z. B. `1.0.0` → `1.0.1`). Wichtig bei Updates: Kodi erkennt eine neue Version nur, wenn die Nummer höher ist.
-3. **Kurzbeschreibung** – Erscheint in Kodi in den Addon-Details.
-4. **Lizenz** – Standard ist `GPL-2.0-or-later`.
-5. **Kodi-Version** – 19 Matrix, 20 Nexus oder 21 Omega.
-
-### ⚙ Erweiterte Addon-Angaben (optional)
-
-| Feld | Wirkung |
+| Feld | Bedeutung |
 |---|---|
-| **Webseite** | Wird in der `addon.xml` eingetragen. |
-| **Neu in dieser Version** | Änderungstext, den Kodi bei Updates zeigt. |
-| **Begrüßung beim Start** | Kleine Meldung beim Öffnen des Addons, z. B. „Willkommen im Hub!“. |
-| **Zusätzliche Abhängigkeiten** | Andere Addons, die dein Addon braucht. Kodi installiert sie automatisch mit. Schnell-Buttons: `requests`, `beautifulsoup4`, `inputstreamhelper`, `routing` (ein Klick = hinzufügen, nochmal = entfernen). |
+| **Wie soll es heißen?** | Name des Addons in Kodi. Daraus entsteht automatisch die **technische ID**, z.B. `plugin.video.meinkinohub`. |
+| **Autor** | Steht in Kodi als Anbieter. |
+| **Version** | Mit **＋** zählst du die letzte Stelle hoch (1.0.0 → 1.0.1). Erhöhe die Version bei jedem Update, damit Kodi die neue Fassung übernimmt. |
+| **Kurzbeschreibung** | Text in Kodis Addon-Info. |
+| **Lizenz** | Vorschlag: `GPL-2.0-or-later` – frei änderbar. |
+| **Kodi-Version** | Matrix 19, Nexus 20 oder Omega 21. Bestimmt die benötigte Python-Version in der `addon.xml`. |
 
----
+Unter **⚙ Erweiterte Addon-Angaben** findest du außerdem:
 
-## 5. Schritt 2 – Mit einer Vorlage starten
+- **Webseite** und **Neu in dieser Version** (erscheinen in Kodi),
+- **Begrüßung beim Start** – eine kurze Meldung, die beim Öffnen des Addons erscheint,
+- **Zusätzliche Abhängigkeiten** – andere Addons, die Kodi mitinstallieren soll. Schnellknöpfe für `requests`, `beautifulsoup4`, `inputstreamhelper` und `routing` (nochmal klicken entfernt sie wieder).
 
-Oben auf **📂 Vorlagen**:
+<a id="k5"></a>
+
+## 5. Mit einer Vorlage starten – und das Beispiel „Mein Kino-Hub“
+
+Über **📂 Vorlagen** startest du mit einem fertigen Gerüst. Seiten und Elemente werden dabei ersetzt; Bilder, Dateien, Addon-Einstellungen und Modding-Schalter bleiben erhalten. Von Hand geänderte Dateien aus dem 💻 Editor werden zurückgesetzt.
 
 | Vorlage | Inhalt |
 |---|---|
-| **🎬 Streaming-Hub** | Startseite mit Buttons, Filme-Seite mit Postern, Live-TV-Seite |
-| **📺 Live TV** | Senderliste mit Abspiel-Buttons |
-| **🎵 Musik-Player** | Cover, Titel, Fortschritt, Play/Pause, Weiter, Stopp |
-| **🛠 Profi-Menü** | Liste, Widgets aus der Bibliothek, Ein/Aus-Schalter, Lautstärke-Regler, Videofenster, Kindermodus mit Bedingung – ideal zum Kennenlernen der neuen Funktionen |
-| **📄 Leer** | Nur eine Überschrift und ein Button |
+| ✨ **Beispiel zum Lernen: „Mein Kino-Hub“** | 5 fertige Seiten – ideal für Anfänger (siehe unten). |
+| 🎬 Streaming-Hub | Startseite, Filme, Live TV |
+| 📺 Live TV | Senderliste mit Abspiel-Buttons |
+| 🎵 Musik-Player | Cover, Play, Weiter, Stopp, Fortschritt |
+| 🛠 Profi-Menü | Liste, Bibliotheks-Listen, Schalter, Regler, Videofenster |
+| 📄 Leer | Nur ein Button |
 
-> ⚠️ Eine Vorlage **ersetzt alle Seiten und Elemente**. Erhalten bleiben: Projektangaben, Design, Bilder, Dateien, Addon-Einstellungen und Modding-Schalter. Von Hand geänderte Dateien aus dem Editor werden zurückgesetzt.
+### Das Beispiel „Mein Kino-Hub“
 
----
+Das Beispiel zeigt fast alles, was der Generator kann – und ist trotzdem leicht zu verstehen. Nach dem Laden erscheint eine kurze Einführung.
 
-## 6. Schritt 3 – Elemente hinzufügen
+| Seite | Was du dort siehst |
+|---|---|
+| 🏠 **Start** | Großer Titel mit Animation, Begrüßungszeile, **Uhr-Widget** oben rechts, Menü mit sechs Buttons, die nacheinander hereinfahren, und zwei **Widgets**: „Neu in deiner Bibliothek“ (Poster) und „Weiterschauen“ (Breitbild). |
+| **Filme** | **Kachel-Raster** mit sechs Bibliotheks-Befehlen (Alle Filme, Genres, Jahre, Sammlungen, Neu dazu, Aktualisieren) und das Widget „Heute vielleicht …“ mit zufälligen Filmen **und Infos** zum gewählten Titel. |
+| **Live TV** | Button „Demo-Video abspielen“ (ein frei verfügbares Testvideo), TV-Programm, Senderliste, Aufnahmen, eine Textbox mit Anleitung und ein **Videofenster**. |
+| **Musik** | Info-Widget **„Jetzt läuft“** (Cover, Titel, Zeit, Fortschritt, Steuer-Buttons), Party-Modus, Alben, Interpreten und das Widget „Neue Alben“. |
+| **Info** | Eine **Dialog-Seite**: ein Fenster, hinter dem Kodi durchscheint, mit „Schließen“-Button. |
 
-Ein Klick fügt das Element **in der Mitte der Bühne** ein. Danach einfach an die richtige Stelle ziehen.
+Das Beispiel bringt **eigene Farben** (Rot und Gold) und ein **gemaltes Hintergrundbild** mit. Heißt dein Projekt noch „Mein Kodi Projekt“, bekommt es den Namen „Mein Kino-Hub“.
 
-### Alle Elemente
+💡 **So lernst du am schnellsten:** Ändere zuerst nur Texte, dann Farben, dann tausche ein Widget aus – und probiere nach jedem Schritt **▶ Testen**.
 
-| Element | Wo? | Wofür? |
+<a id="k6"></a>
+
+## 6. Elemente hinzufügen
+
+Im Bereich **2 · Hinzufügen**. Ein Klick legt das Element **in die Mitte der Bühne** – von dort ziehst du es an seinen Platz.
+
+| Knopf | Ergebnis |
+|---|---|
+| 📚 **Befehlsliste** | Fertiger Button mit einem von 92 Kodi-Befehlen (siehe [Kapitel 10](#k10)). |
+| 🧩 **Widgets** | Reihen wie im Kodi-Hauptmenü und Info-Widgets (siehe [Kapitel 17](#k17) und [18](#k18)). |
+| 🖼 **Eigenes Bild einfügen** | Bilder vom Gerät, auch mehrere auf einmal. Mit oder ohne Funktion. |
+| ➕ Button · 🔤 Text · 🖼 Poster-Platzhalter · ⬛ Fläche | Die Grundbausteine. |
+| ▬ Fortschrittsbalken · 🎵 Cover | Zeigen in Kodi den Fortschritt bzw. das Bild des gerade laufenden Titels. |
+
+**Schnell-Buttons** haben ihre Aktion schon eingestellt: 🎬 Filme, 📺 Live TV, 🎵 Musik (öffnen eine Seite), ⚙ Einstellungen, 🔧 Addon-Optionen, ⏯ Play/Pause, ⬅ Zurück.
+
+**Live-Infos** sind Texte, die Kodi während der Nutzung selbst ausfüllt: 🕒 Uhrzeit, 📅 Datum, 🌡 Temperatur, 🎵 Läuft gerade, ⏱ Laufzeit, Uhrzeit mit Sekunden, Datum kurz, ☁ Wetter, 📍 Wetter-Ort, 🎤 Interpret, 🎬 Filmtitel, 💾 Freier Speicher, ⚙ CPU-Last, 🌐 IP-Adresse, ℹ Kodi-Version.
+
+Weitere Bausteine (Liste, Schalter, Regler, Textbox, Videofenster, Visualisierung) stehen unter **6 · Modding für Profis** und in der 🛠 Modding-Werkstatt.
+
+<a id="k7"></a>
+
+## 7. Auf der Bühne arbeiten
+
+| So geht's | Was passiert |
+|---|---|
+| **Antippen / Anklicken** | Markiert das Element (weißer Rahmen). Rechts bzw. unter der Vorschau erscheinen seine Eigenschaften. |
+| **Ziehen** | Verschiebt das Element. Mit eingeschaltetem **Raster** rastet es ein (Standard 20 px). |
+| **Weiße Ecke unten rechts ziehen** | Ändert die Größe. |
+| **Pfeiltasten** | Verschieben um eine Rasterweite – mit Umschalt um 100 px. |
+| **◀ ▲ ▼ ▶ unter „Position & Größe“** | Dasselbe per Knopf – ideal auf Handy und Tablet. |
+| **X / Y / Breite / Höhe** | Punktgenau eintippen; die Änderung ist sofort sichtbar. |
+| **Leere Stelle antippen** | Hebt die Markierung auf. |
+
+- **🔒 Sperren** (unten in den Eigenschaften) schützt ein Element vor versehentlichem Verschieben.
+- **⬆ nach vorn / ⬇ nach hinten** ändert, was über was liegt.
+- **↔ mittig / ↕ mittig** setzt das Element in die Bildmitte.
+- Teile eines **Info-Widgets** bewegen sich immer gemeinsam (siehe [Kapitel 18](#k18)).
+
+<a id="k8"></a>
+
+## 8. Die Live-Ansicht 👁
+
+Die Live-Ansicht ist ein **kleines Fenster mit einem Live-Bild deiner Bühne**. Sie erscheint von selbst, sobald die große Vorschau nicht zu sehen ist – damit du jede Änderung sofort siehst.
+
+### Wann sie erscheint
+
+- Auf Handy und Tablet im Reiter **⚙️ Einstellungen & Werkzeuge** (z.B. beim Ändern von Farben oder Designs).
+- Wenn du so weit nach unten scrollst, dass weniger als etwa die Hälfte der großen Vorschau sichtbar ist – z.B. bei den Eigenschaften unter der Bühne.
+- In der **🛠 Modding-Werkstatt** und im Fenster **🎨 Hintergrund** einer Seite.
+
+In anderen Fenstern (Editor, Befehlsliste, Vorlagen …) bleibt sie ausgeblendet, weil sie dort nichts zeigen würde.
+
+### Bedienung
+
+| Knopf / Geste | Wirkung |
+|---|---|
+| **Kopfzeile ziehen** | Fenster verschieben. Die Position wird gemerkt. |
+| **⤢** | Größe umschalten: klein, mittel, groß. |
+| **↗** | Zur großen Vorschau springen (schließt ein offenes Fenster und wechselt auf dem Handy den Reiter). |
+| **✖** | Live-Ansicht ausblenden. Unten links erscheint dann der Knopf **👁 Live-Ansicht**, der sie wieder einschaltet. |
+| **Element antippen** | Markiert es – auch in der Live-Ansicht. |
+| **Element ziehen** | Verschiebt es direkt im kleinen Bild (Info-Widgets als Ganzes). |
+
+Dauerhaft ein- oder ausschalten kannst du sie mit dem Schalter **👁 Live-Ansicht in Menüs** ganz oben in den Einstellungen oder in der Modding-Werkstatt unter **🎛 Schalter**.
+
+💡 Im **▶ Testmodus** funktioniert auch die Live-Ansicht wie das echte Menü – Klicks lösen die Aktion aus.
+
+<a id="k9"></a>
+
+## 9. Eigenschaften einstellen
+
+Was du einstellen kannst, hängt von der Art des Elements ab. Oben stehen immer 📋 Kopieren, ⧉ Duplizieren und 🗑 Löschen.
+
+| Einstellung | Für | Hinweis |
 |---|---|---|
-| **➕ Button** | 2 · Hinzufügen | Klassischer Menü-Button mit Text, Farbe oder eigenem Bild |
-| **🔤 Text** | 2 · Hinzufügen | Überschriften, Hinweise, Live-Infos (Uhrzeit, Wetter …) |
-| **🖼 Poster-Platzhalter** | 2 · Hinzufügen | Fläche für ein Poster – mit Bild vom Gerät oder Bild-Adresse |
-| **⬛ Fläche** | 2 · Hinzufügen | Farbiger Block, z. B. als Hintergrund für Gruppen |
-| **▬ Fortschrittsbalken** | 2 · Hinzufügen | Zeigt den Fortschritt der laufenden Wiedergabe |
-| **🎵 Cover** | 2 · Hinzufügen | Bild bzw. Cover des gerade laufenden Titels |
-| **🖼 Eigenes Bild** | 2 · Hinzufügen | Eigene Bilddatei vom Gerät (mehrere auf einmal möglich) |
-| **📋 Liste** | 6 · Modding | Blätterbare Liste, Kachel-Raster, Karussell oder Widget |
-| **🔘 Schalter** | 6 · Modding | Echter Ein/Aus-Schalter, der sich den Zustand merkt |
-| **🎚 Regler** | 6 · Modding | Lautstärke oder Spulen |
-| **📝 Textbox** | 6 · Modding | Mehrzeiliger Text, scrollt automatisch |
-| **📺 Videofenster** | 6 · Modding | Laufendes Video als Fenster im Menü |
-| **🌈 Visualisierung** | 6 · Modding | Musik-Visualisierung |
-| **📡 RSS-Ticker** | 🛠 Modding → Bausteine | Nachrichten-Laufband aus Kodi |
+| **Beschriftung / Text** | Button, Text, Poster, Schalter, Textbox | Über **➕ Live-Info einfügen** kommen Uhrzeit, Titel & Co. hinein. |
+| **Symbol (Emoji)** | Button | Nur in der Vorschau sichtbar – Kodi-Schriften zeigen meist keine Emojis. |
+| **Textausrichtung, Textfarbe** | Button, Text, Textbox, Schalter, Liste, Widget | |
+| **Bild** | Bild, Poster | Vom Gerät oder als Adresse (`https://…`, `special://…` oder `$INFO[…]`). Ein Bild vom Gerät hat Vorrang. |
+| **Bildanpassung** | Bild, Poster, Button-Bild | Ganzes Bild zeigen · Fläche füllen (Rand wird abgeschnitten) · Strecken |
+| **Eigenes Bild als Button-Hintergrund** | Button | Der Button bekommt statt der Farbe ein Bild. |
+| **Farbe** | fast alle | **Standard** setzt auf die Design-Farbe zurück. |
+| **🔘 Form & Stil** | Button, Bild, Poster, Fläche, Cover, Liste, Schalter, Widget | Eckig, Abgerundet, Pille, Nur Rahmen, Glas – dazu Rundung (0–100 %), Rahmen-Dicke und -Farbe, Deckkraft. |
+| **Position & Größe** | alle | Zahlen, ◀ ▲ ▼ ▶, mittig, nach vorn/hinten |
+| **👁 Wann sichtbar?** | alle | Immer · nur wenn etwas läuft · nur wenn nichts läuft · nur bei Video · nur bei Musik · nur bei Pause · nur mit/ohne Internet · eigene Bedingung. Den **🧠 Baukasten** erklärt [Kapitel 31](#k31). |
+| **🔒 Sperren** | alle | |
+| **⚡ Was passiert beim Klick?** | alle außer Liste, Schalter, Regler, Widget | Siehe [Kapitel 10](#k10). |
+| **🔐 Schutz** | alles mit Aktion | **PIN-Sperre** (1–8 Ziffern) und/oder **Sicherheitsfrage** mit Ja/Nein. |
+| **🛠 Modding (Profis)** | alle | Siehe [Kapitel 24](#k24). |
 
-### 📚 Befehlsliste
+⚠️ Der PIN ist ein **einfacher Schutz vor Kindern**, kein echtes Passwort – er steht lesbar in der `pages.json`.
 
-Über **📚 Befehlsliste** wählst du aus über 90 fertigen Kodi-Befehlen. Mit **＋ Neuer Button** entsteht sofort ein passender Button (Text, Symbol und Aktion schon eingestellt). Mehr dazu in Schritt 6.
+<a id="k10"></a>
 
-### Schnell-Buttons
+## 10. Aktionen beim Klick
 
-Fertige Buttons mit eingestellter Aktion: **🎬 Filme**, **📺 Live TV**, **🎵 Musik** (öffnen eine andere Seite), **⚙ Einstellungen**, **🔧 Addon-Optionen**, **⏯ Play/Pause**, **⬅ Zurück**.
+Jedes Element kann eine Aktion bekommen – auch Texte, Bilder und Flächen. Dann ist es in Kodi mit Maus und Fernbedienung anklickbar und bekommt einen Fokus-Rahmen.
 
-### Live-Infos
-
-Texte, die Kodi während der Nutzung selbst ausfüllt:
-
-| Live-Info | Kodi-Code |
+| Aktion | Was passiert in Kodi |
 |---|---|
-| 🕒 Uhrzeit | `$INFO[System.Time]` |
-| 🕒 Uhrzeit mit Sekunden | `$INFO[System.Time(hh:mm:ss)]` |
-| 📅 Datum | `$INFO[System.Date]` |
-| 📆 Datum kurz | `$INFO[System.Date(dd.mm.yyyy)]` |
-| 🌡 Temperatur | `$INFO[Weather.Temperature]` |
-| ☁ Wetter | `$INFO[Weather.Conditions]` |
-| 📍 Wetter-Ort | `$INFO[Weather.Location]` |
-| 🎵 Läuft gerade | `$INFO[Player.Title]` |
-| ⏱ Laufzeit | `$INFO[Player.Time] / $INFO[Player.Duration]` |
-| 🎤 Interpret | `$INFO[MusicPlayer.Artist]` |
-| 🎬 Filmtitel | `$INFO[VideoPlayer.Title]` |
-| 💾 Freier Speicher | `$INFO[System.FreeMemory]` |
-| ⚙ CPU-Last | `$INFO[System.CPUUsage]` |
-| 🌐 IP-Adresse | `$INFO[Network.IPAddress]` |
-| ℹ Kodi-Version | `$INFO[System.BuildVersion]` |
+| Nichts (nur Optik) | – |
+| Andere Seite öffnen | Wechselt zu einer deiner Seiten. |
+| Anderes Addon öffnen | Öffnet z.B. `plugin://plugin.video.youtube/`. |
+| Video / Stream abspielen | Spielt eine Adresse (`https://…`) oder Datei ab. |
+| Play / Pause · Nächster Titel · Wiedergabe stoppen | Steuert die laufende Wiedergabe. |
+| Zurück (vorherige Seite) | Eine Seite zurück. Auf der Startseite schließt es das Addon. |
+| Zur Startseite dieses Addons | Springt direkt zur Startseite – egal wie tief man ist. |
+| Addon komplett schließen | Beendet das Addon (danach Kodi-Startseite). |
+| Kodi-Einstellungen öffnen · Kodi beenden | |
+| Einstellungen dieses Addons öffnen | Öffnet deine eigenen Optionen aus [Kapitel 14](#k14). |
+| Datei aus diesem Addon abspielen | z.B. `resources/playlist.m3u` (vorher unter 📁 anlegen). |
+| Kodi-Befehl | Ein Befehl aus der Befehlsliste oder selbst geschrieben. |
+| Python-Funktion | Eine Funktion aus `custom.py` (siehe [Kapitel 37](#k37)). |
 
-Ein Klick unter **Live-Infos** erzeugt einen neuen Text. In Buttons, Texten, Textboxen und Schaltern fügst du Live-Infos über **➕ Live-Info einfügen …** in die Beschriftung ein. In der Vorschau siehst du Beispielwerte, die Uhrzeit läuft live mit.
+### Die Befehlsliste 📚
 
----
+92 fertige Kodi-Befehle in acht Gruppen: **Navigation** (Filme, Serien, Live TV, Favoriten, Suche, Dateimanager …), **Wiedergabe** (Spulen, Untertitel, Tonspur, Vollbild …), **Lautstärke**, **Einstellungen**, **System** (Bibliothek aktualisieren, Bildschirmfoto, Sleep-Timer, Neustart …), **Addons**, **Abspielen** und **Profi** (Eigenschaften setzen, Skin-Schalter, Fokus setzen, Container neu laden …).
 
-## 7. Schritt 4 – Auf der Bühne arbeiten
+- Suche oben nach einem Wort, z.B. „Filme“, „Lautstärke“ oder „Neustart“.
+- **Einsetzen** gibt den Befehl dem markierten Element, **＋ Neuer Button** erzeugt einen fertigen Button.
+- Befehle mit Platzhaltern wie `DEINE.ADDON.ID` musst du anpassen – ✔ Prüfen erinnert dich daran.
 
-- **Markieren:** Element anklicken. Es bekommt einen weißen Rahmen.
-- **Verschieben:** Mit Maus oder Finger ziehen.
-- **Größe ändern:** An der **weißen Ecke unten rechts** ziehen.
-- **Pfeiltasten:** Verschieben um eine Rasterweite (Standard 20 px), mit **Umschalt** um 100 px.
-- **Raster / Einrasten:** Unter 3 · Design ein- und ausschalten. Die Rastergröße (5–80 px) stellst du in der Modding-Werkstatt ein.
-- **🔒 Sperren:** In den Eigenschaften. Gesperrte Elemente lassen sich nicht mehr versehentlich verschieben.
-- **Ebenen:** **⬆ nach vorn** / **⬇ nach hinten** legt Elemente über- oder untereinander.
-- **Abwählen:** Auf eine leere Stelle der Bühne klicken.
+💡 Öffnet ein Befehl ein Kodi-Fenster (z.B. die Film-Bibliothek) oder ein Video, schließt sich dein Menü kurz und **kommt mit Zurück bzw. nach dem Video wieder** (abschaltbar in der Modding-Werkstatt). Befehle wie „Kodi-Startseite“, „Kodi beenden“ oder „Neustart“ beenden das Addon bewusst.
 
-> 💡 Alle Tastenkürzel findest du am Ende dieses Handbuchs.
+<a id="k11"></a>
 
----
+## 11. Seiten anlegen und verlinken
 
-## 8. Schritt 5 – Eigenschaften einstellen
+Die **Seiten-Leiste** über der Bühne zeigt alle Seiten. Die erste Seite (🏠) ist immer die Startseite (`home.xml`).
 
-Was rechts erscheint, hängt von der Art des Elements ab.
-
-### Beschriftung und Text
-
-- **Beschriftung** – Text auf Button, Text, Poster oder Schalter. Bei der Textbox gibt es ein großes Textfeld.
-- **➕ Live-Info einfügen** – Hängt eine Live-Info an die Beschriftung an.
-- **Symbol (Emoji)** – Nur bei Buttons. ⚠️ Nur in der Vorschau sichtbar, die meisten Kodi-Schriften zeigen keine Emojis.
-- **Textausrichtung** – Links, mittig oder rechts.
-- **Textfarbe** – Bei Buttons, Schaltern und Listen. **Standard** setzt sie zurück.
-
-### Farbe
-
-Je nach Element heißt das Feld **Farbe**, **Textfarbe**, **Farbe der Einträge**, **Farbe der Leiste** oder **Farbe des Balkens**. **Standard** übernimmt wieder die Farbe aus dem Design.
-
-### Bilder
-
-- **Bild / Poster-Bild:** **🖼 Bild vom Gerät wählen** oder eine **Bild-Adresse** eintragen (`https://…`). Profis können auch Kodi-Pfade wie `special://…` oder `$INFO[…]` nutzen. Ein Bild vom Gerät hat Vorrang vor der Adresse.
-- **Eigenes Bild als Button-Hintergrund:** Der Button zeigt statt der Farbe ein Bild. Wenn das Bild allein wirken soll, die Beschriftung leeren.
-- **Bildanpassung:**
-  - *Ganzes Bild zeigen* – Seitenverhältnis bleibt, ggf. mit Rand
-  - *Fläche füllen* – füllt alles, Ränder werden abgeschnitten
-  - *Strecken* – auf die Fläche gezogen
-
-### 🔘 Form & Stil
-
-Für Buttons, Poster, Flächen, Bilder, Cover, Listen und Schalter:
-
-| Einstellung | Wirkung |
+| Knopf | Wirkung |
 |---|---|
-| **Vorgaben** | ▢ Eckig, ▢ Abgerundet, 💊 Pille, ◻ Nur Rahmen, 🪟 Glas |
-| **Rundung der Ecken** | 0 % = eckig, 100 % = Pille. Ohne eigene Einstellung gilt die Rundung aus dem Design. Bei Listen gilt sie für jeden Eintrag. |
-| **Rahmen (Dicke)** | 0–20 px, mit eigener Rahmenfarbe |
-| **Deckkraft** | 0–100 % |
-
-> 💡 Bei Bildern sieht die Rundung mit „Fläche füllen“ am schönsten aus.
-
-### Position & Größe
-
-X, Y, Breite und Höhe in Pixeln (Bühne = 1920 × 1080). **↔ mittig** und **↕ mittig** zentrieren das Element.
-
-### 👁 Wann sichtbar? (in Kodi)
-
-| Auswahl | Bedeutung |
-|---|---|
-| Immer | Standard |
-| Nur wenn etwas läuft | `Player.HasMedia` |
-| Nur wenn nichts läuft | `!Player.HasMedia` |
-| Nur wenn ein Video läuft | `Player.HasVideo` |
-| Nur wenn Musik läuft | `Player.HasAudio` |
-| Nur bei Pause | `Player.Paused` |
-| Nur mit / ohne Internet | `System.InternetState` / `!System.InternetState` |
-| Eigene Bedingung (Profis) | Freies Feld für jede Kodi-Bedingung |
-
-Mit **🧠 Baukasten** öffnest du den Bedingungs-Baukasten (siehe Abschnitt 28).
-
-> ⚠️ In der Vorschau sind **alle** Elemente immer sichtbar. Kodi blendet sie später je nach Bedingung ein oder aus.
-
----
-
-## 9. Schritt 6 – Aktionen: Was passiert beim Klick?
-
-Jedes Element kann eine Aktion bekommen – nicht nur Buttons, auch Texte, Bilder, Poster, Flächen, Cover, Textboxen, Videofenster und mehr. Sobald ein Element eine Aktion hat, kann man es in Kodi mit Maus oder Fernbedienung auswählen (mit Fokus-Rahmen).
-
-> Listen, Schalter und Regler haben eigene Einstellungen statt dieses Bereichs (Teil B).
-
-### Alle Aktionen
-
-| Aktion | Was passiert? |
-|---|---|
-| **Nichts (nur Optik)** | Reine Deko |
-| **Andere Seite öffnen** | Wechselt auf eine Seite deines Menüs |
-| **Anderes Addon öffnen** | z. B. `plugin://plugin.video.youtube/` |
-| **Video / Stream abspielen** | Internet-Adresse oder Dateipfad (`PlayMedia(…)`) |
-| **Play / Pause**, **Nächster Titel**, **Wiedergabe stoppen** | Wiedergabesteuerung |
-| **Zurück (vorherige Seite)** | Eine Seite zurück; auf der Startseite schließt sich das Addon und Kodi zeigt die Kodi-Startseite |
-| **Zur Startseite dieses Addons** | Springt direkt zur Startseite deines Menüs – egal wie tief man drin ist |
-| **Addon komplett schließen** | Beendet dein Addon von jeder Seite aus und kehrt zur Kodi-Startseite zurück |
-| **Kodi-Einstellungen öffnen** | Öffnet das Einstellungs-Menü von Kodi |
-| **Kodi beenden** | Schließt Kodi |
-| **Einstellungen dieses Addons öffnen** | Öffnet die Optionen, die du selbst angelegt hast (Schritt 10) |
-| **Datei aus diesem Addon abspielen** | z. B. `resources/playlist.m3u` (Datei vorher in „📁 Ordner & Dateien“ anlegen) |
-| **Kodi-Befehl** | Jeder Kodi-Befehl (aus der Befehlsliste oder selbst geschrieben) |
-| **Python-Funktion (custom.py)** | Ruft eine eigene Python-Funktion auf (Profis, Abschnitt 34) |
-
-### 📚 Aus der Befehlsliste wählen
-
-Suche nach Stichworten (z. B. „Filme“, „Lautstärke“, „Neustart“, „YouTube“) oder wähle eine Kategorie:
-
-| Kategorie | Beispiele |
-|---|---|
-| **Navigation** | Filme- und Serien-Bibliothek, Genres, Neue Filme, Favoriten, Suche, Live TV, TV-Programm, Addon-Browser, Ereignisprotokoll |
-| **Wiedergabe** | Play/Pause, Stopp, Spulen, Untertitel, Audiospur, Vollbild, Seitenverhältnis, Codec-Info, Party-Modus |
-| **Lautstärke** | Lauter, Leiser, Stumm |
-| **Einstellungen** | Oberfläche, Player, Medien, Dienste, Profile, System-Info, TV |
-| **System** | Bibliothek aktualisieren/säubern, Addon-Updates, Bildschirmfoto, Benachrichtigung, Sleep-Timer, Neustart, Ausschalten |
-| **Addons** | YouTube, Netflix, Twitch, Radio.de, eigenes Addon, Addon-Einstellungen |
-| **Abspielen** | Video direkt abspielen, Playlist öffnen |
-| **Profi** | Eigenschaft setzen/löschen, Skin-Schalter, Fokus setzen, Lautstärke auf 50 %, zu 50 % spulen, Container neu laden |
-
-- **Einsetzen** gibt den Befehl dem markierten Element.
-- **＋ Neuer Button** erzeugt einen fertigen Button.
-
-> ⚠️ Befehle mit Platzhaltern wie `DEINE.ADDON.ID` oder `PlayMedia(https://)` musst du anpassen. **✔ Prüfen** erinnert dich daran.
-
-### Was passiert mit dem Menü bei Kodi-Fenstern und Videos?
-
-Befehle, die ein anderes Fenster öffnen oder etwas abspielen (`ActivateWindow`, `PlayMedia`, `RunAddon`, `RunPlugin`, `RunScript` …), schließen dein Menü automatisch **vorher**. Sonst würde das Menü über dem Video oder dem anderen Fenster hängen bleiben.
-
-Danach geht es so weiter (Schalter **↩ Nach Kodi-Fenstern zurück ins Menü**, Standard: an):
-
-- **Kodi-Fenster** (z. B. Filme-Bibliothek, Favoriten, ein anderes Addon): Mit **Zurück** kommst du wieder **in dein Menü** – auf dieselbe Seite.
-- **Video:** Nach dem Stoppen bzw. am Ende des Videos öffnet sich dein Menü wieder.
-- **Ausnahmen:** Nach `ActivateWindow(home)` (Kodi-Startseite), `Quit`, `RestartApp`, `Reboot`, `Powerdown`, `Suspend`, `Hibernate`, `Shutdown` und `ActivateScreensaver` endet das Addon – dort soll man ja gerade hin.
-
-Alle anderen Befehle (z. B. Lautstärke, Benachrichtigung) laufen, während das Menü offen bleibt.
-
-### 🔐 Schutz (optional)
-
-Sobald ein Element eine Aktion hat:
-
-- **PIN-Sperre (Kindersicherung):** 1–8 Ziffern. Kodi fragt vor der Aktion nach dem PIN. Ein einfacher Schutz vor Kindern, kein echtes Passwort.
-- **Sicherheitsfrage:** z. B. „Kodi wirklich beenden?“ – Kodi fragt vorher mit Ja/Nein.
-
----
-
-## 10. Schritt 7 – Seiten anlegen und verlinken
-
-Über der Bühne:
-
-| Button | Funktion |
-|---|---|
-| **＋ Seite** | Neue Seite (mit Überschrift und Zurück-Button) |
-| **✏ Umbenennen** | Seitennamen ändern |
+| **＋ Seite** | Neue Seite mit Überschrift und Zurück-Button. |
+| **✏ Umbenennen** | |
 | **🎨 Hintergrund** | Eigene Farbe oder eigenes Bild nur für diese Seite. **↺ Wie im Design** setzt zurück. |
-| **◀ / ▶** | Reihenfolge der Seiten ändern (die Startseite bleibt immer vorne) |
-| **🗑 Seite löschen** | Löscht die Seite. Links dorthin werden automatisch entfernt. |
+| **◀ ▶** | Reihenfolge ändern (die Startseite bleibt vorn). |
+| **🗑 Seite löschen** | Buttons, die dorthin führten, verlieren ihre Aktion. |
 
-**Seiten duplizieren:** 4 · Werkzeuge → **⧉ Diese Seite duplizieren**.
+**Verlinken:** Gib einem Button die Aktion **Andere Seite öffnen** und wähle die Zielseite. Für den Rückweg sorgt ein Button mit **Zurück** – oder einfach die Zurück-Taste der Fernbedienung.
 
-### So verlinkst du Seiten
+🪟 **Dialog-Seiten** legen sich als Fenster über Kodi (siehe [Kapitel 29](#k29)).
 
-1. Lege eine neue Seite an.
-2. Gehe zurück zur Startseite und markiere einen Button (oder einen Listen-Eintrag).
-3. Wähle **Andere Seite öffnen** und die Zielseite.
-4. Jede Unterseite braucht eine Möglichkeit zurück: einen Button mit **Zurück**. Die Zurück-Taste der Fernbedienung funktioniert zusätzlich immer.
+<a id="k12"></a>
 
-> 💡 **✔ Prüfen** warnt, wenn eine Seite nicht erreichbar ist oder kein anklickbares Element hat.
+## 12. Design
 
----
+Im Bereich **3 · Design**:
 
-## 11. Schritt 8 – Design
-
-Unter **3 · Design**:
-
-- **Farbthemen:** Standard, Cyberpunk, Matrix, Sonnenuntergang, Hell, Netflix, Ozean, Wald, Violett, Monochrom.
-- **Eigene Farben:** **Buttons** (Grundfarbe), **Fokus** (Farbe des ausgewählten Elements), **Hintergrund**.
-- **🖼 Hintergrundbild:** Gilt für alle Seiten ohne eigenen Hintergrund. **✖** entfernt es.
+- **10 fertige Designs:** Standard, Cyberpunk, Matrix, Sonnenuntergang, Hell, Netflix, Ozean, Wald, Violett, Monochrom.
+- **Drei Farben:** Buttons, Fokus (Farbe des ausgewählten Elements) und Hintergrund.
+- **🖼 Hintergrundbild** für alle Seiten (✖ entfernt es). Ohne eigene Fanart wird es auch als Fanart genutzt.
 - **Übergang beim Seitenwechsel:** Einblenden, Hereinschieben, Heranzoomen oder Keiner.
-- **Rundung aller Buttons:** 0 % (eckig) bis 100 % (Pille). Einzelne Elemente stellst du unter „Form & Stil“ anders ein.
-- **Raster / Einrasten:** Hilfsraster auf der Bühne und Einrasten beim Verschieben.
+- **Rundung aller Buttons:** 0 % = eckig, 100 % = Pille. Einzelne Elemente stellst du unter „Form & Stil“ anders ein.
+- **Raster / Einrasten** ein- oder ausschalten.
 
-Weitere Feinheiten (Fokus-Zoom, Textschatten, Standard-Schrift, Fokus-Textfarbe, Schalterfarbe) stehen in der Modding-Werkstatt.
+💡 Mit eingeschalteter Live-Ansicht siehst du jede Design-Änderung sofort – auch auf dem Handy im Einstellungs-Reiter.
 
----
+<a id="k13"></a>
 
-## 12. Schritt 9 – Werkzeuge
+## 13. Werkzeuge
 
-Unter **4 · Werkzeuge**:
+Im Bereich **4 · Werkzeuge**:
 
 | Werkzeug | Wirkung |
 |---|---|
-| **📐 Buttons mittig untereinander ordnen** | Alle Buttons als zentrierte Spalte |
-| **📏 Alle Buttons so groß wie markierter** | Einheitliche Größe |
-| **⧉ Diese Seite duplizieren** | Kopie der aktuellen Seite |
-| **🔲 Buttons im Raster anordnen …** | Fragt nach der Spaltenzahl (1–8) und ordnet alle Buttons an |
-| **🎨 Stil des markierten Buttons auf alle Buttons** | Überträgt Rundung, Rahmen, Deckkraft, Ausrichtung, Textfarbe, Schrift, Animationen und Farbe |
-| **📋 Kopieren / 📌 Einfügen** | Element kopieren – auch auf andere Seiten |
-| **💻 Dateien von Hand bearbeiten** | Öffnet den Editor |
+| 📐 Buttons mittig untereinander ordnen | Alle Buttons der Seite sauber in einer Spalte. |
+| 📏 Alle Buttons so groß wie markierter | Einheitliche Größe. |
+| ⧉ Diese Seite duplizieren | Kopie der ganzen Seite. |
+| 🔲 Buttons im Raster anordnen … | Fragt nach der Spaltenzahl. |
+| 🎨 Stil des markierten Buttons auf alle Buttons | Rundung, Rahmen, Deckkraft, Farben, Schrift, Animationen. |
+| 📋 Kopieren / 📌 Einfügen | Auch zwischen Seiten. |
+| 💻 Dateien von Hand bearbeiten | Öffnet den Editor (siehe [Kapitel 15](#k15)). |
 
-Viele weitere Werkzeuge (Ausrichten, Verteilen, Spiegeln, Skalieren …) findest du in der Modding-Werkstatt unter **🧰 Werkzeuge**.
+Noch mehr Werkzeuge (Ausrichten, Verteilen, Spiegeln, Skalieren …) findest du in der Modding-Werkstatt ([Kapitel 28](#k28)).
 
----
+<a id="k14"></a>
 
-## 13. Schritt 10 – Addon-Bilder, Dateien und Einstellungen
-
-Unter **5 · Addon-Bilder & Dateien**:
+## 14. Addon-Bilder, Dateien und Einstellungen
 
 ### Icon, Fanart, Screenshots
 
-| Bild | Format | Hinweis |
+| Bild | Format | Ohne eigenes Bild |
 |---|---|---|
-| **Icon** | quadratisch (wird auf 512 × 512 gebracht) | Logo in der Kodi-Addon-Übersicht |
-| **Fanart** | 16:9 (1920 × 1080) | Hintergrund in den Addon-Details |
-| **Screenshots** | bis zu 8 Bilder | Vorschaubilder in den Addon-Details |
+| **Icon** | quadratisch, wird auf 512×512 gebracht | Ein Icon mit dem Anfangsbuchstaben in deinen Farben |
+| **Fanart** | 16:9, wird auf 1920×1080 gebracht | Dein Hintergrundbild oder ein Farbverlauf |
+| **Screenshots** | bis zu 8 Stück | keine |
 
-Alles wird automatisch ins Addon **und** in die `addon.xml` eingetragen. Ohne eigenes Icon erzeugt der Generator eines mit dem Anfangsbuchstaben; ohne eigenes Fanart wird das Hintergrundbild oder ein Farbverlauf verwendet.
+Alle drei kommen automatisch ins Addon **und** in die `addon.xml`.
 
 ### 📁 Ordner & Dateien verwalten
 
-1. **Ordner anlegen:** z. B. `resources/lib` → **＋ Ordner**.
-2. **Dateien hinzufügen:** Zielordner wählen → **＋ Dateien hinzufügen** (max. 4 MB pro Datei). Geeignet für Playlists, Skripte, Musik, Bilder usw.
-3. **📝 Textdatei selbst schreiben:** Mit Vorlagen für **M3U-Playlist**, **Python-Hilfsdatei** und **changelog.txt**.
-4. **✎** öffnet eine Textdatei zum Bearbeiten, **✖** löscht Datei oder Ordner.
-
-> ⚠️ `addon.py`, `addon.xml`, `pages.json`, alles unter `resources/skins` sowie – wenn genutzt – `resources/settings.xml` und `service.py` werden automatisch erzeugt. Diese bearbeitest du im **💻 Editor**.
+- Eigene **Ordner** anlegen (z.B. `resources/lib`) und **Dateien** hochladen (max. 4 MB pro Datei).
+- **📝 Textdatei selbst schreiben** – mit Vorlagen für eine M3U-Playlist, eine Python-Hilfsdatei oder ein Änderungsprotokoll.
+- Textdateien später mit **✎** bearbeiten.
+- Reserviert sind die automatisch erzeugten Dateien (`addon.py`, `addon.xml`, `pages.json`, `resources/skins/…`). Diese änderst du im 💻 Editor.
 
 ### ⚙ Einstellungen deines Addons bauen
 
-Hier legst du Optionen an, die man in Kodi unter **Addon → Konfigurieren** ändern kann:
+Lege Optionen an, die man in Kodi unter **Addon → Konfigurieren** ändern kann:
 
 | Art | Startwert |
 |---|---|
-| **Schalter (An/Aus)** | „an“ oder „aus“ |
-| **Text** | beliebiger Text |
-| **Zahl** | z. B. 10 |
-| **Auswahlliste** | Werte mit Komma trennen, z. B. „Klein, Mittel, Groß“ |
+| Schalter (An/Aus) | „an“ oder „aus“ |
+| Text | beliebiger Text |
+| Zahl | z.B. 10 |
+| Auswahlliste | Werte mit Komma getrennt, z.B. `Klein, Mittel, Groß` |
 
-- Daraus entsteht automatisch `resources/settings.xml`.
-- Ein Button mit der Aktion **Einstellungen dieses Addons öffnen** öffnet sie direkt.
-- **An/Aus-Optionen** kannst du mit einem **🔘 Schalter** direkt im Menü umschalten (Abschnitt 17).
-- Im eigenen Python-Code liest du eine Option mit `xbmcaddon.Addon().getSetting('ID')`. Die ID steht in der Liste unter jeder Option.
+Daraus entsteht `resources/settings.xml`. Ein Button mit der Aktion **Einstellungen dieses Addons öffnen** öffnet sie, ein **🔘 Ein/Aus-Schalter** kann An/Aus-Optionen direkt im Menü umlegen. Im Code liest du eine Option mit `xbmcaddon.Addon().getSetting('ID')`.
 
----
+### Projekt sichern
 
-## 14. Schritt 11 – Testen, Prüfen, Editor und Export
+- **💾 Speichern** lädt dein komplettes Projekt als `.json`-Datei herunter – inklusive Bildern.
+- **📥 Laden** öffnet so eine Datei wieder.
+- Zusätzlich merkt sich der Browser dein Projekt automatisch. Ist sein Speicher voll, erscheint ein Hinweis – dann unbedingt über 💾 sichern.
+
+<a id="k15"></a>
+
+## 15. Testen, Prüfen, Editor und Export
 
 ### ▶ Testen
 
-Im Testmodus reagiert die Bühne wie Kodi:
-
-- Seitenwechsel, **Zurück** und **Zur Startseite** funktionieren echt.
-- Listen-Einträge sind einzeln anklickbar.
-- Schalter wechseln zwischen 🟢 AN und ⚪ AUS.
-- Regler springen an die angeklickte Stelle.
-- PIN-Sperre und Sicherheitsfrage werden abgefragt.
-- Bei Kodi-Befehlen siehst du unten rechts, **was Kodi ausführen würde**.
+Im Testmodus verhält sich die Bühne wie dein Menü in Kodi: Buttons wechseln Seiten, Zurück funktioniert, Schalter lassen sich umlegen, Regler verstellen. Befehle, die nur Kodi ausführen kann, zeigt eine Meldung an („Kodi würde ausführen: …“). **✏ Bearbeiten** beendet den Testmodus.
 
 ### ✔ Prüfen
 
-Zeigt Warnungen (⚠️) und Tipps (💡), zum Beispiel:
+Findet unter anderem:
 
-- Buttons ohne Aktion, fehlende Video-Adressen, Platzhalter in Befehlen
-- Links auf gelöschte Seiten, nicht erreichbare Seiten, Seiten ohne anklickbares Element
-- fehlende Bilder oder Dateien
-- Listen ohne Einträge oder ohne Quelle, Schalter ohne Merker/Einstellung
-- ungültige PINs, Fehler in eigenen XML-Zeilen
-- Python-Funktion gewählt, aber Python-Hooks aus
-- doppelt belegte oder gesperrte Tasten
-- Hintergrundmusik ohne Datei
+- Buttons ohne Aktion, fehlende Video-Adressen, Platzhalter in Befehlen,
+- Seiten, die nicht erreichbar sind oder kein anklickbares Element haben,
+- Widgets und Listen ohne Quelle,
+- fehlende Bilder und Dateien, fehlerhafte eigene XML-Zeilen,
+- doppelt belegte Tasten, ungültige PINs, ausgeschaltete Python-Hooks.
 
-Beim Export werden Warnungen automatisch angezeigt. Du kannst dann **Trotzdem exportieren**.
+⚠️ **Warnungen** solltest du beheben, 💡 **Hinweise** sind nur Tipps. Beim Export erscheint die Liste automatisch, wenn es Warnungen gibt – du kannst aber trotzdem exportieren.
 
 ### 💻 Editor
 
-Zeigt **alle erzeugten Textdateien** (`addon.py`, `addon.xml`, `home.xml`, `page_1.xml`, `pages.json`, `settings.xml`, `service.py`, `custom.py` …):
+Zeigt jede erzeugte Textdatei (`addon.py`, `addon.xml`, `home.xml`, `pages.json` …) und lässt dich sie von Hand ändern:
 
-- Datei oben auswählen, ändern, mit **💾 Übernehmen** (oder **Strg + S**) speichern.
-- XML und JSON werden beim Übernehmen auf Fehler geprüft.
-- Geänderte Dateien sind mit **✎** markiert und landen genau so in der ZIP.
-- **↺ Original wiederherstellen** bzw. **↺ Alle Originale** macht deine Änderungen rückgängig.
-- **Tab** rückt ein (4 Leerzeichen in Python, 2 in XML).
-
-> ⚠️ Eine von Hand geänderte Datei aktualisiert sich **nicht mehr automatisch**, wenn du danach im Designer etwas änderst. Stelle dann das Original wieder her oder passe die Datei erneut an.
+- **💾 Übernehmen** (oder Strg+S) speichert die Änderung – XML und JSON werden dabei auf Fehler geprüft.
+- Geänderte Dateien tragen ein **✎**. Sie werden **genau so** exportiert und ändern sich nicht mehr, wenn du im Designer weiterarbeitest.
+- **↺ Original wiederherstellen** holt die automatisch erzeugte Fassung zurück.
 
 ### ⬇ ZIP exportieren
 
-Erstellt `plugin.video.<deine-id>.zip` – fertig zur Installation.
+Erzeugt `plugin.video.<name>.zip` und zeigt danach die Installations-Schritte.
+
+<a id="k16"></a>
+
+## 16. Installation in Kodi
+
+1. ZIP-Datei auf das Kodi-Gerät kopieren (USB-Stick, Netzwerk, Download …).
+2. Beim ersten Mal: **Einstellungen → System → Addons → Unbekannte Quellen** erlauben.
+3. **Einstellungen → Addons → Aus ZIP-Datei installieren** und die Datei wählen.
+4. Dein Addon steht unter **Addons → Video-Addons**. Beim Öffnen erscheint sofort dein Menü.
+
+💡 **Update:** Version erhöhen (＋), neu exportieren und erneut aus der ZIP installieren. Hilft das nicht, das alte Addon vorher deinstallieren.
 
 ---
 
-## 15. Schritt 12 – Installation in Kodi
+# Teil B – Bausteine
 
-1. Kopiere die ZIP-Datei auf dein Kodi-Gerät (USB-Stick, Netzwerkordner, Download-Ordner).
-2. Kodi: **Einstellungen → System → Addons → Unbekannte Quellen** einschalten.
-3. **Einstellungen → Addons → Aus ZIP-Datei installieren** und die Datei auswählen.
-4. Starte dein Addon über **Addons → Video-Addons → [Dein Addon]**. Dein Menü öffnet sich im Vollbild. Kodis Video-Ansicht wird dabei übersprungen.
-5. Beim Beenden (Zurück auf der Startseite deines Menüs oder „Addon komplett schließen“) landest du auf der **Kodi-Startseite**.
+<a id="k17"></a>
 
-**Update installieren:** Version erhöhen (**＋** neben der Version), neu exportieren und wieder „Aus ZIP-Datei installieren“. Ändert sich nichts, das alte Addon vorher deinstallieren.
+## 17. Widgets 🧩
 
----
+Widgets kennst du vom Kodi-Hauptmenü: **Reihen, die sich von selbst füllen** – mit deinen neuesten Filmen, angefangenen Serien oder Alben. Im Generator fügst du sie über **🧩 Widgets** (Kopfzeile oder Bereich 2 · Hinzufügen) ein.
 
-# Teil B – Die neuen Bausteine im Detail
+### Die fertigen Widgets
 
-## 16. Liste, Kachel-Raster, Karussell und Widgets
+| Gruppe | Widget | Inhalt | Darstellung |
+|---|---|---|---|
+| 🎬 Filme | 🆕 Neue Filme | Zuletzt hinzugefügte Filme | Poster |
+| | ▶ Filme weiterschauen | Angefangene Filme, zuletzt geschaute zuerst | Breitbild |
+| | 👀 Noch nicht gesehen | Ungesehene Filme, neueste zuerst | Poster |
+| | 🎲 Zufällige Filme | Bei jedem Öffnen eine neue Mischung | Poster |
+| | ⭐ Am besten bewertet | Nach Bewertung sortiert | Poster |
+| 📺 Serien | 📺 Neue Folgen | Zuletzt hinzugefügte Folgen | Breitbild |
+| | ⏯ Serien weiterschauen | Serien, die du gerade schaust | Poster |
+| | 🎲 Zufällige Serien | Neue Mischung bei jedem Öffnen | Poster |
+| 🎵 Musik | 💿 Neue Alben | Zuletzt hinzugefügte Alben | Quadratisch |
+| | 🎵 Zuletzt gehört | Zuletzt gespielte Alben | Quadratisch |
+| | 🎲 Zufällige Alben | Neue Musik-Mischung | Quadratisch |
+| 🧰 Sonstiges | 📃 Video-Playlists | Deine gespeicherten Playlists | Liste |
+| | 🧩 Inhalt aus einem Addon | Startliste eines anderen Video-Addons | Breitbild |
+| | ✏ Eigene Quelle | Jeder Kodi-Pfad | Poster |
 
-Listen sind ideal für Menüs mit vielen Einträgen. Man blättert mit der Fernbedienung durch, ohne dass du jeden Button einzeln platzieren musst.
+⚠️ Bibliotheks-Widgets brauchen Inhalte in der **Kodi-Bibliothek** (Quellen mit Scraper eingerichtet). Ohne Inhalte zeigt das Widget in Kodi „Hier ist noch nichts …“.
 
-### Art der Liste
+### Einstellungen eines Widgets
 
-| Art | Verhalten |
+| Einstellung | Bedeutung |
 |---|---|
-| **Liste (normal)** | Klassische Liste, senkrecht oder waagerecht |
-| **Kachel-Raster (panel)** | Kacheln neben- und untereinander, z. B. für Sender oder Kategorien |
-| **Endlos-Karussell (wraplist)** | Beginnt nach dem letzten Eintrag wieder von vorn – wie bei Streaming-Diensten |
-| **Fester Fokus (fixedlist)** | Der Fokus bleibt an einer Stelle, die Einträge wandern |
+| **Überschrift** | Steht über der Reihe. Leer = ohne Überschrift. |
+| **Was soll das Widget zeigen?** | Eines der fertigen Widgets oder eine eigene Quelle. Die Überschrift passt sich an, solange du sie nicht selbst geändert hast. |
+| **Kodi-Pfad anzeigen (Profis)** | Zeigt den echten Pfad. **✏ Pfad selbst ändern** macht daraus eine eigene Quelle. |
+| **Quelle (Kodi-Pfad)** | Bei „Eigene Quelle“ und „Inhalt aus einem Addon“: z.B. `videodb://…`, `musicdb://…`, `plugin://…` oder eine `.xsp`-Playlist. |
+| **Art der Medien** | Video, Musik, Bilder oder Dateien – wichtig für eigene Quellen. |
+| **Darstellung** | 🎬 Poster (hochkant) · 🖼 Breitbild (16:9) · 💿 Quadratisch · 📋 Liste (untereinander) |
+| **Max. Einträge** | Standard 20. |
+| **Abstand** | Platz zwischen den Kacheln. |
+| **Zeilenhöhe** | Nur bei „Liste“. |
+| **Infos zum gewählten Titel zeigen** | Unter der Reihe erscheinen Titel, eine Info-Zeile (Jahr · Bewertung · Laufzeit · Genre · „45 % gesehen“, bei Folgen Serie und S01E05, bei Musik Interpret) und der Inhalt. |
+| **Endlos blättern (Karussell)** | Am Ende geht es wieder von vorne los. |
+| **Textfarbe, Farbe der Kacheln** | Die Kachelfarbe sieht man, bis die Bilder geladen sind. |
+| **Form & Stil** | Rundung **jeder Kachel**, Rahmen, Deckkraft. |
 
-### Maße
+💡 **Größe:** Die Bilder richten sich nach der **Höhe** des Widgets. Zieh die weiße Ecke nach unten – dann werden die Poster größer. Die Überschrift braucht 60 px, die Infos 150 px.
 
-- **Richtung:** Senkrecht (untereinander) oder waagerecht (nebeneinander).
-- **Eintrag-Höhe**, **Eintrag-Breite** (bei Kacheln und waagerechten Listen), **Abstand** zwischen den Einträgen.
-- Die Rundung unter „Form & Stil“ gilt für **jeden Eintrag**.
-- **Farbe der Einträge** und **Textfarbe** wie bei Buttons. Der ausgewählte Eintrag bekommt die Fokusfarbe.
+### So verhält sich ein Widget in Kodi
 
-### Inhalt: Eigene Einträge
+- Beim Öffnen der Seite holt das Addon die Einträge – mit Postern, Fanart oder Vorschaubild, je nach Darstellung.
+- **Klick auf einen Film, eine Folge oder ein Lied** spielt ihn ab. **Klick auf einen Ordner** (z.B. eine Serie, ein Album, ein Addon-Ordner) öffnet ihn in Kodi.
+- Danach kommt man – wie bei allen Kodi-Fenstern – wieder in dein Menü zurück.
+- Ist ein Widget leer, springt der Startfokus automatisch auf das nächste bedienbare Element.
 
-Jeder Eintrag hat:
+In der **Vorschau** siehst du Beispiel-Titel mit bunten Platzhaltern. Im **▶ Testmodus** meldet ein Klick, was Kodi tun würde.
 
-- **Titel**
-- **Zusatz rechts** (optional, z. B. „Bibliothek“)
-- **Bild** – Adresse oder **🖼 vom Gerät**
-- **eine eigene Aktion** (alle Aktionen aus Schritt 6, mit **📚** auch aus der Befehlsliste)
+<a id="k18"></a>
 
-Mit **↑ / ↓** sortierst du Einträge, **✖** löscht, **＋ Eintrag hinzufügen** legt neue an.
+## 18. Info-Widgets und Gruppen
 
-### Inhalt: Automatisch aus Kodi (Widget)
+Info-Widgets sind **fertige Karten aus mehreren Teilen** (Fläche, Texte, Buttons …), die als **Gruppe** zusammengehören.
 
-Die Liste füllt sich beim Öffnen **selbst** – wie ein Widget im Kodi-Startbildschirm. Ein Klick spielt den Eintrag ab oder öffnet den Ordner.
-
-| Vorschlag | Pfad |
+| Info-Widget | Inhalt |
 |---|---|
-| 🆕 Neue Filme | `videodb://recentlyaddedmovies/` |
-| 🆕 Neue Folgen | `videodb://recentlyaddedepisodes/` |
-| 🎬 Alle Filme | `videodb://movies/titles/` |
-| 📺 Alle Serien | `videodb://tvshows/titles/` |
-| ▶ Serien weiterschauen | `videodb://inprogresstvshows/` |
-| 💿 Neue Alben | `musicdb://recentlyaddedalbums/` (Art: Musik) |
-| 🎵 Zuletzt gehört | `musicdb://recentlyplayedalbums/` (Art: Musik) |
-| 📃 Video-Playlists | `special://profile/playlists/video/` |
-| 🧩 Addon | z. B. `plugin://plugin.video.youtube/` |
+| 🕒 **Uhr & Datum** | Große Uhrzeit und Datum auf einer Glas-Karte |
+| 🌤 **Wetter** | Ort, Temperatur und Wetterlage (Kodi braucht dafür ein eingerichtetes Wetter-Addon) |
+| ▶ **Jetzt läuft** | Cover, Titel, Zeit, Fortschritt und die Buttons Play/Pause, Weiter, Stopp – **nur sichtbar, wenn etwas läuft** |
+| 💻 **System-Info** | CPU-Last, freier Speicher, IP-Adresse, Kodi-Version |
 
-- **Art der Medien:** Video, Musik, Bilder oder Dateien – muss zur Quelle passen.
-- **Max. Einträge:** Wie viele Einträge höchstens geladen werden (Standard 30).
+### So arbeitest du mit Gruppen
 
-> ⚠️ In der Vorschau siehst du Platzhalter („Eintrag 1 aus Kodi“). Die echten Inhalte erscheinen erst in Kodi. Widgets aus anderen Addons können einen Moment zum Laden brauchen.
+- **Ein beliebiges Teil ziehen** → die ganze Gruppe wandert mit. Die anderen Teile bekommen einen gestrichelten Rahmen.
+- **Pfeiltasten, ◀ ▲ ▼ ▶, X/Y-Felder und „mittig“** bewegen ebenfalls die ganze Gruppe.
+- **Größe, Text, Farbe, Schrift** stellst du **pro Teil** ein.
+- In den Eigenschaften erscheint die Karte **🧩 Teil eines Info-Widgets** mit:
+  - **⧉ Ganzes Widget** – dupliziert alle Teile,
+  - **🗑 Ganzes Widget** – löscht alle Teile,
+  - **✂ Lösen** – macht aus der Gruppe einzelne Elemente.
+- Kopierst oder duplizierst du **ein einzelnes Teil**, ist die Kopie kein Teil der Gruppe mehr.
 
----
+<a id="k19"></a>
 
-## 17. Ein/Aus-Schalter
+## 19. Listen, Kachel-Raster und Karussell
 
-Ein echter Schalter, den man mit OK umschaltet. **Kodi merkt sich den Zustand – auch nach einem Neustart.**
+Listen blättert man mit der Fernbedienung durch. Jeder Eintrag hat seine eigene Aktion.
 
-### Was schaltet der Schalter?
-
-| Modus | Wirkung |
+| Einstellung | Möglichkeiten |
 |---|---|
-| **Eigener Merker** | Ein eigener An/Aus-Wert, den du für Sichtbarkeits-Bedingungen und Befehle nutzt. Der Name wird automatisch vergeben (z. B. `meinkodiprojekt.kindermodus`) und lässt sich ändern. |
-| **Option dieses Addons** | Schaltet eine An/Aus-Option aus deinen Addon-Einstellungen. Mit **＋ Neue An/Aus-Option dafür anlegen** entsteht sie mit einem Klick. |
-| **Kodi-Systemeinstellung** | Schaltet eine echte Kodi-Einstellung (nur An/Aus-Einstellungen). Vorschläge: Webserver, UPnP/DLNA, Zeroconf, AirPlay, Event-Server, Debug-Infos, RSS-Laufschrift, versteckte Dateien, „..“-Einträge, stille Bibliotheks-Updates. |
+| **Art der Liste** | Liste (normal) · Kachel-Raster (panel) · Endlos-Karussell (wraplist) · Fester Fokus (fixedlist) |
+| **Richtung** | Senkrecht oder waagerecht (nicht beim Kachel-Raster) |
+| **Eintrag-Höhe, Eintrag-Breite, Abstand** | in Pixeln |
+| **Inhalt** | **Eigene Einträge** oder **automatisch aus Kodi** |
 
-### Weitere Einstellungen
+**Eigene Einträge:** Titel, Zusatz rechts (optional), Bild (Adresse oder vom Gerät) und eine Aktion wie bei Buttons – inklusive 📚 Befehlsliste. Mit ↑ ↓ sortieren, ✖ löschen, **＋ Eintrag hinzufügen**.
 
-- **Kodi-Befehl beim Einschalten / Ausschalten** (optional), z. B. `Notification(Info,An,2000)`.
-- **Vorschau: eingeschaltet zeigen** – nur für die Optik im Generator.
-- **🔐 Schutz** – PIN oder Sicherheitsfrage vor dem Umschalten. Bei falschem PIN springt der Schalter zurück.
-- Die Farbe für „AN“ stellst du in der Modding-Werkstatt ein (Standard: Grün).
+**Automatisch aus Kodi:** Ein Kodi-Pfad plus Schnellknöpfe (Neue Filme, Neue Folgen, Alle Filme, Alle Serien, Serien weiterschauen, Neue Alben, Zuletzt gehört, Video-Playlists, Addon). Maximal 30 Einträge als Standard.
 
-### Merker als Bedingung nutzen
+💡 **Liste oder Widget?** Für Inhalte aus der Bibliothek ist ein **Widget** meist die schönere Wahl: Es hat Überschrift, passende Bilder je Darstellung und auf Wunsch Infos zum Titel. Listen sind ideal für **eigene Einträge** mit eigenen Aktionen.
 
-Bei „Eigener Merker“ zeigt der Generator dir die fertige Bedingung, z. B.:
+<a id="k20"></a>
 
-```
-String.IsEqual(Window(Home).Property(meinkodiprojekt.kindermodus),1)
-```
+## 20. Ein/Aus-Schalter
 
-Diese Bedingung trägst du bei anderen Elementen unter **👁 Wann sichtbar?** ein (📋 kopiert sie). Noch einfacher: Im **🧠 Bedingungen**-Baukasten gibt es für jeden Merker die Buttons „🟢 … ist AN“ und „⚪ … ist AUS“. Ein komplettes Beispiel steht in den Rezepten.
+Ein echter Schalter, der sich seinen Zustand merkt – auch nach einem Neustart.
 
----
-
-## 18. Regler (Lautstärke und Spulen)
-
-Ein Schieberegler, den man mit links/rechts bedient.
-
-| Modus | Wirkung |
+| Modus | Was er schaltet |
 |---|---|
-| **Lautstärke** | Stellt die Kodi-Lautstärke ein |
-| **Spulen** | Springt im laufenden Video oder Lied |
+| **Eigener Merker** | Eine Kodi-Eigenschaft, z.B. `meinkinohub.kindermodus`. Damit blendest du andere Elemente ein oder aus (siehe [Kapitel 31](#k31)). |
+| **Option dieses Addons** | Eine An/Aus-Option aus deinen Addon-Einstellungen. **＋ Neue An/Aus-Option dafür anlegen** erledigt das in einem Schritt. |
+| **Kodi-Systemeinstellung** | Eine Kodi-Einstellung mit An/Aus-Wert, z.B. `services.webserver` (Vorschläge erscheinen beim Tippen). |
 
-- **Farbe der Leiste** wie gewohnt. Der Knopf bekommt bei Fokus die Fokusfarbe.
-- Tipp: Den Spul-Regler mit **👁 Nur wenn etwas läuft** kombinieren.
-- In der Vorschau springt der Knopf an die angeklickte Stelle.
+Zusätzlich kann der Schalter beim **Ein- und Ausschalten je einen Kodi-Befehl** ausführen, z.B. `Notification(Kindermodus,An,2000)`. Mit **Vorschau: eingeschaltet zeigen** legst du fest, wie er auf der Bühne aussieht. Auch Schalter lassen sich mit PIN oder Sicherheitsfrage schützen.
 
----
+Die Bedingung für einen Merker lautet: `String.IsEqual(Window(Home).Property(NAME),1)` – der 📋-Knopf kopiert sie.
 
-## 19. Textbox, Laufschrift und mehrzeiliger Text
+<a id="k21"></a>
 
-| Variante | So geht's |
+## 21. Regler
+
+Ein Regler wird in Kodi mit links/rechts bedient.
+
+- **Lautstärke** – regelt Kodis Lautstärke.
+- **Spulen** – springt im laufenden Video oder Lied (am besten mit „Wann sichtbar? → Nur wenn etwas läuft“).
+
+In der Vorschau tippst du im Testmodus auf eine Stelle des Reglers.
+
+<a id="k22"></a>
+
+## 22. Textbox und Laufschrift
+
+- **📝 Textbox:** mehrzeiliger Text mit Zeilenumbrüchen. Mit **Langen Text automatisch scrollen** läuft zu langer Text in Kodi langsam durch.
+- **📰 Laufschrift:** Ein normaler Text mit der Option **Laufschrift, wenn der Text zu lang ist** (im 🛠 Modding des Elements). Dort gibt es auch **Mehrzeilig**.
+
+<a id="k23"></a>
+
+## 23. Videofenster, Visualisierung, RSS-Ticker
+
+| Baustein | Zeigt in Kodi |
 |---|---|
-| **📝 Textbox** | Für längere Texte mit Zeilenumbrüchen. **Langen Text automatisch scrollen** lässt Kodi den Text langsam durchlaufen. |
-| **📰 Laufschrift** | Normaler Text → 🛠 Modding → **Laufschrift, wenn der Text zu lang ist** |
-| **Mehrzeiliger Text** | Normaler Text → 🛠 Modding → **Mehrzeilig (Zeilenumbruch erlaubt)** |
+| 📺 **Videofenster** | Das laufende Video als Fenster im Menü (voreingestellt: nur sichtbar, wenn ein Video läuft). |
+| 🌈 **Visualisierung** | Kodis Musik-Visualisierung (nur bei Musik). |
+| 📡 **RSS-Ticker** | Nachrichten aus Kodis RSS-Feeds (in Kodi: Einstellungen → Oberfläche → RSS-Feeds einschalten). |
 
-Zeilenumbrüche aus dem Textfeld werden für Kodi automatisch in `[CR]` umgewandelt.
+In der Vorschau siehst du jeweils einen Platzhalter.
 
----
+<a id="k24"></a>
 
-## 20. Videofenster, Visualisierung, RSS-Ticker
+## 24. Modding pro Element
 
-| Element | Wirkung |
-|---|---|
-| **📺 Videofenster** | Zeigt das laufende Video als Fenster mitten im Menü. Wird automatisch mit „Nur wenn ein Video läuft“ eingefügt. |
-| **🌈 Visualisierung** | Zeigt die Musik-Visualisierung von Kodi. Wird mit „Nur wenn Musik läuft“ eingefügt. |
-| **📡 RSS-Ticker** | Laufband mit den RSS-Nachrichten aus Kodi. Dafür muss in Kodi unter **Einstellungen → Oberfläche** die RSS-Laufschrift eingeschaltet sein. |
-
-Alle drei können zusätzlich eine Klick-Aktion bekommen – z. B. Videofenster anklicken → Vollbild (`Action(FullScreen)`).
-
----
-
-## 21. 🛠 Modding pro Element
-
-Ganz unten in den Eigenschaften jedes Elements:
+Jedes Element hat unten in den Eigenschaften den Bereich **🛠 Modding (Profis)**:
 
 | Einstellung | Wirkung |
 |---|---|
-| **Kodi-ID** | Die Control-ID in Kodi. Bei anklickbaren Elementen steht die Fokus-Bedingung `Control.HasFocus(ID)` daneben (📋 kopiert sie). |
-| **Schrift** | Schriftname aus dem Kodi-Skin, z. B. `font10` (klein) bis `font45` (groß). Leer = Standard-Schrift aus der Werkstatt. Gibt es den Namen im aktiven Skin nicht, nimmt Kodi eine Standardschrift. |
-| **Laufschrift / Mehrzeilig** | Nur bei Texten (Abschnitt 19). |
-| **✨ Animationen** | Mehrere gleichzeitig möglich (Tabelle unten). |
-| **Verzögerung beim Erscheinen** | 0–2000 ms. Damit erscheinen Elemente nacheinander. |
-| **Kodi-Befehl, wenn ausgewählt (Fokus)** | Wird ausgeführt, sobald das Element ausgewählt wird (`<onfocus>`). |
-| **Kodi-Befehl, wenn Fokus weggeht** | `<onunfocus>` |
-| **Eigene XML-Zeilen** | Werden 1:1 in das Kodi-Control geschrieben, z. B. `<animation>`, `<enable>`, `<hitrect>`, weitere `<onfocus>`-Zeilen. **✔ Prüfen** testet die XML. |
+| **Kodi-ID** und **Fokus-Bedingung** | z.B. `Control.HasFocus(105)` – mit 📋 kopieren. |
+| **Schrift** | Kodi-Schriftname aus dem aktiven Skin, z.B. `font10` (klein) bis `font45` (groß). |
+| **Laufschrift / Mehrzeilig** | nur bei Texten |
+| **✨ Animationen** | Einblenden, von links/rechts/oben/unten hereinfahren, Heranzoomen (mit Federn), Ausblenden beim Schließen, Pulsieren, Schweben, Drehen, **Wachsen, wenn ausgewählt** |
+| **Verzögerung beim Erscheinen** | 0–2000 ms – so fahren Elemente nacheinander herein |
+| **Kodi-Befehl bei Fokus / wenn Fokus weggeht** | z.B. `SetProperty(meinmenue.bild,filme,home)` |
+| **Eigene XML-Zeilen** | Werden 1:1 in das Kodi-Control geschrieben (`<animation>`, `<enable>`, `<onclick>` …). ✔ Prüfen testet die Syntax. |
 
-### Animationen
-
-| Animation | Wann? |
-|---|---|
-| Einblenden beim Öffnen | Beim Öffnen der Seite |
-| Von links / rechts / oben / unten hereinfahren | Beim Öffnen der Seite |
-| Heranzoomen (mit Federn) | Beim Öffnen der Seite |
-| Ausblenden beim Schließen | Beim Schließen der Seite |
-| Pulsieren (dauernd) | Immer – ideal für Hinweise wie „NEU!“ |
-| Schweben (dauernd) | Immer – sanftes Auf und Ab |
-| Drehen (dauernd) | Immer – z. B. für ein Logo |
-| Wachsen, wenn ausgewählt (Fokus) | Nur bei anklickbaren Elementen |
-
-> ⚠️ Animationen sieht man nur in Kodi, nicht in der Vorschau.
+Animationen siehst du nur in Kodi, nicht in der Vorschau.
 
 ---
 
 # Teil C – Die Modding-Werkstatt
 
-## 22. Überblick
+<a id="k25"></a>
 
-Öffnen über **🛠 Modding** in der Kopfzeile oder **🛠 Modding-Werkstatt öffnen** links. Oben wählst du einen der acht Bereiche:
+## 25. Überblick
 
-| Bereich | Inhalt |
-|---|---|
-| **🎛 Schalter** | Ein/Aus-Schalter für Generator, Optik und Verhalten in Kodi |
-| **🧩 Bausteine** | 16 fertige Profi-Bausteine mit einem Klick |
-| **🧰 Werkzeuge** | Ausrichten, Verteilen, Spiegeln, Skalieren … |
-| **📄 Seiten-Tuning** | Dialog-Seiten, Startfokus, Seiten-Befehle, eigenes XML, Direkt-Link |
-| **⌨ Tasten** | Tasten der Fernbedienung belegen |
-| **🧠 Bedingungen** | Baukasten für Sichtbarkeits-Regeln |
-| **🔍 Inspektor & Links** | Alle Kodi-IDs und Direkt-Links |
-| **🧬 Projekt-JSON** | Das ganze Projekt als Text bearbeiten |
+Die **🛠 Modding-Werkstatt** (Kopfzeile oder Bereich 6) bündelt alle Profi-Funktionen in acht Reitern: 🎛 Schalter · 🧩 Bausteine · 🧰 Werkzeuge · 📄 Seiten-Tuning · ⌨ Tasten · 🧠 Bedingungen · 🔍 Inspektor & Links · 🧬 Projekt-JSON.
 
----
+Alles ist optional und wirkt sofort. Während die Werkstatt offen ist, zeigt dir die **👁 Live-Ansicht** jede Änderung – und du kannst darin Elemente antippen, um sie z.B. als Vorlage für die Ausrichten-Werkzeuge zu markieren.
 
-## 23. 🎛 Schalter
+<a id="k26"></a>
+
+## 26. Schalter
 
 ### 🖥 Im Generator
 
 | Schalter | Wirkung |
 |---|---|
-| **🔢 Kodi-IDs auf der Bühne zeigen** | Jedes Element zeigt seine Control-ID (gelbes Schildchen) |
-| **➕ Hilfslinien** | Mittellinien und Drittel-Raster |
-| **📺 Sicherer Bereich (Overscan)** | Gelber Rahmen: Was außerhalb liegt, schneiden manche Fernseher ab |
-| **📐 Rastergröße** | 5, 10, 20, 40 oder 80 px – auch die Schrittweite der Pfeiltasten |
+| 🔢 Kodi-IDs auf der Bühne zeigen | Jedes Element zeigt seine Control-ID. |
+| ➕ Hilfslinien | Mittellinien und Drittel-Raster. |
+| 📺 Sicherer Bereich | Zeigt den Rand, den manche Fernseher abschneiden. |
+| 👁 Live-Ansicht in Menüs | Siehe [Kapitel 8](#k8). |
+| 📐 Rastergröße | 5, 10, 20, 40 oder 80 px – auch die Schrittweite der Pfeiltasten. |
 
 ### ✨ Optik in Kodi
 
 | Schalter | Wirkung |
 |---|---|
-| **🔍 Fokus-Zoom** | Ausgewählte Buttons, Schalter, Regler und anklickbare Elemente wachsen (101–125 %). Listen sind ausgenommen, damit nicht die ganze Liste wächst. |
-| **🎞 Nacheinander einblenden** | Anklickbare Elemente gleiten beim Öffnen einer Seite nacheinander von links herein. Elemente mit eigener Öffnen-Animation behalten ihre eigene. |
-| **🌑 Textschatten** | Bessere Lesbarkeit auf hellen Bildern |
-| **🔤 Standard-Schrift** | Schrift für alle Texte ohne eigene Schrift (Standard `font13`) |
-| **🎯 Textfarbe bei Fokus** | Schriftfarbe auf ausgewählten Buttons, Schaltern und Listeneinträgen (Standard Schwarz) |
-| **🟢 Farbe „Schalter AN“** | Farbe eingeschalteter Ein/Aus-Schalter |
+| 🔍 Fokus-Zoom | Ausgewählte Buttons und anklickbare Elemente wachsen ein Stück (101–125 %). |
+| 🎞 Nacheinander einblenden | Alle anklickbaren Elemente gleiten beim Öffnen einer Seite nacheinander herein. |
+| 🌑 Textschatten | Bessere Lesbarkeit auf hellen Bildern. |
+| 🔤 Standard-Schrift | Für alle Texte ohne eigene Schrift (Standard `font13`). |
+| 🎯 Textfarbe bei Fokus | Schrift auf ausgewählten Buttons, Schaltern und Listeneinträgen. |
+| 🟢 Farbe „Schalter AN“ | |
 
 ### 🧭 Verhalten in Kodi
 
 | Schalter | Wirkung |
 |---|---|
-| **🏠 Beenden führt zur Kodi-Startseite** | Wer das Addon verlässt, landet auf der Kodi-Startseite – nicht in Kodis Video-Ansicht („Videos“ mit Dateien, Wiedergabelisten, Video-Addons). Beim Start aus den Video-Addons wird diese Ansicht ebenfalls übersprungen. Standard: an. |
-| **↩ Nach Kodi-Fenstern zurück ins Menü** | Öffnet ein Button ein Kodi-Fenster oder ein Video, kommt man mit Zurück bzw. nach dem Video wieder in dein Menü – statt in Kodis Ansicht hängenzubleiben. Standard: an. |
-| **❓ Beim Verlassen nachfragen** | „Zurück“ auf der Startseite fragt erst „Addon wirklich verlassen?“ |
-| **🧠 Letzte Seite merken** | Das Addon öffnet sich wieder auf der zuletzt besuchten Seite |
-| **🔗 Direkt-Links erlauben** | Seiten lassen sich direkt öffnen (Abschnitt 35). Standard: an. |
-| **🚀 Autostart-Option einbauen** | Erzeugt `service.py` und die Option „Beim Kodi-Start automatisch öffnen“ in den Addon-Einstellungen. Einstellbar: Wartezeit nach dem Start (Sekunden) und ob die Option nach der Installation schon an ist. |
-| **🎵 Hintergrundmusik** | Spielt beim Öffnen Musik oder einen Radio-Stream. Eine Internet-Adresse eintragen oder eine eigene Datei (vorher unter „📁 Ordner & Dateien“ hochladen, z. B. `resources/musik.mp3`). Optionen: **Nur starten, wenn gerade nichts läuft** und **Beim Verlassen des Addons stoppen**. |
+| 🏠 Beenden führt zur Kodi-Startseite | Wer das Addon verlässt, landet auf der Kodi-Startseite statt in Kodis Video-Ansicht. *(Standard: an)* |
+| ↩ Nach Kodi-Fenstern zurück ins Menü | Nach Kodi-Fenstern, anderen Addons und Videos öffnet sich dein Menü wieder. *(Standard: an)* |
+| ❓ Beim Verlassen nachfragen | „Addon wirklich verlassen?“ auf der Startseite. |
+| 🧠 Letzte Seite merken | Das Addon öffnet sich dort, wo man es verlassen hat. |
+| 🔗 Direkt-Links erlauben | Jede Seite lässt sich direkt öffnen (siehe [Kapitel 38](#k38)). *(Standard: an)* |
+| 🚀 Autostart-Option einbauen | Erzeugt `service.py` und die Option „Beim Kodi-Start automatisch öffnen“. Einstellbar: Wartezeit nach dem Start und ob die Option nach der Installation schon an ist. |
+| 🎵 Hintergrundmusik | Spielt beim Öffnen Musik oder einen Radio-Stream – auf Wunsch nur, wenn gerade nichts läuft, und mit Stopp beim Verlassen. |
 
 ### 🐍 Für Profis
 
 | Schalter | Wirkung |
 |---|---|
-| **🐍 Python-Hooks (custom.py)** | Erzeugt `resources/lib/custom.py` mit Beispielen und erlaubt die Aktion „Python-Funktion“ (Abschnitt 34). **💻 custom.py im Editor öffnen** bringt dich direkt hin. |
-| **🐞 Ausführliches Kodi-Log** | Schreibt jeden Seitenwechsel und jeden Schalter ins Kodi-Log, auch ohne Debug-Modus |
+| 🐍 Python-Hooks | Eigene Python-Funktionen als Aktion (siehe [Kapitel 37](#k37)). |
+| 🐞 Ausführliches Kodi-Log | Schreibt jeden Seitenwechsel und Schalter ins Kodi-Log. |
 
----
+<a id="k27"></a>
 
-## 24. 🧩 Bausteine
+## 27. Bausteine
 
-Ein Klick fügt den Baustein auf der aktuellen Seite ein:
+Ein Klick fügt den Baustein auf der aktuellen Seite ein: Liste, Kachel-Raster, Karussell, **Widget „Neue Filme“**, **Widget „Weiterschauen“**, **Widget aus Addon**, **✨ Alle Widgets …**, Ein/Aus-Schalter, Lautstärke-Regler, Spul-Regler, Textbox, Laufschrift, Videofenster, Visualisierung, RSS-Ticker, Große Uhr, Wetter-Zeile und Pulsierender Hinweis.
 
-| Baustein | Inhalt |
-|---|---|
-| 📋 Liste | Senkrechte Liste mit eigenen Einträgen |
-| 🔲 Kachel-Raster | 8 Kacheln im Raster |
-| 🎠 Karussell | Waagerechte Endlos-Reihe |
-| 🆕 Widget „Neue Filme“ | Reihe, die sich aus deiner Bibliothek füllt |
-| 🧩 Widget aus Addon | Inhalt eines anderen Addons als Liste (Pfad anpassen) |
-| 🔘 Ein/Aus-Schalter | Mit eigenem Merker |
-| 🔊 Lautstärke-Regler | Lautstärke im Menü |
-| ⏩ Spul-Regler | Nur sichtbar, wenn etwas läuft |
-| 📝 Textbox | Mehrzeiliger, scrollender Text |
-| 📰 Laufschrift | Durchlaufender Text |
-| 📺 Videofenster | Nur sichtbar, wenn ein Video läuft |
-| 🌈 Visualisierung | Nur sichtbar, wenn Musik läuft |
-| 📡 RSS-Ticker | Nachrichten-Laufband |
-| 🕒 Große Uhr | Uhrzeit mit Sekunden |
-| 🌤 Wetter-Zeile | Ort · Wetter · Temperatur |
-| 💓 Pulsierender Hinweis | „NEU!“ in Gelb, pulsiert dauerhaft |
+<a id="k28"></a>
 
----
+## 28. Werkzeuge
 
-## 25. 🧰 Werkzeuge
+**Am markierten Element ausrichten** – wirkt auf alle nicht gesperrten Elemente **derselben Art** auf der Seite:
 
-Erst ein Element **markieren** – es dient als Vorlage. Die Werkzeuge wirken auf alle **nicht gesperrten** Elemente **derselben Art** auf der aktuellen Seite.
+- Links, Mitte, Rechts, Oben, Mitte, Unten
+- Gleichmäßig verteilen (waagerecht oder senkrecht, ab drei Elementen)
+- Gleiche Breite, Höhe oder beides
 
-| Werkzeug | Wirkung |
-|---|---|
-| **⇤ Links / ↔ Mitte / ⇥ Rechts** | Waagerecht am markierten Element ausrichten |
-| **⤒ Oben / ↕ Mitte / ⤓ Unten** | Senkrecht am markierten Element ausrichten |
-| **↔ Waagerecht / ↕ Senkrecht verteilen** | Gleiche Abstände (ab 3 Elementen) |
-| **Gleiche Größe: Breite / Höhe / Beides** | Maße wie das markierte Element |
+**Ganze Seite:** Spiegeln (links ↔ rechts), alles aufs Raster, alles ins Bild holen, Seite duplizieren, alles sperren/entsperren, alles um X/Y verschieben, alles skalieren (von der Bildmitte aus).
 
-Für die **ganze Seite**:
+Gesperrte Elemente bleiben unverändert. Alles lässt sich mit ↩ Rückgängig zurücknehmen.
 
-| Werkzeug | Wirkung |
-|---|---|
-| **🪞 Spiegeln** | Layout links ↔ rechts spiegeln (Textausrichtung wird mit getauscht) |
-| **🧲 Alles aufs Raster** | Position und Größe aller Elemente einrasten |
-| **🧲 Alles ins Bild holen** | Elemente, die über den Rand ragen, zurückholen |
-| **⧉ Seite duplizieren** | Kopie der Seite |
-| **🔒 Alles sperren / 🔓 Alles entsperren** | Sperre für alle Elemente |
-| **Alles verschieben** | Um X/Y Pixel |
-| **Alles skalieren** | Prozentual von der Bildmitte aus (auch Listen-Maße und Rahmen) |
+<a id="k29"></a>
 
-Alles lässt sich mit **↩ Rückgängig** zurücknehmen.
-
----
-
-## 26. 📄 Seiten-Tuning
-
-Oben wählst du die Seite. Angezeigt werden auch Dateiname und **Seiten-ID**.
+## 29. Seiten-Tuning
 
 | Einstellung | Wirkung |
 |---|---|
-| **🪟 Als Dialog öffnen** | Die Seite legt sich über das, was gerade in Kodi zu sehen ist – ideal für Pop-up-Menüs. Mit **Abdunkeln** (0–100 %) bestimmst du, wie stark der Hintergrund abgedunkelt wird. Hintergrundbilder werden auf Dialog-Seiten nicht verwendet. |
-| **🎯 Startfokus** | Welches Element beim Öffnen ausgewählt ist. Standard: das oberste links. |
-| **🔗 Direkt-Link** | Adresse und Favoriten-Befehl für genau diese Seite (Abschnitt 35) |
-| **▶ Befehle beim Öffnen** | Ein Kodi-Befehl pro Zeile (`<onload>`) |
-| **⏹ Befehle beim Schließen** | Ein Kodi-Befehl pro Zeile (`<onunload>`) |
-| **🧬 Eigene Controls (XML)** | Eigene Kodi-Controls, die am Ende der Seite eingefügt werden – Gruppen, Labels, Bilder, Animationen … |
+| 🪟 **Als Dialog öffnen** | Die Seite legt sich über das, was gerade in Kodi zu sehen ist – ideal für Pop-up-Menüs. Mit **Abdunkeln** (0–100 %) stellst du ein, wie stark der Hintergrund gedimmt wird. |
+| 🎯 **Startfokus** | Welches Element beim Öffnen ausgewählt ist. Automatisch = oben links. |
+| 🔗 **Direkt-Link** | Adresse und Befehl, um genau diese Seite zu öffnen. |
+| ▶ **Befehle beim Öffnen** / ⏹ **beim Schließen** | Ein Kodi-Befehl pro Zeile (`<onload>` / `<onunload>`). |
+| 🧬 **Eigene Controls (XML)** | Wird am Ende der Seite eingefügt – für eigene Gruppen, Labels, Bilder, Variablen-Tricks. |
 
-Beispiel für eigene Controls:
+<a id="k30"></a>
 
-```xml
-<control type="label">
-  <left>40</left><top>1000</top><width>800</width><height>50</height>
-  <label>$INFO[System.Date]</label>
-</control>
-```
+## 30. Tasten
 
----
+Lege fest, was eine Taste der Fernbedienung oder Tastatur **auf allen Seiten** macht: Kontextmenü, Info, Pause, Play, Play/Pause, Stopp, Nächster/Vorheriger Titel, Bild hoch/runter, Menü-Taste, Ziffern 0–9 – oder eine **eigene Aktions-ID** aus dem Kodi-Wiki („Action IDs“). Jede Taste bekommt eine Aktion wie ein Button.
 
-## 27. ⌨ Tasten
+⚠️ „Zurück“ (Aktions-IDs 10 und 92) ist bewusst gesperrt, damit man das Addon immer verlassen kann. Kodi führt die normale Funktion einer Taste eventuell zusätzlich aus.
 
-Lege fest, was eine Taste in deinem Menü macht – auf **allen Seiten**. Jede Taste kann jede Aktion aus Schritt 6 bekommen (auch Seitenwechsel oder Python-Funktion).
+<a id="k31"></a>
 
-| Taste | Aktions-ID |
-|---|---|
-| Kontextmenü (Taste C) | 117 |
-| Info (Taste I) | 11 |
-| Pause (Leertaste) | 12 |
-| Play (Taste P) | 79 |
-| Play/Pause (Fernbedienung) | 229 |
-| Stopp (Taste X) | 13 |
-| Nächster Titel (Taste .) | 14 |
-| Vorheriger Titel (Taste ,) | 15 |
-| Bild hoch / Bild runter | 5 / 6 |
-| Menü-Taste (Fernbedienung) | 163 |
-| Ziffern 0–9 | 58–67 |
-| **Eigene Aktions-ID (Profis)** | beliebige Zahl (siehe Kodi-Wiki „Action IDs“) |
+## 31. Bedingungen
 
-- Kodi führt die normale Funktion der Taste eventuell **zusätzlich** aus.
-- **Zurück (10 und 92) ist gesperrt**, damit man das Addon immer verlassen kann.
-- Doppelt belegte Tasten meldet **✔ Prüfen**.
+Der **🧠 Bedingungs-Baukasten** hilft beim Feld „👁 Wann sichtbar?“.
 
----
+- **Schreibweise:** `+` = UND, `|` = ODER, `!` = NICHT, `[ ]` = Klammer.
+- **29 fertige Bedingungen** in den Gruppen Wiedergabe, System, Zeit, Gerät, Bibliothek und Wetter & TV – z.B. „Video läuft“, „5 Min. keine Eingabe“, „Abends 18–23 Uhr“, „Dezember“, „Android“, „Filme vorhanden“, „TV-Aufnahme läuft“.
+- **Deine Schalter:** „🟢 Kindermodus ist AN“ / „⚪ … ist AUS“ für jeden Merker.
+- **Fokus auf dieser Seite:** „🎯 Filme“ ergibt `Control.HasFocus(ID)`.
+- **🧪 Prüfen** testet Klammern und Verknüpfungen, **✅ Übernehmen** setzt die Bedingung beim markierten Element.
 
-## 28. 🧠 Bedingungen
+Beispiel: `Player.HasVideo + !Player.Paused` = „nur wenn ein Video läuft und nicht pausiert ist“.
 
-Hier baust du Sichtbarkeits-Regeln zusammen, ohne die Kodi-Schreibweise auswendig zu kennen.
+<a id="k32"></a>
 
-### Kodi-Schreibweise
+## 32. Inspektor und Links
 
-| Zeichen | Bedeutung | Beispiel |
-|---|---|---|
-| `+` | UND | `Player.HasVideo + !Player.Paused` |
-| `\|` | ODER | `Player.HasVideo \| Player.HasAudio` |
-| `!` | NICHT | `!System.InternetState` |
-| `[ ]` | Klammer | `[System.Time(23:00) \| System.Time(00:00,06:00)]` |
+Zeigt alle Seiten mit Dateiname, Seiten-ID und Favoriten-Befehl sowie jedes Element mit **Kodi-ID, Art, Name, Aktion und Sichtbarkeit**. 🎯 springt direkt zum Element auf der Bühne.
 
-### So geht's
+<a id="k33"></a>
 
-1. Element markieren, Werkstatt öffnen → **🧠 Bedingungen** (oder **🧠 Baukasten** in den Eigenschaften).
-2. Bausteine anklicken. Sie werden an der Cursorposition eingefügt. **＋ UND**, **| ODER**, **! NICHT** und **[ ] Klammer** verknüpfen sie.
-3. **🧪 Prüfen** kontrolliert Klammern und Verknüpfungszeichen.
-4. **✅ Für markiertes Element übernehmen** – fertig.
+## 33. Projekt-JSON
 
-### Fertige Bausteine
+Das komplette Projekt (ohne Bilddaten) als JSON – zum Ansehen, Kopieren, Formatieren und Ändern. Seiten-Hintergrundbilder stehen als `§BILD§` darin und bleiben erhalten. **💾 Übernehmen** prüft das JSON und übernimmt es; Seiten-Änderungen lassen sich mit ↩ Rückgängig zurücknehmen.
 
-| Gruppe | Bausteine |
-|---|---|
-| **Wiedergabe** | Etwas läuft, Video läuft, Musik läuft, Pausiert, Ton stumm, Internet-Stream |
-| **System** | Internet vorhanden, Bildschirmschoner aktiv, 5 Min. keine Eingabe, Addon installiert, Addon aktiv, Live-TV-Addon vorhanden, Ein Dialog ist offen |
-| **Zeit** | Morgens 06–12 Uhr, Abends 18–23 Uhr, Nachts 23–06 Uhr, Dezember (Weihnachtszeit) |
-| **Gerät** | Android, Windows, Linux, Raspberry Pi, macOS, iOS/tvOS |
-| **Bibliothek** | Filme / Serien / Musik vorhanden |
-| **Wetter & TV** | Wetter geladen, TV-Aufnahme läuft |
-| **Deine Schalter** | Für jeden Merker-Schalter: „🟢 … ist AN“ und „⚪ … ist AUS“ |
-| **Fokus auf dieser Seite** | `Control.HasFocus(ID)` für jedes anklickbare Element |
-
-> 💡 Die Fokus-Bedingungen sind ein Profi-Trick: Ein Infotext erscheint nur, während ein bestimmter Button ausgewählt ist.
-
----
-
-## 29. 🔍 Inspektor & Links
-
-Für jede Seite:
-
-- Dateiname (`home.xml`, `page_1.xml` …), Seiten-ID und der fertige **Favoriten-Befehl** (📋 kopiert ihn)
-- Tabelle aller Elemente mit **Kodi-ID**, Art, Name, Aktion und Sichtbarkeits-Bedingung
-- **🎯** springt direkt zum Element und markiert es
-
----
-
-## 30. 🧬 Projekt-JSON
-
-Das komplette Projekt (Projektangaben, Design, Modding-Schalter, Addon-Einstellungen und alle Seiten) als Text – ohne Bilddaten.
-
-- **💾 Übernehmen** – Änderungen anwenden. Bei Fehlern bleibt das alte Projekt erhalten.
-- **↺ Neu laden** – aktuellen Stand wieder anzeigen.
-- **✨ Formatieren** – sauber einrücken.
-- **📋 Kopieren** – in die Zwischenablage.
-- Seiten-Hintergrundbilder stehen als `§BILD§` im Text und bleiben erhalten.
-
-> ⚠️ Vorher mit **💾 Speichern** ein Backup anlegen. Mit **↩ Rückgängig** lassen sich nur die Seiten zurücknehmen.
+⚠️ Sichere dein Projekt vorher mit **💾 Speichern**.
 
 ---
 
 # Teil D – Für Profis
 
-## 31. Was im ZIP steckt
+<a id="k34"></a>
 
+## 34. Inhalt des ZIP
+
+```text
+plugin.video.<projektname>/
+├── addon.xml                 Name, Version, Abhängigkeiten, Icon, Fanart, Screenshots
+├── addon.py                  Startet das Menü, führt Aktionen aus, füllt Listen und Widgets
+├── pages.json                Seiten, Aktionen, Listen, Widgets, Schalter, Tasten, Optionen
+├── icon.png
+├── fanart.jpg
+├── service.py                nur mit Autostart
+├── resources/
+│   ├── settings.xml          nur mit eigenen Addon-Optionen oder Autostart
+│   ├── screenshot-01.jpg …   bis zu 8
+│   ├── lib/custom.py         nur mit Python-Hooks (wird mit Beispielen angelegt)
+│   └── skins/Default/
+│       ├── 1080i/
+│       │   ├── home.xml      Startseite
+│       │   └── page_1.xml …  weitere Seiten in der Reihenfolge der Seiten-Leiste
+│       └── media/
+│           ├── white.png, background.jpg, bg_page_<n>.jpg
+│           ├── img_<id>.png/.jpg          deine Bilder
+│           ├── round_<r>.png, ring_<r>_<b>.png, mask_<b>x<h>_<r>.png   Rundungen, Rahmen, Bild-Masken
+│           └── kfe_sw_*.png, kfe_sbar.png, kfe_snib.png                Schalter und Regler
+└── (deine eigenen Ordner und Dateien)
 ```
-plugin.video.<id>/
-├── addon.xml                      Addon-Beschreibung, Abhängigkeiten, Bilder, ggf. Autostart-Dienst
-├── addon.py                       Startet das Menü, verarbeitet alle Aktionen
-├── pages.json                     Seiten, Aktionen, Listen, Schalter, Tasten, Optionen
-├── service.py                     nur mit Autostart
-├── icon.png / fanart.jpg
-└── resources/
-    ├── settings.xml               nur wenn Addon-Einstellungen oder Autostart
-    ├── screenshot-01.jpg …
-    ├── lib/custom.py              nur mit Python-Hooks
-    └── skins/Default/
-        ├── 1080i/home.xml         Startseite
-        ├── 1080i/page_1.xml …     weitere Seiten
-        └── media/                 Bilder, Rundungen, Masken, Schalter- und Regler-Grafiken
+
+Das Addon ist ein `xbmc.python.pluginsource` mit `<provides>video</provides>`. Jede Seite läuft als `xbmcgui.WindowXML` – Dialog-Seiten als `WindowXMLDialog`.
+
+<a id="k35"></a>
+
+## 35. Kodi-IDs
+
+Die IDs ergeben sich aus der **Reihenfolge der Elemente auf ihrer Seite** (Index ab 0):
+
+| Element | Control-ID |
+|---|---|
+| Bedienbare Controls: Button, Liste, Schalter, Regler, **Widget** | `100 + Index` |
+| Andere Elemente **mit Aktion** (Bild, Text, Fläche …) | Anzeige `100 + Index`, darüber ein unsichtbarer Button `1000 + Index` (der bekommt den Fokus) |
+| Reine Anzeige-Elemente | `100 + Index` |
+| Rahmen (bei Rahmen-Dicke > 0) | `2000 + Index` |
+| Bild-Hintergrund eines Buttons | `4000 + Index` |
+| Seitenhintergrund | `99` |
+
+Mit **🔢 Kodi-IDs auf der Bühne zeigen** oder im **🔍 Inspektor** siehst du alle IDs.
+
+⚠️ **⬆ nach vorn / ⬇ nach hinten**, Löschen und Einfügen ändern die Reihenfolge – und damit die IDs. Prüfe danach Bedingungen wie `Control.HasFocus(…)` und `SetFocus(…)`.
+
+<a id="k36"></a>
+
+## 36. pages.json
+
+Die `pages.json` steuert das Verhalten des Addons. Ein gekürztes Beispiel:
+
+```json
+{
+  "start": "home",
+  "welcome": "Willkommen im Kino-Hub!",
+  "pages": [
+    { "id": "home", "name": "Start", "file": "home.xml", "dlg": false, "focus": 105, "ids": [105, 111, 106] }
+  ],
+  "actions": {
+    "home": { "105": { "k": "page", "v": "filme" }, "110": { "k": "exit", "ask": "Kino-Hub wirklich verlassen?" } }
+  },
+  "lists": {
+    "home": { "111": { "dir": "videodb://recentlyaddedmovies/", "media": "video", "max": 20, "w": 1, "style": "poster" } }
+  },
+  "switches": {},
+  "keys": {},
+  "close": ["activatewindow", "playmedia", "…"],
+  "noreturn": ["activatewindow(home", "quit", "…"],
+  "opts": { "home_exit": true, "return_menu": true, "confirm_exit": false, "remember": false, "deeplinks": true, "hooks": false, "debug": false, "bgm": "", "bgm_idle": true, "bgm_stop": true }
+}
 ```
 
-Dazu kommen deine eigenen Ordner und Dateien.
-
-- `addon.py` öffnet jede Seite als `WindowXML` (normale Seite) bzw. `WindowXMLDialog` (Dialog-Seite).
-- Das Plugin beendet das Verzeichnis-Listing sofort, wechselt mit `ReplaceWindow(home)` zur Kodi-Startseite (damit Kodis Video-Ansicht nicht im Verlauf bleibt) und zeigt danach dein Menü.
-- Befehle, die ein anderes Fenster öffnen, führt `addon.py` erst **nach** dem Schließen des Menüs aus. Danach wartet es, bis wieder das Ausgangsfenster aktiv ist und kein Dialog mehr offen ist, und öffnet dann dieselbe Seite erneut.
-- Wird das Addon ein zweites Mal gestartet, während es noch wartet, übernimmt der neue Start; der alte beendet sich still (Kennung `Window(Home).Property(kfe.run.<id>)`).
-
----
-
-## 32. Die Kodi-IDs
-
-| ID | Wofür |
+| Schlüssel | Bedeutung |
 |---|---|
-| **99** | Hintergrund der Seite |
-| **100 + Position** | Buttons, Listen, Schalter, Regler sowie alle sichtbaren Elemente |
-| **1000 + Position** | Unsichtbarer Fokus-Button über anklickbaren Elementen, die selbst kein Button sind (Texte, Bilder, Flächen …) |
-| **2000 + Position** | Rahmen (Form & Stil) |
-| **4000 + Position** | Bild hinter einem Button mit eigenem Hintergrundbild |
+| `pages[].focus` / `ids` | Startfokus und alle bedienbaren IDs der Seite (für die Fokus-Reserve bei leeren Widgets) |
+| `actions` | Aktion je Control-ID: `page`, `back`, `home`, `exit`, `cmd` (mit `c` = Befehl, `close` = Menü vorher schließen), `py` (Python-Funktion), optional `pin` und `ask`. Bei Listen: `k: "list"` mit `items` |
+| `lists` | Eigene Einträge als Liste – oder ein Objekt mit `dir`, `media`, `max`. **Widgets** haben zusätzlich `w: 1` und `style` |
+| `switches` | Modus `m` (`flag`, `addon`, `kodi`), Schlüssel `k`, Befehle `on` / `off` |
+| `keys` | Aktion je Kodi-Aktions-ID |
+| `close` / `noreturn` | Befehle, vor denen sich das Menü schließt bzw. nach denen das Addon endet |
+| `opts` | Die Schalter aus der Modding-Werkstatt |
 
-„Position“ ist die Ebenen-Reihenfolge auf der Seite, beginnend bei 0 (das hinterste Element hat Position 0).
+<a id="k37"></a>
 
-> ⚠️ Die IDs **ändern sich**, wenn du Elemente nach vorn/hinten legst, löschst oder neue davor einfügst. Wenn du IDs in Bedingungen (`Control.HasFocus(…)`), `SetFocus(…)` oder eigenem XML nutzt, prüfe sie nach Umbauten im **🔍 Inspektor** oder mit **🔢 Kodi-IDs auf der Bühne zeigen**.
+## 37. Python-Hooks (custom.py)
 
----
+Schalte in der Modding-Werkstatt **🐍 Python-Hooks** ein. Dann entsteht `resources/lib/custom.py` mit Beispielen (`hallo`, `zufallsfilm`, `nachfragen`). Eine eigene `custom.py` unter 📁 ersetzt die Vorlage.
 
-## 33. pages.json – die Schaltzentrale
+**Als Aktion:** Wähle bei einem Element **Python-Funktion** und trage den Funktionsnamen ein, z.B. `zufallsfilm`. Jede Funktion bekommt das geöffnete Menü-Fenster:
 
-`addon.py` liest alles aus `pages.json`:
-
-| Schlüssel | Inhalt |
-|---|---|
-| `start` | ID der Startseite |
-| `welcome` | Begrüßungstext |
-| `pages` | Liste der Seiten mit `id`, `name`, `file`, `dlg` (Dialog) und `focus` (Startfokus-ID) |
-| `actions` | Pro Seite: Control-ID → Aktion (`page`, `back`, `home`, `exit`, `cmd`, `py`, `list`), ggf. mit `pin` und `ask` |
-| `lists` | Pro Seite: Listen-Einträge (`l`, `l2`, `t` = Bild) oder Widget-Quelle (`dir`, `media`, `max`) |
-| `switches` | Pro Seite: Schalter mit Modus `m` (`flag`, `addon`, `kodi`), Schlüssel `k` und Befehlen `on` / `off` |
-| `keys` | Aktions-ID → Aktion |
-| `close` | Befehle, vor denen das Menü geschlossen wird |
-| `noreturn` | Befehle, nach denen das Addon endet statt ins Menü zurückzukehren |
-| `opts` | `home_exit`, `return_menu`, `confirm_exit`, `remember`, `deeplinks`, `hooks`, `debug`, `bgm`, `bgm_idle`, `bgm_stop` |
-
-Du kannst `pages.json` im **💻 Editor** direkt anpassen – z. B. weitere Befehle in `close` aufnehmen.
-
----
-
-## 34. Python-Hooks (custom.py)
-
-Mit **🐍 Python-Hooks** bekommst du die Datei `resources/lib/custom.py`. Darin schreibst du eigene Python-Funktionen und rufst sie über die Aktion **Python-Funktion (custom.py)** auf – bei Buttons, Listen-Einträgen oder Tasten.
-
-### Regeln
-
-- Als Wert trägst du nur den **Funktionsnamen** ein, z. B. `hallo`.
-- Jede Funktion bekommt das geöffnete **Menü-Fenster** übergeben: `def meine_funktion(window):`
-- Der **Rückgabewert** steuert, was danach passiert:
+```python
+def meine_funktion(window):
+    # ... dein Code ...
+    return 'page:filme'   # optional
+```
 
 | Rückgabe | Wirkung |
 |---|---|
-| nichts / `None` | Menü bleibt offen |
-| `'back'` | Eine Seite zurück |
-| `'home'` | Zur Startseite |
+| `'back'` | eine Seite zurück |
+| `'home'` | zur Startseite des Addons |
 | `'exit'` | Addon schließen |
-| `'page:ID'` | Zur Seite mit dieser ID (siehe Inspektor) |
-| jeder andere Text | Wird als Kodi-Befehl ausgeführt, z. B. `'PlayMedia("…")'` |
+| `'page:ID'` | zu einer Seite springen (Seiten-ID siehe Seiten-Tuning oder Inspektor) |
+| jeder andere Text | wird als Kodi-Befehl ausgeführt, z.B. `'PlayMedia("…")'` |
+| `None` | nichts weiter |
 
-### Automatische Hooks (optional)
+**Automatisch aufgerufen**, wenn vorhanden: `on_start()`, `on_page(window, page_id)` bei jeder geöffneten Seite und `on_exit()`.
 
-| Funktion | Wann? |
-|---|---|
-| `on_start()` | Beim Start des Addons |
-| `on_page(window, page_id)` | Bei jeder geöffneten Seite |
-| `on_exit()` | Beim Schließen des Addons |
+Fehler in `custom.py` landen im Kodi-Log, Kodi zeigt zusätzlich eine Meldung.
 
-### Mitgelieferte Beispiele
+<a id="k38"></a>
 
-| Funktion | Was sie tut |
-|---|---|
-| `hallo` | Zeigt einen Dialog „Dein erster Python-Hook funktioniert!“ |
-| `zufallsfilm` | Spielt einen zufälligen Film aus der Bibliothek ab |
-| `nachfragen` | Ja/Nein-Frage, danach zur Startseite |
-| `on_page` | Schreibt jede geöffnete Seite ins Log |
-
-### Eigenes Beispiel
-
-```python
-def lauter_und_info(window):
-    """Lautstärke auf 80 % und eine Meldung zeigen."""
-    xbmc.executebuiltin('SetVolume(80)')
-    return 'Notification(Info,Lautstärke 80 %,2000)'
-```
-
-- Bearbeiten im **💻 Editor** → `resources/lib/custom.py`, oder eine eigene `custom.py` unter „📁 Ordner & Dateien“ nach `resources/lib/` hochladen (die eigene Datei hat dann Vorrang).
-- Fehler in `custom.py` landen mit vollständiger Fehlermeldung im Kodi-Log; in Kodi erscheint „Fehler in custom.… (siehe Log)“.
-
----
-
-## 35. Direkt-Links und Favoriten
+## 38. Direkt-Links und Favoriten
 
 Mit **🔗 Direkt-Links erlauben** lässt sich jede Seite direkt öffnen:
 
+```text
+plugin://plugin.video.meinkinohub/?page=filme
+RunPlugin(plugin://plugin.video.meinkinohub/?page=filme)
 ```
-plugin://plugin.video.<id>/?page=<Seiten-ID>
-```
 
-Statt der Seiten-ID funktioniert auch der **Seitenname** (Groß-/Kleinschreibung egal).
-
-### Als Kodi-Favorit
-
-In der Datei `userdata/favourites.xml`:
+- Statt der Seiten-ID funktioniert auch der **Seitenname** (Groß-/Kleinschreibung egal).
+- Die fertigen Links stehen im **🔍 Inspektor** und im **📄 Seiten-Tuning**.
+- Als Kodi-Favorit in `userdata/favourites.xml`:
 
 ```xml
-<favourite name="Meine Optionen">RunPlugin(plugin://plugin.video.meinkodiprojekt/?page=opt)</favourite>
+<favourite name="Meine Filme">RunPlugin(plugin://plugin.video.meinkinohub/?page=filme)</favourite>
 ```
 
-Die fertigen Befehle stehen im **📄 Seiten-Tuning** und im **🔍 Inspektor** (📋 zum Kopieren).
+Auch Skins mit eigenen Menüpunkten oder andere Addons können so direkt auf eine Unterseite springen. Die Startseite liegt dabei immer darunter – „Zurück“ führt dorthin.
 
-> 💡 `RunPlugin(…)` öffnet das Menü direkt über dem aktuellen Bildschirm. `ActivateWindow(videos,plugin://…,return)` geht dagegen erst in die Video-Ansicht.
+<a id="k39"></a>
 
----
-
-## 36. Merker, Zustände und Speicherorte
+## 39. Merker, Zustände und Speicherorte
 
 | Was | Wo |
 |---|---|
-| Zustand der **Merker-Schalter** und die **zuletzt besuchte Seite** | `special://profile/addon_data/plugin.video.<id>/state.json` |
-| **Merker als Kodi-Eigenschaft** | `Window(Home).Property(<name>)` = `1`, solange der Schalter an ist. Wird beim Start des Addons aus `state.json` wiederhergestellt. |
-| **Addon-Optionen** | Die normale `settings.xml` im `addon_data`-Ordner |
-| **Kodi-Systemeinstellungen** | Direkt in Kodi (über JSON-RPC `Settings.SetSettingValue`) |
+| Schalter-Merker | `userdata/addon_data/plugin.video.<name>/state.json` unter `flags` – beim Start als Eigenschaft im Home-Fenster gesetzt, abfragbar mit `String.IsEqual(Window(Home).Property(NAME),1)` |
+| Letzte Seite (wenn „merken“ an) | dieselbe `state.json` unter `last` |
+| Addon-Optionen | `userdata/addon_data/plugin.video.<name>/settings.xml` |
+| Kodi-Einstellungen (Schalter-Modus „Kodi“) | werden über JSON-RPC (`Settings.SetSettingValue`) direkt in Kodi geändert |
 
-> 💡 Merker-Eigenschaften gelten in ganz Kodi. Ein Skin oder ein anderes Addon kann sie ebenfalls abfragen.
+Weil Merker als Home-Eigenschaft gesetzt sind, kannst du sie auch in deinem Kodi-Skin oder in anderen Addons abfragen – sobald das Addon nach einem Kodi-Start einmal geöffnet wurde.
+
+<a id="k40"></a>
+
+## 40. So füllen sich Widgets und Listen
+
+Beim Öffnen einer Seite fragt `addon.py` jede Bibliotheks-Liste und jedes Widget über Kodis JSON-RPC ab:
+
+```text
+Files.GetDirectory  directory=<Pfad>  media=<video|music|pictures|files>
+                    properties=[title, thumbnail, art, year, rating, plot, runtime, genre,
+                                season, episode, showtitle, artist, resume]
+                    limits={start: 0, end: <Max. Einträge>}
+```
+
+Kennt eine ältere Kodi-Version einen Teil der Abfrage nicht, versucht das Addon es ohne `limits` und zuletzt mit der einfachen Abfrage (`title`, `thumbnail`, `art`). Das Widget erscheint dann trotzdem – nur ohne Zusatz-Infos.
+
+**Bilder je Darstellung** (das erste vorhandene gewinnt):
+
+| Darstellung | Reihenfolge |
+|---|---|
+| Poster | `poster` → `tvshow.poster` → `season.poster` → `thumb` |
+| Breitbild | `landscape` → bei Folgen `thumb`, sonst `fanart` → `tvshow.fanart` → `thumb` |
+| Quadratisch, Liste | `thumb` → `poster` → `icon` |
+
+**Was jeder Eintrag mitbringt** – nutzbar in eigenen XML-Zeilen:
+
+| Info | Inhalt |
+|---|---|
+| `ListItem.Label` | Titel |
+| `ListItem.Label2` | Jahr bzw. `S01E05` bei Folgen |
+| `ListItem.Art(thumb)` | das passende Bild |
+| `ListItem.Property(kfe.meta)` | z.B. `2024 · ★ 7,8 · 112 Min. · Abenteuer · 45 % gesehen` |
+| `ListItem.Property(kfe.plot)` | Inhaltsangabe |
+
+Von außerhalb des Widgets: `$INFO[Container(ID).ListItem.Property(kfe.meta)]`.
+
+**Bibliotheks-Widgets** nutzen intelligente Listen im Pfad, wie die Kodi-Skins auch – z.B. „Filme weiterschauen“:
+
+```text
+videodb://movies/titles/?xsp=<URL-kodiertes JSON>
+{"order":{"direction":"descending","ignorefolders":0,"method":"lastplayed"},
+ "rules":{"and":[{"field":"inprogress","operator":"true","value":[]}]},"type":"movies"}
+```
+
+Eigene Varianten baust du am einfachsten als **intelligente Playlist in Kodi** und trägst deren Pfad ein (siehe Rezept 11).
 
 ---
 
 # Teil E – Rezepte
 
-## 37. Rezepte
+<a id="k41"></a>
+
+## 41. Zwölf Rezepte Schritt für Schritt
 
 ### Rezept 1: Kindersicherung mit Schalter
 
-1. Seite „Optionen“ anlegen, **🔘 Schalter** einfügen, Beschriftung „Kindermodus“.
-2. Modus **Eigener Merker** lassen. Optional: **🔐 PIN** eintragen, damit nur Eltern umschalten können.
-3. Auf der Startseite den Button „Filme ab 18“ markieren → **🧠 Baukasten** → **⚪ Kindermodus ist AUS** → **✅ Übernehmen**.
-4. Ergebnis: Ist der Kindermodus an, verschwindet der Button.
+1. Füge über die Modding-Werkstatt (🧩 Bausteine) einen **Ein/Aus-Schalter** ein und nenne ihn „Kindermodus“. Modus: **Eigener Merker**.
+2. Gib dem Schalter unter **🔐 Schutz** einen PIN, z.B. `1234` – so können Kinder ihn nicht einfach ausschalten.
+3. Markiere einen Button, den Kinder nicht sehen sollen → **👁 Wann sichtbar?** → **🧠 Baukasten** → „⚪ Kindermodus ist AUS“ → **✅ Übernehmen**.
+4. Optional: ein Text „Kindermodus aktiv“ mit „🟢 Kindermodus ist AN“.
 
-> Fertig zum Ansehen in der Vorlage **🛠 Profi-Menü** (Seite „Optionen“).
+In der Vorschau ist alles sichtbar – in Kodi blenden sich die Elemente je nach Schalter ein und aus.
 
-### Rezept 2: Streaming-Startseite mit Widgets
+### Rezept 2: Startseite wie im Kodi-Hauptmenü
 
-1. **🧩 Bausteine** → **🆕 Widget „Neue Filme“**.
-2. Noch einmal einfügen, unter **Inhalt** die Quelle **🆕 Neue Folgen** wählen.
-3. Beide Reihen untereinander schieben, Überschriften als Text darüber.
-4. Optional: **🎞 Nacheinander einblenden** und **🔍 Fokus-Zoom** einschalten.
+1. Lege links eine Spalte mit Menü-Buttons an (z.B. über die 📚 Befehlsliste).
+2. **🧩 Widgets → Neue Filme**. Breite und Position so ziehen, dass das Widget rechts neben den Buttons steht.
+3. Darunter **Filme weiterschauen** und **Neue Folgen**. Tipp: Ein Widget mit ⧉ duplizieren und nur „Was soll das Widget zeigen?“ ändern.
+4. Bei einem Widget **Infos zum gewählten Titel zeigen** einschalten.
+5. Im **📄 Seiten-Tuning** den Startfokus auf den ersten Menü-Button setzen.
 
 ### Rezept 3: Pop-up-Menü als Dialog
 
-1. Neue Seite „Schnellmenü“ mit 3–4 Buttons (z. B. Lautstärke, Untertitel, Stopp).
-2. **📄 Seiten-Tuning** → **🪟 Als Dialog öffnen**, Abdunkeln auf 50 %.
-3. **⌨ Tasten** → **Kontextmenü (117)** → **Andere Seite öffnen** → „Schnellmenü“.
-4. Ergebnis: Taste C bzw. die Kontextmenü-Taste der Fernbedienung öffnet auf jeder Seite deines Menüs das Pop-up.
+1. **＋ Seite** „Schnellmenü“ anlegen.
+2. Modding-Werkstatt → **📄 Seiten-Tuning** → **🪟 Als Dialog öffnen**, Abdunkeln z.B. 60 %.
+3. Eine **⬛ Fläche** als Fenster in die Mitte, Form & Stil „Glas“ oder eigene Farbe.
+4. Darauf die Buttons – und einen Button „Schließen“ mit der Aktion **Zurück**.
+5. Auf der Startseite: Button „Schnellmenü“ mit **Andere Seite öffnen** – oder unter **⌨ Tasten** die Menü-Taste damit belegen.
 
 ### Rezept 4: Favorit direkt auf eine Unterseite
 
-1. **🔗 Direkt-Links erlauben** muss an sein.
-2. **🔍 Inspektor** → bei der Seite den `RunPlugin(…)`-Befehl kopieren.
-3. In Kodi als Favorit eintragen (Abschnitt 35) oder in einem Skin-Menüpunkt verwenden.
+1. Modding-Werkstatt → 🎛 Schalter → **🔗 Direkt-Links erlauben** (Standard: an).
+2. **🔍 Inspektor** → beim Eintrag der Seite den Befehl kopieren, z.B. `RunPlugin(plugin://plugin.video.meinkinohub/?page=filme)`.
+3. In Kodi in `userdata/favourites.xml` eintragen (siehe [Kapitel 38](#k38)) oder in deinem Skin als eigenen Menüpunkt hinterlegen.
 
 ### Rezept 5: Zufallsfilm-Button
 
-1. **🐍 Python-Hooks** einschalten.
-2. Button „🎲 Überrasch mich“ anlegen, Aktion **Python-Funktion**, Wert `zufallsfilm`.
-3. Exportieren – der Button spielt einen zufälligen Film aus deiner Bibliothek.
+1. Modding-Werkstatt → 🎛 Schalter → **🐍 Python-Hooks** an.
+2. Button „Überrasch mich“ → Aktion **Python-Funktion** → `zufallsfilm`.
+3. Fertig – die Funktion steckt schon in der erzeugten `custom.py`.
+
+Ohne Python geht es auch: **🧩 Widget „Zufällige Filme“**.
 
 ### Rezept 6: Radio im Hintergrund
 
-1. **🎵 Hintergrundmusik** einschalten, Stream-Adresse eintragen.
-2. **Nur starten, wenn gerade nichts läuft** und **Beim Verlassen stoppen** anlassen.
-3. Optional: **🎚 Lautstärke-Regler** ins Menü setzen.
+1. Modding-Werkstatt → 🎛 Schalter → **🎵 Hintergrundmusik** an.
+2. Die Adresse eines Radio-Streams eintragen – oder eine eigene Datei unter 📁 hochladen und ihren Pfad eintragen, z.B. `resources/musik.mp3`.
+3. „Nur starten, wenn gerade nichts läuft“ und „Beim Verlassen des Addons stoppen“ nach Wunsch.
 
 ### Rezept 7: Begrüßung je nach Tageszeit
 
-1. Drei Texte übereinander legen: „Guten Morgen“, „Schönen Abend“, „Gute Nacht“.
-2. Jedem im **🧠 Baukasten** die passende Zeit geben: Morgens 06–12, Abends 18–23, Nachts 23–06.
-3. In Kodi ist immer nur der passende Gruß sichtbar.
+1. Drei Texte anlegen: „Guten Morgen“, „Guten Tag“, „Guten Abend“.
+2. Jedem unter **👁 Wann sichtbar? → Eigene Bedingung** eine Zeit geben:
+   - `System.Time(05:00,12:00)`
+   - `System.Time(12:00,18:00)`
+   - `[System.Time(18:00) | System.Time(00:00,05:00)]`
+3. Alle drei auf dieselbe Stelle setzen (gleiche X/Y-Werte oder 🧰 Werkzeuge → Links/Oben ausrichten).
+
+💡 In der Vorschau liegen sie übereinander – in Kodi ist immer nur einer sichtbar.
 
 ### Rezept 8: Infotext zum ausgewählten Button
 
-1. Unter den Buttons einen Text „Hier findest du alle Filme“ anlegen.
-2. **🧠 Baukasten** → **Fokus auf dieser Seite** → den Filme-Button wählen → **✅ Übernehmen**.
-3. Für jeden Button einen eigenen Infotext an derselben Stelle – es ist immer nur der passende sichtbar.
+1. Unter dem Menü für jeden Button einen Text anlegen, z.B. „Alle deine Filme auf einen Blick“.
+2. Text markieren → **🧠 Baukasten** → **Fokus auf dieser Seite** → „🎯 Filme“ → ✅ Übernehmen. Das ergibt `Control.HasFocus(ID)`.
+3. Alle Infotexte an dieselbe Stelle setzen.
+
+⚠️ Die IDs hängen von der Reihenfolge ab ([Kapitel 35](#k35)) – nach „nach vorn/hinten“ im Inspektor kontrollieren.
 
 ### Rezept 9: Autostart für ein Kiosk-Menü
 
-1. **🚀 Autostart-Option einbauen**, **Nach Installation schon an** aktivieren.
-2. Optional **❓ Beim Verlassen nachfragen** einschalten.
-3. Nach der Installation öffnet sich dein Menü bei jedem Kodi-Start. Abschalten in den Addon-Einstellungen.
+1. Modding-Werkstatt → 🎛 Schalter → **🚀 Autostart-Option einbauen**, Wartezeit z.B. 5 Sekunden, **Nach Installation schon an**.
+2. **❓ Beim Verlassen nachfragen** einschalten.
+3. Dem Beenden-Button einen **PIN** geben.
+
+Die Option „Beim Kodi-Start automatisch öffnen“ steht danach in den Addon-Einstellungen und lässt sich dort jederzeit abschalten.
+
+### Rezept 10: Widget aus einem anderen Addon
+
+1. **🧩 Widgets → Inhalt aus einem Addon**.
+2. Unter „Quelle“ die Adresse des Addons eintragen: `plugin://<addon-id>/`. Die ID findest du in Kodi in der Addon-Info oder als Ordnername im Kodi-Ordner `addons`.
+3. Darstellung wählen (Breitbild passt zu den meisten Video-Addons).
+
+⚠️ Das andere Addon wird bei jedem Öffnen der Seite gefragt. Addons, die eine Anmeldung brauchen oder langsam laden, verzögern deine Seite.
+
+### Rezept 11: Eigene intelligente Playlist als Widget
+
+1. In Kodi: **Videos → Playlists → Neue intelligente Playlist**, Regeln festlegen (z.B. „Genre ist Animation“) und als „Kinderfilme“ speichern.
+2. Im Generator: **🧩 Widgets → Eigene Quelle**.
+3. Quelle: `special://profile/playlists/video/Kinderfilme.xsp`, Art der Medien: Video, Darstellung: Poster.
+
+### Rezept 12: Uhr- und Wetter-Ecke
+
+1. **🧩 Widgets → Uhr & Datum** – die Karte an eine beliebige Stelle ziehen (alle Teile wandern mit).
+2. **🧩 Widgets → Wetter** darunter setzen.
+3. In Kodi ein Wetter-Addon einrichten (**Einstellungen → Dienste → Wetter**), sonst bleiben die Wetter-Texte leer.
+4. Farben pro Teil anpassen – z.B. die Datumszeile in deiner Fokusfarbe.
 
 ---
 
 # Teil F – Hilfe
 
-## 38. Vorschau und Kodi – die Unterschiede
+<a id="k42"></a>
 
-| In der Vorschau | In Kodi |
-|---|---|
-| Emojis werden angezeigt | Die meisten Kodi-Schriften zeigen keine Emojis |
-| Schriftgröße passt sich der Elementhöhe an | Es gilt die gewählte Kodi-Schrift (z. B. `font13`) |
-| Alle Elemente sind immer sichtbar | Bedingungen blenden Elemente ein und aus |
-| Keine Animationen | Alle Animationen laufen |
-| Widgets zeigen Platzhalter | Echte Inhalte aus der Bibliothek bzw. dem Addon |
-| Videofenster, Cover, Fortschritt, Visualisierung als Platzhalter | Echte Wiedergabe-Inhalte |
-| Live-Infos mit Beispielwerten | Echte Werte von Kodi |
-| Befehle werden nur angezeigt | Befehle werden ausgeführt |
+## 42. Unterschiede zwischen Vorschau und Kodi
 
----
+| Thema | Vorschau im Generator | In Kodi |
+|---|---|---|
+| Emojis | sichtbar | in den meisten Kodi-Schriften nicht vorhanden |
+| Schrift | an die Elementhöhe angepasst | die gewählte Kodi-Schrift (Standard `font13`) |
+| Sichtbarkeit („Wann sichtbar?“) | alles immer sichtbar | Bedingungen steuern die Anzeige |
+| Animationen | nicht zu sehen | laufen |
+| Widgets | Beispiel-Titel mit bunten Platzhaltern | echte Inhalte aus Bibliothek oder Addon |
+| Info-Widgets, Live-Infos | Beispielwerte (Uhrzeit echt) | echte Werte |
+| Videofenster, Cover, Fortschritt, Visualisierung | Platzhalter | echte Wiedergabe |
+| Befehle | werden im Testmodus nur angezeigt | werden ausgeführt |
+| Live-Ansicht 👁 | Hilfe beim Bearbeiten | gibt es nur im Generator |
 
-## 39. Fehlerbehebung und häufige Fragen
+<a id="k43"></a>
 
-**Das Addon zeigt nach einem Update noch das alte Menü.**
-Version erhöhen (**＋**), neu exportieren und installieren. Hilft das nicht: altes Addon deinstallieren und neu installieren.
+## 43. Fehlerbehebung und häufige Fragen
 
-**Nach dem Beenden lande ich in Kodis Video-Ansicht („Videos“ mit Dateien, Wiedergabelisten, Video-Addons).**
-Im 🛠 Modding unter Schalter **🏠 Beenden führt zur Kodi-Startseite** einschalten (Standard: an), neu exportieren und installieren. Projekte aus älteren Versionen bekommen den Schalter beim Laden automatisch eingeschaltet.
+**Mein Menü ist nach einem Update noch das alte.**
+Version erhöhen (＋), neu exportieren und erneut aus der ZIP installieren. Hilft das nicht: altes Addon deinstallieren und neu installieren.
 
-**Nach einem Kodi-Fenster (z. B. Filme) komme ich nicht mehr ins Menü zurück.**
-**↩ Nach Kodi-Fenstern zurück ins Menü** muss an sein. Zurück geht es, sobald du wieder auf dem Fenster bist, von dem aus das Menü geöffnet wurde (normalerweise die Kodi-Startseite). Navigierst du im Kodi-Fenster woandershin, öffnet sich das Menü erst, wenn du dorthin zurückkehrst.
+**Nach dem Beenden lande ich in Kodis Video-Ansicht.**
+Modding-Werkstatt → 🎛 Schalter → **🏠 Beenden führt zur Kodi-Startseite** einschalten und neu exportieren.
 
-**„Filme“ zeigt eine leere Liste („0 / 0“).**
-Deine Kodi-Bibliothek enthält noch keine Filme. Die Bibliotheks-Befehle zeigen nur, was Kodi gescannt hat. Mit Zurück kommst du wieder in dein Menü.
+**Nach einem Kodi-Fenster komme ich nicht ins Menü zurück.**
+**↩ Nach Kodi-Fenstern zurück ins Menü** muss an sein. Befehle wie „Kodi-Startseite“ (`ActivateWindow(home)`), „Kodi beenden“ oder „Neustart“ beenden das Addon absichtlich. Manche Addons öffnen mehrere Ebenen – dann mehrmals Zurück drücken.
 
-**„Aus ZIP-Datei installieren“ geht nicht.**
-**Einstellungen → System → Addons → Unbekannte Quellen** einschalten.
+**Das Widget oder die Liste bleibt leer („Hier ist noch nichts …“).**
+Sind die Inhalte in der Kodi-Bibliothek? Stimmt der Pfad (bei eigenen Quellen und Addons)? Ist das andere Addon installiert? Im Kodi-Log stehen Fehler der Abfrage (mit 🐞 Ausführliches Kodi-Log noch genauer).
 
-**Der Generator sieht ohne Internet „kaputt“ aus.**
-Das Design (Tailwind CSS) wird beim Öffnen aus dem Internet geladen. Mit Verbindung neu laden. Dein Projekt bleibt gespeichert.
+**Das Widget zeigt keine Bilder oder keine Infos.**
+Bilder kommen aus deiner Bibliothek – fehlen dort Poster oder Fanart, bleibt die Kachel einfarbig. Fehlen nur die Infos, nutzt deine Kodi-Version die einfache Abfrage (siehe [Kapitel 40](#k40)).
+
+**Die Installation aus der ZIP klappt nicht.**
+„Unbekannte Quellen“ erlauben (Einstellungen → System → Addons). Die ZIP nicht entpacken und nicht umbenennen.
+
+**Funktioniert der Generator ohne Internet?**
+Deine Daten bleiben immer im Browser. Für die Darstellung lädt die Seite aber Tailwind CSS aus dem Netz – ohne Internet sieht sie ungestaltet aus.
 
 **„Browser-Speicher voll“.**
-Viele große Bilder füllen den Browser-Speicher. Mit **💾 Speichern** sichern. Tipp: kleinere Bilder verwenden.
+Große Bilder füllen den Speicher des Browsers. Sichere dein Projekt mit **💾 Speichern** als Datei und entferne nicht genutzte große Bilder.
 
-**Die Schrift ist in Kodi zu klein oder zu groß.**
-Im 🛠 Modding des Elements eine andere **Schrift** wählen (z. B. `font27`, `font37`) oder die **Standard-Schrift** in der Werkstatt ändern.
+**Die Schrift ist in Kodi kleiner oder größer als in der Vorschau.**
+Kodi nutzt die Schriften des aktiven Skins. Stelle im 🛠 Modding des Elements eine andere Schrift ein (z.B. `font27`, `font37`, `font45`) oder ändere die Standard-Schrift in der Modding-Werkstatt.
 
 **Meine Emojis fehlen in Kodi.**
-Normal – Kodi-Schriften haben meist keine Emojis. Nutze stattdessen eigene Bilder als Button-Hintergrund.
+Die meisten Kodi-Schriften haben keine Emojis. Das Feld „Symbol (Emoji)“ ist darum nur für die Vorschau gedacht.
 
-**Eine Widget-Liste bleibt leer.**
-Stimmt der Pfad? Hat deine Bibliothek Inhalte? Passt die **Art der Medien** (Musik-Pfade brauchen „Musik“)? Bei Addon-Pfaden muss das Addon installiert sein.
-
-**Ein Kodi-Schalter ändert nichts.**
-Die Einstellungs-ID muss exakt stimmen und eine An/Aus-Einstellung sein. Im Log steht bei Fehlern „JSON-RPC Settings.SetSettingValue …“.
+**Ein Schalter im Modus „Kodi-Einstellung“ bewirkt nichts.**
+Die Einstellung muss einen An/Aus-Wert haben und die ID muss stimmen (Vorschläge erscheinen beim Tippen). Manche Einstellungen wirken erst nach einem Neustart oder sind gesperrt – das Kodi-Log zeigt den Grund.
 
 **Meine Python-Funktion tut nichts.**
-**🐍 Python-Hooks** an? Funktionsname richtig geschrieben? Fehler stehen im Kodi-Log (`kodi.log`) mit vollständiger Fehlermeldung.
+Sind die **🐍 Python-Hooks** an? Gibt es die Funktion in `custom.py` genau so (Groß-/Kleinschreibung)? Fehler stehen im Kodi-Log, Kodi zeigt außerdem eine Meldung.
 
-**Eine Taste macht zusätzlich noch etwas anderes.**
-Kodi führt die normale Tastenfunktion eventuell zusätzlich aus. Wähle eine andere Taste oder eine eigene Aktions-ID.
+**Eine Taste ist doppelt belegt.**
+Nur die letzte Belegung zählt – ✔ Prüfen weist darauf hin.
 
-**Bedingung mit `Control.HasFocus(…)` stimmt nicht mehr.**
-Die IDs haben sich durch Umbauten geändert (Abschnitt 32). Im 🔍 Inspektor nachsehen und anpassen.
+**Meine `Control.HasFocus`-Bedingung stimmt nicht mehr.**
+Die IDs hängen von der Reihenfolge der Elemente ab ([Kapitel 35](#k35)). Prüfe sie im 🔍 Inspektor und baue die Bedingung neu.
 
-**Meine Änderung im Designer kommt nicht in der ZIP an.**
-Die Datei wurde im 💻 Editor von Hand geändert (✎). Im Editor **↺ Original wiederherstellen**.
+**Änderungen aus dem Designer kommen nicht im ZIP an.**
+Die Datei wurde im 💻 Editor von Hand geändert (✎). Sie wird dann genau so exportiert. Im Editor **↺ Original wiederherstellen**.
 
-**Das Menü öffnet sich nicht, Kodi meldet „Menü konnte nicht geladen werden“.**
-Meist ein Fehler in eigenem XML (Element-XML, Seiten-XML oder von Hand geänderte Datei). **✔ Prüfen** testet das Element- und Seiten-XML; im Editor werden XML-Dateien beim Übernehmen geprüft. Details stehen im Kodi-Log.
+**Kodi meldet „Menü konnte nicht geladen werden“.**
+Meist stimmt etwas in eigenen XML-Zeilen nicht. ✔ Prüfen zeigt fehlerhafte XML-Stellen; Details stehen im Kodi-Log.
 
-**Wie finde ich das Kodi-Log?**
-Der Ort hängt vom Gerät ab – Windows: `%APPDATA%\Kodi\kodi.log`, Linux: `~/.kodi/temp/kodi.log`, Android: `Android/data/org.xbmc.kodi/files/.kodi/temp/kodi.log`. Mit **🐞 Ausführliches Kodi-Log** schreibt dein Addon mehr hinein.
+**Die Live-Ansicht verdeckt etwas – oder erscheint nicht.**
+Zieh sie am Kopf an eine freie Stelle oder mach sie mit ⤢ kleiner. ✖ blendet sie aus, der Knopf **👁 Live-Ansicht** unten links holt sie zurück. Sie erscheint nur, wenn die große Vorschau verdeckt ist ([Kapitel 8](#k8)).
+
+**Wie verschiebe ich ein Teil eines Info-Widgets einzeln?**
+Teil markieren → **✂ Lösen**. Danach sind alle Teile einzeln beweglich.
+
+**Kann ich den Hintergrund des Beispiels ersetzen?**
+Ja: 3 · Design → **🖼 Hintergrundbild** wählen (oder mit ✖ entfernen). Einzelne Seiten bekommen über **🎨 Hintergrund** ein eigenes Bild.
+
+**Wo finde ich das Kodi-Log?**
+
+| System | Pfad |
+|---|---|
+| Windows | `%APPDATA%\Kodi\kodi.log` |
+| Linux | `~/.kodi/temp/kodi.log` |
+| LibreELEC / CoreELEC | `/storage/.kodi/temp/kodi.log` |
+| Android | `Android/data/org.xbmc.kodi/files/.kodi/temp/kodi.log` |
+| macOS | `~/Library/Logs/kodi.log` |
+
+<a id="k44"></a>
+
+## 44. Tastenkürzel
+
+| Taste | Wirkung |
+|---|---|
+| Pfeiltasten | markiertes Element (bzw. ganzes Info-Widget) um eine Rasterweite verschieben (Standard 20 px) |
+| Umschalt + Pfeiltasten | um 100 px verschieben |
+| Entf / Rücktaste | markiertes Element löschen |
+| Strg + C / Strg + V | kopieren / einfügen (auch auf anderen Seiten) |
+| Strg + D | duplizieren |
+| Strg + Z | rückgängig |
+| Strg + Y oder Strg + Umschalt + Z | wiederholen |
+| Strg + S | Projekt speichern – im Editor: Datei übernehmen |
+| Tab (im Editor) | einrücken |
+
+Auf dem Mac gilt **Cmd** statt Strg. Auf Handy und Tablet nutzt du die Knöpfe ◀ ▲ ▼ ▶, ⧉, 🗑 und ↩ ↪.
 
 ---
 
-## 40. Tastenkürzel
+```text
+Kodi Video-Addon Generator – Copyright (c) 2026 Team IT('s) Possible
+Handbuch zu Version v8.1x · Stand 2026.10.23. Alle Rechte vorbehalten.
 
-| Taste | Aktion |
-|---|---|
-| **Pfeiltasten** | Markiertes Element um eine Rasterweite verschieben (Standard 20 px) |
-| **Umschalt + Pfeiltasten** | Um 100 px verschieben |
-| **Entf / Rücktaste** | Markiertes Element löschen |
-| **Strg + C** | Element kopieren |
-| **Strg + V** | Element einfügen (auch auf anderen Seiten) |
-| **Strg + D** | Element duplizieren |
-| **Strg + Z** | Rückgängig |
-| **Strg + Y** oder **Strg + Umschalt + Z** | Wiederholen |
-| **Strg + S** | Projekt speichern – im Editor: Datei übernehmen |
-| **Tab** (im Editor) | Einrücken |
+Die Nutzung ist für die Kodi-Community kostenlos. Der Generator darf weder verkauft
+noch kopiert und weiterverkauft werden. Änderungen am Code und eine Weiterverbreitung
+sind nur mit Erlaubnis der Autoren gestattet. Die mit dem Generator gebauten Addons
+gehören ihren Erstellern.
 
-Auf dem Mac gilt **Cmd** statt **Strg**.
-
-
-# Copyright (c) 2026 Team IT('s) Possible. All rights reserved.
-# Version 2026.10.23
-# RECHTLICHER HINWEIS:
-# Jegliche Haftung und Garantie für Schäden jeglicher Art ist ausgeschlossen. 
-# Dieser Code ist das geistige Eigentum der Autoren.
-# Das Modifizieren, Verändern, Umschreiben oder die unautorisierte 
-# Weiterverbreitung des Codes ist strengstens untersagt.
+Die Nutzung erfolgt auf eigene Gefahr. Eine Haftung für Schäden jeder Art und
+jegliche Gewährleistung sind ausgeschlossen.
+```
