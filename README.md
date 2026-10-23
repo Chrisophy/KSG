@@ -4,6 +4,8 @@
 
 👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
+🚥 **Demos:** 
+[https://github.com/Chrisophy/KSG/Demos]
 
 > 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
