@@ -1,4 +1,4 @@
-# 📖 Handbuch – Kodi Video-Addon Generator v8.1x by IT('s) Possible
+# 📖 Handbuch – Kodi Video-Addon Generator v8.1 Pro by IT('s) Possible
 
 Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail.
 
@@ -1134,7 +1134,7 @@ Auf dem Mac gilt **Cmd** statt Strg. Auf Handy und Tablet nutzt du die Knöpfe �
 
 ```text
 Kodi Video-Addon Generator – Copyright (c) 2026 Team IT('s) Possible
-Handbuch zu Version v8.1x · Stand 2026.10.23. Alle Rechte vorbehalten.
+Handbuch zu Version v8.1 Pro · Stand 2026.10.23. Alle Rechte vorbehalten.
 
 Die Nutzung ist für die Kodi-Community kostenlos. Der Generator darf weder verkauft
 noch kopiert und weiterverkauft werden. Änderungen am Code und eine Weiterverbreitung
