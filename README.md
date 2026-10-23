@@ -5,9 +5,7 @@
 👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
 🚥 **Demos:** 
-[https://github.com/Chrisophy/KSG/Demos]
-(Demos)
-
+[https://github.com/Chrisophy/KSG/Demos](Demos)
 > 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
 > 🇩🇪 Oberfläche und Handbuch auf Deutsch · 📱 Maus, Tastatur und Touch (PC, Tablet, Handy) · 🔒 Läuft komplett in deinem Browser – nichts wird hochgeladen · 💚 Gratis für die Kodi-Community
