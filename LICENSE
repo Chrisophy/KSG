@@ -1,84 +1,64 @@
 IT('s) Possible Freeware-Lizenz
 Kodi Video-Addon Generator v8.1 Pro
-Copyright (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
-Stand: 2026.10.23
+Copyright (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten. All rights reserved.
+Original: https://chrisophy.github.io/KSG/
 
-Der Kodi Video-Addon Generator ("die Software") ist kostenlose Software für die
-Kodi-Community. Sie ist NICHT Open Source. Diese Lizenz regelt, was du mit der
-Software tun darfst und was nicht.
+Kostenlos für die Kodi-Community, aber NICHT Open Source.
 
+1. WAS ERLAUBT IST
 
-1. WAS DU DARFST
+   a) Den Generator kostenlos nutzen – online unter der oben genannten Adresse
+      oder als heruntergeladene Datei.
+   b) Auf den Generator verlinken und ihn weiterempfehlen.
+   c) Die mit dem Generator gebauten Addons und Skins frei veröffentlichen.
+      Sie gehören dir. Die Lizenz deines Addons wählst du selbst; "GPL-2.0-or-later"
+      ist im Generator nur als Vorschlag eingetragen.
 
-   a) Die Software kostenlos nutzen – privat und für eigene Projekte, online unter
-      https://chrisophy.github.io/KSG/ oder als heruntergeladene Datei auf deinen
-      eigenen Geräten.
+2. WAS OHNE SCHRIFTLICHE ERLAUBNIS DES URHEBERS VERBOTEN IST
 
-   b) Auf die Software verlinken und sie weiterempfehlen. Das ist ausdrücklich
-      erwünscht.
+   a) Den Generator verkaufen, vermieten oder gegen Bezahlung anbieten,
+      auch als Abo oder hinter einer Bezahlschranke.
+   b) Den Generator mit Werbung oder anderen Einnahmequellen versehen.
+   c) Den Generator auf anderen Seiten, Servern oder in App-Stores
+      bereitstellen oder spiegeln.
+   d) Veränderte Fassungen des Generators verbreiten oder als eigenes Werk
+      ausgeben.
+   e) Copyright- und Lizenzhinweise entfernen oder verändern.
 
-   c) Die Addons, die du mit der Software erstellst, frei verwenden, veröffentlichen
-      und unter einer Lizenz deiner Wahl weitergeben. Sie gehören dir. Das gilt auch
-      für die Dateien, die die Software dafür erzeugt (z.B. addon.py, addon.xml,
-      pages.json und die Skin-Dateien deines Addons).
+3. DRITTE KOMPONENTEN
 
+   a) Estuary (Grundlage des Titan-Modus) stammt von phil65 und Team Kodi.
+      Der Code steht unter der GNU General Public License 2.0, die Grafiken
+      unter CC BY-SA 4.0. Ein daraus gebauter Skin steht unter denselben
+      Lizenzen und nennt Estuary als Grundlage. Diese Lizenz gilt nicht für
+      Estuary und nicht für daraus gebaute Skins.
+   b) Eingebundene Fremd-Addons behalten ihre eigene Lizenz. Diese Lizenz
+      gilt nicht für sie.
+   c) Tailwind CSS wird zur Darstellung aus dem Netz geladen und steht unter
+      seiner eigenen Lizenz.
 
-2. WAS OHNE SCHRIFTLICHE ERLAUBNIS VERBOTEN IST
+4. HAFTUNGSAUSSCHLUSS
 
-   a) Die Software oder Teile ihres Codes zu verkaufen, zu vermieten oder gegen
-      Bezahlung anzubieten – auch nicht als Abo, gegen Pflicht-Spende, hinter einer
-      Bezahlschranke oder in einem kostenpflichtigen Produkt oder Dienst.
-
-   b) Die Software oder Teile ihres Codes mit Werbung, Tracking oder anderen
-      Einnahmequellen zu versehen und so weiterzugeben.
-
-   c) Die Software, ganz oder in Teilen, auf anderen Webseiten, Servern, App-Stores
-      oder Download-Portalen bereitzustellen oder zu spiegeln.
-
-   d) Veränderte Fassungen der Software zu verbreiten, auf ihr aufbauende Produkte zu
-      veröffentlichen oder die Software als eigenes Werk auszugeben.
-
-   e) Copyright-, Lizenz- und Urheberhinweise zu entfernen, zu verstecken oder zu
-      verändern.
-
-   Das bloße Ansehen und Forken des Repositorys im Rahmen der GitHub-Funktionen
-   (gemäß den GitHub-Nutzungsbedingungen) bleibt davon unberührt. Es gibt aber
-   keine weiteren Rechte, insbesondere nicht die Rechte aus Abschnitt 2.
-
-
-3. KEINE GEWÄHR
-
-   Die Software wird so bereitgestellt, wie sie ist, ohne jede ausdrückliche oder
-   stillschweigende Gewährleistung. Die Nutzung erfolgt auf eigene Gefahr. Soweit
-   gesetzlich zulässig, haften die Autoren nicht für Schäden jeder Art, die durch
-   die Nutzung der Software oder der damit erstellten Addons entstehen.
-
-
-4. ENDE DER RECHTE
-
-   Wer gegen diese Lizenz verstößt, verliert automatisch das Recht, die Software zu
-   nutzen. Weitere Ansprüche der Autoren bleiben vorbehalten.
-
+   Die Nutzung erfolgt auf eigene Gefahr. Der Generator wird "wie besehen"
+   bereitgestellt, ohne Gewähr und ohne Haftung für Schäden jeder Art,
+   soweit das gesetzlich zulässig ist.
 
 5. MARKEN
 
-   Kodi(R) ist eine Marke der XBMC Foundation. Dieses Projekt steht in keiner
-   Verbindung zur XBMC Foundation.
+   Kodi(R) ist eine Marke der XBMC Foundation. Dieses Projekt steht in
+   keiner Verbindung zur XBMC Foundation.
 
+6. KONTAKT FÜR ERLAUBNISSE
 
-Fragen oder Anfragen für eine Erlaubnis: über das GitHub-Repository
-https://github.com/Chrisophy/KSG
+   Erlaubnisse nach Punkt 2 bitte schriftlich über das GitHub-Repository
+   Chrisophy/KSG anfragen: https://github.com/Chrisophy/KSG
 
-
--------------------------------------------------------------------------------
-ENGLISH SUMMARY (the German text above is authoritative)
-
-Copyright (c) 2026 Team IT('s) Possible. All rights reserved.
-
-This software is free of charge for the Kodi community, but it is NOT open
-source. You may use it for free and link to it. Add-ons you create with it are
-yours. Without written permission you may NOT sell, rent, or charge for this
-software or any part of its code, monetize it (ads, subscriptions, paywalls),
-host or mirror it elsewhere, distribute modified versions, present it as your
-own work, or remove copyright and license notices. Provided "as is", without
-warranty of any kind. Any violation terminates your right to use the software.
+------------------------------------------------------------------------
+English summary (the German text above is binding):
+Free for the Kodi community, but not open source. You may use and link to
+the tool, and publish the addons and skins you build with it. Without
+written permission you may not sell, rent or charge for it, add
+advertising, host or mirror it elsewhere, distribute modified versions, or
+remove copyright notices. Estuary-based skins stay under Estuary's free
+licenses; bundled third-party addons keep their own licenses. Use at your
+own risk, no warranty.
