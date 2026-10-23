@@ -458,7 +458,7 @@
       ['play', 'Video / Stream abspielen'], ['playpause', 'Play / Pause'], ['next', 'Nächster Titel'],
       ['stop', 'Wiedergabe stoppen'], ['back', 'Zurück (vorherige Seite)'], ['home', 'Zur Startseite dieses Addons'], ['exit', 'Addon komplett schließen'],
       ['settings', 'Kodi-Einstellungen öffnen'], ['quit', 'Kodi beenden'], ['mysettings', 'Einstellungen dieses Addons öffnen'],
-      ['addonfile', 'Datei aus diesem Addon abspielen'], ['custom', 'Kodi-Befehl (aus Liste oder selbst)'], ['py', 'Python-Funktion (custom.py, Profis)']
+      ['addonfile', 'Datei aus diesem Addon abspielen'], ['browse', 'Ordner im eigenen Browser öffnen (bleibt im Skin)'], ['custom', 'Kodi-Befehl (aus Liste oder selbst)'], ['py', 'Python-Funktion (custom.py, Profis)']
     ];
     const NOVAL = new Set(['back', 'mysettings', 'home', 'exit']);
     const ACTHINT = {
@@ -471,6 +471,7 @@
       exit: 'Schließt das Addon komplett und kehrt zur Kodi-Startseite zurück – egal auf welcher Seite man gerade ist.',
       mysettings: 'Öffnet die Einstellungen, die du unter „⚙ Einstellungen deines Addons bauen“ angelegt hast.',
       addonfile: 'Pfad im Addon, z.B. resources/playlist.m3u (Datei vorher unter „📁 Ordner & Dateien“ anlegen).',
+      browse: 'Kodi-Pfad, z.B. plugin://plugin.video.xyz/ – öffnet sich auf deiner Browser-Seite (Seite mit einer Liste „Automatisch aus Kodi“), ohne zu Kodis Ansicht zu wechseln.',
       py: 'Name einer Funktion aus resources/lib/custom.py, z.B. hallo (im 🛠 Modding „Python-Hooks“ einschalten).'
     };
     const QUICK = [['🎬 Filme', 'page'], ['📺 Live TV', 'page'], ['🎵 Musik', 'page'], ['⚙ Einstellungen', 'settings'], ['🔧 Addon-Optionen', 'mysettings'], ['⏯ Play/Pause', 'playpause'], ['⬅ Zurück', 'back']];
@@ -503,6 +504,9 @@
       'System.Time': () => new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
       'System.Date': () => new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }),
       'Weather.Temperature': () => '18 °C',
+      'ListItem.Label': () => 'Gewählter Eintrag',
+      'ListItem.Property(kfe.plot)': () => 'Hier steht die Beschreibung des gewählten Eintrags – Kodi füllt sie live aus dem Addon.',
+      'Window.Property(kfe.title)': () => 'Rubrik › Unterordner',
       'Player.Title': () => 'Titel des Videos',
       'Player.Time': () => '12:34',
       'Player.Duration': () => '1:45:00',
@@ -1347,7 +1351,8 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       h += `<div class="grid grid-cols-3 gap-1.5 mt-2">${g.hz ? '' : numF('Eintrag-Höhe', 'ih', e.ih)}${g.tile ? numF('Eintrag-Breite', 'iw', e.iw) : ''}${numF('Abstand', 'gap', e.gap)}</div>`;
       h += field('Inhalt der Liste', `<select class="inp" onchange="setP('lsrc',this.value);renderProps()"><option value="static" ${e.lsrc !== 'dir' ? 'selected' : ''}>Eigene Einträge (unten anlegen)</option><option value="dir" ${e.lsrc === 'dir' ? 'selected' : ''}>Automatisch aus Kodi (Bibliothek, Ordner, Addon)</option></select>`);
       if (e.lsrc === 'dir') {
-        h += field('Quelle (Kodi-Pfad)', `<input class="inp" list="dl-dir" value="${esc(e.dir)}" oninput="setP('dir',this.value)" placeholder="videodb://recentlyaddedmovies/">`, 'Wie ein Widget: Kodi füllt die Liste beim Öffnen selbst. Ein Klick spielt den Eintrag ab oder öffnet den Ordner.');
+        h += field('Quelle (Kodi-Pfad)', `<input class="inp" list="dl-dir" value="${esc(e.dir)}" oninput="setP('dir',this.value)" placeholder="videodb://recentlyaddedmovies/">`, 'Wie ein Widget: Kodi füllt die Liste beim Öffnen selbst.');
+        h += `<label class="text-xs flex items-center gap-1.5 mt-2"><input type="checkbox" ${e.nav !== false ? 'checked' : ''} onchange="setP('nav',this.checked)">📂 Ordner hier in der Liste öffnen – nicht zu Kodis Ansicht wechseln</label><p class="hint">An: Ordner öffnen sich in dieser Liste, Zurück geht eine Ebene hoch, Videos starten direkt. Aus: Kodi öffnet seine eigene Video-Ansicht.</p>`;
         h += `<div class="flex flex-wrap gap-1 mt-1">${DIRPRE.map((d, i) => `<button class="btn" onclick="setDirPre(${i})">${d[0]}</button>`).join('')}</div>`;
         h += `<div class="grid grid-cols-2 gap-1.5 mt-2"><div><span class="hint">Art der Medien</span><select class="inp" onchange="setP('dmedia',this.value)">${[['video', 'Video'], ['music', 'Musik'], ['pictures', 'Bilder'], ['files', 'Dateien']].map(m => `<option value="${m[0]}" ${m[0] === e.dmedia ? 'selected' : ''}>${m[1]}</option>`).join('')}</select></div>${numF('Max. Einträge', 'dmax', e.dmax)}</div>`;
       } else {
@@ -2058,6 +2063,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       if (a.t === 'page') s = { k: 'page', v: a.v };
       else if (a.t === 'back' || a.t === 'home' || a.t === 'exit') s = { k: a.t };
       else if (a.t === 'py') s = String(a.v || '').trim() ? { k: 'py', f: String(a.v).trim() } : null;
+      else if (a.t === 'browse') { const bp = browsePage(), v = String(a.v || '').trim(); s = v ? { k: 'browse', v, p: bp ? bp.id : '', l: String(a.l || '') } : null; }
       else { const c = cmdOf(a); s = c ? { k: 'cmd', c, close: needClose(c) } : null; }
       if (s && pin && /^\d{1,8}$/.test(pin)) s.pin = pin;
       if (s && ask && String(ask).trim()) s.ask = String(ask).trim();
@@ -2075,6 +2081,11 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
     function runA(a, pin, ask) {
       if (!a || a.t === 'none') return toast('Hier ist keine Aktion eingestellt.');
       if (!pinOk(pin, ask)) return;
+      if (a.t === 'browse') {
+        const bp = browsePage(); if (!bp) return toast('Dafür fehlt eine Browser-Seite (eine Seite mit Liste „Automatisch aus Kodi“).');
+        toast('Kodi zeigt „' + (a.v || '?') + '“ auf der Seite „' + bp.name + '“ – ohne zu Kodis Ansicht zu wechseln.');
+        return runA({ t: 'page', v: bp.id });
+      }
       if (a.t === 'page') {
         const i = S.pages.findIndex(p => p.id === a.v);
         if (i < 0) return toast('Die Ziel-Seite gibt es nicht mehr.');
@@ -2106,7 +2117,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
     function pvClick(e, lx, ly) {
       if (e.type === 'widget') return toast('🧩 Kodi würde den gewählten Titel aus „' + (e.wtitle || wPre(e.wsrc)[2]) + '“ abspielen bzw. öffnen.');
       if (e.type === 'list') {
-        if (e.lsrc === 'dir') return toast('Kodi würde den Eintrag aus „' + (e.dir || '?') + '“ abspielen bzw. den Ordner öffnen.');
+        if (e.lsrc === 'dir') return toast(e.nav !== false ? 'Kodi zeigt hier „' + (e.dir || '?') + '“. Ordner öffnen sich in dieser Liste, Zurück geht eine Ebene hoch, Videos starten direkt.' : 'Kodi würde den Eintrag aus „' + (e.dir || '?') + '“ abspielen bzw. den Ordner in seiner eigenen Ansicht öffnen.');
         const g = liGeo(e), col = g.tile ? Math.floor(lx / (g.iw + g.gap)) : 0, row = g.hz ? 0 : Math.floor(ly / (g.ih + g.gap));
         if (g.panel && col >= g.cols) return;
         const it = (e.items || [])[g.panel ? row * g.cols + col : g.hz ? col : row];
@@ -2141,6 +2152,8 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       else if ((a.t === 'addon' || a.t === 'custom') && !a.v) r.push(['w', `${n}: Es fehlt der Befehl bzw. die Adresse.`]);
       else if (a.t === 'custom' && /DEINE\.ADDON\.ID|DEIN\.SKRIPT\.ID|PlayMedia\(https:\/\/\)$/.test(a.v)) r.push(['w', `${n}: Im Befehl steht noch ein Platzhalter, bitte anpassen.`]);
       else if (a.t === 'page' && !S.pages.some(q => q.id === a.v)) r.push(['w', `${n}: Die Ziel-Seite gibt es nicht mehr.`]);
+      else if (a.t === 'browse' && !String(a.v || '').trim()) r.push(['w', `${n}: Es fehlt der Ordner-Pfad (z.B. plugin://…/).`]);
+      else if (a.t === 'browse' && !browsePage()) r.push(['w', `${n}: Für „Ordner im eigenen Browser“ fehlt eine Seite mit einer Liste „Automatisch aus Kodi“ (Ordner hier öffnen).`]);
       else if (a.t === 'addonfile' && !a.v) r.push(['w', `${n}: Es fehlt der Dateipfad im Addon.`]);
       else if (a.t === 'addonfile' && !S.files.some(f => cleanPath(f.p) === cleanPath(a.v))) r.push(['w', `${n}: Die Datei „${a.v}“ gibt es unter „📁 Ordner & Dateien“ nicht.`]);
       else if (a.t === 'mysettings' && !allSettings().length) r.push(['w', `${n}: Du hast noch keine Addon-Einstellungen angelegt („⚙ Einstellungen deines Addons bauen“).`]);
@@ -2149,6 +2162,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
     }
 
     function checkExt(r) {
+      autoDeps().forEach(d => r.push(['i', `Abhängigkeit automatisch in die addon.xml eingetragen: ${d.id} (${d.why}). Kodi holt sie beim Installieren mit.`]));
       S.ext.forEach(e => {
         if (!EXTZ[e.id]) r.push(['w', `Fremd-Addon „${e.name}“: Die ZIP fehlt im Speicher dieses Geräts – bitte unter 🧩 Fremd-Addon erneut auswählen.`]);
         else if (!e.entries.some(x => String(x.l || '').trim())) r.push(['i', `Fremd-Addon „${e.name}“: Noch keine Menüeinträge angelegt.`]);
@@ -2156,7 +2170,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       });
     }
     function check() {
-      const r = [], leadsTo = id => S.pages.some(q => q.els.some(e => (e.act && e.act.t === 'page' && e.act.v === id) || (e.items || []).some(it => it.act && it.act.t === 'page' && it.act.v === id))) || S.mod.keys.some(k => k.act.t === 'page' && k.act.v === id);
+      const r = [], leadsTo = id => S.pages.some(q => q.els.some(e => (e.act && e.act.t === 'page' && e.act.v === id) || (e.items || []).some(it => it.act && it.act.t === 'page' && it.act.v === id))) || S.mod.keys.some(k => k.act.t === 'page' && k.act.v === id) || ((browsePage() || {}).id === id && S.pages.some(q => q.els.some(e => e.act && e.act.t === 'browse')));
       S.pages.forEach((p, i) => {
         p.els.forEach(e => {
           const n = `„${elName(e)}“ (Seite ${p.name})`;
@@ -2618,6 +2632,8 @@ RUN_KEY = 'kfe.run.' + ADDON_ID
 TOKEN = '%.6f' % time.time()
 BACK_ACTIONS = (10, 92)
 DIR_WINDOWS = {'music': 'Music', 'pictures': 'Pictures', 'programs': 'Programs'}
+NAV_PROPS = ['title', 'thumbnail', 'art', 'plot']
+PENDING = {}
 
 
 def log(msg, level=None):
@@ -2920,8 +2936,22 @@ class MenuBase(object):
     result = None
 
     def onInit(self):
-        self.dirs = {}
-        for cid, data in LISTS.get(self.page_id, {}).items():
+        first = not getattr(self, 'kfe_ready', False)
+        lists = LISTS.get(self.page_id, {})
+        has_nav = any(isinstance(d, dict) and d.get('nav') for d in lists.values())
+        if first:
+            self.kfe_ready = True
+            self.dirs, self.navs, self.cur, self.keep = {}, {}, {}, {}
+            pend = PENDING.pop(self.page_id, None)
+            if pend:
+                for cid, data in lists.items():
+                    if isinstance(data, dict) and data.get('nav'):
+                        self.cur[cid] = pend
+                        break
+        for cid, data in lists.items():
+            if not first and isinstance(data, dict) and data.get('nav') and cid in self.dirs:
+                # Nach einem Video: Ordner und Position im eigenen Browser bleiben erhalten
+                continue
             try:
                 self.fill_list(cid, data)
             except Exception as exc:
@@ -2933,7 +2963,7 @@ class MenuBase(object):
                 log('Schalter %s: %s' % (cid, exc), xbmc.LOGWARNING)
         page = PAGES.get(self.page_id, {})
         focus = page.get('focus')
-        if LISTS.get(self.page_id) and focus:
+        if LISTS.get(self.page_id) and focus and (first or not has_nav):
             # Startfokus setzen – eine leere Liste/ein leeres Widget wird dabei übersprungen
             order = [focus] + [i for i in page.get('ids', []) if i != focus]
             for cid in order:
@@ -2961,9 +2991,18 @@ class MenuBase(object):
             limit = int(data.get('max') or 30)
             widget = bool(data.get('w'))
             style = data.get('style') or 'poster'
-            params = {'directory': data.get('dir', ''), 'media': media}
+            nav = bool(data.get('nav'))
+            cur = self.cur.get(cid) if nav else None
+            if nav:
+                limit = max(limit, 500)
+            params = {'directory': cur[0] if cur else data.get('dir', ''), 'media': media}
             res = None
-            if widget:
+            if nav:
+                # Mit customproperties erfahren wir, ob ein Eintrag abspielbar ist (ab Kodi 20)
+                res = rpc('Files.GetDirectory', dict(params, properties=NAV_PROPS + ['customproperties']), True)
+                if res is None:
+                    res = rpc('Files.GetDirectory', dict(params, properties=NAV_PROPS), True)
+            elif widget:
                 # Erst mit allen Infos versuchen; ältere Kodi-Versionen bekommen die einfache Abfrage
                 res = rpc('Files.GetDirectory', dict(params, properties=WIDGET_PROPS, limits={'start': 0, 'end': limit}), True)
                 if res is None:
@@ -2984,11 +3023,30 @@ class MenuBase(object):
                     art = it.get('art') or {}
                     thumb = art.get('poster') or art.get('thumb') or art.get('icon') or it.get('thumbnail') or ''
                     item = xbmcgui.ListItem(label)
+                    if nav:
+                        item.setProperty('kfe.plot', it.get('plot') or '')
+                        if it.get('filetype') == 'directory':
+                            item.setProperty('kfe.folder', '1')
+                        if art.get('fanart'):
+                            item.setArt({'fanart': art.get('fanart')})
                 if thumb:
                     item.setArt({'thumb': thumb, 'icon': thumb})
                 ctl.addItem(item)
-                rows.append((it.get('file', ''), it.get('filetype', 'file')))
+                cp = it.get('customproperties')
+                playable = None
+                if isinstance(cp, dict):
+                    playable = str(cp.get('IsPlayable', cp.get('isplayable', ''))).lower() == 'true'
+                rows.append((it.get('file', ''), it.get('filetype', 'file'), playable, label))
             self.dirs[cid] = (media, rows)
+            if nav:
+                self.setProperty('kfe.title', cur[1] if cur else '')
+                self.setProperty('kfe.depth', str(len(self.navs.get(cid, []))))
+                pos = self.keep.pop(cid, None)
+                if pos is not None and 0 <= pos < len(rows):
+                    try:
+                        ctl.selectItem(pos)
+                    except Exception:
+                        pass
             return
         for it in data:
             item = xbmcgui.ListItem(it.get('l', ''), it.get('l2', ''))
@@ -2998,6 +3056,65 @@ class MenuBase(object):
                     thumb = os.path.join(MEDIA_PATH, thumb)
                 item.setArt({'thumb': thumb, 'icon': thumb})
             ctl.addItem(item)
+
+    def nav_fill(self, cid):
+        data = LISTS.get(self.page_id, {}).get(cid) or {}
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try:
+            self.fill_list(cid, data)
+        except Exception as exc:
+            log('Ordner %s: %s' % (cid, exc), xbmc.LOGWARNING)
+        finally:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+        try:
+            ctl = self.getControl(int(cid))
+            if ctl.size() > 0:
+                self.setFocusId(int(cid))
+                return True
+        except Exception:
+            pass
+        return False
+
+    def nav_open(self, cid, path, ftype, playable, label, pos):
+        if ftype == 'directory':
+            self.navs.setdefault(cid, []).append((self.cur.get(cid), pos))
+            self.cur[cid] = (path, label)
+            if not self.nav_fill(cid):
+                prev, ppos = self.navs[cid].pop()
+                if prev is None:
+                    self.cur.pop(cid, None)
+                else:
+                    self.cur[cid] = prev
+                self.keep[cid] = ppos
+                self.nav_fill(cid)
+                notify('Dieser Ordner ist leer oder konnte nicht geladen werden', xbmcgui.NOTIFICATION_WARNING, 3000)
+            return
+        self.keep[cid] = pos
+        if playable is False and path.startswith('plugin://'):
+            # Kein Video (z.B. Artikel, Dialog): die Funktion des Addons ausfuehren, das Menue bleibt offen
+            xbmc.executebuiltin('RunPlugin("%s")' % path)
+        elif PAGES.get(self.page_id, {}).get('dlg'):
+            self.finish(('cmd', 'PlayMedia("%s")' % path))
+        else:
+            xbmc.executebuiltin('PlayMedia("%s")' % path)
+
+    def nav_up(self):
+        navs = getattr(self, 'navs', {})
+        try:
+            fid = str(self.getFocusId())
+        except Exception:
+            fid = ''
+        order = ([fid] if navs.get(fid) else []) + [c for c in navs if navs.get(c) and c != fid]
+        for cid in order:
+            prev, pos = navs[cid].pop()
+            if prev is None:
+                self.cur.pop(cid, None)
+            else:
+                self.cur[cid] = prev
+            self.keep[cid] = pos
+            self.nav_fill(cid)
+            return True
+        return False
 
     def list_pos(self, control_id):
         try:
@@ -3027,8 +3144,11 @@ class MenuBase(object):
             media, rows = dyn
             pos = self.list_pos(control_id)
             if 0 <= pos < len(rows):
-                path, ftype = rows[pos]
-                if ftype == 'directory':
+                path, ftype, playable, label = rows[pos]
+                data = LISTS.get(self.page_id, {}).get(cid)
+                if isinstance(data, dict) and data.get('nav'):
+                    self.nav_open(cid, path, ftype, playable, label, pos)
+                elif ftype == 'directory':
                     self.finish(('cmd', 'ActivateWindow(%s,"%s",return)' % (DIR_WINDOWS.get(media, 'Videos'), path)))
                 else:
                     self.finish(('cmd', 'PlayMedia("%s")' % path))
@@ -3048,9 +3168,18 @@ class MenuBase(object):
         if kind == 'page':
             self.finish(('page', act.get('v')))
         elif kind in ('back', 'home', 'exit'):
+            if kind == 'back' and self.nav_up():
+                return
             if kind == 'back' and self.page_id == ROOT and not leave_ok():
                 return
             self.finish((kind, None))
+        elif kind == 'browse':
+            target = act.get('p') or CONFIG.get('browse')
+            if target not in PAGES:
+                self.run_cmd('ActivateWindow(Videos,"%s",return)' % act.get('v', ''))
+                return
+            PENDING[target] = (act.get('v', ''), act.get('l', ''))
+            self.finish(('page', target))
         elif kind == 'py':
             if not hooks():
                 notify('Python-Hooks sind ausgeschaltet', xbmcgui.NOTIFICATION_WARNING)
@@ -3076,6 +3205,8 @@ class MenuBase(object):
             self.finish((ret, None))
         elif ret.startswith('page:'):
             self.finish(('page', ret[5:]))
+        elif ret.startswith('browse:'):
+            self.do({'k': 'browse', 'v': ret[7:], 'p': CONFIG.get('browse') or '', 'l': ''})
         else:
             self.run_cmd(ret)
 
@@ -3086,6 +3217,8 @@ class MenuBase(object):
             self.do(act)
             return
         if aid in BACK_ACTIONS:
+            if self.nav_up():
+                return
             if self.page_id == ROOT and not leave_ok():
                 return
             self.finish(None)
@@ -3259,6 +3392,7 @@ So nutzt du sie:
       'home'      -> zur Startseite des Addons
       'exit'      -> Addon schliessen
       'page:ID'   -> zu einer Seite springen (ID steht im Modding-Inspektor)
+      'browse:PFAD' -> Ordner im eigenen Browser zeigen, z.B. 'browse:plugin://plugin.video.xyz/'
       jeder andere Text wird als Kodi-Befehl ausgefuehrt,
       z.B. 'ActivateWindow(home)' oder 'PlayMedia(https://...)'
 
@@ -3318,6 +3452,8 @@ def on_page(window, page_id):
         prov: ['video', 'audio', 'image', 'executable'].includes(e.prov) ? e.prov : 'video', kind: ['plugin', 'script', 'other'].includes(e.kind) ? e.kind : 'plugin',
         key: /^\w{1,20}$/.test(String(e.key || '')) ? String(e.key) : 'mode',
         deps: (Array.isArray(e.deps) ? e.deps : []).map(String).filter(d => /^[A-Za-z0-9_.\-]+$/.test(d)).slice(0, 30),
+        need: (Array.isArray(e.need) ? e.need : []).map(String).filter(d => /^[A-Za-z0-9_.\-]+$/.test(d)).slice(0, 30),
+        more: (Array.isArray(e.more) ? e.more : []).map(String).filter(v => /^[\w\-]{1,32}$/.test(v)).slice(0, 30),
         entries: (Array.isArray(e.entries) ? e.entries : []).filter(x => x && typeof x === 'object').slice(0, 60).map(x => ({ l: String(x.l || '').slice(0, 60), u: String(x.u || '').slice(0, 400), k: ok(x.k) ? x.k : 'dir' }))
       };
     }
@@ -3328,23 +3464,82 @@ def on_page(window, page_id):
       for (const e of S.ext) if (!EXTZ[e.id]) { try { const d = await tiDbGet('ext:' + e.id); if (typeof d === 'string') { EXTZ[e.id] = d; got = true; } } catch (x) {} }
       if (got && $('ext-box')) showExt();
     }
-    // Menü-Pfade in den Python-Dateien erraten (nur eine Hilfe – bitte prüfen)
-    function extDetect(all, pre, id, kind) {
-      const td = new TextDecoder(), keyOf = s => s;
+    // Menü-Pfade in den Python-Dateien erraten (nur eine Hilfe – bitte prüfen).
+    // vals: Pfade, die ohne weitere Angaben funktionieren · more: Pfade, die Angaben aus der vorherigen Liste brauchen (z.B. url=…)
+    function extDetect(all, pre) {
+      const td = new TextDecoder();
       const py = Object.keys(all).filter(p => p.startsWith(pre) && /\.py$/.test(p) && all[p].length < 700000).slice(0, 80);
       let txt = ''; py.forEach(p => { txt += '\n' + td.decode(all[p]); });
       const typical = ['mode', 'action', 'route', 'function', 'func', 'cmd', 'command', 'page', 'do'], cnt = {};
       let m; const kr = /['"](\w{2,12})['"]/g;
       while ((m = kr.exec(txt))) if (typical.includes(m[1])) cnt[m[1]] = (cnt[m[1]] || 0) + 1;
       const key = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0] || 'mode';
-      const vals = {}, add = v => { v = String(v || ''); if (!v || v.length > 32 || /^\d+$/.test(v) || /^(None|True|False)$/.test(v)) return; vals[v] = (vals[v] || 0) + 1; };
+      const vals = {}, free = {}, need = {}, branch = {};
+      const ok = v => v && v.length <= 32 && !/^\d+$/.test(v) && !/^(None|True|False)$/.test(v);
+      const add = v => { if (ok(v)) vals[v] = (vals[v] || 0) + 1; };
+      const vote = (o, v) => { if (ok(v)) o[v] = (o[v] || 0) + 1; };
+      const otherParam = seg => { const r = /\b(?:params|args|query|qs|parameters|p|kwargs|arguments)\s*(?:\.get\(|\[)\s*['"](\w+)['"]/g; let x; while ((x = r.exec(seg))) if (x[1] !== key) return true; return false; };
+      // 1) Verteiler: mode == 'x' – liest der Zweig weitere Parameter, braucht der Pfad Angaben
       const names = '(?:\\b\\w*' + key + '\\w*|\\bmode|\\baction|\\broute)';
       const re1 = new RegExp(names + '\\s*(?:==|in|is)\\s*[\\(\\[]?\\s*((?:[\'"][\\w\\-]+[\'"]\\s*,?\\s*)+)', 'g');
-      while ((m = re1.exec(txt))) (m[1].match(/['"]([\w\-]+)['"]/g) || []).forEach(s => add(s.slice(1, -1)));
-      const re2 = new RegExp('[\'"]' + key + '[\'"]\\s*:\\s*[\'"]([\\w\\-]+)[\'"]', 'g'); while ((m = re2.exec(txt))) add(m[1]);
-      const re3 = new RegExp('[?&]' + key + '=([\\w\\-]+)', 'g'); while ((m = re3.exec(txt))) add(m[1]);
-      const list = Object.keys(vals).sort((a, b) => vals[b] - vals[a] || a.localeCompare(b)).slice(0, 24);
-      return { key: keyOf(key), vals: list, n: py.length };
+      while ((m = re1.exec(txt))) {
+        const vs = (m[1].match(/['"]([\w\-]+)['"]/g) || []).map(s => s.slice(1, -1));
+        let seg = txt.slice(m.index + m[0].length, m.index + m[0].length + 600); const nl = seg.indexOf('\n');
+        if (nl >= 0) { const cut = seg.slice(nl).search(/\n\s*(?:elif\b|else\b|if\b|def\b|@)/); if (cut > 0) seg = seg.slice(0, nl + cut); }
+        const nd = otherParam(seg);
+        vs.forEach(v => { add(v); if (ok(v)) branch[v] = branch[v] === 'need' || nd ? 'need' : 'free'; });
+      }
+      // 2) Adressen im Code: {'mode': 'x'} allein = frei, mit weiteren Schlüsseln = braucht Angaben
+      const re2 = /\{[^{}]{0,400}\}/g;
+      while ((m = re2.exec(txt))) {
+        const d = m[0], mm = new RegExp('[\'"]' + key + '[\'"]\\s*:\\s*[\'"]([\\w\\-]+)[\'"]').exec(d); if (!mm) continue;
+        add(mm[1]); vote((d.match(/['"]\w+['"]\s*:/g) || []).length > 1 ? need : free, mm[1]);
+      }
+      const re3 = new RegExp('[?&]' + key + '=([\\w\\-]+)(&?)', 'g'); while ((m = re3.exec(txt))) { add(m[1]); vote(m[2] ? need : free, m[1]); }
+      const isFree = v => branch[v] ? branch[v] === 'free' : !!free[v] || !need[v];
+      const all2 = Object.keys(vals).sort((a, b) => vals[b] - vals[a] || a.localeCompare(b)).slice(0, 30);
+      return { key, vals: all2.filter(isFree), more: all2.filter(v => !isFree(v)), n: py.length };
+    }
+    // Welche Python-Module importiert der Code? (oberste Ebene, ohne relative Importe)
+    function pyImports(txt) {
+      const out = new Set(); let m;
+      const r1 = /^[ \t]*import[ \t]+([\w., \t]+)/gm, r2 = /^[ \t]*from[ \t]+([\w.]+)[ \t]+import\b/gm;
+      while ((m = r1.exec(txt))) m[1].split(',').forEach(x => { const n = x.trim().split(/\s+/)[0].split('.')[0]; if (n) out.add(n); });
+      while ((m = r2.exec(txt))) { const n = m[1].split('.')[0]; if (n) out.add(n); }
+      return out;
+    }
+    // Python-Modul → Kodi-Addon aus dem offiziellen Kodi-Repository
+    const IMPORT_MAP = {
+      bs4: 'script.module.beautifulsoup4', soupsieve: 'script.module.soupsieve', requests: 'script.module.requests', feedparser: 'script.module.feedparser',
+      six: 'script.module.six', simplejson: 'script.module.simplejson', dateutil: 'script.module.dateutil', html5lib: 'script.module.html5lib',
+      chardet: 'script.module.chardet', idna: 'script.module.idna', urllib3: 'script.module.urllib3', certifi: 'script.module.certifi',
+      routing: 'script.module.routing', xmltodict: 'script.module.xmltodict', inputstreamhelper: 'script.module.inputstreamhelper', pytz: 'script.module.pytz',
+      arrow: 'script.module.arrow', kodi_six: 'script.module.kodi-six', m3u8: 'script.module.m3u8', websocket: 'script.module.websocket',
+      pyxbmct: 'script.module.pyxbmct', unidecode: 'script.module.unidecode', Cryptodome: 'script.module.pycryptodome', socks: 'script.module.pysocks',
+      simplecache: 'script.module.simplecache', yaml: 'script.module.pyyaml'
+    };
+    const KODI_MODS = new Set(Object.values(IMPORT_MAP));
+    // Eigene Module im Code (Datei name.py oder Ordner name/__init__.py) brauchen kein Kodi-Modul
+    const localMods = paths => { const s = new Set(); paths.forEach(p => { const m = /(?:^|\/)([\w]+)\.py$/.exec(p); if (m) s.add(m[1]); const d = /(?:^|\/)([\w]+)\/__init__\.py$/.exec(p); if (d) s.add(d[1]); }); return s; };
+    function needFromImports(imps, local, declared) {
+      return [...imps].filter(n => !local.has(n) && IMPORT_MAP[n]).map(n => IMPORT_MAP[n]).filter((id, i, a) => a.indexOf(id) === i && !declared.includes(id));
+    }
+    // Automatisch einzutragende Abhängigkeiten für das eigene Addon (mit Grund)
+    function autoDeps() {
+      const res = [], have = new Set(depList()), bundled = new Set((S.ext || []).map(e => e.id)), add = (id, why) => { if (!have.has(id) && !bundled.has(id) && !res.some(x => x.id === id)) res.push({ id, why }); };
+      const own = S.files.filter(f => /\.py$/i.test(f.p)).map(f => { let t = ''; try { t = dataToTxt(f.d); } catch (e) {} return { p: cleanPath(f.p), t }; });
+      Object.keys(S.overrides || {}).filter(p => /\.py$/i.test(p) && typeof S.overrides[p] === 'string').forEach(p => own.push({ p, t: S.overrides[p] }));
+      const local = localMods(own.map(x => x.p));
+      own.forEach(x => [...pyImports(x.t)].forEach(n => { if (!local.has(n) && IMPORT_MAP[n]) add(IMPORT_MAP[n], `import ${n} in ${x.p}`); }));
+      (S.ext || []).forEach(e => {
+        e.need.forEach(id => add(id, `„${e.name}“ importiert es, meldet es aber nicht an`));
+        e.deps.filter(d => KODI_MODS.has(d)).forEach(d => add(d, `wird von „${e.name}“ gebraucht`));
+      });
+      return res;
+    }
+    function allDeps() {
+      const bundled = new Set((S.ext || []).map(e => e.id)), own = addonId();
+      return [...new Set([...depList(), ...autoDeps().map(d => d.id)])].filter(d => d !== own && d !== 'xbmc.python' && !bundled.has(d));
     }
     const extNice = v => String(v).replace(/[_\-]+/g, ' ').replace(/^./, c => c.toUpperCase());
     function extEntries(ex, vals) {
@@ -3353,6 +3548,9 @@ def on_page(window, page_id):
       (vals || []).forEach(v => e.push({ l: extNice(v), u: 'plugin://' + ex.id + '/?' + ex.key + '=' + v, k: 'dir' }));
       return e;
     }
+    // Die Seite, auf der Ordner im eigenen Skin angezeigt werden: erste Seite mit einer Liste „Automatisch aus Kodi“ und Ordner-Navigation
+    const isNavList = e => e.type === 'list' && e.lsrc === 'dir' && e.nav !== false;
+    const browsePage = () => S.pages.find(p => p.els.some(isNavList)) || null;
     async function extAdd(inp) {
       const files = [...inp.files]; inp.value = ''; if (!files.length) return;
       if (!('DecompressionStream' in window)) return toast('Dein Browser kann keine ZIP-Dateien lesen – bitte Chrome, Edge, Firefox oder Safari aktualisieren.');
@@ -3370,8 +3568,11 @@ def on_page(window, page_id):
           const exts = [...doc.getElementsByTagName('extension')], pl = exts.find(x => x.getAttribute('point') === 'xbmc.python.pluginsource'), sc = exts.find(x => x.getAttribute('point') === 'xbmc.python.script');
           const kind = pl ? 'plugin' : sc ? 'script' : 'other', prov = pl ? ((pl.getElementsByTagName('provides')[0] || {}).textContent || 'video').trim().split(/\s+/)[0] : 'executable';
           const deps = [...doc.getElementsByTagName('import')].map(i => i.getAttribute('addon')).filter(a => a && !/^(xbmc|kodi)\./.test(a));
-          const det = kind === 'plugin' ? extDetect(all, pre, id, kind) : { key: 'mode', vals: [] };
-          const ex = extClean({ id, name: root.getAttribute('name') || id, ver: root.getAttribute('version') || '0', size: f.size, prov, kind, key: det.key, deps, entries: [] });
+          const det = kind === 'plugin' ? extDetect(all, pre) : { key: 'mode', vals: [], more: [] };
+          const pyPaths = Object.keys(all).filter(p => p.startsWith(pre) && /\.py$/.test(p)), imps = new Set();
+          pyPaths.forEach(p => { if (all[p].length < 700000) pyImports(td.decode(all[p])).forEach(n => imps.add(n)); });
+          const need = needFromImports(imps, localMods(pyPaths.map(p => p.slice(pre.length))), deps);
+          const ex = extClean({ id, name: root.getAttribute('name') || id, ver: root.getAttribute('version') || '0', size: f.size, prov, kind, key: det.key, deps, need, more: det.more, entries: [] });
           if (!ex) { toast('„' + f.name + '“ konnte nicht gelesen werden.'); continue; }
           const old = S.ext.find(x => x.id === id);
           ex.entries = old && old.entries.length ? old.entries : extEntries(ex, det.vals);
@@ -3393,23 +3594,27 @@ def on_page(window, page_id):
     function extEntAdd(i) { const e = S.ext[i]; if (!e || e.entries.length >= 60) return; e.entries.push({ l: 'Neuer Eintrag', u: 'plugin://' + e.id + '/?' + e.key + '=', k: 'dir' }); save(); showExt(); }
     function extEntDel(i, j) { const e = S.ext[i]; if (!e) return; e.entries.splice(j, 1); save(); showExt(); }
     function extKey(i, v) { const e = S.ext[i]; if (!e) return; e.key = /^\w{1,20}$/.test(v) ? v : 'mode'; save(); }
-    async function extRedetect(i) {
+    async function extRedetect(i, reset) {
       const e = S.ext[i]; if (!e) return;
       if (!EXTZ[e.id]) return toast('Die ZIP fehlt im Speicher – bitte unten erneut auswählen.');
       try {
         const all = await tiReadZip(b64ToBytes(b64(EXTZ[e.id]))), ax = Object.keys(all).filter(p => /(^|\/)addon\.xml$/.test(p)).sort((a, b) => a.split('/').length - b.split('/').length)[0];
-        const det = extDetect(all, ax.slice(0, -'addon.xml'.length), e.id, e.kind), have = new Set(e.entries.map(x => x.u));
-        let n = 0; e.key = det.key; extEntries(e, det.vals).forEach(x => { if (!have.has(x.u) && e.entries.length < 60) { e.entries.push(x); n++; } });
+        const det = extDetect(all, ax.slice(0, -'addon.xml'.length)), have = new Set(e.entries.map(x => x.u));
+        e.key = det.key; e.more = det.more;
+        if (reset) { e.entries = extEntries(e, det.vals); save(); showExt(); return toast('Einträge neu aufgebaut: ' + e.entries.length + ' Pfade, die ohne weitere Angaben funktionieren.'); }
+        let n = 0; extEntries(e, det.vals).forEach(x => { if (!have.has(x.u) && e.entries.length < 60) { e.entries.push(x); n++; } });
         save(); showExt(); toast(n ? n + ' neue Einträge erkannt (Vermutung – bitte prüfen).' : 'Keine neuen Menü-Pfade gefunden.');
       } catch (x) { toast('Lesen fehlgeschlagen: ' + (x.message || x)); }
     }
+    function extReset(i) { const e = S.ext[i]; if (!e || !confirm('Alle Einträge von „' + e.name + '“ durch die neu erkannten ersetzen?')) return; extRedetect(i, true); }
     // Aktion für einen Eintrag
     function extAct(ex, en) {
       const u = String(en.u || '').trim(), w = EXT_WIN[ex.prov] || 'videos';
       if (en.k === 'play') return { t: 'custom', v: 'PlayMedia(' + u + ')' };
       if (en.k === 'run') return { t: 'custom', v: 'RunPlugin(' + u + ')' };
       if (en.k === 'script') return { t: 'custom', v: 'RunAddon(' + (u || ex.id) + ')' };
-      return w === 'videos' ? { t: 'addon', v: u } : { t: 'custom', v: 'ActivateWindow(' + w + ',' + u + ',return)' };
+      // Ordner öffnen sich im eigenen Browser – kein Wechsel zu Kodis Ansicht
+      return { t: 'browse', v: u, l: String(en.l || '') };
     }
     function extIcon(l) {
       const s = String(l).toLowerCase();
@@ -3417,12 +3622,23 @@ def on_page(window, page_id):
       return m ? m[1] : '📂';
     }
     // Seiten im gewählten Stil bauen
-    const EXT_STYLES = [['grid', '▦ Kachel-Raster'], ['list', '☰ Liste'], ['calc', '🧮 Taschenrechner'], ['desk', '🐧 Linux-Desktop']];
+    const EXT_STYLES = [['browse', '📂 Live-Browser (empfohlen)'], ['grid', '▦ Kachel-Raster'], ['list', '☰ Liste'], ['calc', '🧮 Taschenrechner'], ['desk', '🐧 Linux-Desktop']];
     function extPage(style, ex) {
       const en = ex.entries.filter(x => String(x.l || '').trim()).slice(0, 40), n = en.length, els = [], A = e => extAct(ex, e);
       const back = (x, y, w, h, o) => btn('Zurück', '⬅', x, y, 'back', '', Object.assign({ w, h }, o || {}));
       let bg = null, def = '';
-      if (style === 'grid') {
+      if (style === 'browse') {
+        // Zeigt das Addon live im eigenen Skin: Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos laufen direkt
+        const lst = mk('list', { label: '', x: 120, y: 230, w: 1000, h: 790, ltype: 'list', orient: 'vertical', ih: 96, gap: 10, lsrc: 'dir', dir: 'plugin://' + ex.id + '/', dmedia: ex.prov === 'audio' ? 'music' : ex.prov === 'image' ? 'pictures' : 'video', dmax: 300, nav: true, items: [] });
+        els.push(mk('text', { label: ex.name, x: 120, y: 50, w: 1200, h: 100, font: 'font45', anim: ['left'] }),
+          mk('text', { label: '$INFO[Window.Property(kfe.title)]', x: 120, y: 150, w: 1000, h: 60, font: 'font27', color: '#cbd5e1' }),
+          back(1500, 60, 300, 90), lst,
+          mk('box', { x: 1180, y: 230, w: 620, h: 790, color: '#000000', op: 40, rad: 4 }),
+          mk('pic', { x: 1210, y: 260, w: 560, h: 315, src: '$INFO[ListItem.Art(thumb)]', fit: 'keep' }),
+          mk('text', { label: '$INFO[ListItem.Label]', x: 1210, y: 595, w: 560, h: 70, font: 'font27', scroll: true }),
+          mk('tbox', { label: '$INFO[ListItem.Property(kfe.plot)]', x: 1210, y: 675, w: 560, h: 320, font: 'font12', scroll: true }));
+        def = lst.id;
+      } else if (style === 'grid') {
         const cols = n > 12 ? 4 : 3, rows = Math.max(1, Math.ceil(n / cols)), gap = 24, w = Math.floor((1680 - gap * (cols - 1)) / cols), h = Math.max(70, Math.min(150, Math.floor((700 - gap * (rows - 1)) / rows)));
         els.push(mk('text', { label: ex.name, x: 120, y: 60, w: 1200, h: 110, font: 'font45', anim: ['left'] }), back(1500, 70, 300, 90));
         en.forEach((e, i) => els.push(btn(e.l, extIcon(e.l), 120 + (i % cols) * (w + gap), 230 + Math.floor(i / cols) * (h + gap), 'none', '', { w, h, act: A(e), wrap: true })));
@@ -3447,37 +3663,42 @@ def on_page(window, page_id):
         els.push(mk('box', { x: 180, y: 100, w: 1700, h: 930, color: '#2b2b2b', rad: 3, bw: 2, bc: '#4a4a4a' }), mk('box', { x: 180, y: 100, w: 1700, h: 60, color: '#3d3d3d', rad: 3 }), mk('text', { label: '●  ●  ●', x: 200, y: 108, w: 200, h: 44, font: 'font27', color: '#f97316' }), mk('text', { label: ex.name + ' – Dateien', x: 560, y: 108, w: 800, h: 44, al: 'center', font: 'font27' }));
         en.forEach((e, i) => els.push(btn(e.l, extIcon(e.l), 215 + (i % cols) * (w + gap), 190 + Math.floor(i / cols) * (h + gap), 'none', '', { w, h, act: A(e), rad: 18, color: '#5c2a50', wrap: true })));
       }
-      const first = els.find(e => e.type === 'button' && e.act && e.act.t !== 'none' && e.act.t !== 'back');
+      const first = def ? { id: def } : els.find(e => e.type === 'button' && e.act && e.act.t !== 'none' && e.act.t !== 'back');
       return { id: 'ext_' + ex.id.replace(/[^a-z0-9]+/gi, '_').slice(0, 20) + '_' + style + '_' + uid(), name: ex.name + ' (' + (EXT_STYLES.find(s => s[0] === style) || ['', style])[1].replace(/^\S+\s/, '') + ')', bg, bgImg: null, dlg: false, dim: 60, onload: '', onunload: '', xml: '', def: first ? first.id : '', els };
     }
     function extBuild(i) {
       const ex = S.ext[i]; if (!ex) return;
       const style = ($('ext-style') || {}).value || 'grid', asStart = !!($('ext-start') || {}).checked, link = !!($('ext-link') || {}).checked;
-      if (!ex.entries.some(x => String(x.l || '').trim())) return toast('Bitte zuerst mindestens einen Eintrag anlegen.');
-      hpush(true); const pg = extPage(style, ex);
+      if (style !== 'browse' && !ex.entries.some(x => String(x.l || '').trim())) return toast('Bitte zuerst mindestens einen Eintrag anlegen.');
+      hpush(true); const had = browsePage(), pg = extPage(style, ex);
       if (asStart) { S.pages.unshift(pg); S.cur = 0; } else {
         S.pages.push(pg);
         if (link) { const home = S.pages[0], low = home.els.reduce((m, e) => Math.max(m, e.y + e.h), 0); home.els.push(btn(ex.name, '🧩', 120, Math.min(960, low + 30), 'page', pg.id)); }
         S.cur = S.pages.indexOf(pg);
       }
-      S.sel = null; closeModal(); renderAll(); save(); toast('Seite „' + pg.name + '“ erstellt – du kannst sie jetzt frei umbauen.');
+      // Buttons, die Ordner öffnen, brauchen eine Browser-Seite – fehlt sie, wird sie mit angelegt
+      let extra = '';
+      if (style !== 'browse' && !had && ex.entries.some(x => x.k === 'dir')) { const bp = extPage('browse', ex); bp.name = ex.name + ' – Browser'; S.pages.push(bp); extra = ' Dazu die Seite „' + bp.name + '“, in der sich die Ordner öffnen.'; }
+      S.sel = null; closeModal(); renderAll(); save(); toast('Seite „' + pg.name + '“ erstellt – du kannst sie jetzt frei umbauen.' + extra);
     }
     function showExt() {
       const fmt = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
       const cards = S.ext.map((e, i) => `<div class="card mt-3" style="padding:12px">
           <div class="flex items-start gap-2"><div class="flex-1 min-w-0"><b class="text-sm">🧩 ${esc(e.name)}</b> <span class="hint">v${esc(e.ver)} · ${fmt(e.size)}</span><div class="hint break-all">${esc(e.id)} · ${e.kind === 'plugin' ? 'Plugin (' + esc(e.prov) + ')' : e.kind === 'script' ? 'Script' : 'Sonstiges'}${EXTZ[e.id] ? '' : ' · <b style="color:#fca5a5">ZIP fehlt im Speicher – unten erneut wählen</b>'}</div></div><button class="btn" aria-label="Addon entfernen" onclick="extDel(${i})">🗑</button></div>
-          ${e.deps.length ? `<p class="hint mt-1">Braucht: ${e.deps.map(esc).join(', ')} – Kodi holt fehlende Module beim Einrichten selbst aus den Repositories (Internet nötig).</p>` : ''}
-          <p class="hint mt-2"><b>Menüeinträge</b> – so ruft dein Menü das Addon auf (erkannte Pfade sind nur eine Vermutung):</p>
+          ${e.deps.length || e.need.length ? `<p class="hint mt-1">Braucht: ${[...new Set([...e.deps, ...e.need])].map(d => esc(d) + (e.need.includes(d) ? ' <b style="color:#fde68a">(fehlt in seiner addon.xml – wird automatisch ergänzt)</b>' : '')).join(', ')}. Bekannte Kodi-Module trägt der Generator in <b>deine</b> addon.xml ein, damit Kodi sie beim Installieren gleich mitholt (Internet nötig).</p>` : ''}
+          <p class="hint mt-2"><b>Menüeinträge</b> für Buttons (Tipp: Der 📂 Live-Browser braucht keine – er zeigt das Addon so, wie es selbst seine Listen liefert):</p>
           ${e.kind === 'plugin' ? `<div class="flex gap-1.5 items-center mt-1"><span class="hint shrink-0">Parametername</span><input class="inp" style="width:110px" value="${esc(e.key)}" oninput="extKey(${i},this.value)" aria-label="Parametername"><span class="hint">z. B. mode oder action – bestimmt die Adressen neuer Einträge</span></div>` : ''}
           ${e.entries.map((x, j) => `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:5px"><div class="flex gap-1.5"><input class="inp" value="${esc(x.l)}" placeholder="Beschriftung" oninput="extSet(${i},${j},'l',this.value)"><button class="btn" aria-label="Eintrag löschen" onclick="extEntDel(${i},${j})">✖</button></div>
             <input class="inp" value="${esc(x.u)}" placeholder="plugin://${esc(e.id)}/?mode=…" oninput="extSet(${i},${j},'u',this.value)" style="font-family:monospace;font-size:12px"><select class="inp" onchange="extKind(${i},${j},this.value)">${EXT_KINDS.map(k => `<option value="${k[0]}" ${x.k === k[0] ? 'selected' : ''}>${k[1]}</option>`).join('')}</select></div>`).join('')}
-          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn" onclick="extEntAdd(${i})">＋ Eintrag</button><button class="btn" onclick="extRedetect(${i})" ${EXTZ[e.id] ? '' : 'disabled'}>🔍 Pfade neu erkennen</button></div>
+          ${e.more.length ? `<p class="hint mt-1.5">Nicht als Button geeignet, weil sie Angaben aus der vorherigen Liste brauchen (z. B. welche Rubrik oder welches Video): <code>${e.more.map(esc).join(', ')}</code>. Diese erreichst du im Live-Browser ganz normal.</p>` : ''}
+          <div class="grid grid-cols-3 gap-2 mt-2"><button class="btn" onclick="extEntAdd(${i})">＋ Eintrag</button><button class="btn" onclick="extRedetect(${i})" ${EXTZ[e.id] ? '' : 'disabled'}>🔍 Neue suchen</button><button class="btn" onclick="extReset(${i})" ${EXTZ[e.id] ? '' : 'disabled'}>↺ Neu aufbauen</button></div>
           <div class="mt-3 p-2 rounded-xl" style="background:rgba(139,92,246,.1)"><b class="text-xs">🎨 Menü-Seite im eigenen Stil bauen</b>
             <select id="ext-style" class="inp mt-1">${EXT_STYLES.map(s => `<option value="${s[0]}">${s[1]}</option>`).join('')}</select>
+            <p class="hint mt-1">Alles bleibt in deinem Skin: Ordner öffnen sich auf deiner Browser-Seite, Zurück geht eine Ebene hoch, Videos starten direkt. Bei den Button-Stilen wird die Browser-Seite automatisch mit angelegt.</p>
             <label class="text-xs flex items-center gap-1.5 mt-1.5"><input type="checkbox" id="ext-link" checked>Button auf der Startseite einfügen</label><label class="text-xs flex items-center gap-1.5 mt-1"><input type="checkbox" id="ext-start">Stattdessen als neue Startseite setzen</label>
             <button class="btn pri w-full mt-2" onclick="extBuild(${i})">▶ Seite erzeugen</button></div></div>`).join('');
       modal(`<div id="ext-box"><div class="flex justify-between items-center mb-2"><b>🧩 Fremd-Addon einbinden</b><button class="btn" onclick="closeModal()">Schließen</button></div>
-        <p class="hint">Du hast schon ein Addon (z. B. <code>plugin.video.xyz</code>)? Wähle seine <b>ZIP</b>. Sie wird unverändert in dein Addon gepackt und beim Installieren von einem kleinen Hintergrunddienst <b>automatisch entpackt und eingeschaltet</b>. Dein Menü hier im Generator ist dann nur noch die schöne Oberfläche dafür – im Stil Taschenrechner, Linux-Desktop, Kacheln oder Liste.</p>
+        <p class="hint">Du hast schon ein Addon (z. B. <code>plugin.video.xyz</code>)? Wähle seine <b>ZIP</b>. Sie wird unverändert in dein Addon gepackt und beim Installieren von einem kleinen Hintergrunddienst <b>automatisch entpackt und eingeschaltet</b>. Dein Menü hier im Generator ist dann die Oberfläche dafür – als Live-Browser oder im Stil Taschenrechner, Linux-Desktop, Kacheln oder Liste. Kodis eigene Ansicht taucht dabei nicht auf.</p>
         <p class="hint mt-1">Eigene Einträge und Funktionen schreibst du zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>, im 💻 Editor ansehen).</p>
         <button class="btn pri w-full mt-3" onclick="$('f-ext').click()">＋ Addon-ZIP wählen</button><input type="file" id="f-ext" accept=".zip,application/zip" multiple class="hidden" onchange="extAdd(this)">
         ${cards || '<p class="hint mt-3">Noch kein Addon eingebunden.</p>'}
@@ -3497,7 +3718,7 @@ def on_page(window, page_id):
 #
 #  DEIN BEREICH: Trage unten in MENUE die Eintraege ein, die du von den
 #  Addons brauchst. Jeder Eintrag: (Beschriftung, Art, Adresse)
-#     Art 'ordner'     -> Liste/Ordner des Addons oeffnen
+#     Art 'ordner'     -> Liste/Ordner im eigenen Browser oeffnen (bleibt im Skin)
 #     Art 'abspielen'  -> Adresse direkt abspielen
 #     Art 'plugin'     -> Plugin-Befehl ausfuehren (RunPlugin)
 #     Art 'addon'      -> Addon starten (Adresse = Addon-ID)
@@ -3519,7 +3740,9 @@ def befehl(art, ziel, fenster='videos'):
         return 'RunPlugin(%s)' % ziel
     if art == 'addon':
         return 'RunAddon(%s)' % ziel
-    return 'ActivateWindow(%s,%s,return)' % (fenster, ziel)
+    if art == 'kodi':
+        return 'ActivateWindow(%s,%s,return)' % (fenster, ziel)
+    return 'browse:' + ziel
 
 
 def menue(window):
@@ -3594,7 +3817,7 @@ if __name__ == '__main__':
       F['icon.png'] = { b64: A.icon ? b64(A.icon) : mkImg(512, 512, 'image/png', 1) };
       F['fanart.jpg'] = { b64: A.fanart ? b64(A.fanart) : S.bgImg ? b64(S.bgImg) : mkImg(1920, 1080, 'image/jpeg', .12) };
       A.shots.forEach((d, i) => { F[shots[i]] = { b64: b64(d) }; });
-      F['addon.xml'] = `<?xml version="1.0" encoding="UTF-8"?>\n<addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">\n <requires>\n <import addon="xbmc.python" version="${PY[S.kodi]}"/>${depList().map(d => `\n <import addon="${esc(d)}"/>`).join('')}\n </requires>\n <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>${M.autostart || extHas() ? '\n <extension point="xbmc.service" library="service.py"/>' : ''}\n ${meta}\n</addon>`;
+      F['addon.xml'] = `<?xml version="1.0" encoding="UTF-8"?>\n<addon id="${id}" version="${esc(m.ver)}" name="${esc(m.name)}" provider-name="${esc(m.author)}">\n <requires>\n <import addon="xbmc.python" version="${PY[S.kodi]}"/>${allDeps().map(d => `\n <import addon="${esc(d)}"/>`).join('')}\n </requires>\n <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>${M.autostart || extHas() ? '\n <extension point="xbmc.service" library="service.py"/>' : ''}\n ${meta}\n</addon>`;
       
       if (allSettings().length) F['resources/settings.xml'] = settingsXml();
       F[MEDIA + 'white.png'] = { b64: mkWhite() };
@@ -3617,7 +3840,7 @@ if __name__ == '__main__':
           const cid = fid(p, e);
           if (e.type === 'widget') ls[cid] = { dir: String(e.dir || '').trim(), media: e.dmedia || 'video', max: Math.max(1, parseInt(e.dmax, 10) || 20), w: 1, style: e.wstyle || 'poster' };
           else if (e.type === 'list') {
-            if (e.lsrc === 'dir') ls[cid] = { dir: String(e.dir || '').trim(), media: e.dmedia || 'video', max: Math.max(1, parseInt(e.dmax, 10) || 30) };
+            if (e.lsrc === 'dir') ls[cid] = { dir: String(e.dir || '').trim(), media: e.dmedia || 'video', max: Math.max(1, parseInt(e.dmax, 10) || 30), nav: e.nav !== false };
             else {
               ls[cid] = (e.items || []).map(it => ({ l: it.l || '', l2: it.l2 || '', t: S.imgs[it.img] ? picName(it.img) : String(it.src || '').trim() }));
               mp[cid] = { k: 'list', items: (e.items || []).map(it => specOf(it.act)) };
@@ -3644,6 +3867,7 @@ if __name__ == '__main__':
         close: CLOSE_CMDS,
         noreturn: NO_RETURN,
         bundles: bundlesCfg(),
+        browse: (browsePage() || {}).id || '',
         opts: {
           home_exit: !!M.homeExit, return_menu: !!M.retMenu,
           confirm_exit: !!M.confirmExit, back_mode: M.backMode === 'stay' && !hasExit() ? 'twice' : (M.backMode || 'exit'), remember: !!M.remember, deeplinks: !!M.deeplinks, hooks: hooksOn(), debug: !!M.debug,
@@ -3925,7 +4149,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Der Generator erkennt Menü-Pfade, und du baust daraus eine Seite im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Mit dem <b>📂 Live-Browser</b> zeigst du das Addon direkt in deinem Skin – Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos starten sofort, Kodis eigene Ansicht taucht nicht auf. Oder du baust Buttons im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Benötigte Module (z. B. <code>bs4</code>, <code>requests</code>) erkennt der Generator und trägt sie selbst in die addon.xml ein. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
