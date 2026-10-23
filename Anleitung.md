@@ -2,7 +2,7 @@
 
 Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail.
 
-> 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es darf nicht verkauft werden. **Die Addons, die du damit baust, gehören dir.**
+> 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 
@@ -1133,14 +1133,15 @@ Auf dem Mac gilt **Cmd** statt Strg. Auf Handy und Tablet nutzt du die Knöpfe �
 ---
 
 ```text
-Kodi Video-Addon Generator – Copyright (c) 2026 Team IT('s) Possible
-Handbuch zu Version v8.1 Pro · Stand 2026.10.23. Alle Rechte vorbehalten.
+Kodi Video-Addon Generator v8.1 Pro – Copyright (c) 2026 Team IT('s) Possible
+Handbuch · Stand 2026.10.23. Alle Rechte vorbehalten.
 
-Die Nutzung ist für die Kodi-Community kostenlos. Der Generator darf weder verkauft
-noch kopiert und weiterverkauft werden. Änderungen am Code und eine Weiterverbreitung
-sind nur mit Erlaubnis der Autoren gestattet. Die mit dem Generator gebauten Addons
+Kostenlos für die Kodi-Community, aber nicht Open Source. Ohne schriftliche Erlaubnis
+verboten: Verkaufen, Vermieten oder Anbieten gegen Bezahlung, Einbau von Werbung,
+Bereitstellen auf anderen Seiten oder in App-Stores, Verbreiten veränderter Fassungen
+und das Entfernen von Copyright-Hinweisen. Die mit dem Generator gebauten Addons
 gehören ihren Erstellern.
 
-Die Nutzung erfolgt auf eigene Gefahr. Eine Haftung für Schäden jeder Art und
-jegliche Gewährleistung sind ausgeschlossen.
+Die Nutzung erfolgt auf eigene Gefahr, ohne Gewähr und ohne Haftung.
+Es gilt die IT('s) Possible Freeware-Lizenz (Datei LICENSE).
 ```

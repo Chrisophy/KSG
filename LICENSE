@@ -1,0 +1,84 @@
+IT('s) Possible Freeware-Lizenz
+Kodi Video-Addon Generator v8.1 Pro
+Copyright (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
+Stand: 2026.10.23
+
+Der Kodi Video-Addon Generator ("die Software") ist kostenlose Software für die
+Kodi-Community. Sie ist NICHT Open Source. Diese Lizenz regelt, was du mit der
+Software tun darfst und was nicht.
+
+
+1. WAS DU DARFST
+
+   a) Die Software kostenlos nutzen – privat und für eigene Projekte, online unter
+      https://chrisophy.github.io/KSG/ oder als heruntergeladene Datei auf deinen
+      eigenen Geräten.
+
+   b) Auf die Software verlinken und sie weiterempfehlen. Das ist ausdrücklich
+      erwünscht.
+
+   c) Die Addons, die du mit der Software erstellst, frei verwenden, veröffentlichen
+      und unter einer Lizenz deiner Wahl weitergeben. Sie gehören dir. Das gilt auch
+      für die Dateien, die die Software dafür erzeugt (z.B. addon.py, addon.xml,
+      pages.json und die Skin-Dateien deines Addons).
+
+
+2. WAS OHNE SCHRIFTLICHE ERLAUBNIS VERBOTEN IST
+
+   a) Die Software oder Teile ihres Codes zu verkaufen, zu vermieten oder gegen
+      Bezahlung anzubieten – auch nicht als Abo, gegen Pflicht-Spende, hinter einer
+      Bezahlschranke oder in einem kostenpflichtigen Produkt oder Dienst.
+
+   b) Die Software oder Teile ihres Codes mit Werbung, Tracking oder anderen
+      Einnahmequellen zu versehen und so weiterzugeben.
+
+   c) Die Software, ganz oder in Teilen, auf anderen Webseiten, Servern, App-Stores
+      oder Download-Portalen bereitzustellen oder zu spiegeln.
+
+   d) Veränderte Fassungen der Software zu verbreiten, auf ihr aufbauende Produkte zu
+      veröffentlichen oder die Software als eigenes Werk auszugeben.
+
+   e) Copyright-, Lizenz- und Urheberhinweise zu entfernen, zu verstecken oder zu
+      verändern.
+
+   Das bloße Ansehen und Forken des Repositorys im Rahmen der GitHub-Funktionen
+   (gemäß den GitHub-Nutzungsbedingungen) bleibt davon unberührt. Es gibt aber
+   keine weiteren Rechte, insbesondere nicht die Rechte aus Abschnitt 2.
+
+
+3. KEINE GEWÄHR
+
+   Die Software wird so bereitgestellt, wie sie ist, ohne jede ausdrückliche oder
+   stillschweigende Gewährleistung. Die Nutzung erfolgt auf eigene Gefahr. Soweit
+   gesetzlich zulässig, haften die Autoren nicht für Schäden jeder Art, die durch
+   die Nutzung der Software oder der damit erstellten Addons entstehen.
+
+
+4. ENDE DER RECHTE
+
+   Wer gegen diese Lizenz verstößt, verliert automatisch das Recht, die Software zu
+   nutzen. Weitere Ansprüche der Autoren bleiben vorbehalten.
+
+
+5. MARKEN
+
+   Kodi(R) ist eine Marke der XBMC Foundation. Dieses Projekt steht in keiner
+   Verbindung zur XBMC Foundation.
+
+
+Fragen oder Anfragen für eine Erlaubnis: über das GitHub-Repository
+https://github.com/Chrisophy/KSG
+
+
+-------------------------------------------------------------------------------
+ENGLISH SUMMARY (the German text above is authoritative)
+
+Copyright (c) 2026 Team IT('s) Possible. All rights reserved.
+
+This software is free of charge for the Kodi community, but it is NOT open
+source. You may use it for free and link to it. Add-ons you create with it are
+yours. Without written permission you may NOT sell, rent, or charge for this
+software or any part of its code, monetize it (ads, subscriptions, paywalls),
+host or mirror it elsewhere, distribute modified versions, present it as your
+own work, or remove copyright and license notices. Provided "as is", without
+warranty of any kind. Any violation terminates your right to use the software.

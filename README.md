@@ -9,7 +9,7 @@
 
 ---
 
-## 🆕 Neu in v8.1 Pro
+## 🆕 Neu im Update vom 23.10.2026
 
 | | Neuheit | Was sie bringt |
 |---|---|---|
@@ -109,18 +109,23 @@ plugin.video.<projektname>/
 
 ## 📄 Lizenz & Credits
 
+**Kostenlos, aber nicht Open Source.** Es gilt die **[IT('s) Possible Freeware-Lizenz](LICENSE)**.
+
 ```text
-Kodi Video-Addon Generator – Copyright (c) 2026 Team IT('s) Possible
-Version 2026.10.23 (v8.1 Pro). Alle Rechte vorbehalten.
-
-Die Nutzung ist für die Kodi-Community kostenlos – für Anfänger und Profis.
-Der Generator darf weder verkauft noch kopiert und weiterverkauft werden.
-Änderungen am Code und eine Weiterverbreitung sind nur mit Erlaubnis der Autoren gestattet.
-
-Die Nutzung erfolgt auf eigene Gefahr. Eine Haftung für Schäden jeder Art
-und jegliche Gewährleistung sind ausgeschlossen.
+Kodi Video-Addon Generator v8.1 Pro – Copyright (c) 2026 Team IT('s) Possible
+Stand 2026.10.23. Alle Rechte vorbehalten.
 ```
+
+| ✅ Erlaubt | 🚫 Verboten ohne schriftliche Erlaubnis |
+|---|---|
+| Kostenlos nutzen – online oder als heruntergeladene Datei | Verkaufen, vermieten oder gegen Bezahlung anbieten (auch als Abo oder hinter einer Bezahlschranke) |
+| Verlinken und weiterempfehlen | Mit Werbung oder anderen Einnahmequellen versehen |
+| Deine damit gebauten Addons frei veröffentlichen – sie gehören dir | Auf anderen Seiten, Servern oder in App-Stores bereitstellen oder spiegeln |
+| | Veränderte Fassungen verbreiten oder als eigenes Werk ausgeben |
+| | Copyright- und Lizenzhinweise entfernen |
+
+Die Nutzung erfolgt auf eigene Gefahr, ohne Gewähr und ohne Haftung. Die vollständigen Bedingungen stehen in der Datei **[LICENSE](LICENSE)**.
 
 - **Deine Addons gehören dir.** Für die damit gebauten Addons ist `GPL-2.0-or-later` nur als Lizenz **vorgeschlagen** – du kannst im Generator jede andere eintragen.
 - Kodi® ist eine Marke der XBMC Foundation. Dieses Projekt steht in keiner Verbindung zur XBMC Foundation.
-- Gemacht mit ?? von **IT('s) Possible** für die Kodi-Community.
+- Gemacht mit 💚 von **IT('s) Possible** für die Kodi-Community.
