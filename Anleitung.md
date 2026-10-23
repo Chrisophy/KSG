@@ -5,7 +5,7 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 > 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-**Demos:**[https://github.com/Chrisophy/KSG/tree/main/Demos](Beispiele)
+**Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
 ---
 
 ## Inhalt
