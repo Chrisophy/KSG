@@ -3911,8 +3911,8 @@ if __name__ == '__main__':
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
       ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
-      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', false],
-      ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', false],
+      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
+      ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', true],
       ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', true],
       ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
     ];
@@ -3972,7 +3972,7 @@ if __name__ == '__main__':
         L.im = (Array.isArray(L0.im) ? L0.im : []).filter(q => q && typeof q === 'object' && q.id).slice(0, 30).map(q => ({
           id: String(q.id), k: q.k === 'box' ? 'box' : 'img', nm: String(q.nm || '').slice(0, 30), x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0),
           w: cl(q.w, 4, 4000, 300), h: cl(q.h, 4, 4000, 200), op: cl(q.op, 5, 100, 100), z: q.z === 'over' ? 'over' : 'under', only: String(q.only || ''),
-          col: /^#[0-9a-fA-F]{6}$/.test(q.col) ? q.col : '#ffffff', fit: q.fit === 'stretch' ? 'stretch' : 'keep'
+          col: /^#[0-9a-fA-F]{6}$/.test(q.col) ? q.col : '#ffffff', fit: q.fit === 'stretch' ? 'stretch' : 'keep', off: q.off === true
         }));
         Object.keys(S.titan.dimgs).forEach(k => { if (!L.im.some(q => q.id === k && q.k === 'img')) delete S.titan.dimgs[k]; });
         S.titan.lay = L;
@@ -4155,8 +4155,8 @@ if __name__ == '__main__':
       const P = {};
       // Dekoration (eigene Bilder und Flächen): hinter oder vor allem anderen
       const deco = z => L.im.filter(q => q.z === z).map(q => {
-        const other = q.only && (!cur || q.only !== cur.id);
-        if (other && !lay) return '';
+        const other = q.only && (!cur || q.only !== cur.id) || q.off;
+        if (other && !lay || q.off && !lay) return '';
         const base = `position:absolute;left:${q.x}px;top:${q.y}px;width:${q.w}px;height:${q.h}px;opacity:${q.op / 100 * (other ? .35 : 1)};`;
         return q.k === 'box' ? `<div style="${base}background:${q.col}"></div>` : (T.dimgs[q.id] ? `<img src="${T.dimgs[q.id]}" alt="" style="${base}object-fit:${q.fit === 'stretch' ? 'fill' : 'contain'}">` : '');
       }).join('');
@@ -4207,7 +4207,7 @@ if __name__ == '__main__':
       h += deco('under');
       // Jeder Baustein liegt auf einer eigenen Ebene, die um den eingestellten Versatz verschoben wird
       TBLK.forEach(bk => {
-        const k = bk[0], o = (k === 'menu' && btn) || (k === 'buttons' && single) ? { dx: 0, dy: 0, show: true } : L.b[k]; if (!P[k] || (!o.show && !lay)) return;
+        const k = bk[0], o = (k === 'menu' && btn) ? { dx: 0, dy: 0, show: L.b.menu.show } : (k === 'buttons' && single) ? { dx: 0, dy: 0, show: true } : L.b[k]; if (!P[k] || (!o.show && !lay)) return;
         h += `<div data-lb="${k}" style="position:absolute;left:0;top:0;width:0;height:0;overflow:visible;transform:translate(${o.dx}px,${o.dy}px);${o.show ? '' : 'opacity:.2;'}">${P[k]}</div>`;
       });
       h += tbs + deco('over');
@@ -4263,7 +4263,7 @@ if __name__ == '__main__':
         if (L.mm !== 'btn') return null;
         const list = tiMbList(), idx = list.findIndex(m => m.id === id); if (idx < 0) return null;
         const r = tiMbRect(list[idx], idx);
-        return { key, t, id, name: '🔘 ' + tiLabel(list[idx]), sub: 'Menü-Button', col: TMBCOL, show: true, rel: false, size: true, vx: r.x, vy: r.y, rect: r };
+        return { key, t, id, name: '🔘 ' + tiLabel(list[idx]), sub: 'Menü-Button', col: TMBCOL, show: L.b.menu.show !== false, rel: false, size: true, vx: r.x, vy: r.y, rect: r };
       }
       if (t === 'tb') {
         if (L.tm !== 'single') return null;
@@ -4272,7 +4272,7 @@ if __name__ == '__main__':
       }
       if (t === 'im') {
         const q = L.im.find(x => x.id === id); if (!q) return null;
-        return { key, t, id, name: (q.k === 'box' ? '▭ ' : '🖼 ') + (q.nm || (q.k === 'box' ? 'Farbfläche' : 'Bild')), sub: 'Dekoration', col: TIMGCOL, show: true, rel: false, size: true, del: true, vx: q.x, vy: q.y, rect: { x: q.x, y: q.y, w: q.w, h: q.h } };
+        return { key, t, id, name: (q.k === 'box' ? '▭ ' : '🖼 ') + (q.nm || (q.k === 'box' ? 'Farbfläche' : 'Bild')), sub: 'Dekoration', col: TIMGCOL, canHide: true, show: !q.off, rel: false, size: true, del: true, vx: q.x, vy: q.y, rect: { x: q.x, y: q.y, w: q.w, h: q.h } };
       }
       return null;
     }
@@ -4313,11 +4313,12 @@ if __name__ == '__main__':
       const opt = (a, cur) => a.map(o => `<option value="${o[0]}" ${String(o[0]) === String(cur) ? 'selected' : ''}>${o[1]}</option>`).join('');
       const num = (lab, k, v, mn, mx) => `<div><span class="hint">${lab}</span><input type="number" class="inp" min="${mn}" max="${mx}" value="${v}" onchange="tiMbSet('${k}',this.value)"></div>`;
       let h = `<p class="hint mb-2">Hier machst du Estuary wirklich zu deinem: <b>Ziehe die farbigen Rahmen in der Vorschau</b> an die Stelle, an der das Element in Kodi stehen soll – oder gib Zahlen ein. Bei Rahmen mit Ecke unten rechts änderst du dort die Größe. Alles andere an Estuary bleibt unverändert.</p>
-        <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('right')">↦ Menü nach rechts</button><button class="btn titb" onclick="tiLayPreset('top')">↔ Waagerechtes Menü oben</button>
+        <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('right')">↦ Menü nach rechts</button><button class="btn titb" onclick="tiLayPreset('top')">↔ Waagerechtes Menü oben</button><button class="btn" onclick="tiLayPreset('blank')">⬜ Leere Seite</button>
           <span class="hint ml-auto">Raster:</span><select class="inp" style="width:84px" aria-label="Schrittweite" onchange="tiLayStep(this.value)">${[1, 5, 10, 20, 40].map(v => `<option value="${v}" ${v === L.step ? 'selected' : ''}>${v} px</option>`).join('')}</select></div>
         <div class="card mt-2"><b class="text-xs">📋 Hauptmenü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${btn ? '' : 'titb'}" onclick="tiLayMm('list')">Liste wie Estuary</button><button class="btn ${btn ? 'titb' : ''}" onclick="tiLayMm('btn')">Einzelne Buttons</button></div>
-          ${btn ? `<p class="hint mt-1">Jeder Menüpunkt ist ein eigener Button, den du frei platzierst – senkrecht, waagerecht, im Kreis, wie du magst. Die Reihenfolge unter „📋 Hauptmenü“ bestimmt nur die Liste; die Lage legst du hier fest.</p>
+          ${btn ? `<div class="flex flex-wrap gap-x-3 gap-y-1 mt-2"><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.b.menu.show ? 'checked' : ''} onchange="tiLayShow('menu',this.checked)"><b>Menü anzeigen</b></label>${T.menu.filter(m => m.id !== 'disc').map(m => `<label class="text-xs flex items-center gap-1"><input type="checkbox" ${m.show ? 'checked' : ''} onchange="tiMShow('${esc(m.id)}',this.checked)">${esc(tiLabel(m))}</label>`).join('')}</div>
+          <p class="hint mt-1">Jeder Menüpunkt ist ein eigener Button, den du frei platzierst – senkrecht, waagerecht, im Kreis, wie du magst. Die Reihenfolge unter „📋 Hauptmenü“ bestimmt nur die Liste; die Lage legst du hier fest.</p>
           <div class="flex flex-wrap gap-1.5 mt-2"><button class="btn" onclick="tiLayPreset('left')">↕ Senkrecht links</button><button class="btn" onclick="tiLayPreset('right')">↕ Senkrecht rechts</button><button class="btn" onclick="tiLayPreset('top')">↔ Waagerecht oben</button></div>
           <div class="grid grid-cols-3 gap-1.5 mt-2">${num('Breite', 'w', g.w, 60, 1900)}${num('Höhe', 'h', g.h, 40, 600)}${num('Symbolgröße', 'ic', g.ic, 16, 300)}
             <div><span class="hint">Symbol</span><select class="inp" onchange="tiMbSet('ip',this.value)">${opt([['left', 'links vom Text'], ['top', 'über dem Text'], ['none', 'kein Symbol'], ['only', 'nur Symbol']], g.ip)}</select></div>${num('Schriftgröße', 'fs', g.fs, 16, 80)}
@@ -4354,8 +4355,9 @@ if __name__ == '__main__':
       S.titan.lay.sel = key; save(); tiPv(); tiLayInputs(key);
     }
     function tiLayShow(key, on) {
+      if (key === 'menu') { S.titan.lay.b.menu.show = !!on; save(); tiPv(); return; }
       const o = tiObj(key); if (!o) return;
-      if (o.t === 'tb') S.titan.top[o.id] = !!on; else if (o.t === 'b') S.titan.lay.b[o.id].show = !!on;
+      if (o.t === 'tb') S.titan.top[o.id] = !!on; else if (o.t === 'b') S.titan.lay.b[o.id].show = !!on; else if (o.t === 'im') S.titan.lay.im.find(q => q.id === o.id).off = !on;
       save(); tiPv();
     }
     function tiLayRst(key) {
@@ -4365,6 +4367,7 @@ if __name__ == '__main__':
       else if (o.t === 'tb') L.tp[o.id] = Object.assign({}, defTp()[o.id]);
       save(); tiRe();
     }
+    function tiMShow(id, on) { const m = S.titan.menu.find(x => x.id === id); if (!m) return; m.show = !!on; if (!tiObj(S.titan.lay.sel)) S.titan.lay.sel = 'widgets'; save(); tiRe(); }
     function tiLayStep(v) { S.titan.lay.step = +v || 10; save(); tiRe(); }
     function tiLayMm(m) {
       const L = S.titan.lay; if (L.mm === m) return;
@@ -4404,15 +4407,17 @@ if __name__ == '__main__':
     function tiLayPreset(n) {
       const L = S.titan.lay;
       if (n === 'std') {
-        const fresh = defLay(); L.b = fresh.b; L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.sel = 'menu';
+        const fresh = defLay(); L.b = fresh.b; TTOP.forEach(x => { S.titan.top[x[0]] = true; }); L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.sel = 'menu';
       } else if (n === 'right') {
         if (L.mm === 'btn') tiMbPreset('right');
         else { TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; }); const w = tiBlkRect('menu').w; L.b.menu.dx = 1920 - w; L.b.buttons.dx = 1920 - w; L.b.widgets.dx = -w; }
+      } else if (n === 'blank') {
+        TBLK.forEach(b => { L.b[b[0]].show = false; }); TTOP.forEach(x => { S.titan.top[x[0]] = false; }); L.im.forEach(q => { q.off = true; });
       } else if (n === 'left') tiMbPreset('left');
       else if (n === 'top') tiMbPreset('top');
       if (!tiObj(L.sel)) L.sel = 'widgets';
       save(); tiRe();
-      toast(n === 'std' ? 'Alle Elemente stehen wieder wie bei Estuary.' : 'Anordnung gesetzt – danach nach Wunsch feinziehen.');
+      toast(n === 'blank' ? 'Alles ausgeblendet – die Startseite ist leer. Einzelne Elemente schaltest du mit den Schaltern wieder ein.' : n === 'std' ? 'Alle Elemente stehen wieder wie bei Estuary.' : 'Anordnung gesetzt – danach nach Wunsch feinziehen.');
     }
 
     // Eigene Dekoration: Bilder und Farbflächen
@@ -4643,7 +4648,7 @@ if __name__ == '__main__':
     }
     function tiCheck() {
       const T = S.titan, r = [], vis = T.menu.filter(m => m.show);
-      if (!vis.length) r.push(['w', 'Im Hauptmenü ist kein Punkt sichtbar.']);
+      if (!vis.length && T.lay.b.menu.show !== false) r.push(['w', 'Im Hauptmenü ist kein Punkt sichtbar.']);
       T.menu.forEach(m => {
         const n = `„${tiLabel(m)}“`;
         if (m.custom) {
@@ -4664,8 +4669,9 @@ if __name__ == '__main__':
           rs.forEach((q, i) => { if (q.x + q.w < 40 || q.x > 1880 || q.y + q.h < 40 || q.y > 1040) r.push(['w', `Layout: Der Menü-Button „${tiLabel(tiMbList()[i])}“ liegt außerhalb des Bildschirms.`]); });
         }
         if (Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x) > 40 && Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y) > 40) r.push(['i', 'Layout: Hauptmenü und Widget-Bereich überlappen sich – prüfe das in der Vorschau (📐 Layout).']);
-        if (L.im.some(q => q.k === 'img' && !T.dimgs[q.id])) r.push(['w', 'Layout: Ein Dekorations-Bild hat keine Bilddaten – bitte neu einfügen.']);
+        if (L.im.some(q => !q.off && q.k === 'img' && !T.dimgs[q.id])) r.push(['w', 'Layout: Ein Dekorations-Bild hat keine Bilddaten – bitte neu einfügen.']);
       }
+      if (TBLK.every(b => !T.lay.b[b[0]].show) || (!tiMbList().length && T.lay.mm === 'btn' && T.lay.b.widgets.show === false)) r.push(['i', 'Layout: Es ist alles ausgeblendet – die Startseite bleibt leer (nur Hintergrund). Kodi lässt sich dann nur noch über Tasten und das Kontextmenü bedienen.']);
       if (T.bg.mode === 'image' && !T.bg.img) r.push(['i', 'Eigener Hintergrund gewählt, aber noch kein Bild – es bleibt das Estuary-Muster.']);
       if (T.fontScale !== 100) r.push(['i', `Schriftgröße ${T.fontScale} % – prüfe in Kodi, ob lange Texte noch passen.`]);
       return r;
@@ -4917,7 +4923,7 @@ if __name__ == '__main__':
         if (/Container\(9000\)/.test(new XMLSerializer().serializeToString(hd))) TLAYWARN.push('Die Startseite nutzt das alte Menü noch an weiteren Stellen');
         const other = Object.keys(F).filter(p => /^xml\/[^/]+\.xml$/.test(p) && p !== 'xml/Home.xml' && /Container\(9000\)/.test(dec.decode(F[p])));
         if (other.length) TLAYWARN.push('Estuary nutzt das alte Menü auch in ' + other.join(', '));
-      } else if (btnM0) TLAYWARN.push('Einzelne Menü-Buttons: Es ist kein Menüpunkt sichtbar – das Menü bleibt wie bei Estuary');
+      } else if (btnM0) { if (LAY.b.menu.show !== false) TLAYWARN.push('Einzelne Menü-Buttons: Es ist kein Menüpunkt sichtbar – das Menü ist leer'); }
       else addNode(rectB('menu'), 9000, 1, '2000', null);
       // Knöpfe oben: einzeln statt in der Leiste
       if (g700 && !sglT) addNode(rectB('buttons'), 700, 1, '2000', null);
@@ -4982,6 +4988,7 @@ if __name__ == '__main__':
       };
       wrapNodes([logoNode], 'logo'); wrapNodes(incAll('TopBar'), 'clock'); if (!sglT) wrapNodes([g700], 'buttons');
       if (!btnM) wrapNodes([list], 'menu');
+      else if (holder && LAY.b.menu.show === false) { const w0 = xe(hd, 'control', { type: 'group' }); w0.appendChild(xe(hd, 'visible', {}, 'false')); holder.parentNode.insertBefore(w0, holder); w0.appendChild(holder); }
       wrapNodes([g2000], 'widgets'); wrapNodes(incAll('BottomBar'), 'bottom');
       // Eigene Dekoration (Bilder und Farbflächen)
       if (LAY.im.length) {
@@ -4991,7 +4998,7 @@ if __name__ == '__main__':
           const topOf = n => { while (n && n.parentNode && n.parentNode !== ctrls) n = n.parentNode; return n && n.parentNode === ctrls ? n : null; };
           const order = [...ctrls.children], at = [topOf(g2000), topOf(holder || list), topOf(g700)].filter(Boolean).map(n => order.indexOf(n)).filter(i => i >= 0);
           const anchor = at.length ? order[Math.min(...at)] : null;
-          LAY.im.forEach(q => {
+          LAY.im.filter(q => !q.off).forEach(q => {
             const isBox = q.k === 'box', data = T.dimgs[q.id];
             if (!isBox && !data) { TLAYWARN.push('Ein Dekorations-Bild hat keine Bilddaten und wurde übersprungen'); return; }
             let tex = 'titan/white.png', cd = A(q.op) + (isBox ? H(q.col) : 'FFFFFF');
