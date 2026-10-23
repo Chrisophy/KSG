@@ -6,7 +6,7 @@
 
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
 
-🚥 **Demos:** [Demonstrationen](https://github.com/Chrisophy/KSG/Demos)
+🚥 **Demos:** [Demonstrationen]([https://github.com/Chrisophy/KSG/Demos](https://github.com/Chrisophy/KSG/tree/main/Demos))
 
 > 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
