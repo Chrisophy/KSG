@@ -3906,7 +3906,7 @@ if __name__ == '__main__':
       ['Petrol', { focus: '#009688', bg: '#00665C', pat: '#F07942', patA: 20, dialog: '#222A2A', sel: '#C67F03' }],
       ['Violett', { focus: '#C050FF', bg: '#5B1C80', pat: '#FFB3D7', patA: 20, dialog: '#27222A', sel: '#FF0054' }]
     ];
-    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['export', '📦 Export']];
+    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['pro', '🔧 Profi'], ['export', '📦 Export']];
     // Frei verschiebbare Bausteine der Estuary-Startseite: [Schlüssel, Symbol, Name, Beschreibung, Standard-Rechteck in der Vorschau, Farbe, ausblendbar?]
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
@@ -3922,7 +3922,7 @@ if __name__ == '__main__':
     const defLay = () => {
       const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
       // mm: Hauptmenü als 'list' (wie Estuary) oder 'btn' (einzelne Buttons) · tm: Knöpfe oben 'group' oder 'single' · im: Dekoration
-      return { step: 10, sel: 'menu', b, mm: 'list', mb: { w: 462, h: 95, ic: 80, ip: 'left', fs: 36, al: 'left' }, mp: {}, tm: 'group', tp: defTp(), im: [] };
+      return { step: 10, sel: 'menu', b, mm: 'list', mb: { w: 462, h: 95, ic: 80, ip: 'left', fs: 36, al: 'left', fx: 'none', fxv: 8 }, mp: {}, tm: 'group', tp: defTp(), im: [], cd: {}, gd: false, sf: false };
     };
     let TIB = null, TIBUSY = false, TIIDX = -1, TLAYMISS = [], TLAYWARN = [];
 
@@ -3943,7 +3943,7 @@ if __name__ == '__main__':
         kodi: '21', name: '', ver: '1.0.0', author: '', langs: 'de',
         col: Object.assign({ text: '#F0F0F0', grey: '#A0A0A0' }, TCOLS[1][1]),
         bg: { mode: 'estuary', img: null, dim: 45 }, logo: null, fontScale: 100, font: null,
-        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {}, dimgs: {},
+        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {}, dimgs: {}, ov: {}, rr: [], xf: [], wh: {},
         menu: TMENU.map(m => ({ id: m[0], show: true, label: '', icon: '', w: 'keep', wl: [] })),
         cur: 'movies', tab: 'basis', lay: defLay()
       };
@@ -3955,6 +3955,11 @@ if __name__ == '__main__':
       S.titan.bg = Object.assign(defTitan().bg, T.bg || {});
       S.titan.top = Object.assign(defTitan().top, T.top || {});
       if (!S.titan.imgs || typeof S.titan.imgs !== 'object') S.titan.imgs = {};
+      if (!S.titan.ov || typeof S.titan.ov !== 'object' || Array.isArray(S.titan.ov)) S.titan.ov = {};
+      Object.keys(S.titan.ov).forEach(k => { if (typeof S.titan.ov[k] !== 'string') delete S.titan.ov[k]; });
+      S.titan.rr = (Array.isArray(S.titan.rr) ? S.titan.rr : []).filter(r => r && typeof r === 'object').slice(0, 30).map(r => ({ f: String(r.f || '').slice(0, 200), a: String(r.a || '').slice(0, 2000), b: String(r.b || '').slice(0, 2000), re: r.re === true }));
+      S.titan.xf = (Array.isArray(S.titan.xf) ? S.titan.xf : []).filter(r => r && typeof r === 'object' && typeof r.d === 'string' && r.p).slice(0, 30).map(r => ({ p: String(r.p).replace(/^\/+/, '').replace(/\.\.+/g, '.').slice(0, 200), d: r.d, n: String(r.n || '').slice(0, 80) }));
+      if (!S.titan.wh || typeof S.titan.wh !== 'object' || Array.isArray(S.titan.wh)) S.titan.wh = {};
       if (!TKODI[S.titan.kodi]) S.titan.kodi = '21';
       {
         const L0 = (T.lay && typeof T.lay === 'object') ? T.lay : {}, L = defLay();
@@ -3963,14 +3968,16 @@ if __name__ == '__main__':
         const cl = (v, a, z, d) => { v = Math.round(+v); return isFinite(v) ? Math.max(a, Math.min(z, v)) : d; };
         L.mm = L0.mm === 'btn' ? 'btn' : 'list'; L.tm = L0.tm === 'single' ? 'single' : 'group';
         const m0 = (L0.mb && typeof L0.mb === 'object') ? L0.mb : {}, d0 = L.mb;
-        L.mb = { w: cl(m0.w, 60, 1900, d0.w), h: cl(m0.h, 40, 600, d0.h), ic: cl(m0.ic, 16, 300, d0.ic), ip: ['left', 'top', 'none', 'only'].includes(m0.ip) ? m0.ip : d0.ip, fs: cl(m0.fs, 16, 80, d0.fs), al: m0.al === 'center' ? 'center' : 'left' };
+        L.mb = { w: cl(m0.w, 60, 1900, d0.w), h: cl(m0.h, 40, 600, d0.h), ic: cl(m0.ic, 16, 300, d0.ic), ip: ['left', 'top', 'none', 'only'].includes(m0.ip) ? m0.ip : d0.ip, fs: cl(m0.fs, 16, 80, d0.fs), al: m0.al === 'center' ? 'center' : 'left', fx: ['zoom', 'lift'].includes(m0.fx) ? m0.fx : 'none', fxv: cl(m0.fxv, 2, 40, 8) };
+        L.gd = L0.gd === true; L.sf = L0.sf === true; L.cd = {};
+        if (L0.cd && typeof L0.cd === 'object') Object.keys(L0.cd).forEach(k => { if (typeof L0.cd[k] === 'string' && L0.cd[k]) L.cd[k] = L0.cd[k].slice(0, 300); });
         L.mp = {};
         if (L0.mp && typeof L0.mp === 'object') Object.keys(L0.mp).forEach(id => { const q = L0.mp[id]; if (q && typeof q === 'object') L.mp[id] = { x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0), w: Math.max(0, cl(q.w, 0, 3000, 0)), h: Math.max(0, cl(q.h, 0, 2000, 0)) }; });
         const t0 = (L0.tp && typeof L0.tp === 'object') ? L0.tp : {}, tdef = defTp();
         TTOP.forEach(x => { const q = t0[x[0]] || {}; L.tp[x[0]] = { x: cl(q.x, -3000, 3000, tdef[x[0]].x), y: cl(q.y, -3000, 3000, tdef[x[0]].y) }; });
         if (!S.titan.dimgs || typeof S.titan.dimgs !== 'object') S.titan.dimgs = {};
-        L.im = (Array.isArray(L0.im) ? L0.im : []).filter(q => q && typeof q === 'object' && q.id).slice(0, 30).map(q => ({
-          id: String(q.id), k: q.k === 'box' ? 'box' : 'img', nm: String(q.nm || '').slice(0, 30), x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0),
+        L.im = (Array.isArray(L0.im) ? L0.im : []).filter(q => q && typeof q === 'object' && q.id).slice(0, 40).map(q => ({
+          id: String(q.id), k: q.k === 'box' ? 'box' : q.k === 'txt' ? 'txt' : 'img', bg: q.bg === true, txt: String(q.txt || '').slice(0, 500), fs: cl(q.fs, 12, 200, 40), al: ['left', 'center', 'right'].includes(q.al) ? q.al : 'left', nm: String(q.nm || '').slice(0, 30), x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0),
           w: cl(q.w, 4, 4000, 300), h: cl(q.h, 4, 4000, 200), op: cl(q.op, 5, 100, 100), z: q.z === 'over' ? 'over' : 'under', only: String(q.only || ''),
           col: /^#[0-9a-fA-F]{6}$/.test(q.col) ? q.col : '#ffffff', fit: q.fit === 'stretch' ? 'stretch' : 'keep', off: q.off === true
         }));
@@ -4110,7 +4117,7 @@ if __name__ == '__main__':
     // ---------- Werkstatt ----------
     function showTitan(t) {
       if (t) S.titan.tab = t;
-      modal(`<div class="flex justify-between items-start gap-2 mb-3"><div><b class="text-lg ti-grad">⚡ Titan-Modus</b><div class="hint">Dein eigener, echter Kodi-Skin · Stufe A: Estuary umbauen</div></div><button class="btn" onclick="closeModal()">Schließen</button></div>
+      modal(`<div class="flex justify-between items-start gap-2 mb-3"><div><b class="text-lg ti-grad">⚡ Titan-Modus</b><div class="hint">Dein eigener, echter Kodi-Skin · Stufe A: Estuary umbauen</div></div><div class="flex gap-1.5 shrink-0"><button class="btn" id="ti-undo" aria-label="Rückgängig" title="Rückgängig (Strg+Z)" onclick="tiUndo()">↶</button><button class="btn" id="ti-redo" aria-label="Wiederholen" title="Wiederholen (Strg+Y)" onclick="tiRedo()">↷</button><button class="btn" onclick="closeModal()">Schließen</button></div></div>
         <div class="grid lg:grid-cols-2 gap-4 items-start">
           <div class="ti-pvbox"><div id="tpv-wrap"><div id="tpv-stage" onclick="tiPvClick(event)"></div></div><p class="hint mt-1">Vorschau im Estuary-Stil – tippe auf einen Menüpunkt. Die echten Bilder und Titel füllt Kodi.</p></div>
           <div class="min-w-0"><div class="flex flex-wrap gap-1.5 mb-3" id="ti-tabs"></div><div id="ti-body"></div></div>
@@ -4118,14 +4125,14 @@ if __name__ == '__main__':
       $('modal-in').style.maxWidth = '86rem';
       new ResizeObserver(tiFit).observe($('tpv-wrap'));
       tiLayBind();
-      tiTab(S.titan.tab); tiFit();
+      tiTab(S.titan.tab); tiFit(); tiHistInit();
     }
     function tiFit() { const w = $('tpv-wrap'), s = $('tpv-stage'); if (!w || !s || !w.clientWidth) return; s.style.transform = `scale(${w.clientWidth / 1920})`; }
     function tiTab(t) {
       if (!$('ti-body')) return;
       S.titan.tab = t; save();
       $('ti-tabs').innerHTML = TTABS.map(x => `<button class="btn ${x[0] === t ? 'titb' : ''}" onclick="tiTab('${x[0]}')">${x[1]}</button>`).join('');
-      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, export: tiExport };
+      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, pro: tiPro, export: tiExport };
       $('ti-body').innerHTML = (R[t] || tiBasis)();
       tiPv();
       if (t === 'basis') tiBaseStatus();
@@ -4146,6 +4153,7 @@ if __name__ == '__main__':
       if (m.custom || m.w === 'own') return m.wl.map(w => ({ t: w.title || wPre(w.src)[2], s: w.style, media: w.media, src: w.src }));
       return (TDEFW[m.id] || [['Inhalte', 'poster']]).map(x => ({ t: x[0], s: x[1], media: /music|radio/.test(m.id) ? 'music' : 'video', src: m.id }));
     }
+    function tiTxtPv(t) { return String(t || '').replace(/\[CR\]/g, '\n').replace(/\$INFO\[([^\]]*)\]/g, (m, k) => { const f = LIVEPV[k]; return typeof f === 'function' ? f() : f != null ? String(f) : k; }); }
     function tiPv() {
       const st = $('tpv-stage'); if (!st) return;
       const T = S.titan, C = T.col, L = T.lay, lay = T.tab === 'layout', vis = T.menu.filter(m => m.show && m.id !== 'disc'), cur = vis.find(m => m.id === T.cur) || vis[0], btn = L.mm === 'btn', single = L.tm === 'single';
@@ -4158,6 +4166,7 @@ if __name__ == '__main__':
         const other = q.only && (!cur || q.only !== cur.id) || q.off;
         if (other && !lay || q.off && !lay) return '';
         const base = `position:absolute;left:${q.x}px;top:${q.y}px;width:${q.w}px;height:${q.h}px;opacity:${q.op / 100 * (other ? .35 : 1)};`;
+        if (q.k === 'txt') return `<div style="${base}display:flex;align-items:center;justify-content:${{ left: 'flex-start', center: 'center', right: 'flex-end' }[q.al]};font:400 ${q.fs}px Arial;color:${q.col};text-align:${q.al};overflow:hidden;white-space:pre-wrap">${esc(tiTxtPv(q.txt))}</div>`;
         return q.k === 'box' ? `<div style="${base}background:${q.col}"></div>` : (T.dimgs[q.id] ? `<img src="${T.dimgs[q.id]}" alt="" style="${base}object-fit:${q.fit === 'stretch' ? 'fill' : 'contain'}">` : '');
       }).join('');
       // Logo, Uhr, Knöpfe oben
@@ -4175,7 +4184,8 @@ if __name__ == '__main__':
           const r = tiMbRect(m, i), foc = m === cur, geo = tiMbGeo(r, L.mb);
           const ih = geo.icon ? `<div style="position:absolute;left:${geo.icon.x}px;top:${geo.icon.y}px;width:${geo.icon.s}px;height:${geo.icon.s}px;display:flex;align-items:center;justify-content:center">${tiIconHtml(m, geo.icon.s, !foc)}</div>` : '';
           const lh = geo.label ? `<div style="position:absolute;left:${geo.label.x}px;top:${geo.label.y}px;width:${geo.label.w}px;height:${geo.label.h}px;display:flex;align-items:center;justify-content:${geo.label.al === 'center' ? 'center' : 'flex-start'};font:400 ${L.mb.fs}px Arial;color:${foc ? C.text : C.grey};white-space:nowrap;overflow:hidden;text-shadow:0 2px 4px rgba(0,0,0,.25)">${esc(tiLabel(m))}</div>` : '';
-          P.menu += `<div data-tm="${m.id}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;cursor:pointer;${foc ? `background:${C.focus}` : ''}">${ih}${lh}</div>`;
+          const fxs = foc && L.mb.fx === 'zoom' ? `transform:scale(${1 + L.mb.fxv / 100});z-index:3;` : foc && L.mb.fx === 'lift' ? `transform:translateY(-${L.mb.fxv}px);z-index:3;` : '';
+          P.menu += `<div data-tm="${m.id}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;cursor:pointer;${fxs}${foc ? `background:${C.focus}` : ''}">${ih}${lh}</div>`;
         });
       } else vis.forEach((m, i) => {
         const y = 240 + i * 95; if (y > 1000) return; const foc = m === cur;
@@ -4211,11 +4221,13 @@ if __name__ == '__main__':
         h += `<div data-lb="${k}" style="position:absolute;left:0;top:0;width:0;height:0;overflow:visible;transform:translate(${o.dx}px,${o.dy}px);${o.show ? '' : 'opacity:.2;'}">${P[k]}</div>`;
       });
       h += tbs + deco('over');
+      if (lay && L.gd) { const gs = Math.max(10, L.step) * (L.step < 10 ? 1 : 1); h += `<div style="position:absolute;inset:0;pointer-events:none;z-index:4;background-image:linear-gradient(rgba(255,255,255,.13) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.13) 2px,transparent 2px);background-size:${gs * (gs < 40 ? Math.ceil(40 / gs) : 1)}px ${gs * (gs < 40 ? Math.ceil(40 / gs) : 1)}px"></div>`; }
+      if (lay && L.sf) h += `<div style="position:absolute;left:96px;top:54px;width:1728px;height:972px;border:3px dashed rgba(255,255,0,.55);box-sizing:border-box;pointer-events:none;z-index:4"></div><div style="position:absolute;left:958px;top:0;width:4px;height:1080px;background:rgba(255,80,80,.5);pointer-events:none;z-index:4"></div><div style="position:absolute;left:0;top:538px;width:1920px;height:4px;background:rgba(255,80,80,.5);pointer-events:none;z-index:4"></div>`;
       if (lay) {
         const keys = tiObjKeys().filter(k => k !== L.sel).concat(tiObj(L.sel) ? [L.sel] : []);
         keys.forEach(key => {
           const o = tiObj(key), r = o.rect, on = L.sel === key, col = o.col;
-          h += `<div data-box="${key}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;box-sizing:border-box;border:${on ? 6 : 3}px ${on ? 'solid' : 'dashed'} ${col};background:${rgba(col, on ? .2 : .08)};cursor:move;touch-action:none;z-index:${on ? 7 : 5};${o.show ? '' : 'opacity:.55;'}"><span style="position:absolute;left:0;top:0;max-width:100%;overflow:hidden;background:${col};color:#000;font:700 ${r.h < 80 || r.w < 200 ? 20 : 26}px Arial;padding:2px 10px;white-space:nowrap;pointer-events:none">${esc(o.name)}${o.show ? '' : ' (aus)'}</span>${o.size ? `<span data-rs="${key}" style="position:absolute;right:-3px;bottom:-3px;width:46px;height:46px;background:${col};clip-path:polygon(100% 0,100% 100%,0 100%);cursor:nwse-resize;touch-action:none"></span>` : ''}</div>`;
+          h += `<div data-box="${key}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;box-sizing:border-box;border:${on ? 6 : 3}px ${on ? 'solid' : 'dashed'} ${col};background:${rgba(col, on ? .2 : .08)};cursor:move;touch-action:none;z-index:${on ? 7 : 5};${o.show ? '' : 'opacity:.55;'}"><span style="position:absolute;left:0;top:0;max-width:100%;overflow:hidden;background:${col};color:#000;font:700 ${r.h < 80 || r.w < 200 ? 20 : 26}px Arial;padding:2px 10px;white-space:nowrap;pointer-events:none">${esc(o.name)}${tiCond(key) ? ' 👁' : ''}${o.show ? '' : ' (aus)'}</span>${o.size ? `<span data-rs="${key}" style="position:absolute;right:-3px;bottom:-3px;width:46px;height:46px;background:${col};clip-path:polygon(100% 0,100% 100%,0 100%);cursor:nwse-resize;touch-action:none"></span>` : ''}</div>`;
         });
       }
       st.innerHTML = h;
@@ -4272,7 +4284,7 @@ if __name__ == '__main__':
       }
       if (t === 'im') {
         const q = L.im.find(x => x.id === id); if (!q) return null;
-        return { key, t, id, name: (q.k === 'box' ? '▭ ' : '🖼 ') + (q.nm || (q.k === 'box' ? 'Farbfläche' : 'Bild')), sub: 'Dekoration', col: TIMGCOL, canHide: true, show: !q.off, rel: false, size: true, del: true, vx: q.x, vy: q.y, rect: { x: q.x, y: q.y, w: q.w, h: q.h } };
+        return { key, t, id, name: q.k === 'txt' ? '🔤 ' + (q.nm || String(q.txt).replace(/\$INFO\[([^\]]*)\]/g, '$1').slice(0, 24) || 'Text') : (q.k === 'box' ? '▭ ' : '🖼 ') + (q.nm || (q.k === 'box' ? 'Farbfläche' : 'Bild')), sub: q.bg ? 'Hintergrund' : q.k === 'txt' ? 'Text' : 'Dekoration', col: TIMGCOL, canHide: true, show: !q.off, rel: false, size: true, del: true, vx: q.x, vy: q.y, rect: { x: q.x, y: q.y, w: q.w, h: q.h } };
       }
       return null;
     }
@@ -4298,51 +4310,99 @@ if __name__ == '__main__':
       const val = { dx: o.vx, dy: o.vy, x: o.vx, y: o.vy, w: o.rect.w, h: o.rect.h };
       Object.keys(val).forEach(ax => document.querySelectorAll(`[data-lf="${key}.${ax}"]`).forEach(i => { i.value = val[ax]; }));
     }
+    // Bedingungen: Kodi-Ausdrücke, die ein Element nur unter bestimmten Umständen zeigen
+    const TCONDS = [['', 'immer'], ['Player.HasMedia', 'wenn etwas abgespielt wird'], ['!Player.HasMedia', 'wenn nichts abgespielt wird'], ['Player.HasVideo', 'bei Video-Wiedergabe'], ['Player.HasAudio', 'bei Musik-Wiedergabe'],
+      ['Library.HasContent(movies)', 'wenn Filme in der Bibliothek sind'], ['Library.HasContent(tvshows)', 'wenn Serien in der Bibliothek sind'], ['Library.HasContent(music)', 'wenn Musik in der Bibliothek ist'],
+      ['System.InternetState', 'wenn Internet da ist'], ['!System.InternetState', 'wenn kein Internet da ist'], ['Integer.IsLess(System.Time(hh),12)', 'vormittags (vor 12 Uhr)'], ['Integer.IsGreater(System.Time(hh),17)', 'abends (nach 17 Uhr)'],
+      ['Skin.HasSetting(touchmode)', 'im Touch-Modus'], ['__custom', 'Eigene Bedingung …']];
+    const tiCond = key => String((S.titan.lay.cd || {})[key] || '').trim();
+    function tiCondOk(c) { let a = 0, b = 0; for (const ch of String(c)) { if (ch === '(') a++; else if (ch === ')') a--; else if (ch === '[') b++; else if (ch === ']') b--; if (a < 0 || b < 0) return false; } return a === 0 && b === 0; }
+    function tiCondUi(key) {
+      const c = (S.titan.lay.cd || {})[key] || '', known = TCONDS.some(x => x[0] === c && x[0] !== '__custom');
+      return `<div style="grid-column:1/-1"><span class="hint">👁 Nur zeigen …</span><select class="inp" onchange="tiCondPick('${key}',this.value)">${TCONDS.map(x => `<option value="${x[0]}" ${(known ? x[0] === c : x[0] === '__custom') ? 'selected' : ''}>${x[1]}</option>`).join('')}</select>${known ? '' : `<input class="inp mt-1" value="${esc(String(c).trim())}" placeholder="z.B. Player.HasVideo + Library.HasContent(movies)" oninput="tiCondSet('${key}',this.value)">`}</div>`;
+    }
+    function tiCondPick(key, v) { const L = S.titan.lay; if (!v) delete L.cd[key]; else L.cd[key] = v === '__custom' ? ' ' : v; save(); tiRe(); }
+    function tiCondSet(key, v) { S.titan.lay.cd[key] = String(v).slice(0, 300); save(); }
+
+    function tiAlign(key, how) {
+      const o = tiObj(key); if (!o) return; const r = o.rect, X = tiAx(o, 'x'), Y = tiAx(o, 'y');
+      const tx = { l: 0, cx: (1920 - r.w) / 2, r: 1920 - r.w }[how], ty = { t: 0, cy: (1080 - r.h) / 2, b: 1080 - r.h }[how];
+      if (tx !== undefined) tiObjPut(key, X, o.vx + Math.round(tx) - r.x);
+      if (ty !== undefined) tiObjPut(key, Y, o.vy + Math.round(ty) - r.y);
+      save(); tiRe();
+    }
+    // Mehrere Menü-Buttons gemeinsam ausrichten: gleichmäßig verteilen, in eine Reihe oder Spalte bringen
+    function tiMbArrange(kind) {
+      const L = S.titan.lay, list = tiMbList().map((m, i) => ({ m, r: tiMbRect(m, i) })); if (list.length < 2) return;
+      const ens = q => (L.mp[q.m.id] = L.mp[q.m.id] || { x: q.r.x, y: q.r.y, w: 0, h: 0 });
+      if (kind === 'dh' || kind === 'dv') {
+        const hor = kind === 'dh'; list.sort((a, b) => hor ? a.r.x - b.r.x : a.r.y - b.r.y);
+        const f = list[0].r, l = list[list.length - 1].r, n = list.length, span = hor ? l.x + l.w - f.x : l.y + l.h - f.y, tot = list.reduce((s, q) => s + (hor ? q.r.w : q.r.h), 0), gap = (span - tot) / (n - 1);
+        let p = hor ? f.x : f.y;
+        list.forEach(q => { const e = ens(q); e[hor ? 'x' : 'y'] = Math.round(p); p += (hor ? q.r.w : q.r.h) + gap; });
+      } else { const b = list[0].r; list.forEach(q => { const e = ens(q); if (kind === 'row') e.y = b.y; else e.x = b.x; }); }
+      save(); tiRe();
+    }
+    function tiDetail(key) {
+      const T = S.titan, L = T.lay, o = tiObj(key); if (!o) return '';
+      const opt = (a, cur) => a.map(x => `<option value="${x[0]}" ${String(x[0]) === String(cur) ? 'selected' : ''}>${x[1]}</option>`).join('');
+      let h = '';
+      if (o.t === 'im') {
+        const q = L.im.find(x => x.id === o.id), id = esc(q.id);
+        if (q.k === 'txt') h += `<div style="grid-column:1/-1"><span class="hint">Text – Zeilenumbruch mit [CR], Live-Infos per Knopf anhängen</span><textarea class="inp" rows="2" oninput="tiDecoSet('${id}','txt',this.value,true)">${esc(q.txt)}</textarea><div class="flex flex-wrap gap-1 mt-1">${LIVEOPTS.map((x, i) => `<button class="btn" onclick="tiTxtIns('${id}',${i})">${x[0]}</button>`).join('')}</div></div>
+          <div><span class="hint">Schriftgröße</span><input type="number" min="12" max="200" class="inp" value="${q.fs}" onchange="tiDecoSet('${id}','fs',this.value)"></div><div><span class="hint">Textfarbe</span><input type="color" class="inp" value="${q.col}" oninput="tiDecoSet('${id}','col',this.value,true)" style="height:36px"></div>
+          <div><span class="hint">Ausrichtung</span><select class="inp" onchange="tiDecoSet('${id}','al',this.value)">${opt([['left', 'links'], ['center', 'mittig'], ['right', 'rechts']], q.al)}</select></div>`;
+        h += `<div><span class="hint">Deckkraft: <b id="tq-op">${q.op}</b> %</span><input type="range" min="5" max="100" value="${q.op}" oninput="tiDecoSet('${id}','op',this.value,true)" style="width:100%"></div>
+          <div><span class="hint">Ebene</span><select class="inp" onchange="tiDecoSet('${id}','z',this.value)">${opt([['under', 'hinter Menü & Widgets'], ['over', 'vor allem']], q.z)}</select></div>
+          ${q.k === 'box' ? `<div><span class="hint">Farbe</span><input type="color" class="inp" value="${q.col}" oninput="tiDecoSet('${id}','col',this.value,true)" style="height:36px"></div>` : q.k === 'img' ? `<div><span class="hint">Form</span><select class="inp" onchange="tiDecoSet('${id}','fit',this.value)">${opt([['keep', 'Seitenverhältnis behalten'], ['stretch', 'auf die Fläche strecken']], q.fit)}</select></div>` : ''}
+          <div><span class="hint">Nur bei Menüpunkt</span><select class="inp" onchange="tiDecoSet('${id}','only',this.value)">${opt([['', 'immer']].concat(T.menu.filter(m => m.show && m.id !== 'disc').map(m => [m.id, tiLabel(m)])), q.only)}</select></div>`;
+      }
+      h += tiCondUi(key);
+      h += `<div style="grid-column:1/-1" class="flex flex-wrap gap-1 items-center"><span class="hint">Ausrichten am Bildschirm:</span>${[['l', '⇤', 'links'], ['cx', '⇔', 'waagerecht mittig'], ['r', '⇥', 'rechts'], ['t', '⤒', 'oben'], ['cy', '⇕', 'senkrecht mittig'], ['b', '⤓', 'unten']].map(a => `<button class="btn" aria-label="${a[2]}" title="${a[2]}" onclick="tiAlign('${key}','${a[0]}')">${a[1]}</button>`).join('')}</div>`;
+      return `<div class="card" style="margin-top:-2px;border-color:${o.col}"><div class="grid grid-cols-2 gap-1.5">${h}</div></div>`;
+    }
     function tiLayRow(key) {
       const L = S.titan.lay, o = tiObj(key); if (!o) return '';
-      const on = L.sel === key, k = esc(key), X = tiAx(o, 'x'), Y = tiAx(o, 'y');
+      const on = L.sel === key, k = esc(key), X = tiAx(o, 'x'), Y = tiAx(o, 'y'), cd = tiCond(key);
       const inp = (ax, lab, v) => `<div><span class="hint">${lab}</span><input data-lf="${k}.${ax}" type="number" class="inp" value="${v}" oninput="tiLaySet('${k}','${ax}',this.value,true)"></div>`;
       return `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:6px;cursor:pointer;border-color:${on ? o.col : '#1e293b'};${on ? `box-shadow:0 0 0 1px ${o.col}` : ''}" onclick="tiLaySel('${k}')">
-        <div class="flex items-center gap-2"><span style="width:12px;height:12px;border-radius:3px;background:${o.col};flex-shrink:0"></span><div class="flex-1 min-w-0"><b class="text-xs">${esc(o.name)}</b><div class="hint">${esc(o.sub)}</div></div>${o.canHide ? `<label class="tg" onclick="event.stopPropagation()" title="Anzeigen"><input type="checkbox" aria-label="${esc(o.name)} anzeigen" ${o.show ? 'checked' : ''} onchange="tiLayShow('${k}',this.checked)"><span></span></label>` : ''}${o.del ? `<button class="btn" aria-label="Entfernen" onclick="event.stopPropagation();tiDecoDel('${esc(o.id)}')">🗑</button>` : ''}</div>
+        <div class="flex items-center gap-2"><span style="width:12px;height:12px;border-radius:3px;background:${o.col};flex-shrink:0"></span><div class="flex-1 min-w-0"><b class="text-xs">${esc(o.name)}${cd ? ' 👁' : ''}</b><div class="hint">${esc(o.sub)}${cd ? ' · nur bei: ' + esc(cd) : ''}</div></div>${o.canHide ? `<label class="tg" onclick="event.stopPropagation()" title="Anzeigen"><input type="checkbox" aria-label="${esc(o.name)} anzeigen" ${o.show ? 'checked' : ''} onchange="tiLayShow('${k}',this.checked)"><span></span></label>` : ''}${o.del ? `<button class="btn" aria-label="Entfernen" onclick="event.stopPropagation();tiDecoDel('${esc(o.id)}')">🗑</button>` : ''}</div>
         <div class="grid ${o.size ? 'grid-cols-4' : 'grid-cols-2'} gap-1.5" onclick="event.stopPropagation()">${inp(X, o.rel ? '← → (X)' : 'X', o.vx)}${inp(Y, o.rel ? '↑ ↓ (Y)' : 'Y', o.vy)}${o.size ? inp('w', 'Breite', o.rect.w) + inp('h', 'Höhe', o.rect.h) : ''}</div>
         ${on ? `<div class="flex gap-1.5 items-center" onclick="event.stopPropagation()"><span class="hint flex-1">Verschieben (je ${L.step} px):</span><button class="btn" aria-label="Nach links" onclick="tiLayNudge('${k}',-1,0)">◀</button><button class="btn" aria-label="Nach oben" onclick="tiLayNudge('${k}',0,-1)">▲</button><button class="btn" aria-label="Nach unten" onclick="tiLayNudge('${k}',0,1)">▼</button><button class="btn" aria-label="Nach rechts" onclick="tiLayNudge('${k}',1,0)">▶</button>${o.t !== 'im' ? `<button class="btn" aria-label="Zurücksetzen" onclick="tiLayRst('${k}')">↺</button>` : ''}</div>` : ''}
-      </div>`;
+      </div>${on ? `<div onclick="event.stopPropagation()">${tiDetail(key)}</div>` : ''}`;
     }
+    const TVORL = [['', '📐 Vorlage wählen …'], ['left', '↕ Menü senkrecht links (Einzel-Buttons)'], ['right', '↕ Menü senkrecht rechts'], ['top', '↔ Menü waagerecht oben'], ['dock', '▁ Dock unten (nur Symbole)'], ['tiles', '▦ Kacheln, Widgets aus'], ['kiosk', '🖥 Kiosk: große Leiste mittig, Widgets aus']];
     function tiLayout() {
       const T = S.titan, L = T.lay, g = L.mb, btn = L.mm === 'btn', sgl = L.tm === 'single';
       const opt = (a, cur) => a.map(o => `<option value="${o[0]}" ${String(o[0]) === String(cur) ? 'selected' : ''}>${o[1]}</option>`).join('');
       const num = (lab, k, v, mn, mx) => `<div><span class="hint">${lab}</span><input type="number" class="inp" min="${mn}" max="${mx}" value="${v}" onchange="tiMbSet('${k}',this.value)"></div>`;
       let h = `<p class="hint mb-2">Hier machst du Estuary wirklich zu deinem: <b>Ziehe die farbigen Rahmen in der Vorschau</b> an die Stelle, an der das Element in Kodi stehen soll – oder gib Zahlen ein. Bei Rahmen mit Ecke unten rechts änderst du dort die Größe. Alles andere an Estuary bleibt unverändert.</p>
-        <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('right')">↦ Menü nach rechts</button><button class="btn titb" onclick="tiLayPreset('top')">↔ Waagerechtes Menü oben</button><button class="btn" onclick="tiLayPreset('blank')">⬜ Leere Seite</button>
-          <span class="hint ml-auto">Raster:</span><select class="inp" style="width:84px" aria-label="Schrittweite" onchange="tiLayStep(this.value)">${[1, 5, 10, 20, 40].map(v => `<option value="${v}" ${v === L.step ? 'selected' : ''}>${v} px</option>`).join('')}</select></div>
+        <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('blank')">⬜ Leere Seite</button><select class="inp" style="width:auto;flex:1;min-width:190px" aria-label="Vorlage" onchange="tiLayPreset(this.value);this.value=''">${opt(TVORL, '')}</select></div>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 items-center mb-2"><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.gd ? 'checked' : ''} onchange="tiLayView('gd',this.checked)">Raster zeigen</label><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.sf ? 'checked' : ''} onchange="tiLayView('sf',this.checked)">Mittellinien & Sicherheitsrand</label>
+          <span class="hint ml-auto">Einrasten:</span><select class="inp" style="width:84px" aria-label="Schrittweite" onchange="tiLayStep(this.value)">${[1, 5, 10, 20, 40].map(v => `<option value="${v}" ${v === L.step ? 'selected' : ''}>${v} px</option>`).join('')}</select></div>
         <div class="card mt-2"><b class="text-xs">📋 Hauptmenü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${btn ? '' : 'titb'}" onclick="tiLayMm('list')">Liste wie Estuary</button><button class="btn ${btn ? 'titb' : ''}" onclick="tiLayMm('btn')">Einzelne Buttons</button></div>
           ${btn ? `<div class="flex flex-wrap gap-x-3 gap-y-1 mt-2"><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.b.menu.show ? 'checked' : ''} onchange="tiLayShow('menu',this.checked)"><b>Menü anzeigen</b></label>${T.menu.filter(m => m.id !== 'disc').map(m => `<label class="text-xs flex items-center gap-1"><input type="checkbox" ${m.show ? 'checked' : ''} onchange="tiMShow('${esc(m.id)}',this.checked)">${esc(tiLabel(m))}</label>`).join('')}</div>
           <p class="hint mt-1">Jeder Menüpunkt ist ein eigener Button, den du frei platzierst – senkrecht, waagerecht, im Kreis, wie du magst. Die Reihenfolge unter „📋 Hauptmenü“ bestimmt nur die Liste; die Lage legst du hier fest.</p>
-          <div class="flex flex-wrap gap-1.5 mt-2"><button class="btn" onclick="tiLayPreset('left')">↕ Senkrecht links</button><button class="btn" onclick="tiLayPreset('right')">↕ Senkrecht rechts</button><button class="btn" onclick="tiLayPreset('top')">↔ Waagerecht oben</button></div>
           <div class="grid grid-cols-3 gap-1.5 mt-2">${num('Breite', 'w', g.w, 60, 1900)}${num('Höhe', 'h', g.h, 40, 600)}${num('Symbolgröße', 'ic', g.ic, 16, 300)}
             <div><span class="hint">Symbol</span><select class="inp" onchange="tiMbSet('ip',this.value)">${opt([['left', 'links vom Text'], ['top', 'über dem Text'], ['none', 'kein Symbol'], ['only', 'nur Symbol']], g.ip)}</select></div>${num('Schriftgröße', 'fs', g.fs, 16, 80)}
-            <div><span class="hint">Text</span><select class="inp" onchange="tiMbSet('al',this.value)">${opt([['left', 'links'], ['center', 'mittig']], g.al)}</select></div></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
+            <div><span class="hint">Text</span><select class="inp" onchange="tiMbSet('al',this.value)">${opt([['left', 'links'], ['center', 'mittig']], g.al)}</select></div>
+            <div><span class="hint">Fokus-Effekt</span><select class="inp" onchange="tiMbSet('fx',this.value)">${opt([['none', 'keiner'], ['zoom', 'vergrößern'], ['lift', 'anheben']], g.fx)}</select></div>${g.fx === 'none' ? '' : num(g.fx === 'zoom' ? 'Zoom (%)' : 'Anheben (px)', 'fxv', g.fxv, 2, 40)}</div>
+          <div class="flex flex-wrap gap-1.5 mt-2 items-center"><span class="hint">Alle Buttons:</span><button class="btn" onclick="tiMbArrange('dh')" title="Abstände waagerecht angleichen">↔ verteilen</button><button class="btn" onclick="tiMbArrange('dv')" title="Abstände senkrecht angleichen">↕ verteilen</button><button class="btn" onclick="tiMbArrange('row')" title="alle auf die Höhe des ersten">≡ eine Reihe</button><button class="btn" onclick="tiMbArrange('col')" title="alle unter den ersten">‖ eine Spalte</button></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
         </div>`;
       h += btn ? tiMbList().map(m => tiLayRow('mb:' + m.id)).join('') : tiLayRow('menu');
       h += `<div class="card mt-3"><b class="text-xs">⏻ Knöpfe über dem Menü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${sgl ? '' : 'titb'}" onclick="tiLayTm('group')">Zusammen (Leiste)</button><button class="btn ${sgl ? 'titb' : ''}" onclick="tiLayTm('single')">Einzeln platzieren</button></div></div>`;
       h += sgl ? TTOP.map(x => tiLayRow('tb:' + x[0])).join('') : tiLayRow('buttons');
       ['widgets', 'logo', 'clock', 'bottom'].forEach(k => { h += tiLayRow(k); });
-      h += `<div class="card mt-3"><b class="text-xs">🖼 Eigene Bilder & Flächen als Dekoration</b><p class="hint mt-1">Genau wie im Addon-Designer: Bild wählen, an die gewünschte Stelle ziehen, an der Ecke die Größe ändern. Mit „Ebene“ legst du es hinter oder vor Menü und Widgets, mit „Nur bei“ zeigt Kodi es nur bei einem bestimmten Menüpunkt.</p>
-          <div class="flex gap-1.5 mt-2"><button class="btn titb flex-1" onclick="$('f-timg').click()">＋ Bild</button><button class="btn flex-1" onclick="tiBoxAdd()">＋ Farbfläche</button></div>
-          <input type="file" id="f-timg" accept="image/*" class="hidden" onchange="tiImgAdd(this)"></div>`;
-      L.im.forEach(q => {
-        const k = 'im:' + q.id, on = L.sel === k;
-        h += tiLayRow(k);
-        if (on) h += `<div class="card" style="margin-top:-2px;border-color:${TIMGCOL}"><div class="grid grid-cols-2 gap-1.5">
-          <div><span class="hint">Deckkraft: <b id="tq-op">${q.op}</b> %</span><input type="range" min="5" max="100" value="${q.op}" oninput="tiDecoSet('${q.id}','op',this.value,true)" style="width:100%"></div>
-          <div><span class="hint">Ebene</span><select class="inp" onchange="tiDecoSet('${q.id}','z',this.value)">${opt([['under', 'hinter Menü & Widgets'], ['over', 'vor allem']], q.z)}</select></div>
-          ${q.k === 'box' ? `<div><span class="hint">Farbe</span><input type="color" class="inp" value="${q.col}" oninput="tiDecoSet('${q.id}','col',this.value,true)" style="height:36px"></div>` : `<div><span class="hint">Form</span><select class="inp" onchange="tiDecoSet('${q.id}','fit',this.value)">${opt([['keep', 'Seitenverhältnis behalten'], ['stretch', 'auf die Fläche strecken']], q.fit)}</select></div>`}
-          <div><span class="hint">Nur bei Menüpunkt</span><select class="inp" onchange="tiDecoSet('${q.id}','only',this.value)">${opt([['', 'immer']].concat(T.menu.filter(m => m.show && m.id !== 'disc').map(m => [m.id, tiLabel(m)])), q.only)}</select></div></div></div>`;
-      });
-      return h + `<div class="card mt-3"><b class="text-xs">ℹ So funktioniert es</b><p class="hint mt-1">Beim Bauen packt der Generator jedes verschobene Element in eine unsichtbare Gruppe mit dem Versatz – Estuary selbst wird nicht umgeschrieben. Einzelne Menü-Buttons und Knöpfe baut er als eigene Bedienelemente nach und verbindet die Pfeiltasten nach ihrer Lage. Die Vorschau zeigt Estuary nur angenähert; prüfe die Lage einmal in Kodi. Der Widget-Bereich bewegt sich als Ganzes. Elemente, die in deiner Estuary-Version nicht gefunden werden, meldet der Generator beim Bauen.</p></div>`;
+      h += `<div class="card mt-3"><b class="text-xs">🖼 Eigene Bilder, Flächen & Texte als Dekoration</b><p class="hint mt-1">Genau wie im Addon-Designer: Element hinzufügen, an die gewünschte Stelle ziehen, an der Ecke die Größe ändern. Mit „Ebene“ legst du es hinter oder vor Menü und Widgets, mit „Nur bei Menüpunkt“ zeigt Kodi es nur bei einem bestimmten Menüpunkt. Texte können Live-Infos zeigen (Uhrzeit, Wetter, „Läuft gerade“ …).</p>
+          <div class="grid grid-cols-3 gap-1.5 mt-2"><button class="btn titb" onclick="$('f-timg').click()">＋ Bild</button><button class="btn" onclick="tiBoxAdd()">＋ Fläche</button><button class="btn" onclick="tiTxtAdd()">＋ Text</button></div>
+          <div class="flex gap-1.5 mt-2 items-center"><span class="hint">Eigener Hintergrund für</span><select id="tbg-sel" class="inp" style="flex:1">${T.menu.filter(m => m.show && m.id !== 'disc').map(m => `<option value="${esc(m.id)}">${esc(tiLabel(m))}</option>`).join('')}</select><button class="btn" onclick="$('f-tbg').click()">🖼 wählen</button></div>
+          <input type="file" id="f-timg" accept="image/*" class="hidden" onchange="tiImgAdd(this)"><input type="file" id="f-tbg" accept="image/*" class="hidden" onchange="tiBgSet(this)"></div>`;
+      L.im.forEach(q => { h += tiLayRow('im:' + q.id); });
+      return h + `<div class="card mt-3"><b class="text-xs">ℹ So funktioniert es</b><p class="hint mt-1">Beim Bauen packt der Generator jedes verschobene Element in eine unsichtbare Gruppe mit dem Versatz – Estuary selbst wird nicht umgeschrieben. Einzelne Menü-Buttons und Knöpfe baut er als eigene Bedienelemente nach und verbindet die Pfeiltasten nach ihrer Lage. Die Vorschau zeigt Estuary nur angenähert; prüfe die Lage einmal in Kodi. Der Widget-Bereich bewegt sich als Ganzes. Elemente, die in deiner Estuary-Version nicht gefunden werden, meldet der Generator beim Bauen. Alles Weitere für Profis (Änderungen ansehen, XML von Hand, Suchen & Ersetzen) findest du im Reiter „🔧 Profi“.</p></div>`;
     }
+    function tiLayView(k, on) { S.titan.lay[k] = !!on; save(); tiPv(); }
     function tiLaySel(k) { if (S.titan.lay.sel === k) return; S.titan.lay.sel = k; save(); tiRe(); }
     function tiLaySet(key, ax, v, live) {
       v = parseInt(v, 10); if (isNaN(v) || !tiObj(key)) return;
@@ -4383,7 +4443,7 @@ if __name__ == '__main__':
       save(); tiRe();
     }
     function tiMbSet(k, v) {
-      const g = S.titan.lay.mb, lim = { w: [60, 1900], h: [40, 600], ic: [16, 300], fs: [16, 80] };
+      const g = S.titan.lay.mb, lim = { w: [60, 1900], h: [40, 600], ic: [16, 300], fs: [16, 80], fxv: [2, 40] };
       if (lim[k]) { v = Math.round(+v); if (!isFinite(v)) return; g[k] = Math.max(lim[k][0], Math.min(lim[k][1], v)); } else g[k] = v;
       save(); tiRe();
     }
@@ -4392,37 +4452,55 @@ if __name__ == '__main__':
       const L = S.titan.lay, list = tiMbList(), n = Math.max(1, list.length), g = L.mb;
       if (!keepBlocks) TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; });
       L.mp = {}; L.mm = 'btn';
+      const put = (m, x, y) => { L.mp[m.id] = { x: Math.round(x), y: Math.round(y), w: 0, h: 0 }; };
+      const fx = { fx: g.fx, fxv: g.fxv };
       if (kind === 'top') {
         const w = Math.max(110, Math.min(260, Math.floor(1800 / n))), x0 = Math.round((1920 - w * n) / 2);
         Object.assign(g, { w, h: 128, ic: 56, ip: 'top', fs: w < 170 ? 24 : 28, al: 'center' });
-        list.forEach((m, i) => { L.mp[m.id] = { x: x0 + i * w, y: 140, w: 0, h: 0 }; });
-        if (!keepBlocks) { L.b.widgets.dx = -400; L.b.widgets.dy = 230; L.b.buttons.dx = 620; L.b.buttons.dy = -90; }
+        list.forEach((m, i) => put(m, x0 + i * w, 140));
+        if (!keepBlocks) { L.b.widgets.dx = -400; L.b.widgets.dy = 230; L.b.buttons.dx = 620; L.b.buttons.dy = -90; L.b.widgets.show = true; }
+      } else if (kind === 'tiles') {
+        const cols = n <= 4 ? n : n <= 6 ? 3 : 4, rows = Math.ceil(n / cols), gap = 24, w = Math.min(380, Math.floor((1700 - gap * (cols - 1)) / cols)), h = rows > 2 ? 200 : 240;
+        const y0 = Math.max(150, Math.round((1080 - (rows * h + (rows - 1) * gap)) / 2));
+        Object.assign(g, { w, h, ic: Math.min(110, h - 80), ip: 'top', fs: 32, al: 'center' });
+        list.forEach((m, i) => { const r = Math.floor(i / cols), c = i % cols, cnt = Math.min(cols, n - r * cols); put(m, (1920 - (cnt * w + (cnt - 1) * gap)) / 2 + c * (w + gap), y0 + r * (h + gap)); });
+        if (!keepBlocks) L.b.widgets.show = false;
+      } else if (kind === 'kiosk') {
+        const w = Math.max(120, Math.min(300, Math.floor(1760 / n))), x0 = (1920 - w * n) / 2;
+        Object.assign(g, { w, h: 340, ic: Math.min(160, w - 60), ip: 'top', fs: 30, al: 'center' });
+        list.forEach((m, i) => put(m, x0 + i * w, 380));
+        if (!keepBlocks) L.b.widgets.show = false;
+      } else if (kind === 'dock') {
+        const w = Math.max(90, Math.min(150, Math.floor(1700 / n))), x0 = (1920 - w * n) / 2;
+        Object.assign(g, { w, h: 120, ic: 72, ip: 'only', fs: 28, al: 'center' });
+        list.forEach((m, i) => put(m, x0 + i * w, 940));
+        if (!keepBlocks) L.b.widgets.show = true;
       } else {
         const right = kind === 'right', h = Math.max(48, Math.min(95, Math.floor(760 / n)));
         Object.assign(g, { w: 462, h, ic: Math.min(80, h), ip: 'left', fs: 36, al: 'left' });
-        list.forEach((m, i) => { L.mp[m.id] = { x: right ? 1920 - 462 : 0, y: 240 + i * h, w: 0, h: 0 }; });
-        if (right && !keepBlocks) { L.b.buttons.dx = 1920 - 462; L.b.widgets.dx = -462; }
+        list.forEach((m, i) => put(m, right ? 1920 - 462 : 0, 240 + i * h));
+        if (!keepBlocks) { L.b.widgets.show = true; if (right) { L.b.buttons.dx = 1920 - 462; L.b.widgets.dx = -462; } }
       }
+      Object.assign(g, fx);
     }
     function tiLayPreset(n) {
+      if (!n) return;
       const L = S.titan.lay;
       if (n === 'std') {
-        const fresh = defLay(); L.b = fresh.b; TTOP.forEach(x => { S.titan.top[x[0]] = true; }); L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.sel = 'menu';
-      } else if (n === 'right') {
-        if (L.mm === 'btn') tiMbPreset('right');
-        else { TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; }); const w = tiBlkRect('menu').w; L.b.menu.dx = 1920 - w; L.b.buttons.dx = 1920 - w; L.b.widgets.dx = -w; }
+        const fresh = defLay(); L.b = fresh.b; TTOP.forEach(x => { S.titan.top[x[0]] = true; }); L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.cd = {}; L.sel = 'menu';
       } else if (n === 'blank') {
         TBLK.forEach(b => { L.b[b[0]].show = false; }); TTOP.forEach(x => { S.titan.top[x[0]] = false; }); L.im.forEach(q => { q.off = true; });
-      } else if (n === 'left') tiMbPreset('left');
-      else if (n === 'top') tiMbPreset('top');
+      } else if (n === 'right' && L.mm !== 'btn') {
+        TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; }); const w = tiBlkRect('menu').w; L.b.menu.dx = 1920 - w; L.b.buttons.dx = 1920 - w; L.b.widgets.dx = -w;
+      } else tiMbPreset(n);
       if (!tiObj(L.sel)) L.sel = 'widgets';
       save(); tiRe();
-      toast(n === 'blank' ? 'Alles ausgeblendet – die Startseite ist leer. Einzelne Elemente schaltest du mit den Schaltern wieder ein.' : n === 'std' ? 'Alle Elemente stehen wieder wie bei Estuary.' : 'Anordnung gesetzt – danach nach Wunsch feinziehen.');
+      toast(n === 'blank' ? 'Alles ausgeblendet – die Startseite ist leer. Einzelne Elemente schaltest du mit den Schaltern wieder ein.' : n === 'std' ? 'Alle Elemente stehen wieder wie bei Estuary.' : 'Vorlage gesetzt – danach nach Wunsch feinziehen.');
     }
 
-    // Eigene Dekoration: Bilder und Farbflächen
+    // Eigene Dekoration: Bilder, Flächen und Texte
     function tiDecoAdd(q) {
-      const L = S.titan.lay; if (L.im.length >= 30) return toast('Maximal 30 Dekorationen.');
+      const L = S.titan.lay; if (L.im.length >= 40) return toast('Maximal 40 Dekorationen.');
       L.im.push(q); L.sel = 'im:' + q.id; save(); tiRe();
     }
     function tiImgAdd(inp) {
@@ -4438,9 +4516,27 @@ if __name__ == '__main__':
       });
     }
     function tiBoxAdd() { tiDecoAdd({ id: uid(), k: 'box', nm: '', x: 900, y: 300, w: 400, h: 200, op: 40, z: 'under', only: '', col: '#000000', fit: 'keep' }); }
+    function tiTxtAdd() { tiDecoAdd({ id: uid(), k: 'txt', nm: '', x: 700, y: 120, w: 520, h: 80, op: 100, z: 'over', only: '', col: '#ffffff', fit: 'keep', txt: '$INFO[System.Time]', fs: 48, al: 'left' }); }
+    function tiTxtIns(id, i) { const q = S.titan.lay.im.find(x => x.id === id); if (!q || !LIVEOPTS[i]) return; q.txt = (q.txt ? q.txt + ' ' : '') + LIVEOPTS[i][1]; save(); tiRe(); }
+    // Eigener Hintergrund für einen Menüpunkt: ein Vollbild-Bild, das nur bei diesem Punkt erscheint
+    function tiBgSet(inp) {
+      const f = inp.files[0]; inp.value = ''; if (!f) return;
+      const sel = $('tbg-sel'), mid = sel ? sel.value : ''; if (!mid) return toast('Bitte zuerst einen Menüpunkt wählen.');
+      const m = S.titan.menu.find(x => x.id === mid);
+      loadImgFile(f, im => {
+        const L = S.titan.lay;
+        L.im.filter(q => q.bg && q.only === mid).forEach(q => { delete S.titan.dimgs[q.id]; });
+        L.im = L.im.filter(q => !(q.bg && q.only === mid));
+        const id = uid(); S.titan.dimgs[id] = coverCanvas(im, 1920, 1080).toDataURL('image/jpeg', .82);
+        L.im.unshift({ id, k: 'img', bg: true, nm: 'Hintergrund ' + (m ? tiLabel(m) : mid), x: 0, y: 0, w: 1920, h: 1080, op: 100, z: 'under', only: mid, col: '#ffffff', fit: 'stretch' });
+        L.sel = 'im:' + id; save(); tiRe(); toast('Hintergrund für „' + (m ? tiLabel(m) : mid) + '“ gesetzt.');
+      });
+    }
     function tiDecoSet(id, f, v, live) {
       const q = S.titan.lay.im.find(x => x.id === id); if (!q) return;
-      q[f] = f === 'op' ? Math.max(5, Math.min(100, Math.round(+v) || 100)) : v;
+      if (f === 'op') q.op = Math.max(5, Math.min(100, Math.round(+v) || 100));
+      else if (f === 'fs') q.fs = Math.max(12, Math.min(200, Math.round(+v) || 40));
+      else q[f] = v;
       save(); tiPv();
       if (f === 'op' && live && $('tq-op')) $('tq-op').textContent = q.op;
       if (!live) tiRe();
@@ -4478,6 +4574,213 @@ if __name__ == '__main__':
       });
       const end = () => { if (TLD) { TLD = null; save(); } };
       st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
+    }
+
+    // ---------- Rückgängig / Wiederholen ----------
+    const TH = { st: [], i: -1, t: null, big: [], busy: false };
+    const _saveRaw = save;
+    save = function () { _saveRaw(); if (!TH.busy && document.getElementById('tpv-stage')) tiHistSched(); };
+    const tiHistStr = () => JSON.stringify(S.titan, (k, v) => {
+      if (k === 'tab' || k === 'cur' || k === 'sel') return undefined;
+      if (typeof v === 'string' && v.length > 2000) { let j = TH.big.indexOf(v); if (j < 0) j = TH.big.push(v) - 1; return '\u0001' + j; }
+      return v;
+    });
+    function tiHistInit() { TH.st = []; TH.i = -1; clearTimeout(TH.t); TH.t = null; tiHistPush(); }
+    function tiHistPush() {
+      clearTimeout(TH.t); TH.t = null; if (TH.busy || !S.titan) return;
+      const s = tiHistStr(); if (TH.i >= 0 && TH.st[TH.i] === s) { tiHistBtn(); return; }
+      TH.st.length = TH.i + 1; TH.st.push(s); if (TH.st.length > 80) TH.st.shift(); TH.i = TH.st.length - 1; tiHistBtn();
+    }
+    const tiHistSched = () => { clearTimeout(TH.t); TH.t = setTimeout(tiHistPush, 450); };
+    function tiHistBtn() { const u = $('ti-undo'), r = $('ti-redo'); if (u) u.disabled = TH.i <= 0 && !TH.t; if (r) r.disabled = TH.i >= TH.st.length - 1; }
+    function tiHistGo(d) {
+      if (TH.t) tiHistPush();
+      const j = TH.i + d; if (j < 0 || j >= TH.st.length) return;
+      TH.busy = true;
+      try {
+        const keep = { tab: S.titan.tab, cur: S.titan.cur, sel: S.titan.lay.sel };
+        S.titan = JSON.parse(TH.st[j], (k, v) => typeof v === 'string' && v.charCodeAt(0) === 1 ? TH.big[+v.slice(1)] : v);
+        normTitan(); S.titan.tab = keep.tab; if (S.titan.menu.some(m => m.id === keep.cur)) S.titan.cur = keep.cur; S.titan.lay.sel = keep.sel; if (!tiObj(keep.sel)) S.titan.lay.sel = 'widgets';
+        TH.i = j; _saveRaw(); tiRe();
+      } finally { TH.busy = false; }
+      tiHistBtn();
+    }
+    const tiUndo = () => tiHistGo(-1), tiRedo = () => tiHistGo(1);
+    document.addEventListener('keydown', ev => {
+      if (!document.getElementById('tpv-stage') || !(ev.ctrlKey || ev.metaKey)) return;
+      const k = String(ev.key).toLowerCase(); if (k !== 'z' && k !== 'y') return;
+      const t = ev.target; if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      ev.preventDefault(); (k === 'y' || ev.shiftKey) ? tiRedo() : tiUndo();
+    });
+
+    // ---------- Reiter: Profi ----------
+    let TPRO = { fin: null, raw: null, base: null, kodi: '', view: '', edit: '', filt: '', rows: null, op: { diff: true } };
+    const tiIsText = p => /\.(xml|txt|json|po|md|py)$/i.test(p);
+    function tiPretty(txt) {
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return txt.split('\n');
+      const out = [], at = e => [...e.attributes].map(a => ` ${a.name}="${a.value}"`).join('');
+      const walk = (e, dp) => {
+        const pad = '  '.repeat(dp), ks = [...e.childNodes].filter(n => n.nodeType === 1 || (n.nodeType === 3 && n.nodeValue.trim()));
+        if (!ks.length) { out.push(`${pad}<${e.tagName}${at(e)}/>`); return; }
+        if (ks.every(n => n.nodeType === 3)) { out.push(`${pad}<${e.tagName}${at(e)}>${ks.map(n => n.nodeValue.trim()).join(' ')}</${e.tagName}>`); return; }
+        out.push(`${pad}<${e.tagName}${at(e)}>`); ks.forEach(n => n.nodeType === 1 ? walk(n, dp + 1) : out.push(pad + '  ' + n.nodeValue.trim())); out.push(`${pad}</${e.tagName}>`);
+      };
+      walk(d.documentElement, 0); return out;
+    }
+    function tiDiff(a, b) {
+      let s = 0; while (s < a.length && s < b.length && a[s] === b[s]) s++;
+      let ea = a.length, eb = b.length; while (ea > s && eb > s && a[ea - 1] === b[eb - 1]) { ea--; eb--; }
+      const A = a.slice(s, ea), B = b.slice(s, eb), n = A.length, m = B.length, ops = [];
+      for (let i = 0; i < s; i++) ops.push([' ', a[i]]);
+      if (n * m > 4e6) { A.forEach(x => ops.push(['-', x])); B.forEach(x => ops.push(['+', x])); }
+      else {
+        const w = m + 1, Lc = new Uint16Array((n + 1) * w);
+        for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) Lc[i * w + j] = A[i] === B[j] ? Lc[(i + 1) * w + j + 1] + 1 : Math.max(Lc[(i + 1) * w + j], Lc[i * w + j + 1]);
+        let i = 0, j = 0;
+        while (i < n && j < m) { if (A[i] === B[j]) { ops.push([' ', A[i]]); i++; j++; } else if (Lc[(i + 1) * w + j] >= Lc[i * w + j + 1]) ops.push(['-', A[i++]]); else ops.push(['+', B[j++]]); }
+        while (i < n) ops.push(['-', A[i++]]); while (j < m) ops.push(['+', B[j++]]);
+      }
+      for (let i = ea; i < a.length; i++) ops.push([' ', a[i]]);
+      return ops;
+    }
+    const tiSame = (x, y) => { if (x.length !== y.length) return false; for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return false; return true; };
+    async function tiProBase() {
+      const T = S.titan; let b = await tiGetBase(T.kodi, true);
+      if (!b) { tiProg('ti-pro-prog', 'Estuary wird zuerst geladen …', 0); b = await tiLoadGithub(); }
+      return b || null;
+    }
+    async function tiProCalc() {
+      const b = await tiProBase(); if (!b) return tiProg('ti-pro-prog', '⚠️ Estuary konnte nicht geladen werden. Reiter „🧬 Basis“ → Estuary laden oder eigene Skin-ZIP wählen.', null);
+      try {
+        tiProg('ti-pro-prog', 'Skin wird berechnet …', .5); await new Promise(r => setTimeout(r, 20));
+        const fin = tiTransform(b), raw = tiTransform(b, true), dec = new TextDecoder(), ch = {};
+        Object.keys(fin).forEach(p => {
+          const o = b.files[p];
+          if (!o) { ch[p] = 'new'; return; }
+          if (tiSame(o, fin[p])) return;
+          if (/\.xml$/i.test(p)) { try { if (tiSame(new TextEncoder().encode(tiPretty(dec.decode(o)).join('\n')), new TextEncoder().encode(tiPretty(dec.decode(fin[p])).join('\n')))) return; } catch (e) {} }
+          ch[p] = 'changed';
+        });
+        TPRO = Object.assign(TPRO, { fin, raw, base: b.files, kodi: S.titan.kodi, changed: ch, view: '' });
+        tiProg('ti-pro-prog', '', null); tiRe();
+      } catch (e) { tiProg('ti-pro-prog', '⚠️ ' + esc(e.message || 'Berechnung fehlgeschlagen'), null); }
+    }
+    function tiProView(p) { TPRO.view = TPRO.view === p ? '' : p; tiRe(); }
+    function tiProDiffHtml(p) {
+      const dec = new TextDecoder(), a = TPRO.base[p], b = TPRO.fin[p];
+      if (!tiIsText(p)) return '<p class="hint">Binärdatei – kein Textvergleich.</p>';
+      const xml = /\.xml$/i.test(p), la = a ? (xml ? tiPretty(dec.decode(a)) : dec.decode(a).split('\n')) : [], lb = xml ? tiPretty(dec.decode(b)) : dec.decode(b).split('\n');
+      const ops = tiDiff(la, lb), keep = new Uint8Array(ops.length);
+      ops.forEach((o, i) => { if (o[0] !== ' ') for (let k = Math.max(0, i - 2); k <= Math.min(ops.length - 1, i + 2); k++) keep[k] = 1; });
+      let out = '', n = 0, gap = false, add = 0, del = 0; ops.forEach(o => { if (o[0] === '+') add++; else if (o[0] === '-') del++; });
+      ops.forEach((o, i) => {
+        if (!keep[i]) { gap = true; return; } if (n > 700) return; n++;
+        if (gap && out) out += '<div style="color:#64748b">⋯</div>'; gap = false;
+        const c = o[0] === '+' ? 'background:rgba(34,197,94,.18);color:#86efac' : o[0] === '-' ? 'background:rgba(239,68,68,.18);color:#fca5a5' : 'color:#94a3b8';
+        out += `<div style="${c};white-space:pre">${o[0]} ${esc(o[1])}</div>`;
+      });
+      return `<p class="hint">${add} Zeilen neu, ${del} Zeilen entfernt${xml ? ' (XML einheitlich eingerückt, damit nur echte Änderungen auffallen)' : ''}.</p><div style="font:12px/1.45 ui-monospace,monospace;max-height:340px;overflow:auto;background:#020617;border:1px solid #1e293b;border-radius:8px;padding:8px">${out || '<div style="color:#64748b">keine Unterschiede</div>'}</div>`;
+    }
+    function tiProEdit(p) { TPRO.edit = p; tiRe(); }
+    function tiProFilt(v) { TPRO.filt = v; const sel = $('ti-pro-files'); if (sel) sel.innerHTML = tiProFileOpts(); }
+    function tiProFileOpts() {
+      if (!TPRO.raw) return '';
+      const f = TPRO.filt.toLowerCase(), all = Object.keys(TPRO.raw).filter(tiIsText).filter(p => !f || p.toLowerCase().includes(f)).sort((a, b) => ((TPRO.changed[b] ? 1 : 0) - (TPRO.changed[a] ? 1 : 0)) || a.localeCompare(b));
+      return all.slice(0, 400).map(p => `<option value="${esc(p)}" ${p === TPRO.edit ? 'selected' : ''}>${S.titan.ov[p] != null ? '✎ ' : TPRO.changed[p] ? '● ' : ''}${esc(p)}</option>`).join('');
+    }
+    function tiProSave() {
+      const p = TPRO.edit, ta = $('ti-ed'); if (!p || !ta) return;
+      if (/\.xml$/i.test(p) && new DOMParser().parseFromString(ta.value, 'application/xml').getElementsByTagName('parsererror').length) return toast('Das ist kein gültiges XML – bitte prüfen (nicht gespeichert).');
+      S.titan.ov[p] = ta.value; save(); tiRe(); toast('Deine Fassung von ' + p + ' wird beim Bauen verwendet.');
+    }
+    function tiProReset() { const p = TPRO.edit; if (!p) return; delete S.titan.ov[p]; save(); tiRe(); toast('Zurück zur erzeugten Fassung.'); }
+    function tiProOvDel(p) { delete S.titan.ov[p]; save(); tiRe(); }
+    // Suchen & Ersetzen
+    function tiRrAdd() { if (S.titan.rr.length >= 30) return; S.titan.rr.push({ f: 'xml/Home.xml', a: '', b: '', re: false }); save(); tiRe(); }
+    function tiRrSet(i, k, v) { const r = S.titan.rr[i]; if (!r) return; r[k] = v; save(); }
+    function tiRrDel(i) { S.titan.rr.splice(i, 1); save(); tiRe(); }
+    function tiRrTest() {
+      if (!TPRO.raw) return toast('Erst „Skin berechnen“ im Block „Änderungen“.');
+      const dec = new TextDecoder(), out = S.titan.rr.map((rl, i) => {
+        if (!rl.a) return `#${i + 1}: leer`;
+        const pat = String(rl.f || '').trim() || 'xml/Home.xml', rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'); let n = 0, nf = 0;
+        Object.keys(TPRO.raw).filter(p => tiIsText(p) && (rx.test(p) || rx.test(p.split('/').pop()))).forEach(p => { try { const t = dec.decode(TPRO.raw[p]), c = rl.re ? (t.match(new RegExp(rl.a, 'g')) || []).length : t.split(rl.a).length - 1; if (c) { n += c; nf++; } } catch (e) {} });
+        return `#${i + 1}: ${n} Treffer in ${nf} Datei(en)`;
+      });
+      if ($('ti-rr-test')) $('ti-rr-test').textContent = out.join(' · ');
+    }
+    // Eigene Dateien
+    function tiXfAdd(inp) {
+      const fs = [...inp.files]; inp.value = '';
+      fs.forEach(f => {
+        if (f.size > 2.5e6) return toast(f.name + ' ist zu groß (max. 2,5 MB).');
+        const r = new FileReader(); r.onload = () => {
+          const n = f.name.replace(/[^A-Za-z0-9._-]+/g, '_'), dir = /\.(png|jpe?g|gif|webp|svg)$/i.test(n) ? 'media/titan/' : /\.(ttf|otf)$/i.test(n) ? 'fonts/' : /\.xml$/i.test(n) ? 'xml/' : /\.(wav|mp3|ogg)$/i.test(n) ? 'sounds/' : 'extras/';
+          S.titan.xf.push({ p: dir + n, d: r.result, n: f.name }); save(); tiRe();
+        }; r.readAsDataURL(f);
+      });
+    }
+    function tiXfPath(i, v) { const x = S.titan.xf[i]; if (x) { x.p = String(v).replace(/^\/+/, '').replace(/\.\.+/g, '.'); save(); } }
+    function tiXfDel(i) { S.titan.xf.splice(i, 1); save(); tiRe(); }
+    // Widgetreihen aus Estuary ausblenden
+    async function tiProRows() {
+      const b = await tiProBase(); if (!b) return tiProg('ti-pro-prog', '⚠️ Estuary konnte nicht geladen werden.', null);
+      try {
+        const d = new DOMParser().parseFromString(new TextDecoder().decode(b.files['xml/Home.xml']), 'application/xml'), g = [...d.getElementsByTagName('control')].find(c => c.getAttribute('id') === '2000'), rows = [];
+        [...(g ? g.children : [])].filter(c => c.tagName === 'control').forEach(grp => {
+          const vm = [...grp.children].filter(x => x.tagName === 'visible').map(x => /Property\(id\),\s*(\w+)\)/.exec(x.textContent)).find(Boolean); if (!vm) return;
+          const items = [...grp.getElementsByTagName('include')].map(inc => { const pr = n => { const e = [...inc.children].find(x => x.tagName === 'param' && x.getAttribute('name') === n); return e ? e.getAttribute('value') || '' : ''; }; return { id: pr('list_id'), head: pr('widget_header'), path: pr('content_path') }; }).filter(x => x.id);
+          if (items.length) rows.push({ menu: vm[1], items });
+        });
+        TPRO.rows = rows; tiProg('ti-pro-prog', '', null); tiRe();
+      } catch (e) { tiProg('ti-pro-prog', '⚠️ ' + esc(e.message), null); }
+    }
+    function tiWhSet(id, on) { if (on) S.titan.wh[id] = true; else delete S.titan.wh[id]; save(); }
+    // Projekt als Datei
+    function tiProjExport() {
+      const blob = new Blob([JSON.stringify({ format: 'kfe-titan', v: 1, titan: S.titan })], { type: 'application/json' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'titan-' + (slug(tiName()) || 'projekt') + '.json'; a.click(); toast('Titan-Projekt gespeichert: ' + a.download);
+    }
+    function tiProjImport(inp) {
+      const f = inp.files[0]; inp.value = ''; if (!f) return;
+      const r = new FileReader(); r.onload = () => {
+        let o; try { o = JSON.parse(r.result); } catch (e) { return toast('Die Datei ist keine gültige Projektdatei.'); }
+        const t = o && o.format === 'kfe-titan' ? o.titan : null; if (!t || typeof t !== 'object' || !Array.isArray(t.menu)) return toast('Das ist keine Titan-Projektdatei.');
+        if (!confirm('Dein aktuelles Titan-Projekt wird durch die Datei ersetzt (mit „Rückgängig“ kommst du zurück). Fortfahren?')) return;
+        S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; save(); tiRe(); toast('Titan-Projekt geladen.');
+      }; r.readAsText(f);
+    }
+    function tiPro() {
+      const T = S.titan, op = k => `${TPRO.op[k] ? 'open' : ''} ontoggle="TPRO.op['${k}']=this.open"`, ok = TPRO.fin && TPRO.kodi === T.kodi;
+      const sum = ok ? (() => { const ks = Object.keys(TPRO.changed), nn = ks.filter(p => TPRO.changed[p] === 'new').length, cc = ks.length - nn; return `<p class="hint">${cc} Dateien geändert, ${nn} neu. Tippe auf eine Datei für den Vergleich.</p>${ks.sort((a, b) => ((TPRO.changed[b] === 'new') - (TPRO.changed[a] === 'new')) || a.localeCompare(b)).map(p => `<div class="row mt-1" style="cursor:pointer;flex-direction:column;align-items:stretch" onclick="tiProView('${esc(p)}')"><div class="flex gap-2 items-center"><span class="text-xs" style="color:${TPRO.changed[p] === 'new' ? '#86efac' : '#fcd34d'}">${TPRO.changed[p] === 'new' ? '＋ neu' : '● geändert'}</span><code class="lk flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis">${esc(p)}</code></div>${TPRO.view === p ? `<div onclick="event.stopPropagation()" style="cursor:default">${tiProDiffHtml(p)}</div>` : ''}</div>`).join('')}`; })() : '<p class="hint">Noch nicht berechnet.</p>';
+      let h = `<p class="hint mb-2">Für Kodi-Bastler: Sieh, was der Generator an Estuary ändert, greife von Hand ein, ersetze Texte in allen Dateien, packe eigene Dateien dazu und blende einzelne Estuary-Widgetreihen aus. Alles wird bei jedem Bauen automatisch angewendet.</p>
+        <div id="ti-pro-prog" class="mb-2"></div>
+        <details class="card" ${op('diff')}><summary class="text-xs font-bold cursor-pointer">🔍 Änderungen gegenüber Estuary</summary>
+          <button class="btn titb w-full mt-2" onclick="tiProCalc()">${ok ? '↻ Neu berechnen' : '▶ Skin berechnen und vergleichen'}</button><div class="mt-2">${sum}</div></details>
+        <details class="card mt-2" ${op('edit')}><summary class="text-xs font-bold cursor-pointer">✎ Datei von Hand ändern${Object.keys(T.ov).length ? ' (' + Object.keys(T.ov).length + ' aktiv)' : ''}</summary>
+          ${ok ? `<p class="hint mt-2">Wähle eine Datei, ändere sie und speichere. Deine Fassung <b>ersetzt die Datei komplett</b> – spätere Änderungen im Generator wirken an dieser Datei dann nicht mehr. ● = vom Generator geändert, ✎ = von dir überschrieben.</p>
+          <input class="inp mt-1" placeholder="Dateien filtern, z.B. Home" value="${esc(TPRO.filt)}" oninput="tiProFilt(this.value)"><select id="ti-pro-files" class="inp mt-1" size="6" onchange="tiProEdit(this.value)">${tiProFileOpts()}</select>
+          ${TPRO.edit ? `<textarea id="ti-ed" class="inp mt-2" rows="14" wrap="off" spellcheck="false" style="font:12px/1.45 ui-monospace,monospace;white-space:pre">${esc(T.ov[TPRO.edit] != null ? T.ov[TPRO.edit] : new TextDecoder().decode(TPRO.raw[TPRO.edit] || new Uint8Array()))}</textarea>
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiProSave()">💾 Meine Fassung speichern</button><button class="btn" onclick="tiProReset()">↺ Zurück zur erzeugten</button></div>` : ''}` : '<p class="hint mt-2">Zuerst oben „Skin berechnen“ ausführen – dann stehen alle Dateien zur Auswahl.</p>'}
+          ${Object.keys(T.ov).map(p => `<div class="row mt-1"><code class="lk flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis">✎ ${esc(p)}</code><button class="btn" aria-label="Überschreibung entfernen" onclick="tiProOvDel('${esc(p)}')">🗑</button></div>`).join('')}</details>
+        <details class="card mt-2" ${op('rr')}><summary class="text-xs font-bold cursor-pointer">⇄ Suchen & Ersetzen${T.rr.length ? ' (' + T.rr.length + ')' : ''}</summary>
+          <p class="hint mt-2">Wird nach dem Umbau auf die Textdateien des Skins angewendet. Datei: Pfad oder Muster mit * (z.B. <code>xml/Home.xml</code> oder <code>xml/*.xml</code>). Beispiel: Schriftart <code>font37</code> → <code>font30</code> in <code>xml/Home.xml</code>.</p>
+          ${T.rr.map((r, i) => `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:5px"><div class="flex gap-1.5"><input class="inp" value="${esc(r.f)}" placeholder="xml/Home.xml" oninput="tiRrSet(${i},'f',this.value)"><label class="text-xs flex items-center gap-1 shrink-0"><input type="checkbox" ${r.re ? 'checked' : ''} onchange="tiRrSet(${i},'re',this.checked)">Regex</label><button class="btn" aria-label="Regel löschen" onclick="tiRrDel(${i})">🗑</button></div>
+            <input class="inp" value="${esc(r.a)}" placeholder="Suchen" oninput="tiRrSet(${i},'a',this.value)"><input class="inp" value="${esc(r.b)}" placeholder="Ersetzen durch" oninput="tiRrSet(${i},'b',this.value)"></div>`).join('')}
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiRrAdd()">＋ Regel</button><button class="btn" onclick="tiRrTest()">🔍 Treffer zählen</button></div><p id="ti-rr-test" class="hint mt-1"></p></details>
+        <details class="card mt-2" ${op('xf')}><summary class="text-xs font-bold cursor-pointer">📎 Eigene Dateien in den Skin${T.xf.length ? ' (' + T.xf.length + ')' : ''}</summary>
+          <p class="hint mt-2">Packe beliebige Dateien in den Skin – Bilder (nach <code>media/titan/</code>), Schriften, XML-Includes, Sounds. Der Pfad bestimmt, wo die Datei im Skin landet; du kannst ihn ändern. Eine gleichnamige Datei von Estuary wird ersetzt.</p>
+          ${T.xf.map((x, i) => `<div class="row mt-1.5"><input class="inp" value="${esc(x.p)}" oninput="tiXfPath(${i},this.value)" aria-label="Pfad im Skin"><span class="hint shrink-0">${Math.round(x.d.length * .75 / 1024)} KB</span><button class="btn" aria-label="Datei entfernen" onclick="tiXfDel(${i})">🗑</button></div>`).join('')}
+          <button class="btn titb w-full mt-2" onclick="$('f-txf').click()">＋ Dateien wählen</button><input type="file" id="f-txf" multiple class="hidden" onchange="tiXfAdd(this)"></details>
+        <details class="card mt-2" ${op('wh')}><summary class="text-xs font-bold cursor-pointer">🧩 Einzelne Estuary-Widgetreihen ausblenden${Object.keys(T.wh).length ? ' (' + Object.keys(T.wh).length + ')' : ''}</summary>
+          <p class="hint mt-2">Gilt für Menüpunkte mit „Wie Estuary“. Die Reihen werden direkt aus deiner Estuary-Version gelesen; Namen wie <code>$LOCALIZE[…]</code> übersetzt Kodi selbst.</p>
+          <button class="btn w-full mt-1" onclick="tiProRows()">${TPRO.rows ? '↻ Reihen neu lesen' : '📋 Reihen aus Estuary lesen'}</button>
+          ${TPRO.rows ? TPRO.rows.map(g => { const m = T.menu.find(x => x.id === g.menu); return `<div class="mt-2"><b class="text-xs">${esc(m ? tiLabel(m) : g.menu)}</b>${g.items.map(x => `<label class="row mt-1 text-xs" style="gap:8px"><input type="checkbox" ${T.wh[x.id] ? 'checked' : ''} onchange="tiWhSet('${esc(x.id)}',this.checked)"><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis"><b>${esc(x.head || '(ohne Titel)')}</b> <span class="hint">· ID ${esc(x.id)}${x.path ? ' · ' + esc(x.path) : ''}</span></span><span class="hint shrink-0">ausblenden</span></label>`).join('')}</div>`; }).join('') : ''}</details>
+        <details class="card mt-2" ${op('pj')}><summary class="text-xs font-bold cursor-pointer">💾 Projekt als Datei</summary>
+          <p class="hint mt-2">Sichert dein komplettes Titan-Projekt (Layout, Bilder, Regeln, Dateien) als JSON – zum Weitergeben, Sichern oder für verschiedene Varianten.</p>
+          <div class="grid grid-cols-2 gap-2 mt-1"><button class="btn titb" onclick="tiProjExport()">⬇ Exportieren</button><button class="btn" onclick="$('f-tpj').click()">⬆ Importieren</button></div><input type="file" id="f-tpj" accept=".json,application/json" class="hidden" onchange="tiProjImport(this)">
+          <p class="hint mt-2">Tipp: <b>↶ ↷</b> oben rechts (oder Strg+Z / Strg+Y) macht Änderungen im Titan-Modus rückgängig.</p></details>`;
+      return h;
     }
 
     // ---------- Reiter: Basis ----------
@@ -4672,6 +4975,9 @@ if __name__ == '__main__':
         if (L.im.some(q => !q.off && q.k === 'img' && !T.dimgs[q.id])) r.push(['w', 'Layout: Ein Dekorations-Bild hat keine Bilddaten – bitte neu einfügen.']);
       }
       if (TBLK.every(b => !T.lay.b[b[0]].show) || (!tiMbList().length && T.lay.mm === 'btn' && T.lay.b.widgets.show === false)) r.push(['i', 'Layout: Es ist alles ausgeblendet – die Startseite bleibt leer (nur Hintergrund). Kodi lässt sich dann nur noch über Tasten und das Kontextmenü bedienen.']);
+      Object.keys(T.lay.cd).forEach(k => { if (tiCond(k) && !tiCondOk(T.lay.cd[k])) r.push(['w', `Layout: Die Bedingung bei „${k}“ hat unpassende Klammern.`]); });
+      T.rr.forEach((x, i) => { if (x.re) { try { new RegExp(x.a); } catch (e) { r.push(['w', `Ersetzen ${i + 1}: ungültiger Ausdruck.`]); } } });
+      Object.keys(T.ov).forEach(p => r.push(['i', 'Von Hand geändert: ' + p + ' (deine Fassung ersetzt die erzeugte Datei).']));
       if (T.bg.mode === 'image' && !T.bg.img) r.push(['i', 'Eigener Hintergrund gewählt, aber noch kein Bild – es bleibt das Estuary-Muster.']);
       if (T.fontScale !== 100) r.push(['i', `Schriftgröße ${T.fontScale} % – prüfe in Kodi, ob lange Texte noch passen.`]);
       return r;
@@ -4702,7 +5008,7 @@ if __name__ == '__main__':
       return c.toDataURL(mime, .88);
     }
     function tiMkSolid() { const c = document.createElement('canvas'); c.width = c.height = 16; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 16, 16); return c.toDataURL('image/png'); }
-    function tiTransform(b) {
+    function tiTransform(b, raw) {
       const T = S.titan, C = T.col, F = {}, dec = new TextDecoder(), enc = new TextEncoder();
       Object.keys(b.files).forEach(p => {
         if (T.langs !== 'all' && /^language\/resource\.language\./.test(p) && !/^language\/resource\.language\.(de_de|en_gb)\//.test(p)) return;
@@ -4779,6 +5085,7 @@ if __name__ == '__main__':
       if (!list || !content || !g2000) throw new Error('Die Startseite dieser Grundlage ist kein Estuary – Hauptmenü und Widgets können nicht umgebaut werden.');
       const orig = {};
       kids(content, 'item').forEach(it => { const p = kids(it, 'property').find(x => x.getAttribute('name') === 'id'); if (p) orig[p.textContent.trim()] = it; });
+      { const wh = T.wh || {}; if (Object.keys(wh).length) [...hd.getElementsByTagName('include')].forEach(inc => { const pr = kids(inc, 'param').find(x => x.getAttribute('name') === 'list_id'); if (pr && wh[pr.getAttribute('value')] && inc.parentNode) inc.parentNode.removeChild(inc); }); }
       while (content.firstChild) content.removeChild(content.firstChild);
       const grpOf = mid => kids(g2000, 'control').find(c => kids(c, 'visible').some(v => v.textContent.replace(/\s+/g, '') === `String.IsEqual(Container(9000).ListItem.Property(id),${mid})`));
       const setTxt = (it, tag, txt) => { let e = kids(it, tag)[0]; if (!e) { e = xe(hd, tag); it.appendChild(e); } e.textContent = txt; };
@@ -4893,8 +5200,13 @@ if __name__ == '__main__':
           if (!first) first = String(bid);
           const wgr = grpOf(m.id); if (wgr) WGRP.push({ wg: wgr, bid });
           const g = xe(hd, 'control', { type: 'group' });
-          g.appendChild(xe(hd, 'left', {}, r.x)); g.appendChild(xe(hd, 'top', {}, r.y));
-          kids(it, 'visible').forEach(v => g.appendChild(xe(hd, 'visible', {}, v.textContent)));
+          g.appendChild(xe(hd, 'left', {}, r.x)); g.appendChild(xe(hd, 'top', {}, r.y)); g.appendChild(xe(hd, 'width', {}, r.w)); g.appendChild(xe(hd, 'height', {}, r.h));
+          { const vp = kids(it, 'visible').map(v => v.textContent), cdn = tiCond('mb:' + m.id); if (cdn) vp.push(cdn); if (vp.length) g.appendChild(xe(hd, 'visible', {}, vp.length > 1 ? vp.map(x => `[${x}]`).join(' + ') : vp[0])); }
+          if (LAY.mb.fx !== 'none') {
+            const an = xe(hd, 'animation', { effect: LAY.mb.fx === 'zoom' ? 'zoom' : 'slide', time: '150', tween: 'sine', easing: 'inout', condition: `Control.HasFocus(${bid})` }, 'Conditional');
+            if (LAY.mb.fx === 'zoom') { an.setAttribute('start', '100'); an.setAttribute('end', String(100 + LAY.mb.fxv)); an.setAttribute('center', 'auto'); } else an.setAttribute('end', '0,-' + LAY.mb.fxv);
+            g.appendChild(an);
+          }
           const bt = xe(hd, 'control', { type: 'button', id: bid });
           setBox(bt, 0, 0, r.w, r.h);
           bt.appendChild(xe(hd, 'font')); bt.appendChild(xe(hd, 'texturefocus', { colordiffuse: 'button_focus' }, 'lists/focus.png')); bt.appendChild(xe(hd, 'texturenofocus'));
@@ -4933,6 +5245,7 @@ if __name__ == '__main__':
           const cid = prm(inc, 'control_id'), key = { '804': 'power', '802': 'settings', '801': 'search' }[cid]; if (!key) return;
           const p = LAY.tp[key], icon = prm(inc, 'icon'), grp = xe(hd, 'control', { type: 'group' });
           grp.appendChild(xe(hd, 'left', {}, p.x)); grp.appendChild(xe(hd, 'top', {}, p.y));
+          { const cdn = tiCond('tb:' + key); if (cdn) grp.appendChild(xe(hd, 'visible', {}, cdn)); }
           const rb = xe(hd, 'control', { type: 'radiobutton', id: cid });
           setBox(rb, null, null, 120, 120);
           rb.appendChild(xe(hd, 'align', {}, 'center')); rb.appendChild(xe(hd, 'aligny', {}, 'center')); rb.appendChild(xe(hd, 'onclick', {}, prm(inc, 'onclick')));
@@ -4975,14 +5288,14 @@ if __name__ == '__main__':
       TLAYMISS = [];
       const LB = T.lay.b, incAll = nm => [...hd.getElementsByTagName('include')].filter(i => i.getAttribute('content') === nm || (!i.children.length && !i.getAttribute('name') && i.textContent.trim() === nm));
       const wrapNodes = (nodes, key) => {
-        const o = LB[key], bk = tiBlk(key); if (!o || (!o.dx && !o.dy && o.show !== false)) return;
+        const o = LB[key], bk = tiBlk(key), cdn = tiCond(key); if (!o || (!o.dx && !o.dy && o.show !== false && !cdn)) return;
         nodes = nodes.filter(n => n && n.parentNode);
         if (!nodes.length) { TLAYMISS.push(bk[2]); return; }
         nodes.forEach(n => {
           const w = xe(hd, 'control', { type: 'group' });
           if (o.dx) w.appendChild(xe(hd, 'left', {}, o.dx));
           if (o.dy) w.appendChild(xe(hd, 'top', {}, o.dy));
-          if (o.show === false) w.appendChild(xe(hd, 'visible', {}, 'false'));
+          if (o.show === false) w.appendChild(xe(hd, 'visible', {}, 'false')); else if (cdn) w.appendChild(xe(hd, 'visible', {}, cdn));
           n.parentNode.insertBefore(w, n); w.appendChild(n);
         });
       };
@@ -4999,19 +5312,24 @@ if __name__ == '__main__':
           const order = [...ctrls.children], at = [topOf(g2000), topOf(holder || list), topOf(g700)].filter(Boolean).map(n => order.indexOf(n)).filter(i => i >= 0);
           const anchor = at.length ? order[Math.min(...at)] : null;
           LAY.im.filter(q => !q.off).forEach(q => {
-            const isBox = q.k === 'box', data = T.dimgs[q.id];
-            if (!isBox && !data) { TLAYWARN.push('Ein Dekorations-Bild hat keine Bilddaten und wurde übersprungen'); return; }
-            let tex = 'titan/white.png', cd = A(q.op) + (isBox ? H(q.col) : 'FFFFFF');
-            if (isBox) F['media/titan/white.png'] = tiBytes(tiMkSolid());
-            else { const ext = /^data:image\/jpe?g/i.test(data) ? 'jpg' : 'png'; tex = `titan/deco_${q.id}.${ext}`; F['media/' + tex] = tiBytes(data); }
-            const c = xe(hd, 'control', { type: 'image' });
-            setBox(c, q.x, q.y, q.w, q.h);
-            c.appendChild(xe(hd, 'aspectratio', {}, !isBox && q.fit !== 'stretch' ? 'keep' : 'stretch'));
-            c.appendChild(xe(hd, 'texture', { colordiffuse: cd }, tex));
-            if (q.only) {
-              if (!T.menu.some(m => m.show && m.id === q.only && m.id !== 'disc')) { TLAYWARN.push('Eine Dekoration gehört zu einem ausgeblendeten Menüpunkt und bleibt unsichtbar'); }
-              c.appendChild(xe(hd, 'visible', {}, btnM ? `String.IsEqual(Window(home).Property(titan_menu),${q.only})` : `String.IsEqual(Container(9000).ListItem.Property(id),${q.only})`));
+            const isBox = q.k === 'box', isTxt = q.k === 'txt', data = T.dimgs[q.id];
+            if (!isBox && !isTxt && !data) { TLAYWARN.push('Ein Dekorations-Bild hat keine Bilddaten und wurde übersprungen'); return; }
+            const only = q.only ? (btnM ? `String.IsEqual(Window(home).Property(titan_menu),${q.only})` : `String.IsEqual(Container(9000).ListItem.Property(id),${q.only})`) : '', cdn = tiCond('im:' + q.id), vp = [only, cdn].filter(Boolean);
+            let c;
+            if (isTxt) {
+              c = xe(hd, 'control', { type: 'label' }); setBox(c, q.x, q.y, q.w, q.h);
+              c.appendChild(xe(hd, 'font', {}, pickFont(q.fs))); c.appendChild(xe(hd, 'textcolor', {}, A(q.op) + H(q.col))); c.appendChild(xe(hd, 'align', {}, q.al)); c.appendChild(xe(hd, 'aligny', {}, 'center')); c.appendChild(xe(hd, 'scroll', {}, 'false')); c.appendChild(xe(hd, 'label', {}, q.txt));
+            } else {
+              let tex = 'titan/white.png';
+              const cd = A(q.op) + (isBox ? H(q.col) : 'FFFFFF');
+              if (isBox) F['media/titan/white.png'] = tiBytes(tiMkSolid());
+              else { const ext = /^data:image\/jpe?g/i.test(data) ? 'jpg' : 'png'; tex = `titan/deco_${q.id}.${ext}`; F['media/' + tex] = tiBytes(data); }
+              c = xe(hd, 'control', { type: 'image' }); setBox(c, q.x, q.y, q.w, q.h);
+              c.appendChild(xe(hd, 'aspectratio', {}, !isBox && q.fit !== 'stretch' ? 'keep' : 'stretch'));
+              c.appendChild(xe(hd, 'texture', { colordiffuse: cd }, tex));
             }
+            if (q.only && !T.menu.some(m => m.show && m.id === q.only && m.id !== 'disc')) TLAYWARN.push('Eine Dekoration gehört zu einem ausgeblendeten Menüpunkt und bleibt unsichtbar');
+            if (vp.length) c.appendChild(xe(hd, 'visible', {}, vp.length > 1 ? vp.map(x => `[${x}]`).join(' + ') : vp[0]));
             if (q.z === 'over' || !anchor) ctrls.appendChild(c); else ctrls.insertBefore(c, anchor);
           });
         }
@@ -5023,6 +5341,30 @@ if __name__ == '__main__':
       // 6) Hinweise und Änderungsprotokoll
       F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: erstellt mit dem Kodi Video-Addon Generator (Titan-Modus)\n- Grundlage: Estuary ${b.branch || TKODI[T.kodi][0]} (phil65, Team Kodi)\n`);
       F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Video-Addon Generator v8.1 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
+      if (!raw) {
+        const isT = p => /\.(xml|txt|json|po|md|py)$/i.test(p), xmlBad = t => new DOMParser().parseFromString(t, 'application/xml').getElementsByTagName('parsererror').length > 0;
+        // Suchen & Ersetzen
+        (T.rr || []).forEach(rl => {
+          if (!rl.a) return;
+          const pat = String(rl.f || '').trim() || 'xml/Home.xml', rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
+          let n = 0, nf = 0;
+          Object.keys(F).filter(p => isT(p) && (rx.test(p) || rx.test(p.split('/').pop()))).forEach(p => {
+            const t = dec.decode(F[p]); let t2 = t, c = 0;
+            try {
+              if (rl.re) { const R = new RegExp(rl.a, 'g'); t2 = t.replace(R, (...m) => { c++; return rl.b.replace(/\$(\d)/g, (x, d) => typeof m[+d] === 'string' ? m[+d] : ''); }); }
+              else { c = t.split(rl.a).length - 1; if (c) t2 = t.split(rl.a).join(rl.b); }
+            } catch (e) { TLAYWARN.push('Ersetzen: ungültiger Ausdruck „' + rl.a.slice(0, 30) + '“'); return; }
+            if (!c) return;
+            F[p] = enc.encode(t2); n += c; nf++;
+            if (/\.xml$/i.test(p) && xmlBad(t2)) TLAYWARN.push('Ersetzen: ' + p + ' ist danach kein gültiges XML mehr');
+          });
+          TLAYWARN.push(n ? `Ersetzen „${rl.a.slice(0, 30)}“: ${n} Treffer in ${nf} Datei(en)` : `Ersetzen „${rl.a.slice(0, 30)}“: keine Treffer`);
+        });
+        // Eigene Dateien
+        (T.xf || []).forEach(x => { try { F[x.p] = tiBytes(x.d); } catch (e) { TLAYWARN.push('Eigene Datei ' + x.p + ' konnte nicht gelesen werden'); } });
+        // Von Hand geänderte Dateien ersetzen die erzeugten komplett
+        Object.keys(T.ov || {}).forEach(p => { F[p] = enc.encode(T.ov[p]); if (/\.xml$/i.test(p) && xmlBad(T.ov[p])) TLAYWARN.push('Deine Fassung von ' + p + ' ist kein gültiges XML'); });
+      }
       return F;
     }
 
