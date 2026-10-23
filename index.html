@@ -330,7 +330,7 @@
 
       <h3 class="text-xs font-bold uppercase mt-6 ti-grad">7 · ⚡ Titan-Modus</h3>
       <button class="btn titb w-full mt-2" onclick="showTitan()">⚡ Eigenen Kodi-Skin bauen</button>
-      <p class="hint mt-1">Ein echter Kodi-Skin für ganz Kodi: Estuary mit deinen Farben, deinem Hintergrund, Logo, Hauptmenü, eigenen Menüpunkten (auch zu deinem Addon) und Widgets.</p>
+      <p class="hint mt-1">Ein echter Kodi-Skin für ganz Kodi: Estuary mit deinen Farben, deinem Hintergrund, Logo, Hauptmenü, eigenen Menüpunkten (auch zu deinem Addon) und Widgets – und alle Elemente frei verschiebbar – auch das Hauptmenü als einzelne Buttons, waagerecht oder senkrecht, mit eigenen Bildern als Dekoration (📐 Layout).</p>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">Projekt sichern</h3>
       <div class="flex gap-2 mt-2">
@@ -3552,7 +3552,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
@@ -3906,8 +3906,25 @@ if __name__ == '__main__':
       ['Petrol', { focus: '#009688', bg: '#00665C', pat: '#F07942', patA: 20, dialog: '#222A2A', sel: '#C67F03' }],
       ['Violett', { focus: '#C050FF', bg: '#5B1C80', pat: '#FFB3D7', patA: 20, dialog: '#27222A', sel: '#FF0054' }]
     ];
-    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['look', '🖼 Bilder & Schrift'], ['export', '📦 Export']];
-    let TIB = null, TIBUSY = false, TIIDX = -1;
+    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['export', '📦 Export']];
+    // Frei verschiebbare Bausteine der Estuary-Startseite: [Schlüssel, Symbol, Name, Beschreibung, Standard-Rechteck in der Vorschau, Farbe, ausblendbar?]
+    const TBLK = [
+      ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
+      ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
+      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', false],
+      ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', false],
+      ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', false],
+      ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
+    ];
+    // Knöpfe über dem Menü, wenn sie einzeln platziert werden: [Schlüssel, Symbol, Name]
+    const TTOP = [['power', '⏻', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
+    const defTp = () => ({ power: { x: -8, y: 100 }, settings: { x: 172, y: 100 }, search: { x: 352, y: 100 } });
+    const defLay = () => {
+      const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
+      // mm: Hauptmenü als 'list' (wie Estuary) oder 'btn' (einzelne Buttons) · tm: Knöpfe oben 'group' oder 'single' · im: Dekoration
+      return { step: 10, sel: 'menu', b, mm: 'list', mb: { w: 462, h: 95, ic: 80, ip: 'left', fs: 36, al: 'left' }, mp: {}, tm: 'group', tp: defTp(), im: [] };
+    };
+    let TIB = null, TIBUSY = false, TIIDX = -1, TLAYMISS = [], TLAYWARN = [];
 
     const tmenuDef = id => TMENU.find(m => m[0] === id);
     const tiName = () => String(S.titan.name || '').trim() || 'Titan Skin';
@@ -3926,9 +3943,9 @@ if __name__ == '__main__':
         kodi: '21', name: '', ver: '1.0.0', author: '', langs: 'de',
         col: Object.assign({ text: '#F0F0F0', grey: '#A0A0A0' }, TCOLS[1][1]),
         bg: { mode: 'estuary', img: null, dim: 45 }, logo: null, fontScale: 100, font: null,
-        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {},
+        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {}, dimgs: {},
         menu: TMENU.map(m => ({ id: m[0], show: true, label: '', icon: '', w: 'keep', wl: [] })),
-        cur: 'movies', tab: 'basis'
+        cur: 'movies', tab: 'basis', lay: defLay()
       };
     }
     function normTitan() {
@@ -3939,6 +3956,28 @@ if __name__ == '__main__':
       S.titan.top = Object.assign(defTitan().top, T.top || {});
       if (!S.titan.imgs || typeof S.titan.imgs !== 'object') S.titan.imgs = {};
       if (!TKODI[S.titan.kodi]) S.titan.kodi = '21';
+      {
+        const L0 = (T.lay && typeof T.lay === 'object') ? T.lay : {}, L = defLay();
+        L.step = [1, 5, 10, 20, 40].includes(+L0.step) ? +L0.step : 10;
+        TBLK.forEach(b => { const o = (L0.b && typeof L0.b === 'object' && L0.b[b[0]]) || {}; L.b[b[0]] = { dx: Math.round(+o.dx) || 0, dy: Math.round(+o.dy) || 0, show: !(o.show === false && b[6]) }; });
+        const cl = (v, a, z, d) => { v = Math.round(+v); return isFinite(v) ? Math.max(a, Math.min(z, v)) : d; };
+        L.mm = L0.mm === 'btn' ? 'btn' : 'list'; L.tm = L0.tm === 'single' ? 'single' : 'group';
+        const m0 = (L0.mb && typeof L0.mb === 'object') ? L0.mb : {}, d0 = L.mb;
+        L.mb = { w: cl(m0.w, 60, 1900, d0.w), h: cl(m0.h, 40, 600, d0.h), ic: cl(m0.ic, 16, 300, d0.ic), ip: ['left', 'top', 'none', 'only'].includes(m0.ip) ? m0.ip : d0.ip, fs: cl(m0.fs, 16, 80, d0.fs), al: m0.al === 'center' ? 'center' : 'left' };
+        L.mp = {};
+        if (L0.mp && typeof L0.mp === 'object') Object.keys(L0.mp).forEach(id => { const q = L0.mp[id]; if (q && typeof q === 'object') L.mp[id] = { x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0), w: Math.max(0, cl(q.w, 0, 3000, 0)), h: Math.max(0, cl(q.h, 0, 2000, 0)) }; });
+        const t0 = (L0.tp && typeof L0.tp === 'object') ? L0.tp : {}, tdef = defTp();
+        TTOP.forEach(x => { const q = t0[x[0]] || {}; L.tp[x[0]] = { x: cl(q.x, -3000, 3000, tdef[x[0]].x), y: cl(q.y, -3000, 3000, tdef[x[0]].y) }; });
+        if (!S.titan.dimgs || typeof S.titan.dimgs !== 'object') S.titan.dimgs = {};
+        L.im = (Array.isArray(L0.im) ? L0.im : []).filter(q => q && typeof q === 'object' && q.id).slice(0, 30).map(q => ({
+          id: String(q.id), k: q.k === 'box' ? 'box' : 'img', nm: String(q.nm || '').slice(0, 30), x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0),
+          w: cl(q.w, 4, 4000, 300), h: cl(q.h, 4, 4000, 200), op: cl(q.op, 5, 100, 100), z: q.z === 'over' ? 'over' : 'under', only: String(q.only || ''),
+          col: /^#[0-9a-fA-F]{6}$/.test(q.col) ? q.col : '#ffffff', fit: q.fit === 'stretch' ? 'stretch' : 'keep'
+        }));
+        Object.keys(S.titan.dimgs).forEach(k => { if (!L.im.some(q => q.id === k && q.k === 'img')) delete S.titan.dimgs[k]; });
+        S.titan.lay = L;
+        L.sel = String(L0.sel || 'menu');
+      }
       if (!Array.isArray(S.titan.menu)) S.titan.menu = defTitan().menu;
       TMENU.forEach(m => { if (!S.titan.menu.some(x => x.id === m[0])) S.titan.menu.push({ id: m[0], show: true, label: '', icon: '', w: 'keep', wl: [] }); });
       S.titan.menu = S.titan.menu.filter(m => m && (m.custom || tmenuDef(m.id)));
@@ -3947,6 +3986,7 @@ if __name__ == '__main__':
         if (m.custom) { m.w = 'own'; m.act = Object.assign({ t: 'myaddon', v: '' }, m.act || {}); } else if (m.w !== 'own') m.w = 'keep';
         m.wl.forEach(w => { if (!WPRE.some(p => p[0] === w.src)) w.src = 'custom'; if (!TSTY[w.style]) w.style = 'poster'; w.title = w.title || ''; w.dir = w.dir || ''; w.media = w.media || 'video'; });
       });
+      if (!tiObj(S.titan.lay.sel)) S.titan.lay.sel = 'widgets';
     }
 
     // ---------- Zwischenspeicher im Browser (IndexedDB) ----------
@@ -4077,6 +4117,7 @@ if __name__ == '__main__':
         </div>`, 'titan');
       $('modal-in').style.maxWidth = '86rem';
       new ResizeObserver(tiFit).observe($('tpv-wrap'));
+      tiLayBind();
       tiTab(S.titan.tab); tiFit();
     }
     function tiFit() { const w = $('tpv-wrap'), s = $('tpv-stage'); if (!w || !s || !w.clientWidth) return; s.style.transform = `scale(${w.clientWidth / 1920})`; }
@@ -4084,7 +4125,7 @@ if __name__ == '__main__':
       if (!$('ti-body')) return;
       S.titan.tab = t; save();
       $('ti-tabs').innerHTML = TTABS.map(x => `<button class="btn ${x[0] === t ? 'titb' : ''}" onclick="tiTab('${x[0]}')">${x[1]}</button>`).join('');
-      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, look: tiLook, export: tiExport };
+      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, export: tiExport };
       $('ti-body').innerHTML = (R[t] || tiBasis)();
       tiPv();
       if (t === 'basis') tiBaseStatus();
@@ -4106,43 +4147,331 @@ if __name__ == '__main__':
     }
     function tiPv() {
       const st = $('tpv-stage'); if (!st) return;
-      const T = S.titan, C = T.col, vis = T.menu.filter(m => m.show && m.id !== 'disc'), cur = vis.find(m => m.id === T.cur) || vis[0];
+      const T = S.titan, C = T.col, L = T.lay, lay = T.tab === 'layout', vis = T.menu.filter(m => m.show && m.id !== 'disc'), cur = vis.find(m => m.id === T.cur) || vis[0], btn = L.mm === 'btn', single = L.tm === 'single';
       let h = T.bg.mode === 'image' && T.bg.img
         ? `<div style="position:absolute;inset:0;background:url('${T.bg.img}') center/cover"></div><div style="position:absolute;inset:0;background:rgba(0,0,0,${T.bg.dim / 100})"></div>`
         : `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 28% 18%,${tiShade(C.bg, 22)} 0%,${C.bg} 42%,${tiShade(C.bg, -62)} 100%)"></div><div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,${rgba(C.pat, Math.min(1, C.patA / 100 * 1.6))} 0 3px,transparent 3px 28px)"></div>`;
+      const P = {};
+      // Dekoration (eigene Bilder und Flächen): hinter oder vor allem anderen
+      const deco = z => L.im.filter(q => q.z === z).map(q => {
+        const other = q.only && (!cur || q.only !== cur.id);
+        if (other && !lay) return '';
+        const base = `position:absolute;left:${q.x}px;top:${q.y}px;width:${q.w}px;height:${q.h}px;opacity:${q.op / 100 * (other ? .35 : 1)};`;
+        return q.k === 'box' ? `<div style="${base}background:${q.col}"></div>` : (T.dimgs[q.id] ? `<img src="${T.dimgs[q.id]}" alt="" style="${base}object-fit:${q.fit === 'stretch' ? 'fill' : 'contain'}">` : '');
+      }).join('');
       // Logo, Uhr, Knöpfe oben
-      h += T.logo ? `<img src="${T.logo}" alt="" style="position:absolute;left:94px;top:30px;width:192px;height:56px;object-fit:contain;object-position:left center">`
+      P.logo = T.logo ? `<img src="${T.logo}" alt="" style="position:absolute;left:94px;top:30px;width:192px;height:56px;object-fit:contain;object-position:left center">`
         : `<div style="position:absolute;left:94px;top:30px;height:56px;display:flex;align-items:center;gap:10px;font:700 40px Arial;letter-spacing:4px;color:${C.text}"><span style="display:inline-block;width:44px;height:44px;border-radius:10px;background:${C.focus};transform:rotate(45deg) scale(.75)"></span>KODI</div>`;
       const now = new Date();
-      h += `<div style="position:absolute;right:60px;top:22px;text-align:right;color:${C.text}"><div style="font:400 64px Arial;line-height:1">${now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div><div style="font:400 26px Arial;color:${C.grey};margin-top:6px">${now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>`;
+      P.clock = `<div style="position:absolute;left:1260px;width:600px;top:22px;text-align:right;color:${C.text}"><div style="font:400 64px Arial;line-height:1">${now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div><div style="font:400 26px Arial;color:${C.grey};margin-top:6px">${now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>`;
       const tb = [['power', '⏻'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
-      h += `<div style="position:absolute;left:0;top:100px;width:462px;height:110px;display:flex;justify-content:space-around;align-items:center;font-size:52px;color:${C.text}">${tb.map(x => `<span style="opacity:.85">${x[1]}</span>`).join('')}</div>`;
-      // Hauptmenü
-      vis.forEach((m, i) => {
+      P.buttons = single ? '' : `<div style="position:absolute;left:0;top:100px;width:462px;height:110px;display:flex;justify-content:space-around;align-items:center;font-size:52px;color:${C.text}">${tb.map(x => `<span style="opacity:.85">${x[1]}</span>`).join('')}</div>`;
+      const tbs = !single ? '' : tb.map(x => { const p = L.tp[x[0]]; return `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;color:${C.text};opacity:.85">${x[1]}</div>`; }).join('');
+      // Hauptmenü: Liste wie Estuary oder einzelne Buttons
+      P.menu = '';
+      if (btn) {
+        vis.forEach((m, i) => {
+          const r = tiMbRect(m, i), foc = m === cur, geo = tiMbGeo(r, L.mb);
+          const ih = geo.icon ? `<div style="position:absolute;left:${geo.icon.x}px;top:${geo.icon.y}px;width:${geo.icon.s}px;height:${geo.icon.s}px;display:flex;align-items:center;justify-content:center">${tiIconHtml(m, geo.icon.s, !foc)}</div>` : '';
+          const lh = geo.label ? `<div style="position:absolute;left:${geo.label.x}px;top:${geo.label.y}px;width:${geo.label.w}px;height:${geo.label.h}px;display:flex;align-items:center;justify-content:${geo.label.al === 'center' ? 'center' : 'flex-start'};font:400 ${L.mb.fs}px Arial;color:${foc ? C.text : C.grey};white-space:nowrap;overflow:hidden;text-shadow:0 2px 4px rgba(0,0,0,.25)">${esc(tiLabel(m))}</div>` : '';
+          P.menu += `<div data-tm="${m.id}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;cursor:pointer;${foc ? `background:${C.focus}` : ''}">${ih}${lh}</div>`;
+        });
+      } else vis.forEach((m, i) => {
         const y = 240 + i * 95; if (y > 1000) return; const foc = m === cur;
-        h += `<div data-tm="${m.id}" style="position:absolute;left:0;top:${y}px;width:462px;height:95px;cursor:pointer;${foc ? `background:${C.focus}` : ''}"><div style="position:absolute;left:-3px;top:1px;width:95px;height:95px;display:flex;align-items:center;justify-content:center">${tiIconHtml(m, 95, !foc)}</div><div style="position:absolute;left:104px;top:0;height:95px;right:10px;display:flex;align-items:center;font:400 42px Arial;color:${C.text};white-space:nowrap;overflow:hidden;text-shadow:0 2px 4px rgba(0,0,0,.25)">${esc(tiLabel(m))}</div></div>`;
+        P.menu += `<div data-tm="${m.id}" style="position:absolute;left:0;top:${y}px;width:462px;height:95px;cursor:pointer;${foc ? `background:${C.focus}` : ''}"><div style="position:absolute;left:-3px;top:1px;width:95px;height:95px;display:flex;align-items:center;justify-content:center">${tiIconHtml(m, 95, !foc)}</div><div style="position:absolute;left:104px;top:0;height:95px;right:10px;display:flex;align-items:center;font:400 42px Arial;color:${C.text};white-space:nowrap;overflow:hidden;text-shadow:0 2px 4px rgba(0,0,0,.25)">${esc(tiLabel(m))}</div></div>`;
       });
       // Widgets des gewählten Menüpunkts
+      P.widgets = '';
       if (cur) {
         const rows = tiRows(cur);
-        if (!rows.length) h += `<div style="position:absolute;left:560px;top:420px;width:1200px;font:400 36px Arial;color:${C.grey}">Keine Widgets – füge unter „🧩 Widgets“ welche hinzu.</div>`;
+        if (!rows.length) P.widgets += `<div style="position:absolute;left:560px;top:420px;width:1200px;font:400 36px Arial;color:${C.grey}">Keine Widgets – füge unter „🧩 Widgets“ welche hinzu.</div>`;
         let y = 60;
         rows.forEach((r, ri) => {
           if (y > 900) return;
           const x0 = 462 + 68, names = r.media === 'music' ? WSAMPLE.music : /shows|eps|tvshows/.test(r.src) ? WSAMPLE.shows : WSAMPLE.video;
           const Z = { poster: [228, 342], land: [404, 228], square: [276, 276], cat: [300, 170] }[r.s] || [228, 342];
           const yRow = y; y += 120 + Z[1] + (r.s === 'cat' ? 40 : 80);
-          h += `<div style="position:absolute;left:${462 + 55}px;top:${yRow + 10}px;font:400 40px Arial;color:${C.text};text-shadow:0 2px 4px rgba(0,0,0,.3)">${esc(r.t)}</div>`;
+          P.widgets += `<div style="position:absolute;left:${462 + 55}px;top:${yRow + 10}px;font:400 40px Arial;color:${C.text};text-shadow:0 2px 4px rgba(0,0,0,.3)">${esc(r.t)}</div>`;
           for (let k = 0; k < 8; k++) {
             const x = x0 + k * (Z[0] + 24); if (x > 1900) break;
             const hue = (k * 53 + ri * 90 + 200) % 360;
-            h += r.s === 'cat'
+            P.widgets += r.s === 'cat'
               ? `<div style="position:absolute;left:${x}px;top:${yRow + 120}px;width:${Z[0]}px;height:${Z[1]}px;background:${rgba(C.dialog, .85)};border-radius:6px;display:flex;align-items:center;justify-content:center;font:400 30px Arial;color:${C.text}">${esc(['Genres', 'Jahre', 'Schauspieler', 'Studios', 'Länder', 'Sets', 'Tags', 'Titel'][k])}</div>`
               : `<div style="position:absolute;left:${x}px;top:${yRow + 120}px;width:${Z[0]}px"><div style="height:${Z[1]}px;border-radius:6px;background:linear-gradient(160deg,hsl(${hue},50%,42%),hsl(${(hue + 50) % 360},55%,16%));display:flex;align-items:center;justify-content:center;font-size:${Math.round(Z[1] * .26)}px"><span style="opacity:.35">${r.media === 'music' ? '🎵' : '🎬'}</span></div><div style="font:400 26px Arial;color:${C.text};margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(names[k % names.length])}</div></div>`;
           }
         });
       }
+      // Player-Leiste gibt es nur während der Wiedergabe – im Layout-Reiter als Platzhalter
+      P.bottom = lay ? `<div style="position:absolute;left:0;top:972px;width:1920px;height:108px;box-sizing:border-box;background:rgba(0,0,0,.55);display:flex;align-items:center;gap:36px;padding:0 70px;font:400 34px Arial;color:${C.text};white-space:nowrap;overflow:hidden">⏮ ⏯ ⏭ <span style="color:${C.grey}">Läuft gerade: Titel · 01:23 / 04:56</span></div>` : '';
+      h += deco('under');
+      // Jeder Baustein liegt auf einer eigenen Ebene, die um den eingestellten Versatz verschoben wird
+      TBLK.forEach(bk => {
+        const k = bk[0], o = (k === 'menu' && btn) || (k === 'buttons' && single) ? { dx: 0, dy: 0, show: true } : L.b[k]; if (!P[k] || (!o.show && !lay)) return;
+        h += `<div data-lb="${k}" style="position:absolute;left:0;top:0;width:0;height:0;overflow:visible;transform:translate(${o.dx}px,${o.dy}px);${o.show ? '' : 'opacity:.2;'}">${P[k]}</div>`;
+      });
+      h += tbs + deco('over');
+      if (lay) {
+        const keys = tiObjKeys().filter(k => k !== L.sel).concat(tiObj(L.sel) ? [L.sel] : []);
+        keys.forEach(key => {
+          const o = tiObj(key), r = o.rect, on = L.sel === key, col = o.col;
+          h += `<div data-box="${key}" style="position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;box-sizing:border-box;border:${on ? 6 : 3}px ${on ? 'solid' : 'dashed'} ${col};background:${rgba(col, on ? .2 : .08)};cursor:move;touch-action:none;z-index:${on ? 7 : 5};${o.show ? '' : 'opacity:.55;'}"><span style="position:absolute;left:0;top:0;max-width:100%;overflow:hidden;background:${col};color:#000;font:700 ${r.h < 80 || r.w < 200 ? 20 : 26}px Arial;padding:2px 10px;white-space:nowrap;pointer-events:none">${esc(o.name)}${o.show ? '' : ' (aus)'}</span>${o.size ? `<span data-rs="${key}" style="position:absolute;right:-3px;bottom:-3px;width:46px;height:46px;background:${col};clip-path:polygon(100% 0,100% 100%,0 100%);cursor:nwse-resize;touch-action:none"></span>` : ''}</div>`;
+        });
+      }
       st.innerHTML = h;
+    }
+
+    // ---------- Layout: Estuary-Elemente frei verschieben ----------
+    const tiBlk = k => TBLK.find(b => b[0] === k);
+    function tiBlkRect(k) {
+      const r = Object.assign({}, tiBlk(k)[4]);
+      if (k === 'menu') r.h = Math.max(190, Math.min(760, S.titan.menu.filter(m => m.show && m.id !== 'disc').length * 95));
+      return r;
+    }
+    function tiLayClamp(k, ax, v) {
+      const r = tiBlkRect(k); v = Math.round(v) || 0;
+      return ax === 'dx' ? Math.max(-(r.x + r.w - 100), Math.min(1820 - r.x, v)) : Math.max(-(r.y + r.h - 60), Math.min(1020 - r.y, v));
+    }
+    const tiLaySnap = v => { const s = S.titan.lay.step || 10; return Math.round(v / s) * s; };
+
+    // Menü als einzelne Buttons: Lage und Aufbau eines Buttons (gemeinsam für Vorschau und Skin)
+    const tiMbList = () => S.titan.menu.filter(m => m.show && m.id !== 'disc');
+    function tiMbRect(m, idx) {
+      const g = S.titan.lay.mb, p = S.titan.lay.mp[m.id];
+      if (p) return { x: p.x, y: p.y, w: p.w > 0 ? p.w : g.w, h: p.h > 0 ? p.h : g.h };
+      return { x: 0, y: 240 + idx * g.h, w: g.w, h: g.h };
+    }
+    function tiMbGeo(r, g) {
+      const pad = 8;
+      if (g.ip === 'only') { const s = Math.max(16, Math.min(g.ic || 64, r.w, r.h)); return { icon: { x: Math.round((r.w - s) / 2), y: Math.round((r.h - s) / 2), s }, label: null }; }
+      if (g.ip === 'none') return { icon: null, label: { x: pad, y: 0, w: Math.max(20, r.w - 2 * pad), h: r.h, al: g.al } };
+      if (g.ip === 'top') { const s = Math.max(16, Math.min(g.ic, r.h - 30)); return { icon: { x: Math.round((r.w - s) / 2), y: pad, s }, label: { x: pad, y: pad + s, w: Math.max(20, r.w - 2 * pad), h: Math.max(20, r.h - s - 2 * pad), al: 'center' } }; }
+      const s = Math.max(16, Math.min(g.ic, r.h)); return { icon: { x: 4, y: Math.round((r.h - s) / 2), s }, label: { x: s + 14, y: 0, w: Math.max(20, r.w - s - 22), h: r.h, al: g.al } };
+    }
+    const TIMGCOL = '#22d3ee', TMBCOL = '#f59e0b', TTBCOL = '#a78bfa';
+
+    // Jedes verschiebbare Ding (Baustein, Menü-Button, Einzelknopf, Dekoration) als einheitliche Beschreibung
+    function tiObj(key) {
+      const T = S.titan, L = T.lay, i = String(key).indexOf(':'), t = i < 0 ? 'b' : key.slice(0, i), id = i < 0 ? key : key.slice(i + 1);
+      if (t === 'b') {
+        const bk = tiBlk(id), o = L.b[id]; if (!bk || !o) return null;
+        if ((id === 'menu' && L.mm === 'btn') || (id === 'buttons' && L.tm === 'single')) return null;
+        const r = tiBlkRect(id);
+        return { key, t, id, name: bk[1] + ' ' + bk[2], sub: bk[3], col: bk[5], canHide: bk[6], show: o.show, rel: true, size: false, vx: o.dx, vy: o.dy, rect: { x: r.x + o.dx, y: r.y + o.dy, w: r.w, h: r.h } };
+      }
+      if (t === 'mb') {
+        if (L.mm !== 'btn') return null;
+        const list = tiMbList(), idx = list.findIndex(m => m.id === id); if (idx < 0) return null;
+        const r = tiMbRect(list[idx], idx);
+        return { key, t, id, name: '🔘 ' + tiLabel(list[idx]), sub: 'Menü-Button', col: TMBCOL, show: true, rel: false, size: true, vx: r.x, vy: r.y, rect: r };
+      }
+      if (t === 'tb') {
+        if (L.tm !== 'single') return null;
+        const d = TTOP.find(x => x[0] === id); if (!d) return null; const p = L.tp[id];
+        return { key, t, id, name: d[1] + ' ' + d[2], sub: 'einzelner Knopf', col: TTBCOL, canHide: true, show: !!T.top[id], rel: false, size: false, vx: p.x, vy: p.y, rect: { x: p.x, y: p.y, w: 120, h: 120 } };
+      }
+      if (t === 'im') {
+        const q = L.im.find(x => x.id === id); if (!q) return null;
+        return { key, t, id, name: (q.k === 'box' ? '▭ ' : '🖼 ') + (q.nm || (q.k === 'box' ? 'Farbfläche' : 'Bild')), sub: 'Dekoration', col: TIMGCOL, show: true, rel: false, size: true, del: true, vx: q.x, vy: q.y, rect: { x: q.x, y: q.y, w: q.w, h: q.h } };
+      }
+      return null;
+    }
+    function tiObjKeys() {
+      const L = S.titan.lay, k = ['widgets', 'bottom', 'clock', 'logo'];
+      k.push(...(L.tm === 'single' ? TTOP.map(x => 'tb:' + x[0]) : ['buttons']));
+      k.push(...(L.mm === 'btn' ? tiMbList().map(m => 'mb:' + m.id) : ['menu']));
+      L.im.forEach(q => k.push('im:' + q.id));
+      return k.filter(x => tiObj(x));
+    }
+    const tiAx = (o, a) => o.rel ? (a === 'x' ? 'dx' : 'dy') : a;
+    function tiObjPut(key, ax, v) {
+      const o = tiObj(key); if (!o) return; const L = S.titan.lay; v = Math.round(v) || 0;
+      if (o.t === 'b') { L.b[o.id][ax] = tiLayClamp(o.id, ax, v); return; }
+      let p;
+      if (o.t === 'mb') { p = L.mp[o.id]; if (!p) p = L.mp[o.id] = { x: o.rect.x, y: o.rect.y, w: 0, h: 0 }; }
+      else if (o.t === 'tb') p = L.tp[o.id]; else p = L.im.find(q => q.id === o.id);
+      if (ax === 'w' || ax === 'h') { p[ax] = Math.max(20, Math.min(ax === 'w' ? 3000 : 2000, v)); return; }
+      p[ax] = ax === 'x' ? Math.max(-(o.rect.w - 60), Math.min(1860, v)) : Math.max(-(o.rect.h - 40), Math.min(1040, v));
+    }
+    function tiLayInputs(key) {
+      const o = tiObj(key); if (!o) return;
+      const val = { dx: o.vx, dy: o.vy, x: o.vx, y: o.vy, w: o.rect.w, h: o.rect.h };
+      Object.keys(val).forEach(ax => document.querySelectorAll(`[data-lf="${key}.${ax}"]`).forEach(i => { i.value = val[ax]; }));
+    }
+    function tiLayRow(key) {
+      const L = S.titan.lay, o = tiObj(key); if (!o) return '';
+      const on = L.sel === key, k = esc(key), X = tiAx(o, 'x'), Y = tiAx(o, 'y');
+      const inp = (ax, lab, v) => `<div><span class="hint">${lab}</span><input data-lf="${k}.${ax}" type="number" class="inp" value="${v}" oninput="tiLaySet('${k}','${ax}',this.value,true)"></div>`;
+      return `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:6px;cursor:pointer;border-color:${on ? o.col : '#1e293b'};${on ? `box-shadow:0 0 0 1px ${o.col}` : ''}" onclick="tiLaySel('${k}')">
+        <div class="flex items-center gap-2"><span style="width:12px;height:12px;border-radius:3px;background:${o.col};flex-shrink:0"></span><div class="flex-1 min-w-0"><b class="text-xs">${esc(o.name)}</b><div class="hint">${esc(o.sub)}</div></div>${o.canHide ? `<label class="tg" onclick="event.stopPropagation()" title="Anzeigen"><input type="checkbox" aria-label="${esc(o.name)} anzeigen" ${o.show ? 'checked' : ''} onchange="tiLayShow('${k}',this.checked)"><span></span></label>` : ''}${o.del ? `<button class="btn" aria-label="Entfernen" onclick="event.stopPropagation();tiDecoDel('${esc(o.id)}')">🗑</button>` : ''}</div>
+        <div class="grid ${o.size ? 'grid-cols-4' : 'grid-cols-2'} gap-1.5" onclick="event.stopPropagation()">${inp(X, o.rel ? '← → (X)' : 'X', o.vx)}${inp(Y, o.rel ? '↑ ↓ (Y)' : 'Y', o.vy)}${o.size ? inp('w', 'Breite', o.rect.w) + inp('h', 'Höhe', o.rect.h) : ''}</div>
+        ${on ? `<div class="flex gap-1.5 items-center" onclick="event.stopPropagation()"><span class="hint flex-1">Verschieben (je ${L.step} px):</span><button class="btn" aria-label="Nach links" onclick="tiLayNudge('${k}',-1,0)">◀</button><button class="btn" aria-label="Nach oben" onclick="tiLayNudge('${k}',0,-1)">▲</button><button class="btn" aria-label="Nach unten" onclick="tiLayNudge('${k}',0,1)">▼</button><button class="btn" aria-label="Nach rechts" onclick="tiLayNudge('${k}',1,0)">▶</button>${o.t !== 'im' ? `<button class="btn" aria-label="Zurücksetzen" onclick="tiLayRst('${k}')">↺</button>` : ''}</div>` : ''}
+      </div>`;
+    }
+    function tiLayout() {
+      const T = S.titan, L = T.lay, g = L.mb, btn = L.mm === 'btn', sgl = L.tm === 'single';
+      const opt = (a, cur) => a.map(o => `<option value="${o[0]}" ${String(o[0]) === String(cur) ? 'selected' : ''}>${o[1]}</option>`).join('');
+      const num = (lab, k, v, mn, mx) => `<div><span class="hint">${lab}</span><input type="number" class="inp" min="${mn}" max="${mx}" value="${v}" onchange="tiMbSet('${k}',this.value)"></div>`;
+      let h = `<p class="hint mb-2">Hier machst du Estuary wirklich zu deinem: <b>Ziehe die farbigen Rahmen in der Vorschau</b> an die Stelle, an der das Element in Kodi stehen soll – oder gib Zahlen ein. Bei Rahmen mit Ecke unten rechts änderst du dort die Größe. Alles andere an Estuary bleibt unverändert.</p>
+        <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('right')">↦ Menü nach rechts</button><button class="btn titb" onclick="tiLayPreset('top')">↔ Waagerechtes Menü oben</button>
+          <span class="hint ml-auto">Raster:</span><select class="inp" style="width:84px" aria-label="Schrittweite" onchange="tiLayStep(this.value)">${[1, 5, 10, 20, 40].map(v => `<option value="${v}" ${v === L.step ? 'selected' : ''}>${v} px</option>`).join('')}</select></div>
+        <div class="card mt-2"><b class="text-xs">📋 Hauptmenü</b>
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${btn ? '' : 'titb'}" onclick="tiLayMm('list')">Liste wie Estuary</button><button class="btn ${btn ? 'titb' : ''}" onclick="tiLayMm('btn')">Einzelne Buttons</button></div>
+          ${btn ? `<p class="hint mt-1">Jeder Menüpunkt ist ein eigener Button, den du frei platzierst – senkrecht, waagerecht, im Kreis, wie du magst. Die Reihenfolge unter „📋 Hauptmenü“ bestimmt nur die Liste; die Lage legst du hier fest.</p>
+          <div class="flex flex-wrap gap-1.5 mt-2"><button class="btn" onclick="tiLayPreset('left')">↕ Senkrecht links</button><button class="btn" onclick="tiLayPreset('right')">↕ Senkrecht rechts</button><button class="btn" onclick="tiLayPreset('top')">↔ Waagerecht oben</button></div>
+          <div class="grid grid-cols-3 gap-1.5 mt-2">${num('Breite', 'w', g.w, 60, 1900)}${num('Höhe', 'h', g.h, 40, 600)}${num('Symbolgröße', 'ic', g.ic, 16, 300)}
+            <div><span class="hint">Symbol</span><select class="inp" onchange="tiMbSet('ip',this.value)">${opt([['left', 'links vom Text'], ['top', 'über dem Text'], ['none', 'kein Symbol'], ['only', 'nur Symbol']], g.ip)}</select></div>${num('Schriftgröße', 'fs', g.fs, 16, 80)}
+            <div><span class="hint">Text</span><select class="inp" onchange="tiMbSet('al',this.value)">${opt([['left', 'links'], ['center', 'mittig']], g.al)}</select></div></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
+        </div>`;
+      h += btn ? tiMbList().map(m => tiLayRow('mb:' + m.id)).join('') : tiLayRow('menu');
+      h += `<div class="card mt-3"><b class="text-xs">⏻ Knöpfe über dem Menü</b>
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${sgl ? '' : 'titb'}" onclick="tiLayTm('group')">Zusammen (Leiste)</button><button class="btn ${sgl ? 'titb' : ''}" onclick="tiLayTm('single')">Einzeln platzieren</button></div></div>`;
+      h += sgl ? TTOP.map(x => tiLayRow('tb:' + x[0])).join('') : tiLayRow('buttons');
+      ['widgets', 'logo', 'clock', 'bottom'].forEach(k => { h += tiLayRow(k); });
+      h += `<div class="card mt-3"><b class="text-xs">🖼 Eigene Bilder & Flächen als Dekoration</b><p class="hint mt-1">Genau wie im Addon-Designer: Bild wählen, an die gewünschte Stelle ziehen, an der Ecke die Größe ändern. Mit „Ebene“ legst du es hinter oder vor Menü und Widgets, mit „Nur bei“ zeigt Kodi es nur bei einem bestimmten Menüpunkt.</p>
+          <div class="flex gap-1.5 mt-2"><button class="btn titb flex-1" onclick="$('f-timg').click()">＋ Bild</button><button class="btn flex-1" onclick="tiBoxAdd()">＋ Farbfläche</button></div>
+          <input type="file" id="f-timg" accept="image/*" class="hidden" onchange="tiImgAdd(this)"></div>`;
+      L.im.forEach(q => {
+        const k = 'im:' + q.id, on = L.sel === k;
+        h += tiLayRow(k);
+        if (on) h += `<div class="card" style="margin-top:-2px;border-color:${TIMGCOL}"><div class="grid grid-cols-2 gap-1.5">
+          <div><span class="hint">Deckkraft: <b id="tq-op">${q.op}</b> %</span><input type="range" min="5" max="100" value="${q.op}" oninput="tiDecoSet('${q.id}','op',this.value,true)" style="width:100%"></div>
+          <div><span class="hint">Ebene</span><select class="inp" onchange="tiDecoSet('${q.id}','z',this.value)">${opt([['under', 'hinter Menü & Widgets'], ['over', 'vor allem']], q.z)}</select></div>
+          ${q.k === 'box' ? `<div><span class="hint">Farbe</span><input type="color" class="inp" value="${q.col}" oninput="tiDecoSet('${q.id}','col',this.value,true)" style="height:36px"></div>` : `<div><span class="hint">Form</span><select class="inp" onchange="tiDecoSet('${q.id}','fit',this.value)">${opt([['keep', 'Seitenverhältnis behalten'], ['stretch', 'auf die Fläche strecken']], q.fit)}</select></div>`}
+          <div><span class="hint">Nur bei Menüpunkt</span><select class="inp" onchange="tiDecoSet('${q.id}','only',this.value)">${opt([['', 'immer']].concat(T.menu.filter(m => m.show && m.id !== 'disc').map(m => [m.id, tiLabel(m)])), q.only)}</select></div></div></div>`;
+      });
+      return h + `<div class="card mt-3"><b class="text-xs">ℹ So funktioniert es</b><p class="hint mt-1">Beim Bauen packt der Generator jedes verschobene Element in eine unsichtbare Gruppe mit dem Versatz – Estuary selbst wird nicht umgeschrieben. Einzelne Menü-Buttons und Knöpfe baut er als eigene Bedienelemente nach und verbindet die Pfeiltasten nach ihrer Lage. Die Vorschau zeigt Estuary nur angenähert; prüfe die Lage einmal in Kodi. Der Widget-Bereich bewegt sich als Ganzes. Elemente, die in deiner Estuary-Version nicht gefunden werden, meldet der Generator beim Bauen.</p></div>`;
+    }
+    function tiLaySel(k) { if (S.titan.lay.sel === k) return; S.titan.lay.sel = k; save(); tiRe(); }
+    function tiLaySet(key, ax, v, live) {
+      v = parseInt(v, 10); if (isNaN(v) || !tiObj(key)) return;
+      tiObjPut(key, ax, v); save(); tiPv();
+      if (!live) tiLayInputs(key);
+    }
+    function tiLayNudge(key, sx, sy) {
+      const o = tiObj(key), s = S.titan.lay.step || 10; if (!o) return;
+      tiObjPut(key, tiAx(o, 'x'), o.vx + sx * s); tiObjPut(key, tiAx(o, 'y'), o.vy + sy * s);
+      S.titan.lay.sel = key; save(); tiPv(); tiLayInputs(key);
+    }
+    function tiLayShow(key, on) {
+      const o = tiObj(key); if (!o) return;
+      if (o.t === 'tb') S.titan.top[o.id] = !!on; else if (o.t === 'b') S.titan.lay.b[o.id].show = !!on;
+      save(); tiPv();
+    }
+    function tiLayRst(key) {
+      const o = tiObj(key), L = S.titan.lay; if (!o) return;
+      if (o.t === 'b') Object.assign(L.b[o.id], { dx: 0, dy: 0, show: true });
+      else if (o.t === 'mb') delete L.mp[o.id];
+      else if (o.t === 'tb') L.tp[o.id] = Object.assign({}, defTp()[o.id]);
+      save(); tiRe();
+    }
+    function tiLayStep(v) { S.titan.lay.step = +v || 10; save(); tiRe(); }
+    function tiLayMm(m) {
+      const L = S.titan.lay; if (L.mm === m) return;
+      L.mm = m === 'btn' ? 'btn' : 'list';
+      if (L.mm === 'btn' && !Object.keys(L.mp).length) tiMbPreset('left', true);
+      if (!tiObj(L.sel)) L.sel = L.mm === 'btn' ? 'mb:' + ((tiMbList()[0] || {}).id || '') : 'menu';
+      if (!tiObj(L.sel)) L.sel = 'widgets';
+      save(); tiRe();
+    }
+    function tiLayTm(m) {
+      const L = S.titan.lay; L.tm = m === 'single' ? 'single' : 'group';
+      if (!tiObj(L.sel)) L.sel = 'widgets';
+      save(); tiRe();
+    }
+    function tiMbSet(k, v) {
+      const g = S.titan.lay.mb, lim = { w: [60, 1900], h: [40, 600], ic: [16, 300], fs: [16, 80] };
+      if (lim[k]) { v = Math.round(+v); if (!isFinite(v)) return; g[k] = Math.max(lim[k][0], Math.min(lim[k][1], v)); } else g[k] = v;
+      save(); tiRe();
+    }
+    // Fertige Anordnungen für die Menü-Buttons
+    function tiMbPreset(kind, keepBlocks) {
+      const L = S.titan.lay, list = tiMbList(), n = Math.max(1, list.length), g = L.mb;
+      if (!keepBlocks) TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; });
+      L.mp = {}; L.mm = 'btn';
+      if (kind === 'top') {
+        const w = Math.max(110, Math.min(260, Math.floor(1800 / n))), x0 = Math.round((1920 - w * n) / 2);
+        Object.assign(g, { w, h: 128, ic: 56, ip: 'top', fs: w < 170 ? 24 : 28, al: 'center' });
+        list.forEach((m, i) => { L.mp[m.id] = { x: x0 + i * w, y: 140, w: 0, h: 0 }; });
+        if (!keepBlocks) { L.b.widgets.dx = -400; L.b.widgets.dy = 230; L.b.buttons.dx = 620; L.b.buttons.dy = -90; }
+      } else {
+        const right = kind === 'right', h = Math.max(48, Math.min(95, Math.floor(760 / n)));
+        Object.assign(g, { w: 462, h, ic: Math.min(80, h), ip: 'left', fs: 36, al: 'left' });
+        list.forEach((m, i) => { L.mp[m.id] = { x: right ? 1920 - 462 : 0, y: 240 + i * h, w: 0, h: 0 }; });
+        if (right && !keepBlocks) { L.b.buttons.dx = 1920 - 462; L.b.widgets.dx = -462; }
+      }
+    }
+    function tiLayPreset(n) {
+      const L = S.titan.lay;
+      if (n === 'std') {
+        const fresh = defLay(); L.b = fresh.b; L.mm = 'list'; L.tm = 'group'; L.mp = {}; L.mb = fresh.mb; L.tp = fresh.tp; L.sel = 'menu';
+      } else if (n === 'right') {
+        if (L.mm === 'btn') tiMbPreset('right');
+        else { TBLK.forEach(b => { L.b[b[0]] = { dx: 0, dy: 0, show: L.b[b[0]].show }; }); const w = tiBlkRect('menu').w; L.b.menu.dx = 1920 - w; L.b.buttons.dx = 1920 - w; L.b.widgets.dx = -w; }
+      } else if (n === 'left') tiMbPreset('left');
+      else if (n === 'top') tiMbPreset('top');
+      if (!tiObj(L.sel)) L.sel = 'widgets';
+      save(); tiRe();
+      toast(n === 'std' ? 'Alle Elemente stehen wieder wie bei Estuary.' : 'Anordnung gesetzt – danach nach Wunsch feinziehen.');
+    }
+
+    // Eigene Dekoration: Bilder und Farbflächen
+    function tiDecoAdd(q) {
+      const L = S.titan.lay; if (L.im.length >= 30) return toast('Maximal 30 Dekorationen.');
+      L.im.push(q); L.sel = 'im:' + q.id; save(); tiRe();
+    }
+    function tiImgAdd(inp) {
+      const f = inp.files[0]; inp.value = ''; if (!f) return;
+      loadImgFile(f, im => {
+        const k = Math.min(1, 1600 / im.width, 1600 / im.height), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+        const x = c.getContext('2d'); x.drawImage(im, 0, 0, c.width, c.height);
+        const jpg = /jpe?g/i.test(f.type), id = uid(), w = Math.min(480, c.width), h = Math.max(20, Math.round(w * c.height / c.width));
+        S.titan.dimgs[id] = c.toDataURL(jpg ? 'image/jpeg' : 'image/png', .88);
+        tiDecoAdd({ id, k: 'img', nm: f.name.replace(/\.[^.]+$/, '').slice(0, 30), x: 900, y: 300, w, h, op: 100, z: 'under', only: '', col: '#ffffff', fit: 'keep' });
+        toast('Bild eingefügt – ziehe es an die richtige Stelle.');
+      });
+    }
+    function tiBoxAdd() { tiDecoAdd({ id: uid(), k: 'box', nm: '', x: 900, y: 300, w: 400, h: 200, op: 40, z: 'under', only: '', col: '#000000', fit: 'keep' }); }
+    function tiDecoSet(id, f, v, live) {
+      const q = S.titan.lay.im.find(x => x.id === id); if (!q) return;
+      q[f] = f === 'op' ? Math.max(5, Math.min(100, Math.round(+v) || 100)) : v;
+      save(); tiPv();
+      if (f === 'op' && live && $('tq-op')) $('tq-op').textContent = q.op;
+      if (!live) tiRe();
+    }
+    function tiDecoDel(id) {
+      const L = S.titan.lay, q = L.im.find(x => x.id === id); if (!q) return;
+      L.im = L.im.filter(x => x.id !== id); delete S.titan.dimgs[id];
+      if (L.sel === 'im:' + id) L.sel = 'widgets';
+      save(); tiRe();
+    }
+
+    // Ziehen und Skalieren der Rahmen in der Vorschau (Maus und Finger)
+    let TLD = null;
+    function tiLayBind() {
+      const st = $('tpv-stage'); if (!st) return;
+      st.addEventListener('pointerdown', ev => {
+        if (S.titan.tab !== 'layout') return;
+        const rs = ev.target.closest('[data-rs]'), bx = rs || ev.target.closest('[data-box]'); if (!bx) return;
+        const key = rs ? rs.dataset.rs : bx.dataset.box, o = tiObj(key); if (!o) return;
+        if (o.t === 'mb' && !S.titan.lay.mp[o.id]) S.titan.lay.mp[o.id] = { x: o.rect.x, y: o.rect.y, w: 0, h: 0 };
+        TLD = { key, size: !!rs, sx: ev.clientX, sy: ev.clientY, ox: o.vx, oy: o.vy, ow: o.rect.w, oh: o.rect.h, sc: ($('tpv-wrap').clientWidth || 1920) / 1920, moved: false };
+        try { st.setPointerCapture(ev.pointerId); } catch (e) {}
+        if (S.titan.lay.sel !== key) { S.titan.lay.sel = key; tiRe(); }
+        ev.preventDefault();
+      });
+      st.addEventListener('pointermove', ev => {
+        if (!TLD) return;
+        const d = TLD, o = tiObj(d.key); if (!o) return;
+        const dx = (ev.clientX - d.sx) / d.sc, dy = (ev.clientY - d.sy) / d.sc;
+        if (!d.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+        d.moved = true;
+        if (d.size) { tiObjPut(d.key, 'w', tiLaySnap(d.ow + dx)); tiObjPut(d.key, 'h', tiLaySnap(d.oh + dy)); }
+        else { tiObjPut(d.key, tiAx(o, 'x'), tiLaySnap(d.ox + dx)); tiObjPut(d.key, tiAx(o, 'y'), tiLaySnap(d.oy + dy)); }
+        tiPv(); tiLayInputs(d.key); ev.preventDefault();
+      });
+      const end = () => { if (TLD) { TLD = null; save(); } };
+      st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end);
     }
 
     // ---------- Reiter: Basis ----------
@@ -4326,6 +4655,16 @@ if __name__ == '__main__':
         if (m.custom || m.w === 'own') m.wl.forEach((w, k) => { if ((w.src === 'custom' || w.src === 'addon') && !String(w.dir).trim()) r.push(['w', `${n}, Widget ${k + 1}: Es fehlt der Kodi-Pfad.`]); });
         if (m.show && !m.custom && m.w === 'own' && !m.wl.length) r.push(['i', `${n}: „Eigene Widgets“ ohne Widget – der Bereich rechts vom Menü bleibt leer.`]);
       });
+      {
+        const L = T.lay, rc = k => { const q = tiBlkRect(k), o = L.b[k]; return { x: q.x + o.dx, y: q.y + o.dy, w: q.w, h: q.h }; }, B = rc('widgets');
+        let A = rc('menu');
+        if (L.mm === 'btn') {
+          const rs = tiMbList().map((m, i) => tiMbRect(m, i)); if (rs.length) { const x0 = Math.min(...rs.map(q => q.x)), y0 = Math.min(...rs.map(q => q.y)); A = { x: x0, y: y0, w: Math.max(...rs.map(q => q.x + q.w)) - x0, h: Math.max(...rs.map(q => q.y + q.h)) - y0 }; }
+          rs.forEach((q, i) => { if (q.x + q.w < 40 || q.x > 1880 || q.y + q.h < 40 || q.y > 1040) r.push(['w', `Layout: Der Menü-Button „${tiLabel(tiMbList()[i])}“ liegt außerhalb des Bildschirms.`]); });
+        }
+        if (Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x) > 40 && Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y) > 40) r.push(['i', 'Layout: Hauptmenü und Widget-Bereich überlappen sich – prüfe das in der Vorschau (📐 Layout).']);
+        if (L.im.some(q => q.k === 'img' && !T.dimgs[q.id])) r.push(['w', 'Layout: Ein Dekorations-Bild hat keine Bilddaten – bitte neu einfügen.']);
+      }
       if (T.bg.mode === 'image' && !T.bg.img) r.push(['i', 'Eigener Hintergrund gewählt, aber noch kein Bild – es bleibt das Estuary-Muster.']);
       if (T.fontScale !== 100) r.push(['i', `Schriftgröße ${T.fontScale} % – prüfe in Kodi, ob lange Texte noch passen.`]);
       return r;
@@ -4355,6 +4694,7 @@ if __name__ == '__main__':
       if (letter) { x.fillStyle = C.focus; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `bold ${Math.round(Math.min(w, h) * .56)}px Arial`; x.fillText((tiName().trim()[0] || 'T').toUpperCase(), w / 2, h / 2 + Math.min(w, h) * .03); }
       return c.toDataURL(mime, .88);
     }
+    function tiMkSolid() { const c = document.createElement('canvas'); c.width = c.height = 16; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 16, 16); return c.toDataURL('image/png'); }
     function tiTransform(b) {
       const T = S.titan, C = T.col, F = {}, dec = new TextDecoder(), enc = new TextEncoder();
       Object.keys(b.files).forEach(p => {
@@ -4484,7 +4824,190 @@ if __name__ == '__main__':
         if ((cid === '804' && !T.top.power) || (cid === '802' && !T.top.settings) || (cid === '801' && !T.top.search)) g700.removeChild(inc);
       });
       // Logo
-      if (T.logo) { [...hd.getElementsByTagName('texture')].forEach(t => { if (/vendor_logo\.png/.test(t.textContent)) t.textContent = 'titan/logo.png'; }); F['media/titan/logo.png'] = tiBytes(T.logo); }
+      let logoNode = null;
+      [...hd.getElementsByTagName('texture')].forEach(t => {
+        if (!/vendor_logo\.png|titan\/logo\.png/.test(t.textContent)) return;
+        if (!logoNode && t.parentNode && t.parentNode.tagName === 'control') logoNode = t.parentNode;
+        if (T.logo) t.textContent = 'titan/logo.png';
+      });
+      if (T.logo) F['media/titan/logo.png'] = tiBytes(T.logo);
+      // Layout 2: Menü als einzelne Buttons, einzelne Knöpfe oben, Tasten-Navigation nach Lage
+      TLAYWARN = [];
+      const LAY = T.lay, btnM0 = LAY.mm === 'btn', sglT = LAY.tm === 'single';
+      const numOf = s => { const q = /(\d+)/.exec(String(s || '')); return q ? q[1] : ''; };
+      const rectB = k => { const r = tiBlkRect(k), o = LAY.b[k] || { dx: 0, dy: 0 }; return { x: r.x + o.dx, y: r.y + o.dy, w: r.w, h: r.h }; };
+      const NODES = [];
+      const addNode = (r, target, tier, wt, ctl) => { const n = { x: r.x, y: r.y, w: r.w, h: r.h, target: String(target), tier, wt: wt || '2000', ctl: ctl || null }; NODES.push(n); return n; };
+      const pickNav = (a, dir) => {
+        for (const tier of [1, 2]) {
+          let best = null, bs = Infinity;
+          NODES.forEach(c => {
+            if (c === a || c.tier !== tier) return;
+            const hor = dir === 'left' || dir === 'right', sg = dir === 'right' || dir === 'down' ? 1 : -1;
+            const ac = hor ? a.x + a.w / 2 : a.y + a.h / 2, cc = hor ? c.x + c.w / 2 : c.y + c.h / 2;
+            if ((cc - ac) * sg <= 4) return;
+            const a0 = hor ? a.y : a.x, a1 = a0 + (hor ? a.h : a.w), c0 = hor ? c.y : c.x, c1 = c0 + (hor ? c.h : c.w);
+            const l0 = hor ? a.x : a.y, l1 = l0 + (hor ? a.w : a.h), m0 = hor ? c.x : c.y, m1 = m0 + (hor ? c.w : c.h);
+            const perp = Math.max(0, c0 - a1, a0 - c1), pc = Math.abs((c0 + c1) / 2 - (a0 + a1) / 2), gap = sg > 0 ? Math.max(0, m0 - l1) : Math.max(0, l0 - m1);
+            const s = gap + 3 * perp + .25 * pc;
+            if (s < bs) { bs = s; best = c; }
+          });
+          if (best) return best;
+        }
+        return null;
+      };
+      const pickFont = px => {
+        try {
+          const fd = getX('xml/Font.xml'), sets = [...fd.getElementsByTagName('fontset')], fs = sets.find(s => s.getAttribute('id') === 'Default') || sets[0];
+          let best = '', bd = Infinity;
+          [...fs.getElementsByTagName('font')].forEach(f => {
+            const nm = kids(f, 'name')[0], sz = kids(f, 'size')[0], sy = kids(f, 'style')[0];
+            if (!nm || !sz || (sy && /bold|italic/i.test(sy.textContent))) return;
+            const d = Math.abs((parseFloat(sz.textContent) || 0) - px); if (d < bd) { bd = d; best = nm.textContent.trim(); }
+          });
+          return best || 'font37';
+        } catch (e) { return 'font37'; }
+      };
+      const setBox = (e, l, t, w, h) => { [['left', l], ['top', t], ['width', w], ['height', h]].forEach(a => { if (a[1] != null) e.appendChild(xe(hd, a[0], {}, Math.round(a[1]))); }); return e; };
+      let holder = null, btnM1 = null;
+      const btnItems = T.menu.filter(m => m.show && m.id !== 'disc');
+      const btnM = btnM0 && btnItems.length > 0;
+      if (btnM) {
+        const MP = id => `String.IsEqual(Window(home).Property(titan_menu),${id})`, fnt = pickFont(LAY.mb.fs);
+        holder = xe(hd, 'control', { type: 'group' });
+        let first = '';
+        const WGRP = [], BNODES = [];
+        btnItems.forEach((m, i) => {
+          const it = kids(content, 'item').find(x => { const p = kids(x, 'property').find(q => q.getAttribute('name') === 'id'); return p && p.textContent.trim() === m.id; });
+          if (!it) { TLAYWARN.push('Menüpunkt „' + tiLabel(m) + '“ fehlt in Estuary und wurde übersprungen'); return; }
+          const r = tiMbRect(m, i), geo = tiMbGeo(r, LAY.mb), bid = 9201 + i, th = (kids(it, 'thumb')[0] || {}).textContent || '', lbl = (kids(it, 'label')[0] || {}).textContent || tiLabel(m);
+          const mpr = kids(it, 'property').find(q => q.getAttribute('name') === 'menu_id');
+          if (!first) first = String(bid);
+          const wgr = grpOf(m.id); if (wgr) WGRP.push({ wg: wgr, bid });
+          const g = xe(hd, 'control', { type: 'group' });
+          g.appendChild(xe(hd, 'left', {}, r.x)); g.appendChild(xe(hd, 'top', {}, r.y));
+          kids(it, 'visible').forEach(v => g.appendChild(xe(hd, 'visible', {}, v.textContent)));
+          const bt = xe(hd, 'control', { type: 'button', id: bid });
+          setBox(bt, 0, 0, r.w, r.h);
+          bt.appendChild(xe(hd, 'font')); bt.appendChild(xe(hd, 'texturefocus', { colordiffuse: 'button_focus' }, 'lists/focus.png')); bt.appendChild(xe(hd, 'texturenofocus'));
+          kids(it, 'onclick').forEach(oc => bt.appendChild(oc.cloneNode(true)));
+          [`SetProperty(titan_menu,${m.id},home)`, `SetProperty(titan_btn,${bid},home)`, 'ClearProperty(listposition,home)'].forEach(a => bt.appendChild(xe(hd, 'onfocus', {}, a)));
+          g.appendChild(bt);
+          if (geo.icon) {
+            const own = /^titan\//.test(th), mkI = (cd, vis) => { const im = xe(hd, 'control', { type: 'image' }); setBox(im, geo.icon.x, geo.icon.y, geo.icon.s, geo.icon.s); im.appendChild(xe(hd, 'aspectratio', {}, 'keep')); im.appendChild(xe(hd, 'texture', { colordiffuse: cd }, th)); im.appendChild(xe(hd, 'visible', {}, vis)); g.appendChild(im); };
+            mkI(own ? '77FFFFFF' : '77FFFFFF', '!' + MP(m.id)); mkI(own ? 'FFFFFFFF' : 'button_focus', MP(m.id));
+          }
+          if (geo.label) {
+            const mkL = (col, vis) => { const lb = xe(hd, 'control', { type: 'label' }); setBox(lb, geo.label.x, geo.label.y, geo.label.w, geo.label.h); lb.appendChild(xe(hd, 'font', {}, fnt)); lb.appendChild(xe(hd, 'textcolor', {}, col)); lb.appendChild(xe(hd, 'align', {}, geo.label.al)); lb.appendChild(xe(hd, 'aligny', {}, 'center')); lb.appendChild(xe(hd, 'scroll', {}, 'false')); lb.appendChild(xe(hd, 'label', {}, lbl)); lb.appendChild(xe(hd, 'visible', {}, vis)); g.appendChild(lb); };
+            mkL('grey', '!' + MP(m.id)); mkL('white', MP(m.id));
+          }
+          holder.appendChild(nl(hd, 5)); holder.appendChild(g);
+          BNODES.push(addNode(r, bid, 1, mpr ? numOf(mpr.textContent) : '2000', bt));
+        });
+        // Platzhalter mit der alten ID 9000: alle Rücksprünge von Estuary („nach links ins Menü“) landen beim zuletzt gewählten Button
+        const px = xe(hd, 'control', { type: 'button', id: 9000 });
+        px.appendChild(xe(hd, 'include', {}, 'HiddenObject')); px.appendChild(xe(hd, 'onfocus', {}, 'SetFocus($INFO[Window(home).Property(titan_btn)])'));
+        holder.appendChild(nl(hd, 5)); holder.appendChild(px);
+        list.parentNode.replaceChild(holder, list);
+        const dc = hd.getElementsByTagName('defaultcontrol')[0]; if (dc && first) dc.textContent = first;
+        btnM1 = { WGRP, BNODES };
+        [...hd.getElementsByTagName('visible')].forEach(v => { if (v.textContent.includes('Container(9000).ListItem.Property(id)')) v.textContent = v.textContent.split('Container(9000).ListItem.Property(id)').join('Window(home).Property(titan_menu)'); });
+        if (/Container\(9000\)/.test(new XMLSerializer().serializeToString(hd))) TLAYWARN.push('Die Startseite nutzt das alte Menü noch an weiteren Stellen');
+        const other = Object.keys(F).filter(p => /^xml\/[^/]+\.xml$/.test(p) && p !== 'xml/Home.xml' && /Container\(9000\)/.test(dec.decode(F[p])));
+        if (other.length) TLAYWARN.push('Estuary nutzt das alte Menü auch in ' + other.join(', '));
+      } else if (btnM0) TLAYWARN.push('Einzelne Menü-Buttons: Es ist kein Menüpunkt sichtbar – das Menü bleibt wie bei Estuary');
+      else addNode(rectB('menu'), 9000, 1, '2000', null);
+      // Knöpfe oben: einzeln statt in der Leiste
+      if (g700 && !sglT) addNode(rectB('buttons'), 700, 1, '2000', null);
+      if (g700 && sglT) {
+        const prm = (inc, n) => { const e = kids(inc, 'param').find(x => x.getAttribute('name') === n); return e ? e.getAttribute('value') || '' : ''; };
+        kids(g700, 'include').forEach(inc => {
+          const cid = prm(inc, 'control_id'), key = { '804': 'power', '802': 'settings', '801': 'search' }[cid]; if (!key) return;
+          const p = LAY.tp[key], icon = prm(inc, 'icon'), grp = xe(hd, 'control', { type: 'group' });
+          grp.appendChild(xe(hd, 'left', {}, p.x)); grp.appendChild(xe(hd, 'top', {}, p.y));
+          const rb = xe(hd, 'control', { type: 'radiobutton', id: cid });
+          setBox(rb, null, null, 120, 120);
+          rb.appendChild(xe(hd, 'align', {}, 'center')); rb.appendChild(xe(hd, 'aligny', {}, 'center')); rb.appendChild(xe(hd, 'onclick', {}, prm(inc, 'onclick')));
+          rb.appendChild(xe(hd, 'font')); rb.appendChild(xe(hd, 'label', {}, prm(inc, 'label')));
+          rb.appendChild(xe(hd, 'texturefocus', { colordiffuse: 'button_focus' }, 'buttons/roundbutton-fo.png')); rb.appendChild(xe(hd, 'texturenofocus'));
+          rb.appendChild(xe(hd, 'radioposx', {}, '40')); rb.appendChild(xe(hd, 'radioposy', {}, '0')); rb.appendChild(xe(hd, 'radiowidth', {}, '40')); rb.appendChild(xe(hd, 'radioheight', {}, '40'));
+          rb.appendChild(xe(hd, 'textureradioonfocus', {}, icon)); rb.appendChild(xe(hd, 'textureradioonnofocus', { colordiffuse: 'grey' }, icon));
+          rb.appendChild(xe(hd, 'textureradioofffocus', {}, icon)); rb.appendChild(xe(hd, 'textureradiooffnofocus', { colordiffuse: 'grey' }, icon));
+          grp.appendChild(rb); g700.parentNode.insertBefore(grp, g700); g700.removeChild(inc);
+          addNode({ x: p.x, y: p.y, w: 120, h: 120 }, cid, 1, '2000', rb);
+        });
+      }
+      addNode(rectB('widgets'), 2000, 2, '2000', null);
+      // Pfeiltasten: jeder einzelne Button springt zum nächsten Nachbarn in dieser Richtung
+      NODES.filter(n => n.ctl).forEach(n => ['left', 'right', 'up', 'down'].forEach(d => { const c = pickNav(n, d); if (c) n.ctl.appendChild(xe(hd, 'on' + d, {}, c.tier === 2 ? n.wt : c.target)); }));
+      if (!btnM && sglT) {
+        const ln = NODES.find(n => n.target === '9000');
+        if (ln) ['up', 'down'].forEach(d => { const c = pickNav(ln, d); if (c && c.ctl) { kids(list, 'on' + d).forEach(e => list.removeChild(e)); list.appendChild(xe(hd, 'on' + d, {}, c.target)); } });
+      }
+      // Liegt die Menüleiste über (oder unter) den Widgets, führt „hoch“ (bzw. „runter“) aus der ersten (letzten) Reihe zurück zum Button des Menüpunkts
+      const wnode = NODES.find(n => n.tier === 2);
+      if (btnM1 && wnode) {
+        const lap = n => n.x < wnode.x + wnode.w && n.x + n.w > wnode.x;
+        const above = btnM1.BNODES.some(n => n.y + n.h <= wnode.y + 20 && lap(n)), below = btnM1.BNODES.some(n => n.y >= wnode.y + wnode.h - 20 && lap(n));
+        if (above || below) btnM1.WGRP.forEach(q => [...q.wg.getElementsByTagName('control')].filter(c => c.getAttribute('type') === 'grouplist').forEach(gl => {
+          if (below) gl.insertBefore(xe(hd, 'ondown', {}, q.bid), gl.firstChild);
+          if (above) gl.insertBefore(xe(hd, 'onup', {}, q.bid), gl.firstChild);
+        }));
+      }
+      // Menü rechts von den Widgets: dort führt „nach rechts“ aus dem letzten Eintrag ins Menü (bei Estuary ist es „nach links“)
+      {
+        const mn = NODES.filter(n => n.tier === 1 && (n.target === '9000' || (btnM1 && btnM1.BNODES.includes(n))));
+        if (wnode && mn.length && mn.reduce((a, n) => a + n.x + n.w / 2, 0) / mn.length > wnode.x + wnode.w / 2 + 100 && F['xml/Includes_Home.xml']) {
+          const ih = getX('xml/Includes_Home.xml'), wc = [...ih.getElementsByTagName('include')].find(i => i.getAttribute('name') === 'WidgetListCommon');
+          const ol = wc && kids(wc, 'onleft')[0], or = wc && kids(wc, 'onright')[0];
+          if (ol && or && ol.textContent.trim() === '9000') { ol.textContent = 'noop'; or.textContent = '9000'; putX('xml/Includes_Home.xml', ih); }
+        }
+      }
+      // Layout: verschobene oder ausgeblendete Elemente bekommen eine Gruppe mit Versatz (Estuary selbst bleibt unverändert)
+      TLAYMISS = [];
+      const LB = T.lay.b, incAll = nm => [...hd.getElementsByTagName('include')].filter(i => i.getAttribute('content') === nm || (!i.children.length && !i.getAttribute('name') && i.textContent.trim() === nm));
+      const wrapNodes = (nodes, key) => {
+        const o = LB[key], bk = tiBlk(key); if (!o || (!o.dx && !o.dy && o.show !== false)) return;
+        nodes = nodes.filter(n => n && n.parentNode);
+        if (!nodes.length) { TLAYMISS.push(bk[2]); return; }
+        nodes.forEach(n => {
+          const w = xe(hd, 'control', { type: 'group' });
+          if (o.dx) w.appendChild(xe(hd, 'left', {}, o.dx));
+          if (o.dy) w.appendChild(xe(hd, 'top', {}, o.dy));
+          if (o.show === false) w.appendChild(xe(hd, 'visible', {}, 'false'));
+          n.parentNode.insertBefore(w, n); w.appendChild(n);
+        });
+      };
+      wrapNodes([logoNode], 'logo'); wrapNodes(incAll('TopBar'), 'clock'); if (!sglT) wrapNodes([g700], 'buttons');
+      if (!btnM) wrapNodes([list], 'menu');
+      wrapNodes([g2000], 'widgets'); wrapNodes(incAll('BottomBar'), 'bottom');
+      // Eigene Dekoration (Bilder und Farbflächen)
+      if (LAY.im.length) {
+        const ctrls = kids(hd.documentElement, 'controls')[0];
+        if (!ctrls) TLAYWARN.push('Dekoration: In dieser Estuary-Version wurde der Bereich der Bedienelemente nicht gefunden');
+        else {
+          const topOf = n => { while (n && n.parentNode && n.parentNode !== ctrls) n = n.parentNode; return n && n.parentNode === ctrls ? n : null; };
+          const order = [...ctrls.children], at = [topOf(g2000), topOf(holder || list), topOf(g700)].filter(Boolean).map(n => order.indexOf(n)).filter(i => i >= 0);
+          const anchor = at.length ? order[Math.min(...at)] : null;
+          LAY.im.forEach(q => {
+            const isBox = q.k === 'box', data = T.dimgs[q.id];
+            if (!isBox && !data) { TLAYWARN.push('Ein Dekorations-Bild hat keine Bilddaten und wurde übersprungen'); return; }
+            let tex = 'titan/white.png', cd = A(q.op) + (isBox ? H(q.col) : 'FFFFFF');
+            if (isBox) F['media/titan/white.png'] = tiBytes(tiMkSolid());
+            else { const ext = /^data:image\/jpe?g/i.test(data) ? 'jpg' : 'png'; tex = `titan/deco_${q.id}.${ext}`; F['media/' + tex] = tiBytes(data); }
+            const c = xe(hd, 'control', { type: 'image' });
+            setBox(c, q.x, q.y, q.w, q.h);
+            c.appendChild(xe(hd, 'aspectratio', {}, !isBox && q.fit !== 'stretch' ? 'keep' : 'stretch'));
+            c.appendChild(xe(hd, 'texture', { colordiffuse: cd }, tex));
+            if (q.only) {
+              if (!T.menu.some(m => m.show && m.id === q.only && m.id !== 'disc')) { TLAYWARN.push('Eine Dekoration gehört zu einem ausgeblendeten Menüpunkt und bleibt unsichtbar'); }
+              c.appendChild(xe(hd, 'visible', {}, btnM ? `String.IsEqual(Window(home).Property(titan_menu),${q.only})` : `String.IsEqual(Container(9000).ListItem.Property(id),${q.only})`));
+            }
+            if (q.z === 'over' || !anchor) ctrls.appendChild(c); else ctrls.insertBefore(c, anchor);
+          });
+        }
+      }
+
       putX('xml/Home.xml', hd);
       T.menu.forEach(m => { if (m.show && String(m.icon).startsWith('img:') && T.imgs[m.icon.slice(4)]) F['media/titan/icon_' + m.icon.slice(4) + '.png'] = tiBytes(T.imgs[m.icon.slice(4)]); });
 
@@ -4509,7 +5032,7 @@ if __name__ == '__main__':
         await new Promise(r => setTimeout(r, 30));
         const blob = makeZip(E), a = document.createElement('a');
         a.href = URL.createObjectURL(blob); a.download = root + '-' + String(T.ver).replace(/[^0-9A-Za-z.]+/g, '') + '.zip'; a.click();
-        tiProg('ti-prog2', `✅ Fertig: <b>${esc(a.download)}</b> (${(blob.size / 1048576).toFixed(1)} MB, ${E.length - 1} Dateien). Installation siehe unten.`, 1);
+        tiProg('ti-prog2', `✅ Fertig: <b>${esc(a.download)}</b> (${(blob.size / 1048576).toFixed(1)} MB, ${E.length - 1} Dateien). Installation siehe unten.${TLAYMISS.length ? ' ⚠️ In dieser Estuary-Version nicht gefunden, Verschiebung dafür ignoriert: ' + esc(TLAYMISS.join(', ')) + '.' : ''}${TLAYWARN.length ? ' ⚠️ ' + esc(TLAYWARN.join('; ')) + '.' : ''}`, 1);
         toast('⚡ Skin gebaut: ' + a.download);
       } catch (e) { tiProg('ti-prog2', '⚠️ ' + esc(e.message || 'Der Umbau ist fehlgeschlagen.'), null); }
     }
