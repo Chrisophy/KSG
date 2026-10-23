@@ -1,6 +1,6 @@
 # 📖 Handbuch – Kodi Video-Addon Generator v8.1 Pro by IT('s) Possible
 
-Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail.
+Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail – und mit dem **⚡ Titan-Modus** baust du sogar einen echten Kodi-Skin für ganz Kodi (Teil G).
 
 > 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
@@ -71,6 +71,16 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 42. [Unterschiede zwischen Vorschau und Kodi](#k42)
 43. [Fehlerbehebung und häufige Fragen](#k43)
 44. [Tastenkürzel](#k44)
+
+**Teil G – Titan-Modus: dein eigener Kodi-Skin**
+
+45. [Was ist der Titan-Modus?](#k45)
+46. [Grundlage laden](#k46)
+47. [Farben, Hintergrund, Logo und Schrift](#k47)
+48. [Hauptmenü und eigene Menüpunkte](#k48)
+49. [Widgets im Skin](#k49)
+50. [Export und Installation](#k50)
+51. [Lizenz und wie es weitergeht](#k51)
 
 ---
 
@@ -280,7 +290,7 @@ Jedes Element kann eine Aktion bekommen – auch Texte, Bilder und Flächen. Dan
 | Anderes Addon öffnen | Öffnet z.B. `plugin://plugin.video.youtube/`. |
 | Video / Stream abspielen | Spielt eine Adresse (`https://…`) oder Datei ab. |
 | Play / Pause · Nächster Titel · Wiedergabe stoppen | Steuert die laufende Wiedergabe. |
-| Zurück (vorherige Seite) | Eine Seite zurück. Auf der Startseite schließt es das Addon. |
+| Zurück (vorherige Seite) | Eine Seite zurück. Was auf der Startseite passiert, legst du unter „⬅ Zurück auf der Startseite“ fest (siehe [Kapitel 26](#k26)). |
 | Zur Startseite dieses Addons | Springt direkt zur Startseite – egal wie tief man ist. |
 | Addon komplett schließen | Beendet das Addon (danach Kodi-Startseite). |
 | Kodi-Einstellungen öffnen · Kodi beenden | |
@@ -643,6 +653,7 @@ Alles ist optional und wirkt sofort. Während die Werkstatt offen ist, zeigt dir
 |---|---|
 | 🏠 Beenden führt zur Kodi-Startseite | Wer das Addon verlässt, landet auf der Kodi-Startseite statt in Kodis Video-Ansicht. *(Standard: an)* |
 | ↩ Nach Kodi-Fenstern zurück ins Menü | Nach Kodi-Fenstern, anderen Addons und Videos öffnet sich dein Menü wieder. *(Standard: an)* |
+| ⬅ Zurück auf der Startseite | **Schließt das Addon** (Standard) · **Erst beim zweiten Zurück schließen** – beim ersten Mal erscheint „Zum Verlassen noch einmal Zurück drücken“ · **Schließt das Addon nie** – verlassen nur über einen Button mit „Addon komplett schließen“. Auf Unterseiten geht Zurück immer eine Seite zurück. Auch direkt in den Einstellungen über Bereich 6 zu finden. |
 | ❓ Beim Verlassen nachfragen | „Addon wirklich verlassen?“ auf der Startseite. |
 | 🧠 Letzte Seite merken | Das Addon öffnet sich dort, wo man es verlassen hat. |
 | 🔗 Direkt-Links erlauben | Jede Seite lässt sich direkt öffnen (siehe [Kapitel 38](#k38)). *(Standard: an)* |
@@ -1048,6 +1059,9 @@ Die Option „Beim Kodi-Start automatisch öffnen“ steht danach in den Addon-E
 **Mein Menü ist nach einem Update noch das alte.**
 Version erhöhen (＋), neu exportieren und erneut aus der ZIP installieren. Hilft das nicht: altes Addon deinstallieren und neu installieren.
 
+**Zurück wirft mich aus dem Addon.**
+Auf der Startseite schließt Zurück das Addon – so ist es voreingestellt. Unter **⬅ Zurück auf der Startseite** (Einstellungen über Bereich 6 oder 🛠 Modding → Schalter) wählst du „Erst beim zweiten Zurück schließen“ oder „Schließt das Addon nie“. Bei „nie“ brauchst du einen Button mit **Addon komplett schließen** – fehlt er, exportiert der Generator zur Sicherheit „Erst beim zweiten Zurück schließen“, damit niemand festsitzt.
+
 **Nach dem Beenden lande ich in Kodis Video-Ansicht.**
 Modding-Werkstatt → 🎛 Schalter → **🏠 Beenden führt zur Kodi-Startseite** einschalten und neu exportieren.
 
@@ -1129,6 +1143,154 @@ Ja: 3 · Design → **🖼 Hintergrundbild** wählen (oder mit ✖ entfernen). E
 | Tab (im Editor) | einrücken |
 
 Auf dem Mac gilt **Cmd** statt Strg. Auf Handy und Tablet nutzt du die Knöpfe ◀ ▲ ▼ ▶, ⧉, 🗑 und ↩ ↪.
+
+---
+
+# Teil G – Titan-Modus: dein eigener Kodi-Skin
+
+<a id="k45"></a>
+
+## 45. Was ist der Titan-Modus?
+
+Mit dem Titan-Modus baust du einen **echten Kodi-Skin** – also das Aussehen von **ganz Kodi**, nicht nur von deinem Addon. Heraus kommt ein installierbarer Skin `skin.<name>`.
+
+**Stufe A (jetzt verfügbar): Estuary umbauen.** Grundlage ist Estuary, der offizielle Standard-Skin von Kodi. Alles, was Estuary kann – Bibliothek, Ansichten, Player, Einstellungen, Dialoge – funktioniert weiter. Darüber legst du dein eigenes Design: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte und Widgets.
+
+- **Öffnen:** **⚡ Titan** in der Kopfzeile oder **7 · ⚡ Titan-Modus** in den Einstellungen.
+- **Aufbau:** links (auf dem Handy oben) eine **Live-Vorschau im Estuary-Stil**, rechts sechs Reiter: 🧬 Basis · 🎨 Farben · 📋 Hauptmenü · 🧩 Widgets · 🖼 Bilder & Schrift · 📦 Export.
+- Auf dem Handy bleibt die Vorschau beim Scrollen oben stehen – du siehst jede Änderung sofort.
+- Alle Titan-Einstellungen gehören zu deinem Projekt und werden mit **💾 Speichern** mitgesichert.
+
+<a id="k46"></a>
+
+## 46. Grundlage laden (Reiter 🧬 Basis)
+
+| Einstellung | Bedeutung |
+|---|---|
+| **Kodi-Version** | 19 Matrix, 20 Nexus, 21 Omega oder 22 Piers. Ein Skin passt immer nur zu **einer** Kodi-Version – wähle die deines Geräts. |
+| **Name, Version, Autor** | Aus dem Namen entsteht die ID, z.B. `skin.titankino`. Für Updates die Version mit ＋ erhöhen. |
+| **Sprachen** | Deutsch + Englisch (kleinere ZIP) oder alle Sprachen von Estuary. |
+
+**So kommt Estuary in den Generator:**
+
+- **⬇ Estuary laden (offiziell von Kodi):** lädt die passende Fassung direkt aus dem offiziellen Kodi-Archiv auf GitHub (rund 900 Dateien, etwa 10 MB). Danach bleibt sie im Browser gespeichert. Passiert auch automatisch beim ersten Export.
+- **📦 Eigene Skin-ZIP:** die Alternative ohne Internet. Packe den Ordner `skin.estuary` deiner Kodi-Installation als ZIP und lade ihn hoch. Die Kodi-Version wird dabei automatisch erkannt.
+
+| System | Ordner von Estuary |
+|---|---|
+| Windows | `C:\Program Files\Kodi\addons\skin.estuary` |
+| Linux, LibreELEC | `/usr/share/kodi/addons/skin.estuary` |
+| macOS | `/Applications/Kodi.app/Contents/Resources/Kodi/addons/skin.estuary` |
+| Android | steckt in der App – hier bitte „⬇ Estuary laden“ nutzen |
+
+💡 GitHub erlaubt ohne Anmeldung 60 Abfragen pro Stunde – ein Laden braucht nur zwei davon. **🗑 Zwischenspeicher leeren** löscht die gespeicherten Fassungen wieder.
+
+⚠️ Andere Skins als Estuary lassen sich hochladen, dann klappen aber nur Farben und Schrift sicher.
+
+<a id="k47"></a>
+
+## 47. Farben, Hintergrund, Logo und Schrift
+
+### Reiter 🎨 Farben
+
+15 fertige **Farbwelten** (⚡ Titan plus die 14 Farben von Estuary) und **🔗 Wie mein Addon-Design**. Danach jede Farbe einzeln:
+
+| Farbe | Wirkt auf |
+|---|---|
+| ✨ Akzent / Fokus | ausgewählte Menüpunkte, Buttons, Rahmen, Regler |
+| 🌌 Hintergrund | färbt das Hintergrundbild von Estuary ein |
+| 🔷 Muster (mit Deckkraft) | das feine Muster über dem Hintergrund |
+| 🪟 Fenster & Dialoge | Menüs, Info-Fenster, Einstellungen |
+| ⭐ Markiert / Gesehen | Häkchen, Markierungen, Hinweise |
+| 🔤 Text / 🔡 Text gedimmt | Schrift und Zweitzeilen |
+
+### Reiter 🖼 Bilder & Schrift
+
+- **Hintergrund:** Estuary-Muster in deinen Farben – oder ein **eigenes Bild** mit Regler zum Abdunkeln. **🔗 Wie im Addon** übernimmt das Hintergrundbild aus dem Designer.
+- **Logo oben links:** ersetzt das Kodi-Logo auf der Startseite (PNG mit durchsichtigem Hintergrund im Querformat).
+- **Knöpfe über dem Menü:** Ausschalten-Menü, Einstellungen und Suche einzeln ein- oder ausblenden.
+- **Schriftgröße:** 80–130 % für den ganzen Skin.
+- **Eigene Schrift:** TTF oder OTF bis 3 MB – ersetzt die normale Schrift (Noto Sans). Achte darauf, dass du die Schrift weitergeben darfst, z.B. von Google Fonts.
+- **Icon & Fanart des Skins:** automatisch in deinen Farben, wie dein Addon (inklusive Screenshots) oder die Originale von Estuary.
+
+<a id="k48"></a>
+
+## 48. Hauptmenü und eigene Menüpunkte
+
+Im Reiter **📋 Hauptmenü** steht jeder Menüpunkt von Estuary als Zeile:
+
+- **Schalter** = anzeigen oder ausblenden, **↑ ↓** = Reihenfolge,
+- **Name** – leer lassen, dann zeigt Kodi den Original-Namen in deiner Sprache,
+- **Symbol** – eines der 17 Estuary-Symbole oder ein **eigenes Bild** (wird auf 95×95 gebracht; weiße Symbole auf durchsichtigem Grund wirken am besten).
+
+„Disc“ erscheint in Kodi nur bei eingelegter Disc, „Spiele“ nur, wenn Spiele in Kodi aktiviert sind.
+
+### Eigene Menüpunkte (bis zu 9)
+
+**＋ Mein Addon als Menüpunkt** legt sofort einen Punkt an, der dein Addon aus dem Designer öffnet. **＋ Eigener Menüpunkt** kann noch mehr:
+
+| Klick-Aktion | Was passiert |
+|---|---|
+| Mein Addon öffnen | öffnet dein Addon mit seinem eigenen Menü |
+| Eine Seite meines Addons | springt direkt auf eine Unterseite (dafür im 🛠 Modding „Direkt-Links erlauben“ an lassen) |
+| Anderes Addon öffnen | ID wie `plugin.video.youtube` oder eine `plugin://…`-Adresse |
+| Kodi-Befehl | aus der 📚 Befehlsliste oder selbst geschrieben |
+| Nichts | nur zum Anzeigen von Widgets |
+
+💡 **Die perfekte Kombi:** Addon im Designer bauen, im Skin einen Menüpunkt „Mein Addon“ anlegen – fertig ist dein eigenes Kodi von vorne bis hinten. Installiere dafür **beide** ZIPs.
+
+<a id="k49"></a>
+
+## 49. Widgets im Skin
+
+Im Reiter **🧩 Widgets** wählst du oben den Menüpunkt. Bei den Estuary-Punkten entscheidest du:
+
+- **Wie Estuary** – die Reihen bleiben wie im Original (Kategorien, Weiterschauen, Neu …),
+- **Eigene Widgets** – deine Reihen ersetzen die von Estuary. Eigene Menüpunkte haben immer eigene Widgets.
+
+Pro Menüpunkt bis zu **9 Widgets**. Jedes hat:
+
+| Einstellung | Möglichkeiten |
+|---|---|
+| **Quelle** | dieselben 14 Quellen wie im Designer: Neue Filme, Filme weiterschauen, Noch nicht gesehen, Zufällige Filme, Am besten bewertet, Neue Folgen, Serien weiterschauen, Zufällige Serien, Neue Alben, Zuletzt gehört, Zufällige Alben, Video-Playlists, Inhalt aus einem Addon, Eigene Quelle |
+| **Überschrift** | leer = Name der Quelle |
+| **Darstellung** | 🎬 Poster · 🖼 Breitbild · 💿 Quadratisch · 📋 Kategorien |
+| **Kodi-Pfad, Art der Medien** | nur bei „Eigene Quelle“ und „Inhalt aus einem Addon“ |
+
+Die Widgets füllt **Kodi selbst** – mit den bewährten Widget-Bausteinen von Estuary. Das ist schnell, braucht kein Python, zeigt beim Laden den Kodi-Kreisel und blendet leere Reihen aus. In Kodi geht es mit **→** vom Menü in die Widgets und mit **←** zurück.
+
+<a id="k50"></a>
+
+## 50. Export und Installation
+
+Im Reiter **📦 Export** prüft der Generator deine Einstellungen (fehlende Namen, Befehle, Pfade …) und baut mit **⚡ Skin-ZIP bauen** die Datei `skin.<name>-<version>.zip` (rund 5 MB).
+
+1. ZIP auf das Kodi-Gerät kopieren.
+2. **Einstellungen → Addons → Aus ZIP-Datei installieren**.
+3. Kodi fragt, ob du zum neuen Skin wechseln willst → **Ja**. Danach „Änderung beibehalten?“ → **Ja**. Bestätigst du nicht, schaltet Kodi nach ein paar Sekunden von selbst zurück – so kann nichts schiefgehen.
+4. **Zurück zu Estuary:** Einstellungen → Oberfläche → Skin → Skin → Estuary.
+
+- **Update:** Version erhöhen (🧬 Basis), neu bauen, erneut installieren.
+- **Skin-Einstellungen** (Einstellungen → Oberfläche → Skin → Konfigurieren) sind die von Estuary und werden für deinen Skin getrennt gespeichert.
+
+**Wenn etwas hakt:**
+
+| Problem | Lösung |
+|---|---|
+| Installation meldet fehlende Abhängigkeiten | Die gewählte Kodi-Version passt nicht zum Gerät – in 🧬 Basis ändern und neu bauen. |
+| Eigener Menüpunkt tut nichts | Ist dein Addon installiert? Bei Seiten-Links „Direkt-Links erlauben“ prüfen. |
+| Ein Widget bleibt leer | Inhalte in der Bibliothek vorhanden? Pfad korrekt? Leere Reihen blendet Kodi aus. |
+| Hintergrund zu dunkel oder zu hell | Regler „Abdunkeln“ unter 🖼 Bilder & Schrift. |
+
+<a id="k51"></a>
+
+## 51. Lizenz und wie es weitergeht
+
+Estuary stammt von **phil65 und Team Kodi**: der Code steht unter der **GPL-2.0**, die Grafiken unter **CC BY-SA 4.0**. Ein daraus gebauter Skin steht deshalb automatisch unter denselben freien Lizenzen. Die Lizenztexte (`LICENSE.txt`) und ein Hinweis auf die Grundlage (`TITAN.txt`) liegen in jeder Skin-ZIP. Du darfst deinen Skin weitergeben – er muss dann aber frei bleiben und Estuary nennen.
+
+Der **Generator selbst** bleibt unter der IT('s) Possible Freeware-Lizenz geschützt ([LICENSE](LICENSE)).
+
+**Als Nächstes – Stufe B:** eigene Fenster von Grund auf, angefangen mit der Startseite aus dem Designer als echte Skin-Startseite.
 
 ---
 
