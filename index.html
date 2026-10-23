@@ -643,7 +643,7 @@ System|♻|Kodi neu starten|RestartApp|Startet nur Kodi neu
 System|❌|Kodi beenden|Quit|Schließt Kodi
 System|😴|Ruhezustand|Suspend|Gerät in den Ruhezustand
 System|🔁|Gerät neu starten|Reboot|Startet das ganze Gerät neu
-System|🔌|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
+System|⏻|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
 System|⏲|Sleep-Timer 30 Minuten|AlarmClock(Schlaftimer,Quit,30,silent)|Beendet Kodi nach 30 Minuten
 System|🚫|Sleep-Timer abbrechen|CancelAlarm(Schlaftimer)|Bricht den Sleep-Timer ab
 System|🐞|Debug-Log umschalten|ToggleDebug|Ausführliches Protokoll an/aus
@@ -716,7 +716,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
 
     const btn = (label, icon, x, y, t, v = '', extra = {}) => mk('button', Object.assign({ label, icon, x, y, w: 420, h: 110, act: { t, v } }, extra));
 
-    const defMod = () => ({ fzoom: false, zoom: 106, stagger: false, shadow: false, font: 'font13', ftc: '#000000', swOn: '#22c55e', grid: 20, confirmExit: false, backMode: 'exit', remember: false, deeplinks: true, homeExit: true, retMenu: true, autostart: false, autoDelay: 5, autoDef: false, bgmOn: false, bgm: '', bgmIdle: true, bgmStop: true, hooks: false, debug: false, keys: [] });
+    const defMod = () => ({ fzoom: false, zoom: 106, stagger: false, shadow: false, font: 'font13', ftc: '#000000', swOn: '#22c55e', grid: 20, confirmExit: false, backMode: 'exit', remember: false, deeplinks: true, ctx: true, homeExit: true, retMenu: true, autostart: false, autoDelay: 5, autoDef: false, bgmOn: false, bgm: '', bgmIdle: true, bgmStop: true, hooks: false, debug: false, keys: [] });
     const defUi = () => ({ ids: false, guides: false, safe: false, pip: true, pipSize: null, pipPos: null });
 
     function tpl(name) {
@@ -803,7 +803,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       const title = t => mk('text', { label: t, x: 100, y: 50, w: 900, h: 110, font: 'font45', anim: ['left'] });
       const menu = [['Filme', '🎬', 'page', 'filme'], ['Serien', '📺', 'custom', 'ActivateWindow(videos,videodb://tvshows/titles/,return)'], ['Live TV', '📡', 'page', 'tv'], ['Musik', '🎵', 'page', 'musik'], ['Info', 'ℹ', 'page', 'info']]
         .map((m, i) => btn(m[0], m[1], 100, 270 + i * 116, m[2], m[3], { w: 440, h: 96, al: 'left', anim: ['left'], adelay: i * 80 }));
-      menu.push(btn('Beenden', '🔌', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
+      menu.push(btn('Beenden', '⏻', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
       const tile = (l, cmd) => li(l, '', 'custom', cmd);
       return [
         p('home', 'Start', [
@@ -2631,6 +2631,8 @@ HOME = xbmcgui.Window(HOME_ID)
 RUN_KEY = 'kfe.run.' + ADDON_ID
 TOKEN = '%.6f' % time.time()
 BACK_ACTIONS = (10, 92)
+ACTION_RIGHT_CLICK = 101
+ACTION_CONTEXT = 117
 DIR_WINDOWS = {'music': 'Music', 'pictures': 'Pictures', 'programs': 'Programs'}
 NAV_PROPS = ['title', 'thumbnail', 'art', 'plot']
 PENDING = {}
@@ -2930,6 +2932,64 @@ def leave_ok():
     return confirm_exit()
 
 
+# ---------- Favoriten und Wiedergabeliste (fuer das Kontextmenue) ----------
+def fav_page(page_id):
+    from urllib.parse import urlencode
+    return {'type': 'window', 'window': 'videos', 'windowparameter': 'plugin://%s/?%s' % (ADDON_ID, urlencode({'page': page_id}))}
+
+
+def fav_browse(path, title, page=None):
+    from urllib.parse import urlencode
+    target = page or CONFIG.get('browse') or ''
+    return {'type': 'window', 'window': 'videos', 'windowparameter': 'plugin://%s/?%s' % (ADDON_ID, urlencode({'page': target, 'path': path, 'title': title or ''}))}
+
+
+def fav_find(fav):
+    res = rpc('Favourites.GetFavourites', {'properties': ['path', 'window', 'windowparameter']}, True) or {}
+    want = fav.get('windowparameter') if fav.get('type') == 'window' else fav.get('path')
+    for item in res.get('favourites') or []:
+        have = item.get('windowparameter') if fav.get('type') == 'window' else item.get('path')
+        if have and want and have.strip('"') == want:
+            return True
+    return False
+
+
+def fav_toggle(title, thumb, fav):
+    params = dict(fav, title=title or ADDON_NAME)
+    if thumb:
+        params['thumbnail'] = thumb
+    there = fav_find(fav)
+    # Kodi entfernt einen vorhandenen Favoriten beim erneuten Hinzufuegen
+    if rpc('Favourites.AddFavourite', params) is None:
+        notify('Favorit konnte nicht gespeichert werden', xbmcgui.NOTIFICATION_WARNING)
+    else:
+        notify('Aus den Favoriten entfernt' if there else 'Als Favorit gespeichert: %s' % (title or ''), ms=2500)
+
+
+def fav_entry(title, thumb, fav, what=None):
+    if not fav:
+        return None
+    there = fav_find(fav)
+    text = ('%s aus Favoriten entfernen' if there else '%s als Favorit speichern') % (what or 'Eintrag')
+    return (text, lambda: fav_toggle(title, thumb, fav))
+
+
+def playlist_add(path, media):
+    pid = 0 if media == 'music' else 1
+    if rpc('Playlist.Add', {'playlistid': pid, 'item': {'file': path}}) is None:
+        notify('Konnte nicht zur Wiedergabeliste hinzugefügt werden', xbmcgui.NOTIFICATION_WARNING)
+    else:
+        notify('Zur Wiedergabeliste hinzugefügt', ms=2000)
+
+
+def favourites_cmd():
+    try:
+        major = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
+    except Exception:
+        major = 20
+    return 'ActivateWindow(favouritesbrowser)' if major >= 20 else 'ActivateWindow(favourites)'
+
+
 # ---------- Menü-Fenster ----------
 class MenuBase(object):
     page_id = None
@@ -3212,16 +3272,159 @@ class MenuBase(object):
 
     def onAction(self, action):
         aid = action.getId()
+        try:
+            code = action.getButtonCode()
+        except Exception:
+            code = 1
+        skip = getattr(self, 'rc_skip', False)
+        self.rc_skip = False
+        if aid == ACTION_RIGHT_CLICK:
+            # Langes Druecken (Touch) bzw. Rechtsklick
+            self.cancel_back()
+            if not skip:
+                self.context()
+            return
         act = KEYS.get(str(aid))
         if act:
             self.do(act)
             return
+        if aid == ACTION_CONTEXT:
+            self.cancel_back()
+            if code == 0 and self.focus_is_list():
+                # Auf einer Liste schickt Kodi danach noch einen Rechtsklick hinterher
+                self.rc_skip = True
+            self.context()
+            return
         if aid in BACK_ACTIONS:
-            if self.nav_up():
+            if aid == 10 and code == 0:
+                # Kodi macht aus langem Druecken auf einem Button ein Zurueck ohne Tastencode.
+                # Kurz warten: folgt ein Rechtsklick, war es kein echtes Zurueck.
+                self.defer_back()
                 return
-            if self.page_id == ROOT and not leave_ok():
-                return
-            self.finish(None)
+            self.back_now()
+
+    def back_now(self):
+        self.back_timer = None
+        if self.nav_up():
+            return
+        if self.page_id == ROOT and not leave_ok():
+            return
+        self.finish(None)
+
+    def defer_back(self):
+        import threading
+        self.cancel_back()
+        timer = threading.Timer(0.4, self.back_now)
+        timer.daemon = True
+        self.back_timer = timer
+        timer.start()
+
+    def cancel_back(self):
+        timer = getattr(self, 'back_timer', None)
+        if timer:
+            timer.cancel()
+        self.back_timer = None
+
+    def focus_is_list(self):
+        try:
+            fid = str(self.getFocusId())
+        except Exception:
+            return False
+        if fid in LISTS.get(self.page_id, {}):
+            return True
+        return (ACTIONS.get(self.page_id, {}).get(fid) or {}).get('k') == 'list'
+
+    # ---------- Eigenes Kontextmenue (lange druecken, Rechtsklick, Taste C) ----------
+    def context(self):
+        if not OPTS.get('ctx', True):
+            return
+        try:
+            fid = str(self.getFocusId())
+        except Exception:
+            fid = ''
+        entries = []
+        info = {'page': self.page_id, 'control': fid, 'label': '', 'path': '', 'folder': False}
+        dyn = getattr(self, 'dirs', {}).get(fid)
+        if dyn:
+            media, rows = dyn
+            pos = self.list_pos(int(fid))
+            if 0 <= pos < len(rows):
+                path, ftype, playable, label = rows[pos]
+                thumb, plot = '', ''
+                try:
+                    li = self.getControl(int(fid)).getListItem(pos)
+                    thumb = li.getArt('thumb') or ''
+                    plot = li.getProperty('kfe.plot') or ''
+                except Exception:
+                    pass
+                folder = ftype == 'directory'
+                info.update(label=label, path=path, folder=folder, thumb=thumb)
+                data = LISTS.get(self.page_id, {}).get(fid) or {}
+                win = DIR_WINDOWS.get(media, 'Videos')
+                if folder:
+                    entries.append(('Öffnen', lambda: self.onClick(int(fid))))
+                    if data.get('nav') and CONFIG.get('browse') and OPTS.get('deeplinks'):
+                        fav = fav_browse(path, label)
+                        entries.append(fav_entry(label, thumb, fav))
+                    else:
+                        entries.append(fav_entry(label, thumb, {'type': 'window', 'window': win.lower(), 'windowparameter': path}))
+                    entries.append(('In Kodis eigener Ansicht öffnen', lambda: self.finish(('cmd', 'ActivateWindow(%s,"%s",return)' % (win, path)))))
+                elif playable is False:
+                    entries.append(('Ausführen', lambda: self.onClick(int(fid))))
+                else:
+                    entries.append(('Abspielen', lambda: self.onClick(int(fid))))
+                    entries.append(('Zur Wiedergabeliste hinzufügen', lambda: playlist_add(path, media)))
+                    entries.append(fav_entry(label, thumb, {'type': 'media', 'path': path}))
+                if plot:
+                    entries.append(('Beschreibung anzeigen', lambda: xbmcgui.Dialog().textviewer(label, plot)))
+        else:
+            act = ACTIONS.get(self.page_id, {}).get(fid)
+            label = ''
+            if act and act.get('k') == 'list':
+                pos = self.list_pos(int(fid))
+                items = act.get('items') or []
+                act = items[pos] if 0 <= pos < len(items) else None
+                try:
+                    label = self.getControl(int(fid)).getListItem(pos).getLabel()
+                except Exception:
+                    pass
+            elif act:
+                try:
+                    label = self.getControl(int(fid)).getLabel()
+                except Exception:
+                    pass
+            if act:
+                info['label'] = label
+                entries.append(('Ausführen', lambda: self.do(act)))
+                kind = act.get('k')
+                if kind == 'page' and act.get('v') in PAGES and OPTS.get('deeplinks'):
+                    target = act.get('v')
+                    entries.append(fav_entry(label or PAGES[target].get('name', ''), '', fav_page(target)))
+                elif kind == 'browse' and OPTS.get('deeplinks') and (act.get('p') or CONFIG.get('browse')):
+                    entries.append(fav_entry(label or act.get('l') or 'Ordner', '', fav_browse(act.get('v', ''), act.get('l') or label, act.get('p'))))
+                elif kind == 'cmd' and act.get('c', '').lower().startswith('playmedia('):
+                    media_path = act.get('c', '')[10:].rstrip(')').strip('"')
+                    entries.append(fav_entry(label or 'Video', '', {'type': 'media', 'path': media_path}))
+        if OPTS.get('deeplinks'):
+            name = PAGES.get(self.page_id, {}).get('name', '')
+            entries.append(fav_entry('%s - %s' % (ADDON_NAME, name) if self.page_id != ROOT else ADDON_NAME, '', fav_page(self.page_id), 'Dieses Menü'))
+        entries.append(('Kodi-Favoriten öffnen', lambda: self.run_cmd(favourites_cmd())))
+        if os.path.exists(os.path.join(REAL_PATH, 'resources', 'settings.xml')):
+            entries.append(('Einstellungen dieses Addons', lambda: xbmc.executebuiltin('Addon.OpenSettings(%s)' % ADDON_ID)))
+        extra = call_hook('kontextmenue', False, self, info) if hooks() else None
+        if isinstance(extra, (list, tuple)):
+            for ent in extra:
+                if isinstance(ent, (list, tuple)) and len(ent) == 2 and ent[0]:
+                    entries.append((str(ent[0]), (lambda v=ent[1]: self.handle_return(v))))
+        entries = [e for e in entries if e]
+        if not entries:
+            return
+        pick = xbmcgui.Dialog().contextmenu([e[0] for e in entries])
+        if 0 <= pick < len(entries):
+            try:
+                entries[pick][1]()
+            except Exception as exc:
+                log('Kontextmenue: %s' % exc, xbmc.LOGWARNING)
 
     def finish(self, result):
         self.result = result
@@ -3300,6 +3503,9 @@ def start_stack():
                 if p.get('name', '').lower() == target.lower():
                     target = p['id']
                     break
+        if target in PAGES and params.get('path'):
+            # Favorit auf einen Ordner: im eigenen Browser genau dort starten
+            PENDING[target] = (params.get('path'), params.get('title', ''))
     if not target and OPTS.get('remember'):
         target = STATE.get('last')
     if target in PAGES and target != ROOT:
@@ -3395,6 +3601,11 @@ So nutzt du sie:
       'browse:PFAD' -> Ordner im eigenen Browser zeigen, z.B. 'browse:plugin://plugin.video.xyz/'
       jeder andere Text wird als Kodi-Befehl ausgefuehrt,
       z.B. 'ActivateWindow(home)' oder 'PlayMedia(https://...)'
+
+Kontextmenue erweitern (lange druecken / Taste C):
+  kontextmenue(window, info) -> Liste von (Beschriftung, Rueckgabe) wie oben,
+  z.B. [('Im Browser suchen', 'browse:plugin://plugin.video.xyz/?mode=search')]
+  info enthaelt page, control, label, path und folder des gewaehlten Eintrags.
 
 Automatisch aufgerufen (wenn vorhanden):
   on_start()                -> beim Start des Addons
@@ -3870,7 +4081,7 @@ if __name__ == '__main__':
         browse: (browsePage() || {}).id || '',
         opts: {
           home_exit: !!M.homeExit, return_menu: !!M.retMenu,
-          confirm_exit: !!M.confirmExit, back_mode: M.backMode === 'stay' && !hasExit() ? 'twice' : (M.backMode || 'exit'), remember: !!M.remember, deeplinks: !!M.deeplinks, hooks: hooksOn(), debug: !!M.debug,
+          confirm_exit: !!M.confirmExit, back_mode: M.backMode === 'stay' && !hasExit() ? 'twice' : (M.backMode || 'exit'), remember: !!M.remember, deeplinks: !!M.deeplinks, ctx: M.ctx !== false, hooks: hooksOn(), debug: !!M.debug,
           bgm: M.bgmOn && bg ? (/^[a-z]+:/i.test(bg) ? bg : cleanPath(bg)) : '', bgm_idle: !!M.bgmIdle, bgm_stop: !!M.bgmStop
         }
       }, null, 2);
@@ -4149,7 +4360,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Mit dem <b>📂 Live-Browser</b> zeigst du das Addon direkt in deinem Skin – Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos starten sofort, Kodis eigene Ansicht taucht nicht auf. Oder du baust Buttons im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Benötigte Module (z. B. <code>bs4</code>, <code>requests</code>) erkennt der Generator und trägt sie selbst in die addon.xml ein. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Mit dem <b>📂 Live-Browser</b> zeigst du das Addon direkt in deinem Skin – Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos starten sofort, Kodis eigene Ansicht taucht nicht auf. Oder du baust Buttons im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Benötigte Module (z. B. <code>bs4</code>, <code>requests</code>) erkennt der Generator und trägt sie selbst in die addon.xml ein. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>🖱 Kontextmenü (neu):</b> Lange drücken (Touch), Rechtsklick oder Taste C öffnet im fertigen Addon ein eigenes Menü: Öffnen, <b>Als Favorit speichern/entfernen</b> (Ordner aus dem Live-Browser öffnen sich als Favorit direkt in deinem Skin), Zur Wiedergabeliste, Beschreibung, Kodi-Favoriten und Addon-Einstellungen. Abschaltbar im 🛠 Modding, erweiterbar mit <code>kontextmenue()</code> in custom.py.</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
@@ -4251,6 +4462,7 @@ if __name__ == '__main__':
           ${backRow()}
           ${tgM('mod', 'confirmExit', '❓ Beim Verlassen nachfragen', '„Zurück“ auf der Startseite fragt erst „Addon wirklich verlassen?“.')}
           ${tgM('mod', 'remember', '🧠 Letzte Seite merken', 'Das Addon öffnet sich wieder dort, wo man es verlassen hat.')}
+          ${tgM('mod', 'ctx', '🖱 Kontextmenü (lange drücken, Rechtsklick, Taste C)', 'Eigenes Kontextmenü im Addon: Öffnen, Als Favorit speichern/entfernen (auch Ordner aus dem Live-Browser), Wiedergabeliste, Beschreibung, Kodi-Favoriten, Addon-Einstellungen. Mit custom.py kontextmenue() erweiterbar.')}
           ${tgM('mod', 'deeplinks', '🔗 Direkt-Links erlauben', 'Jede Seite lässt sich direkt öffnen – z.B. als Kodi-Favorit. Links stehen im „🔍 Inspektor“.')}
           ${tgM('mod', 'autostart', '🚀 Autostart-Option einbauen', 'Dein Addon kann sich beim Kodi-Start selbst öffnen.', M.autostart ? auto : '', true)}
           ${tgM('mod', 'bgmOn', '🎵 Hintergrundmusik', 'Spielt beim Öffnen des Addons Musik oder einen Radio-Stream.', M.bgmOn ? bgm : '', true)}
@@ -4508,13 +4720,13 @@ if __name__ == '__main__':
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
       ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
-      ['buttons', '🔌', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
+      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
       ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', true],
       ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', true],
       ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
     ];
     // Knöpfe über dem Menü, wenn sie einzeln platziert werden: [Schlüssel, Symbol, Name]
-    const TTOP = [['power', '🔌', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
+    const TTOP = [['power', '⏻', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
     const defTp = () => ({ power: { x: -8, y: 100 }, settings: { x: 172, y: 100 }, search: { x: 352, y: 100 } });
     const defLay = () => {
       const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
@@ -4771,7 +4983,7 @@ if __name__ == '__main__':
         : `<div style="position:absolute;left:94px;top:30px;height:56px;display:flex;align-items:center;gap:10px;font:700 40px Arial;letter-spacing:4px;color:${C.text}"><span style="display:inline-block;width:44px;height:44px;border-radius:10px;background:${C.focus};transform:rotate(45deg) scale(.75)"></span>KODI</div>`;
       const now = new Date();
       P.clock = `<div style="position:absolute;left:1260px;width:600px;top:22px;text-align:right;color:${C.text}"><div style="font:400 64px Arial;line-height:1">${now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div><div style="font:400 26px Arial;color:${C.grey};margin-top:6px">${now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>`;
-      const tb = [['power', '🔌'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
+      const tb = [['power', '⏻'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
       P.buttons = single ? '' : `<div style="position:absolute;left:0;top:100px;width:462px;height:110px;display:flex;justify-content:space-around;align-items:center;font-size:52px;color:${C.text}">${tb.map(x => `<span style="opacity:.85">${x[1]}</span>`).join('')}</div>`;
       const tbs = !single ? '' : tb.map(x => { const p = L.tp[x[0]]; return `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;color:${C.text};opacity:.85">${x[1]}</div>`; }).join('');
       // Hauptmenü: Liste wie Estuary oder einzelne Buttons
@@ -4996,7 +5208,7 @@ if __name__ == '__main__':
           <div class="flex flex-wrap gap-1.5 mt-2 items-center"><span class="hint">Alle Buttons:</span><button class="btn" onclick="tiMbArrange('dh')" title="Abstände waagerecht angleichen">↔ verteilen</button><button class="btn" onclick="tiMbArrange('dv')" title="Abstände senkrecht angleichen">↕ verteilen</button><button class="btn" onclick="tiMbArrange('row')" title="alle auf die Höhe des ersten">≡ eine Reihe</button><button class="btn" onclick="tiMbArrange('col')" title="alle unter den ersten">‖ eine Spalte</button></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
         </div>`;
       h += btn ? tiMbList().map(m => tiLayRow('mb:' + m.id)).join('') : tiLayRow('menu');
-      h += `<div class="card mt-3"><b class="text-xs">🔌 Knöpfe über dem Menü</b>
+      h += `<div class="card mt-3"><b class="text-xs">⏻ Knöpfe über dem Menü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${sgl ? '' : 'titb'}" onclick="tiLayTm('group')">Zusammen (Leiste)</button><button class="btn ${sgl ? 'titb' : ''}" onclick="tiLayTm('single')">Einzeln platzieren</button></div></div>`;
       h += sgl ? TTOP.map(x => tiLayRow('tb:' + x[0])).join('') : tiLayRow('buttons');
       ['widgets', 'logo', 'clock', 'bottom'].forEach(k => { h += tiLayRow(k); });
@@ -5556,7 +5768,7 @@ if __name__ == '__main__':
           <label class="l">Abdunkeln <span class="text-amber-300" id="ti-dim">${T.bg.dim} %</span></label><input type="range" min="0" max="90" value="${T.bg.dim}" class="w-full" oninput="tiSet('bg.dim',+this.value);$('ti-dim').textContent=this.value+' %'">${T.bg.img ? '' : '<p class="hint">Noch kein Bild gewählt – bis dahin bleibt das Estuary-Muster.</p>'}` : '<p class="hint mt-1">Das Muster nimmt deine Farben aus „🎨 Farben“ an.</p>'}</div>
         <div class="card mt-3"><b class="text-xs">🏷 Logo oben links</b><p class="hint mt-1">Ersetzt das Kodi-Logo auf der Startseite. Am besten ein PNG mit durchsichtigem Hintergrund im Querformat.</p>
           <div class="flex gap-2 mt-2 items-center">${T.logo ? `<img src="${T.logo}" alt="Logo" style="height:32px;max-width:120px;object-fit:contain;background:#0b1220;border-radius:6px;padding:2px">` : ''}<button class="btn flex-1" onclick="$('f-tlogo').click()">🖼 ${T.logo ? 'Anderes Logo' : 'Logo wählen'}</button>${T.logo ? '<button class="btn" onclick="tiSet(\'logo\',null,true)">✖ Kodi-Logo</button>' : ''}</div></div>
-        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '🔌 Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
+        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '⏻ Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
         <div class="card mt-3"><b class="text-xs">🔤 Schrift</b>
           <label class="l">Schriftgröße <span class="text-amber-300" id="ti-fs">${T.fontScale} %</span></label><input type="range" min="80" max="130" step="5" value="${T.fontScale}" class="w-full" oninput="tiSet('fontScale',+this.value);$('ti-fs').textContent=this.value+' %'">
           <p class="hint">Gilt für den ganzen Skin. 100 % = wie Estuary.</p>
