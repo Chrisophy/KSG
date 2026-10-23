@@ -3969,7 +3969,7 @@ if __name__ == '__main__':
         L.mm = L0.mm === 'btn' ? 'btn' : 'list'; L.tm = L0.tm === 'single' ? 'single' : 'group';
         const m0 = (L0.mb && typeof L0.mb === 'object') ? L0.mb : {}, d0 = L.mb;
         L.mb = { w: cl(m0.w, 60, 1900, d0.w), h: cl(m0.h, 40, 600, d0.h), ic: cl(m0.ic, 16, 300, d0.ic), ip: ['left', 'top', 'none', 'only'].includes(m0.ip) ? m0.ip : d0.ip, fs: cl(m0.fs, 16, 80, d0.fs), al: m0.al === 'center' ? 'center' : 'left', fx: ['zoom', 'lift'].includes(m0.fx) ? m0.fx : 'none', fxv: cl(m0.fxv, 2, 40, 8) };
-        L.gd = L0.gd === true; L.sf = L0.sf === true; L.cd = {};
+        L.gd = L0.gd === true; L.sf = L0.sf === true; L.rl = L0.rl === true; L.cd = {};
         if (L0.cd && typeof L0.cd === 'object') Object.keys(L0.cd).forEach(k => { if (typeof L0.cd[k] === 'string' && L0.cd[k]) L.cd[k] = L0.cd[k].slice(0, 300); });
         L.mp = {};
         if (L0.mp && typeof L0.mp === 'object') Object.keys(L0.mp).forEach(id => { const q = L0.mp[id]; if (q && typeof q === 'object') L.mp[id] = { x: cl(q.x, -3000, 3000, 0), y: cl(q.y, -3000, 3000, 0), w: Math.max(0, cl(q.w, 0, 3000, 0)), h: Math.max(0, cl(q.h, 0, 2000, 0)) }; });
@@ -4223,6 +4223,13 @@ if __name__ == '__main__':
       h += tbs + deco('over');
       if (lay && L.gd) { const gs = Math.max(10, L.step) * (L.step < 10 ? 1 : 1); h += `<div style="position:absolute;inset:0;pointer-events:none;z-index:4;background-image:linear-gradient(rgba(255,255,255,.13) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.13) 2px,transparent 2px);background-size:${gs * (gs < 40 ? Math.ceil(40 / gs) : 1)}px ${gs * (gs < 40 ? Math.ceil(40 / gs) : 1)}px"></div>`; }
       if (lay && L.sf) h += `<div style="position:absolute;left:96px;top:54px;width:1728px;height:972px;border:3px dashed rgba(255,255,0,.55);box-sizing:border-box;pointer-events:none;z-index:4"></div><div style="position:absolute;left:958px;top:0;width:4px;height:1080px;background:rgba(255,80,80,.5);pointer-events:none;z-index:4"></div><div style="position:absolute;left:0;top:538px;width:1920px;height:4px;background:rgba(255,80,80,.5);pointer-events:none;z-index:4"></div>`;
+      if (lay && L.rl) {
+        let rl = '<div style="position:absolute;left:0;top:0;width:1920px;height:38px;background:rgba(15,23,42,.88);z-index:5;pointer-events:none;border-bottom:2px solid #f59e0b"></div><div style="position:absolute;left:0;top:0;width:64px;height:1080px;background:rgba(15,23,42,.88);z-index:5;pointer-events:none;border-right:2px solid #f59e0b"></div>';
+        for (let x = 0; x <= 1920; x += 20) { const big = x % 100 === 0; rl += `<div style="position:absolute;left:${x}px;top:${big ? 8 : 24}px;width:2px;height:${big ? 30 : 14}px;background:#fbbf24;z-index:6;pointer-events:none"></div>`; if (big && x) rl += `<div style="position:absolute;left:${x + 5}px;top:2px;font:700 18px/1 monospace;color:#fde68a;z-index:6;pointer-events:none">${x}</div>`; }
+        for (let y = 0; y <= 1080; y += 20) { const big = y % 100 === 0; rl += `<div style="position:absolute;top:${y}px;left:${big ? 34 : 50}px;height:2px;width:${big ? 30 : 14}px;background:#fbbf24;z-index:6;pointer-events:none"></div>`; if (big && y) rl += `<div style="position:absolute;top:${y + 4}px;left:2px;font:700 18px/1 monospace;color:#fde68a;z-index:6;pointer-events:none">${y}</div>`; }
+        rl += '<div id="tpv-xy" style="position:absolute;right:10px;bottom:10px;z-index:7;pointer-events:none;background:rgba(0,0,0,.8);color:#fde047;font:700 26px/1 monospace;padding:6px 12px;border-radius:8px">x – · y –</div><div id="tpv-hx" style="position:absolute;top:0;width:2px;height:1080px;background:rgba(253,224,71,.55);z-index:5;pointer-events:none;display:none"></div><div id="tpv-hy" style="position:absolute;left:0;height:2px;width:1920px;background:rgba(253,224,71,.55);z-index:5;pointer-events:none;display:none"></div>';
+        h += rl;
+      }
       if (lay) {
         const keys = tiObjKeys().filter(k => k !== L.sel).concat(tiObj(L.sel) ? [L.sel] : []);
         keys.forEach(key => {
@@ -4378,7 +4385,7 @@ if __name__ == '__main__':
       const num = (lab, k, v, mn, mx) => `<div><span class="hint">${lab}</span><input type="number" class="inp" min="${mn}" max="${mx}" value="${v}" onchange="tiMbSet('${k}',this.value)"></div>`;
       let h = `<p class="hint mb-2">Hier machst du Estuary wirklich zu deinem: <b>Ziehe die farbigen Rahmen in der Vorschau</b> an die Stelle, an der das Element in Kodi stehen soll – oder gib Zahlen ein. Bei Rahmen mit Ecke unten rechts änderst du dort die Größe. Alles andere an Estuary bleibt unverändert.</p>
         <div class="flex flex-wrap gap-1.5 items-center mb-2"><button class="btn" onclick="tiLayPreset('std')">↺ Alles auf Standard</button><button class="btn" onclick="tiLayPreset('blank')">⬜ Leere Seite</button><select class="inp" style="width:auto;flex:1;min-width:190px" aria-label="Vorlage" onchange="tiLayPreset(this.value);this.value=''">${opt(TVORL, '')}</select></div>
-        <div class="flex flex-wrap gap-x-3 gap-y-1 items-center mb-2"><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.gd ? 'checked' : ''} onchange="tiLayView('gd',this.checked)">Raster zeigen</label><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.sf ? 'checked' : ''} onchange="tiLayView('sf',this.checked)">Mittellinien & Sicherheitsrand</label>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 items-center mb-2"><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.gd ? 'checked' : ''} onchange="tiLayView('gd',this.checked)">Raster zeigen</label><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.sf ? 'checked' : ''} onchange="tiLayView('sf',this.checked)">Mittellinien & Sicherheitsrand</label><label class="text-xs flex items-center gap-1"><input type="checkbox" ${L.rl ? 'checked' : ''} onchange="tiLayView('rl',this.checked)">Lineale & Koordinaten</label>
           <span class="hint ml-auto">Einrasten:</span><select class="inp" style="width:84px" aria-label="Schrittweite" onchange="tiLayStep(this.value)">${[1, 5, 10, 20, 40].map(v => `<option value="${v}" ${v === L.step ? 'selected' : ''}>${v} px</option>`).join('')}</select></div>
         <div class="card mt-2"><b class="text-xs">📋 Hauptmenü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${btn ? '' : 'titb'}" onclick="tiLayMm('list')">Liste wie Estuary</button><button class="btn ${btn ? 'titb' : ''}" onclick="tiLayMm('btn')">Einzelne Buttons</button></div>
@@ -4552,6 +4559,11 @@ if __name__ == '__main__':
     let TLD = null;
     function tiLayBind() {
       const st = $('tpv-stage'); if (!st) return;
+      st.addEventListener('pointermove', ev => {
+        const xy = $('tpv-xy'); if (!xy) return;
+        const r = st.getBoundingClientRect(), k = 1920 / (r.width || 1920), x = Math.round((ev.clientX - r.left) * k), y = Math.round((ev.clientY - r.top) * k), hx = $('tpv-hx'), hy = $('tpv-hy');
+        xy.textContent = 'x ' + x + ' · y ' + y; if (hx) { hx.style.display = 'block'; hx.style.left = x + 'px'; } if (hy) { hy.style.display = 'block'; hy.style.top = y + 'px'; }
+      });
       st.addEventListener('pointerdown', ev => {
         if (S.titan.tab !== 'layout') return;
         const rs = ev.target.closest('[data-rs]'), bx = rs || ev.target.closest('[data-box]'); if (!bx) return;
@@ -4737,10 +4749,31 @@ if __name__ == '__main__':
     }
     function tiWhSet(id, on) { if (on) S.titan.wh[id] = true; else delete S.titan.wh[id]; save(); }
     // Projekt als Datei
-    function tiProjExport() {
-      const blob = new Blob([JSON.stringify({ format: 'kfe-titan', v: 1, titan: S.titan })], { type: 'application/json' }), a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'titan-' + (slug(tiName()) || 'projekt') + '.json'; a.click(); toast('Titan-Projekt gespeichert: ' + a.download);
+    function tiDownloadProj(titan, name) {
+      const blob = new Blob([JSON.stringify({ format: 'kfe-titan', v: 1, titan })], { type: 'application/json' }), a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'titan-' + (slug(name) || 'projekt') + '.json'; a.click(); toast('Titan-Projekt gespeichert: ' + a.download);
     }
+    function tiProjExport() { tiDownloadProj(S.titan, tiName()); }
+    // Benannte Profile: mehrere komplette Titan-Projekte im Browser (IndexedDB) ablegen und umschalten
+    const TPF = { list: null };
+    async function tiPfLoad() { const o = await tiDbGet('profiles'); TPF.list = o && typeof o === 'object' && !Array.isArray(o) ? o : {}; }
+    async function tiPfStore() { await tiDbPut('profiles', TPF.list); const c = await tiDbGet('profiles'); return !!(c && Object.keys(c).length === Object.keys(TPF.list).length); }
+    async function tiPfSave() {
+      const inp = $('ti-pf-name'), name = String(inp ? inp.value : '').trim().slice(0, 40); if (!name) return toast('Bitte einen Namen für das Profil eingeben.');
+      if (TPF.list === null) await tiPfLoad();
+      if (TPF.list[name] && !confirm('Das Profil „' + name + '“ gibt es schon – überschreiben?')) return;
+      TPF.list[name] = { ts: Date.now(), t: JSON.stringify(S.titan, (k, v) => (k === 'tab' || k === 'cur') ? undefined : v) };
+      if (!(await tiPfStore())) { delete TPF.list[name]; return toast('Speichern im Browser nicht möglich (privates Fenster oder zu wenig Platz) – nutze „Projekt als Datei“.'); }
+      tiRe(); toast('Profil „' + name + '“ gespeichert.');
+    }
+    function tiPfParse(name) { try { const t = JSON.parse(TPF.list[name].t); return t && Array.isArray(t.menu) ? t : null; } catch (e) { return null; } }
+    function tiPfUse(name) {
+      const t = TPF.list && TPF.list[name] && tiPfParse(name); if (!t) return toast('Dieses Profil ist beschädigt.');
+      if (!confirm('Dein aktuelles Titan-Projekt wird durch das Profil „' + name + '“ ersetzt (mit „Rückgängig“ kommst du zurück). Fortfahren?')) return;
+      S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; save(); tiRe(); toast('Profil „' + name + '“ geladen.');
+    }
+    function tiPfFile(name) { const t = TPF.list && TPF.list[name] && tiPfParse(name); if (!t) return toast('Dieses Profil ist beschädigt.'); tiDownloadProj(t, name); }
+    async function tiPfDel(name) { if (!TPF.list || !TPF.list[name] || !confirm('Profil „' + name + '“ wirklich löschen?')) return; delete TPF.list[name]; await tiPfStore(); tiRe(); }
     function tiProjImport(inp) {
       const f = inp.files[0]; inp.value = ''; if (!f) return;
       const r = new FileReader(); r.onload = () => {
@@ -4751,6 +4784,7 @@ if __name__ == '__main__':
       }; r.readAsText(f);
     }
     function tiPro() {
+      if (TPF.list === null) { TPF.list = {}; tiPfLoad().then(() => { if (S.titan && S.titan.tab === 'pro') tiRe(); }); }
       const T = S.titan, op = k => `${TPRO.op[k] ? 'open' : ''} ontoggle="TPRO.op['${k}']=this.open"`, ok = TPRO.fin && TPRO.kodi === T.kodi;
       const sum = ok ? (() => { const ks = Object.keys(TPRO.changed), nn = ks.filter(p => TPRO.changed[p] === 'new').length, cc = ks.length - nn; return `<p class="hint">${cc} Dateien geändert, ${nn} neu. Tippe auf eine Datei für den Vergleich.</p>${ks.sort((a, b) => ((TPRO.changed[b] === 'new') - (TPRO.changed[a] === 'new')) || a.localeCompare(b)).map(p => `<div class="row mt-1" style="cursor:pointer;flex-direction:column;align-items:stretch" onclick="tiProView('${esc(p)}')"><div class="flex gap-2 items-center"><span class="text-xs" style="color:${TPRO.changed[p] === 'new' ? '#86efac' : '#fcd34d'}">${TPRO.changed[p] === 'new' ? '＋ neu' : '● geändert'}</span><code class="lk flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis">${esc(p)}</code></div>${TPRO.view === p ? `<div onclick="event.stopPropagation()" style="cursor:default">${tiProDiffHtml(p)}</div>` : ''}</div>`).join('')}`; })() : '<p class="hint">Noch nicht berechnet.</p>';
       let h = `<p class="hint mb-2">Für Kodi-Bastler: Sieh, was der Generator an Estuary ändert, greife von Hand ein, ersetze Texte in allen Dateien, packe eigene Dateien dazu und blende einzelne Estuary-Widgetreihen aus. Alles wird bei jedem Bauen automatisch angewendet.</p>
@@ -4775,7 +4809,11 @@ if __name__ == '__main__':
         <details class="card mt-2" ${op('wh')}><summary class="text-xs font-bold cursor-pointer">🧩 Einzelne Estuary-Widgetreihen ausblenden${Object.keys(T.wh).length ? ' (' + Object.keys(T.wh).length + ')' : ''}</summary>
           <p class="hint mt-2">Gilt für Menüpunkte mit „Wie Estuary“. Die Reihen werden direkt aus deiner Estuary-Version gelesen; Namen wie <code>$LOCALIZE[…]</code> übersetzt Kodi selbst.</p>
           <button class="btn w-full mt-1" onclick="tiProRows()">${TPRO.rows ? '↻ Reihen neu lesen' : '📋 Reihen aus Estuary lesen'}</button>
-          ${TPRO.rows ? TPRO.rows.map(g => { const m = T.menu.find(x => x.id === g.menu); return `<div class="mt-2"><b class="text-xs">${esc(m ? tiLabel(m) : g.menu)}</b>${g.items.map(x => `<label class="row mt-1 text-xs" style="gap:8px"><input type="checkbox" ${T.wh[x.id] ? 'checked' : ''} onchange="tiWhSet('${esc(x.id)}',this.checked)"><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis"><b>${esc(x.head || '(ohne Titel)')}</b> <span class="hint">· ID ${esc(x.id)}${x.path ? ' · ' + esc(x.path) : ''}</span></span><span class="hint shrink-0">ausblenden</span></label>`).join('')}</div>`; }).join('') : ''}</details>
+          ${TPRO.rows ? TPRO.rows.map(g => { const m = T.menu.find(x => x.id === g.menu); return `<div class="mt-2"><b class="text-xs">${esc(m ? tiLabel(m) : g.menu)}</b>${g.items.map(x => `<div class="row mt-1 text-xs" style="flex-direction:column;align-items:stretch;gap:4px"><label class="flex items-center" style="gap:8px"><input type="checkbox" ${T.wh[x.id] ? 'checked' : ''} onchange="tiWhSet('${esc(x.id)}',this.checked)"><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis"><b>${esc(x.head || '(ohne Titel)')}</b> <span class="hint">· ID ${esc(x.id)}${x.path ? ' · ' + esc(x.path) : ''}</span></span><span class="hint shrink-0">ausblenden</span></label>${T.wh[x.id] ? '' : `<div class="grid">${tiCondUi('wr:' + x.id)}</div>`}</div>`).join('')}</div>`; }).join('') : ''}</details>
+        <details class="card mt-2" ${op('pf')}><summary class="text-xs font-bold cursor-pointer">🗂 Layout-Profile${TPF.list && Object.keys(TPF.list).length ? ' (' + Object.keys(TPF.list).length + ')' : ''}</summary>
+          <p class="hint mt-2">Lege mehrere komplette Varianten unter eigenem Namen ab (z. B. „Wohnzimmer“, „Kiosk“, „Minimal“) und schalte mit einem Klick um. Sie liegen in diesem Browser; zum Weitergeben nimm 📄 Datei.</p>
+          <div class="flex gap-1.5 mt-1"><input id="ti-pf-name" class="inp" placeholder="Name des Profils" maxlength="40" onkeydown="if(event.key==='Enter')tiPfSave()"><button class="btn titb shrink-0" onclick="tiPfSave()">💾 Speichern</button></div>
+          ${Object.keys(TPF.list || {}).sort().map(n => `<div class="row mt-1.5"><span class="flex-1 min-w-0 text-xs" style="overflow:hidden;text-overflow:ellipsis"><b>${esc(n)}</b> <span class="hint">· ${esc(new Date(TPF.list[n].ts || 0).toLocaleString('de-DE'))}</span></span><button class="btn" onclick="tiPfUse(this.dataset.n)" data-n="${esc(n)}">▶ Laden</button><button class="btn" aria-label="Als Datei" onclick="tiPfFile(this.dataset.n)" data-n="${esc(n)}">📄</button><button class="btn" aria-label="Profil löschen" onclick="tiPfDel(this.dataset.n)" data-n="${esc(n)}">🗑</button></div>`).join('')}</details>
         <details class="card mt-2" ${op('pj')}><summary class="text-xs font-bold cursor-pointer">💾 Projekt als Datei</summary>
           <p class="hint mt-2">Sichert dein komplettes Titan-Projekt (Layout, Bilder, Regeln, Dateien) als JSON – zum Weitergeben, Sichern oder für verschiedene Varianten.</p>
           <div class="grid grid-cols-2 gap-2 mt-1"><button class="btn titb" onclick="tiProjExport()">⬇ Exportieren</button><button class="btn" onclick="$('f-tpj').click()">⬆ Importieren</button></div><input type="file" id="f-tpj" accept=".json,application/json" class="hidden" onchange="tiProjImport(this)">
@@ -4975,7 +5013,7 @@ if __name__ == '__main__':
         if (L.im.some(q => !q.off && q.k === 'img' && !T.dimgs[q.id])) r.push(['w', 'Layout: Ein Dekorations-Bild hat keine Bilddaten – bitte neu einfügen.']);
       }
       if (TBLK.every(b => !T.lay.b[b[0]].show) || (!tiMbList().length && T.lay.mm === 'btn' && T.lay.b.widgets.show === false)) r.push(['i', 'Layout: Es ist alles ausgeblendet – die Startseite bleibt leer (nur Hintergrund). Kodi lässt sich dann nur noch über Tasten und das Kontextmenü bedienen.']);
-      Object.keys(T.lay.cd).forEach(k => { if (tiCond(k) && !tiCondOk(T.lay.cd[k])) r.push(['w', `Layout: Die Bedingung bei „${k}“ hat unpassende Klammern.`]); });
+      Object.keys(T.lay.cd).forEach(k => { if (tiCond(k) && !tiCondOk(T.lay.cd[k])) r.push(['w', `Layout: Die Bedingung bei „${k.replace(/^wr:/, 'Widgetreihe ')}“ hat unpassende Klammern.`]); });
       T.rr.forEach((x, i) => { if (x.re) { try { new RegExp(x.a); } catch (e) { r.push(['w', `Ersetzen ${i + 1}: ungültiger Ausdruck.`]); } } });
       Object.keys(T.ov).forEach(p => r.push(['i', 'Von Hand geändert: ' + p + ' (deine Fassung ersetzt die erzeugte Datei).']));
       if (T.bg.mode === 'image' && !T.bg.img) r.push(['i', 'Eigener Hintergrund gewählt, aber noch kein Bild – es bleibt das Estuary-Muster.']);
@@ -5086,6 +5124,34 @@ if __name__ == '__main__':
       const orig = {};
       kids(content, 'item').forEach(it => { const p = kids(it, 'property').find(x => x.getAttribute('name') === 'id'); if (p) orig[p.textContent.trim()] = it; });
       { const wh = T.wh || {}; if (Object.keys(wh).length) [...hd.getElementsByTagName('include')].forEach(inc => { const pr = kids(inc, 'param').find(x => x.getAttribute('name') === 'list_id'); if (pr && wh[pr.getAttribute('value')] && inc.parentNode) inc.parentNode.removeChild(inc); }); }
+      // Bedingung je Widget-Reihe: eigene Kopie der Include-Definition, bei der alle obersten Elemente nur unter der Bedingung sichtbar sind
+      { const wk = Object.keys(T.lay.cd || {}).filter(k => k.startsWith('wr:') && tiCond(k));
+        if (wk.length) {
+          if (!F['xml/Includes_Home.xml']) TLAYWARN.push('Bedingung für Widget-Reihen nicht möglich: Includes_Home.xml fehlt');
+          else {
+            const ih = getX('xml/Includes_Home.xml'), root = ih.documentElement, made = {}; let n = 0;
+            [...hd.getElementsByTagName('include')].forEach(inc => {
+              const pr = kids(inc, 'param').find(x => x.getAttribute('name') === 'list_id'), nm = inc.getAttribute('content'); if (!pr || !nm) return;
+              const id = pr.getAttribute('value'), c = tiCond('wr:' + id); if (!c) return;
+              const def = kids(root, 'include').find(i => i.getAttribute('name') === nm);
+              if (!def) { TLAYWARN.push(`Bedingung für Reihe ${id}: Widget-Typ „${nm}“ nicht gefunden`); return; }
+              const cn = nm + '_titan_' + String(id).replace(/\W/g, '_');
+              if (!made[cn]) {
+                const cl = def.cloneNode(true); cl.setAttribute('name', cn); const box = kids(cl, 'definition')[0] || cl;
+                [...box.children].forEach(ch => {
+                  if (ch.tagName === 'control') ch.appendChild(xe(ih, 'visible', null, c));
+                  else if (ch.tagName === 'include' && ch.getAttribute('content')) {
+                    let vp = kids(ch, 'param').find(x => x.getAttribute('name') === 'visible');
+                    if (vp) { const o = vp.getAttribute('value') != null ? vp.getAttribute('value') : vp.textContent; vp.setAttribute('value', `[${o}] + [${c}]`); vp.textContent = ''; } else ch.appendChild(xe(ih, 'param', { name: 'visible', value: c }));
+                  }
+                });
+                root.appendChild(cl); made[cn] = true;
+              }
+              inc.setAttribute('content', cn); n++;
+            });
+            if (n) putX('xml/Includes_Home.xml', ih);
+          }
+        } }
       while (content.firstChild) content.removeChild(content.firstChild);
       const grpOf = mid => kids(g2000, 'control').find(c => kids(c, 'visible').some(v => v.textContent.replace(/\s+/g, '') === `String.IsEqual(Container(9000).ListItem.Property(id),${mid})`));
       const setTxt = (it, tag, txt) => { let e = kids(it, tag)[0]; if (!e) { e = xe(hd, tag); it.appendChild(e); } e.textContent = txt; };
