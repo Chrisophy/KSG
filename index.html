@@ -3913,7 +3913,7 @@ if __name__ == '__main__':
       ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
       ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', false],
       ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', false],
-      ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', false],
+      ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', true],
       ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
     ];
     // Knöpfe über dem Menü, wenn sie einzeln platziert werden: [Schlüssel, Symbol, Name]
@@ -3983,7 +3983,7 @@ if __name__ == '__main__':
       S.titan.menu = S.titan.menu.filter(m => m && (m.custom || tmenuDef(m.id)));
       S.titan.menu.forEach(m => {
         m.show = m.show !== false; m.label = m.label || ''; m.icon = m.icon || ''; if (!Array.isArray(m.wl)) m.wl = [];
-        if (m.custom) { m.w = 'own'; m.act = Object.assign({ t: 'myaddon', v: '' }, m.act || {}); } else if (m.w !== 'own') m.w = 'keep';
+        if (m.custom) { m.w = 'own'; m.act = Object.assign({ t: 'myaddon', v: '' }, m.act || {}); } else if (m.w !== 'own' && m.w !== 'none') m.w = 'keep';
         m.wl.forEach(w => { if (!WPRE.some(p => p[0] === w.src)) w.src = 'custom'; if (!TSTY[w.style]) w.style = 'poster'; w.title = w.title || ''; w.dir = w.dir || ''; w.media = w.media || 'video'; });
       });
       if (!tiObj(S.titan.lay.sel)) S.titan.lay.sel = 'widgets';
@@ -4142,6 +4142,7 @@ if __name__ == '__main__':
       return `<span style="display:inline-block;width:${px}px;text-align:center;font-size:${Math.round(px * .58)}px;line-height:${px}px;${dim ? 'opacity:.45;filter:grayscale(1)' : ''}">${TICON[k] || '🧩'}</span>`;
     }
     function tiRows(m) {
+      if (m.w === 'none' && !m.custom) return [];
       if (m.custom || m.w === 'own') return m.wl.map(w => ({ t: w.title || wPre(w.src)[2], s: w.style, media: w.media, src: w.src }));
       return (TDEFW[m.id] || [['Inhalte', 'poster']]).map(x => ({ t: x[0], s: x[1], media: /music|radio/.test(m.id) ? 'music' : 'video', src: m.id }));
     }
@@ -4573,7 +4574,7 @@ if __name__ == '__main__':
     function tiWidgets() {
       const T = S.titan, m = tiCurItem();
       let h = field('Widgets für welchen Menüpunkt?', `<select class="inp" onchange="tiCur(this.value)">${T.menu.map(x => `<option value="${x.id}" ${x.id === m.id ? 'selected' : ''}>${x.show ? '' : '🙈 '}${esc(tiLabel(x))}</option>`).join('')}</select>`);
-      if (!m.custom) h += `<div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${m.w === 'keep' ? 'titb' : ''}" onclick="tiWMode('keep')">Wie Estuary</button><button class="btn ${m.w === 'own' ? 'titb' : ''}" onclick="tiWMode('own')">Eigene Widgets</button></div><p class="hint mt-1">${m.w === 'keep' ? 'Estuary zeigt hier seine eigenen Reihen (z.B. Kategorien, Weiterschauen, Neu).' : 'Deine Reihen ersetzen die von Estuary in diesem Bereich.'}</p>`;
+      if (!m.custom) h += `<div class="grid grid-cols-3 gap-2 mt-2"><button class="btn ${m.w === 'keep' ? 'titb' : ''}" onclick="tiWMode('keep')">Wie Estuary</button><button class="btn ${m.w === 'own' ? 'titb' : ''}" onclick="tiWMode('own')">Eigene Widgets</button><button class="btn ${m.w === 'none' ? 'titb' : ''}" onclick="tiWMode('none')">Keine Widgets</button></div><p class="hint mt-1">${m.w === 'keep' ? 'Estuary zeigt hier seine eigenen Reihen (z.B. Kategorien, Weiterschauen, Neu).' : m.w === 'none' ? 'Bei diesem Menüpunkt bleibt der Bereich rechts leer. Alle Widgets auf einmal blendest du unter „📐 Layout“ beim Widget-Bereich aus.' : 'Deine Reihen ersetzen die von Estuary in diesem Bereich.'}</p>`;
       if (m.custom || m.w === 'own') {
         m.wl.forEach((w, k) => {
           const pth = w.src === 'custom' || w.src === 'addon';
@@ -4792,6 +4793,7 @@ if __name__ == '__main__':
           if (iconPath(m)) setTxt(it, 'thumb', iconPath(m));
         }
         content.appendChild(nl(hd, 6)); content.appendChild(it);
+        if (m.w === 'none' && !m.custom) { const g0 = grpOf(m.id); if (g0 && g0.parentNode) g0.parentNode.removeChild(g0); }
         if (m.custom || m.w === 'own') {
           let grp = m.custom ? null : grpOf(m.id);
           const gid = grp ? parseInt(grp.getAttribute('id'), 10) : 81000 + (ci++) * 1000;
