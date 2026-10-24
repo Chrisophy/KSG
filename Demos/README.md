@@ -47,8 +47,4 @@ Das Addon selbst (`addon.py`, rund 90 Zeilen) ist als Vorlage gedacht: Rubriken 
 - **YouTube und Co. (Demo 5):** Die Pfade zu anderen Addons funktionieren nur, wenn das Addon installiert ist.
 - **PIN ändern:** In Demo 1 steht die PIN lesbar in der `pages.json`. Ein Schutz vor Kindern, kein echtes Passwort.
 - **Icon:** Die Demos bringen kein eigenes Icon mit – der Generator erzeugt automatisch eines. Unter **5 · Addon-Bilder & Dateien** wählst du ein eigenes.
-- **Geprüft:** Alle Dateien lassen sich im Generator laden, ✔ Prüfen meldet keine Warnungen, und die erzeugten Addon-Dateien (Python, XML, JSON) sind syntaktisch fehlerfrei. Das Beispiel-Addon ist mit Simulation von Kodi getestet, Demo 6 mit einer Test-Fassung von Estuary. **Auf einem echten Kodi-Gerät sind Demo 6 und 7 noch nicht getestet.**
-
-## Eigene Demo beisteuern
-
-Baue dein Projekt im Generator, sichere es mit **💾 Speichern** und schicke die `.json` als Pull Request in den Ordner `demos/` des Repos. Bitte ohne Zugangsdaten, fremde Logos oder urheberrechtlich geschützte Bilder.
+- **Geprüft:** Alle Dateien lassen sich im Generator laden, ✔ Prüfen meldet keine Warnungen, und die erzeugten Addon-Dateien (Python, XML, JSON) sind syntaktisch fehlerfrei. Das Beispiel-Addon ist mit Simulation von Kodi getestet.
