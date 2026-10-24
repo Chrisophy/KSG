@@ -2,7 +2,7 @@
 <html lang="de" class="dark">
 <head>
   <!--
-    Kodi Video-Addon Generator v8.1 Pro
+    Kodi Video-Addon Generator v9.0 Pro
     Copyright (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten. All rights reserved.
     IT('s) Possible Freeware-Lizenz: kostenlos für die Kodi-Community, aber NICHT Open Source.
     Ohne schriftliche Erlaubnis verboten: Verkauf, Vermietung, Angebot gegen Bezahlung, Werbung,
@@ -14,7 +14,7 @@
   <meta name="author" content="Team IT('s) Possible">
   <meta name="copyright" content="(c) 2026 Team IT('s) Possible – IT('s) Possible Freeware-Lizenz, Weiterverkauf verboten">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kodi Video-Addon Generator v8.1 Pro</title>
+  <title>Kodi Video-Addon Generator v9.0 Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -123,7 +123,7 @@
     <div class="min-w-0">
       <h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">
         🔌 Kodi Video-Addon Generator by IT('s) Possible
-        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v8.1 Pro</span>
+        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v9.0 Pro</span>
         <span class="text-[10px] text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5 ml-1">💚 Gratis · nicht zum Verkauf</span>
       </h1>
       <p class="text-[11px] text-slate-400 hidden lg:block">Gestalte das Menü deines Addons (home.xml) mit Buttons, Listen, Schaltern, Widgets und Bildern und exportiere alles als installierbare ZIP.</p>
@@ -390,6 +390,7 @@
   <input type="file" id="f-ticon" accept="image/*" class="hidden" onchange="tiSetIcon(this)">
   <input type="file" id="f-tfont" accept=".ttf,.otf,font/ttf,font/otf" class="hidden" onchange="tiSetFont(this)">
   <input type="file" id="f-tzip" accept=".zip,application/zip" class="hidden" onchange="tiLoadZip(this)">
+  <input type="file" id="f-gzip" accept=".zip,application/zip" class="hidden" onchange="tiLoadZip(this,true)">
 
   <!-- Vorschlagslisten für Profi-Eingaben -->
   <datalist id="dl-font"></datalist>
@@ -397,7 +398,7 @@
   <datalist id="dl-dir"></datalist>
 
   <script>
-    /* Kodi Video-Addon Generator v8.1 Pro – (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
+    /* Kodi Video-Addon Generator v9.0 Pro – (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
        IT('s) Possible Freeware-Lizenz: Verkauf, Weiterverbreitung und veränderte Fassungen nur mit schriftlicher Erlaubnis. */
     const $ = id => document.getElementById(id);
     const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -913,6 +914,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       S.pages.forEach(p => p.els.forEach(e => { if (e.type === 'switch' && e.sw.m === 'flag' && !e.sw.k) e.sw.k = uniqFlag(e.label); }));
       if (!(S.cur >= 0 && S.cur < S.pages.length)) S.cur = 0;
       gcImgs();
+      if (!S.tstash || typeof S.tstash !== 'object' || Array.isArray(S.tstash)) S.tstash = {};
       normTitan();
     }
 
@@ -4901,6 +4903,7 @@ if __name__ == '__main__':
       ['Petrol', { focus: '#009688', bg: '#00665C', pat: '#F07942', patA: 20, dialog: '#222A2A', sel: '#C67F03' }],
       ['Violett', { focus: '#C050FF', bg: '#5B1C80', pat: '#FFB3D7', patA: 20, dialog: '#27222A', sel: '#FF0054' }]
     ];
+    const TGENTABS = ['basis', 'win', 'pro', 'export'];
     const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['win', '🪟 Fenster'], ['pro', '🔧 Profi'], ['export', '📦 Export']];
     // Frei verschiebbare Bausteine der Estuary-Startseite: [Schlüssel, Symbol, Name, Beschreibung, Standard-Rechteck in der Vorschau, Farbe, ausblendbar?]
     const TBLK = [
@@ -4922,8 +4925,9 @@ if __name__ == '__main__':
     let TIB = null, TIBUSY = false, TIIDX = -1, TLAYMISS = [], TLAYWARN = [];
 
     const tmenuDef = id => TMENU.find(m => m[0] === id);
-    const tiName = () => String(S.titan.name || '').trim() || 'Titan Skin';
-    const tiId = () => { let s = slug(tiName()); if (s === 'estuary') s = 'estuarytitan'; return 'skin.' + s; };
+    const tiNameDef = () => (S.titan.gen && S.titan.gname) ? S.titan.gname + ' Mod' : 'Titan Skin';
+    const tiName = () => String(S.titan.name || '').trim() || tiNameDef();
+    const tiId = () => { let s = slug(tiName()); if (s === 'estuary') s = 'estuarytitan'; if (S.titan.gen && S.titan.gsid && 'skin.' + s === S.titan.gsid) s += 'mod'; return 'skin.' + s; };
     const tiAuthor = () => String(S.titan.author || '').trim() || S.meta.author || 'Ich';
     const tiLabel = m => String(m.label || '').trim() || (m.custom ? 'Eigener Punkt' : tmenuDef(m.id)[1]);
     const tiCurItem = () => { const T = S.titan; return T.menu.find(m => m.id === T.cur) || T.menu[0]; };
@@ -4972,6 +4976,11 @@ if __name__ == '__main__':
         S.titan.skset = (Array.isArray(S.titan.skset) ? S.titan.skset : []).filter(x => x && typeof x === 'object' && /^[a-z0-9_]{1,40}$/.test(String(x.n)) && !seen.has(String(x.n)) && seen.add(String(x.n))).slice(0, 20).map(x => ({ n: String(x.n), l: String(x.l || '').slice(0, 60) || 'Einstellung' }));
       }
       if (!TKODI[S.titan.kodi]) S.titan.kodi = '21';
+      S.titan.gen = S.titan.gen === true; S.titan.gsid = String(S.titan.gsid || '').slice(0, 120); S.titan.gname = String(S.titan.gname || '').slice(0, 120);
+      {
+        const g = (S.titan.gmeta && typeof S.titan.gmeta === 'object' && !Array.isArray(S.titan.gmeta)) ? S.titan.gmeta : {};
+        S.titan.gmeta = { ver: String(g.ver || '').slice(0, 40), prov: String(g.prov || '').slice(0, 200), lic: String(g.lic || '').slice(0, 300), req: (Array.isArray(g.req) ? g.req : []).map(x => String(x).slice(0, 80)).slice(0, 30), w: +g.w || 0, h: +g.h || 0, dir: String(g.dir || '').slice(0, 40), files: +g.files || 0, nw: +g.nw || 0 };
+      }
       {
         const L0 = (T.lay && typeof T.lay === 'object') ? T.lay : {}, L = defLay();
         L.step = [1, 5, 10, 20, 40].includes(+L0.step) ? +L0.step : 10;
@@ -5018,8 +5027,75 @@ if __name__ == '__main__':
     const tiDbPut = (k, v) => tiDbDo('readwrite', st => st.put(v, k)).catch(() => null);
     const tiDbClear = () => tiDbDo('readwrite', st => st.clear()).catch(() => null);
 
+    // ---------- Skin-Modus: beliebige Skins bearbeiten ----------
+    const tiGen = () => !!(S.titan && S.titan.gen);
+    const tiBaseOk = b => !!b && (tiGen() ? (b.gen === true && (!S.titan.gsid || b.sid === S.titan.gsid)) : (!b.gen && b.kodi === S.titan.kodi));
+    const tiDir = b => { b = b || (tiBaseOk(TIB) ? TIB : null) || WIN.b; return (b && b.dir) || 'xml'; };
+    const tiXp = n => tiDir() + '/' + n;
+    const tiBw = () => { const b = tiBaseOk(TIB) ? TIB : WIN.b; return (b && b.w) || 1920; };
+    const tiBh = () => { const b = tiBaseOk(TIB) ? TIB : WIN.b; return (b && b.h) || 1080; };
+    const tiRx = x => String(x).replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+    const TLC = new WeakMap();
+    function tiLc(b) { let m = TLC.get(b); if (!m) { m = {}; Object.keys(b.files).forEach(p => { m[p.toLowerCase()] = p; }); TLC.set(b, m); } return m; }
+    const tiReal = (b, p) => (b && b.files[p]) ? p : (b ? (tiLc(b)[String(p).toLowerCase()] || null) : null);
+    // Aufbau eines Skins aus der addon.xml lesen: Fenster-Ordner, Auflösung, Lizenz, benötigte Addons, belegte Fensternummern
+    function tiSkinInfo(files) {
+      const td = new TextDecoder(); if (!files['addon.xml']) return null;
+      const d = new DOMParser().parseFromString(td.decode(files['addon.xml']), 'application/xml');
+      if (d.getElementsByTagName('parsererror').length || !d.documentElement) return null;
+      const r = d.documentElement, ext = [...d.getElementsByTagName('extension')].find(e => e.getAttribute('point') === 'xbmc.gui.skin'); if (!ext) return null;
+      const res = [...ext.getElementsByTagName('res')], rs = res.find(x => x.getAttribute('default') === 'true') || res[0]; if (!rs) return null;
+      const want = String(rs.getAttribute('folder') || '').trim(); if (!want) return null;
+      const keys = Object.keys(files), low = want.toLowerCase() + '/', hit = keys.find(p => p.toLowerCase().startsWith(low)), dir = hit ? hit.slice(0, want.length) : want;
+      let w = parseInt(rs.getAttribute('width'), 10), h = parseInt(rs.getAttribute('height'), 10);
+      if (!(w > 0 && h > 0)) { if (/720/.test(want)) { w = 1280; h = 720; } else { w = 1920; h = 1080; } }
+      const txt = tag => { const e = d.getElementsByTagName(tag)[0]; return e ? e.textContent.trim() : ''; }, wids = [];
+      keys.forEach(p => { if (p.startsWith(dir + '/') && /\.xml$/i.test(p)) { const m = td.decode(files[p].subarray(0, 4000)).match(/<window\b[^>]*\bid\s*=\s*"(\d+)"/i); if (m) wids.push(+m[1]); } });
+      return { sid: r.getAttribute('id') || '', sname: r.getAttribute('name') || r.getAttribute('id') || 'Skin', sver: r.getAttribute('version') || '', sprov: r.getAttribute('provider-name') || '', lic: txt('license'), req: [...d.getElementsByTagName('import')].map(e => e.getAttribute('addon')).filter(a => a && !/^xbmc\./.test(a)), dir, w, h, wids: [...new Set(wids)] };
+    }
+    const tiEdits = t => !!t && (Object.keys(t.ov || {}).length || Object.keys(t.hide || {}).length || Object.keys(t.tweak || {}).length || (t.xf || []).length || (t.skset || []).length || (t.rr || []).length);
+    function tiGenReset() {
+      TPRO.fin = null; TPRO.raw = null; TPRO.base = null; TPRO.rows = null; TPRO.edit = ''; TPRO.view = ''; TPRO.changed = {};
+      WIN.dirty = true; WIN.cur = ''; WIN.b = null; WIN.raw = null; WIN.tried = false; WIN.ctlOpen = ''; WIN.diff = false; TIB = null;
+    }
+    // Zwischen Estuary-Projekt und Skin-Projekt umschalten (beide bleiben getrennt gespeichert)
+    function tiMode(g) {
+      if (tiGen() === g) return;
+      S.tstash = S.tstash || {};
+      S.tstash[g ? 'e' : 'g'] = JSON.parse(JSON.stringify(S.titan));
+      const nx = S.tstash[g ? 'g' : 'e']; delete S.tstash[g ? 'g' : 'e'];
+      S.titan = (nx && typeof nx === 'object') ? nx : Object.assign(defTitan(), { kodi: S.titan.kodi });
+      S.titan.gen = g; normTitan(); S.titan.tab = 'basis'; tiGenReset(); save(); showTitan();
+    }
+    async function tiEnterGen(b) {
+      if (!tiGen()) {
+        S.tstash = S.tstash || {}; S.tstash.e = JSON.parse(JSON.stringify(S.titan));
+        const g = S.tstash.g; delete S.tstash.g;
+        S.titan = (g && typeof g === 'object') ? g : Object.assign(defTitan(), { kodi: S.titan.kodi });
+        S.titan.gen = true; normTitan();
+      }
+      if (S.titan.gsid && S.titan.gsid !== b.sid) { S.titan = Object.assign(defTitan(), { kodi: S.titan.kodi, gen: true }); normTitan(); }
+      const T = S.titan;
+      T.gsid = b.sid; T.gname = b.sname;
+      T.gmeta = { ver: b.sver, prov: b.sprov, lic: b.lic, req: b.req || [], w: b.w, h: b.h, dir: b.dir, files: b.count, nw: (b.wids || []).length };
+      normTitan(); T.tab = 'basis'; tiGenReset(); TIB = b; await tiDbPut('gskin', b); WIN.dirty = true; save(); showTitan();
+    }
+    function tiGenInfo() {
+      const T = S.titan, m = T.gmeta || {};
+      if (!T.gsid) return `<div class="card"><b class="text-sm">🎭 Skin-Modus</b><p class="hint mt-1">Noch kein Skin geladen. Wähle im Reiter „🧬 Basis“ die Skin-ZIP, die du bearbeiten möchtest.</p></div>`;
+      return `<div class="card"><b class="text-sm">🎭 ${esc(T.gname)}</b> <span class="hint">· ${esc(T.gsid)} ${esc(m.ver || '')}</span>
+          <ul class="text-xs text-slate-300 mt-2 space-y-1"><li>Autor: ${esc(m.prov || 'unbekannt')}</li><li>Lizenz: ${esc(m.lic || 'siehe LICENSE.txt')}</li><li>Auflösung ${m.w}×${m.h} (Ordner <code>${esc(m.dir)}</code>) · ${m.nw} Fenster · ${m.files} Dateien</li>${m.req && m.req.length ? `<li>Braucht außerdem: ${m.req.map(x => esc(x)).join(', ')}</li>` : ''}</ul></div>
+        <div class="card mt-3"><b class="text-xs">Was geht im Skin-Modus?</b><p class="hint mt-1">Fenster bearbeiten (Reiter „🪟 Fenster“): Knöpfe ausblenden, verschieben, vergrößern, umfärben; Bilder tauschen; XML von Hand ändern; neue Fenster; eigene Skin-Schalter. Dazu „🔧 Profi“ (Suchen &amp; Ersetzen, eigene Dateien) und der Export als eigener Skin mit neuer ID. Farben, Hauptmenü, Widgets und Layout gibt es nur für Estuary – fremde Skins haben dafür eigene Einstellungen in Kodi.</p></div>`;
+    }
+
     async function tiGetBase(kodi, noFetch) {
-      if (TIB && TIB.kodi === kodi) return TIB;
+      if (tiGen()) {
+        const okS = x => !!x && x.gen === true && (!S.titan.gsid || x.sid === S.titan.gsid);
+        if (okS(TIB)) return TIB;
+        const g = await tiDbGet('gskin'); if (g && g.files && okS(g)) { TIB = g; return g; }
+        return null;
+      }
+      if (TIB && !TIB.gen && TIB.kodi === kodi) return TIB;
       const b = await tiDbGet('k' + kodi);
       if (b && b.files) { TIB = b; return b; }
       if (noFetch) return null;
@@ -5099,16 +5175,26 @@ if __name__ == '__main__':
       }
       return out;
     }
-    async function tiLoadZip(inp) {
+    async function tiLoadZip(inp, forceGen) {
       const f = inp.files[0]; inp.value = ''; if (!f) return;
       if (!('DecompressionStream' in window)) return toast('Dein Browser kann keine ZIP-Dateien entpacken – bitte Chrome, Edge, Firefox oder Safari aktualisieren.');
       try {
         tiProg('ti-prog', 'ZIP wird gelesen …', .2);
         const all = await tiReadZip(await f.arrayBuffer()), td = new TextDecoder();
-        const ax = Object.keys(all).filter(p => /(^|\/)addon\.xml$/.test(p)).find(p => /xbmc\.gui\.skin/.test(td.decode(all[p])) && all[p.replace(/addon\.xml$/, 'xml/Home.xml')]);
-        if (!ax) throw new Error('In der ZIP wurde kein Kodi-Skin mit xml/Home.xml gefunden.');
+        const ax = Object.keys(all).filter(p => /(^|\/)addon\.xml$/.test(p)).find(p => /xbmc\.gui\.skin/.test(td.decode(all[p])));
+        if (!ax) throw new Error('In der ZIP wurde kein Kodi-Skin gefunden (eine addon.xml mit xbmc.gui.skin fehlt).');
         const pre = ax.slice(0, ax.length - 'addon.xml'.length), files = {}; let size = 0;
         Object.keys(all).forEach(p => { if (p.startsWith(pre)) { files[p.slice(pre.length)] = all[p]; size += all[p].length; } });
+        const info = tiSkinInfo(files), est = !forceGen && !tiGen() && !!files['xml/Home.xml'] && (!info || info.dir === 'xml');
+        if (!est) {
+          if (!info) throw new Error('Die addon.xml dieses Skins konnte nicht gelesen werden.');
+          if (!Object.keys(files).some(p => p.startsWith(info.dir + '/') && /\.xml$/i.test(p))) throw new Error('Der Fenster-Ordner „' + info.dir + '“ fehlt in der ZIP.');
+          const old = tiGen() ? S.titan : (S.tstash && S.tstash.g);
+          if (old && old.gsid && old.gsid !== info.sid && tiEdits(old) && !confirm('Du hast am bisherigen Skin „' + (old.gname || old.gsid) + '“ schon Änderungen gemacht. Sie gehören nicht zu „' + info.sname + '“ und werden verworfen. Fortfahren?')) return tiProg('ti-prog', '', null);
+          const b = { files, gen: true, src: 'zip', kodi: S.titan.kodi, branch: info.sname, date: Date.now(), count: Object.keys(files).length, size, name: f.name, dir: info.dir, w: info.w, h: info.h, sid: info.sid, sname: info.sname, sver: info.sver, sprov: info.sprov, lic: info.lic, req: info.req, wids: info.wids };
+          await tiEnterGen(b); toast('✅ Skin „' + info.sname + '“ geladen – Skin-Modus ist aktiv.');
+          return;
+        }
         const gui = (td.decode(files['addon.xml']).match(/addon="xbmc\.gui"\s+version="([\d.]+)"/) || [])[1];
         const kodi = Object.keys(TKODI).find(k => TKODI[k][1] === gui) || S.titan.kodi;
         if (!/id="9000"/.test(td.decode(files['xml/Home.xml']))) toast('⚠️ Das sieht nicht nach Estuary aus – Farben und Schrift klappen, Hauptmenü und Widgets eventuell nicht.');
@@ -5122,27 +5208,31 @@ if __name__ == '__main__':
     async function tiBaseStatus() {
       if (!$('ti-base')) return;
       const b = await tiGetBase(S.titan.kodi, true), el = $('ti-base'); if (!el) return;
-      el.innerHTML = b ? `✅ Bereit: ${b.src === 'zip' ? 'eigene ZIP „' + esc(b.name || '') + '“' : 'offiziell von Kodi (GitHub)'} · ${b.count} Dateien · ${(b.size / 1048576).toFixed(1)} MB · ${new Date(b.date).toLocaleDateString('de-DE')}` : '⚪ Noch nicht geladen – das passiert beim Export automatisch, oder jetzt mit dem Knopf.';
+      el.innerHTML = b ? (b.gen ? `✅ Bereit: Skin „${esc(b.sname)}“ ${esc(b.sver)} (ZIP „${esc(b.name || '')}“) · ${b.count} Dateien · ${(b.size / 1048576).toFixed(1)} MB` : `✅ Bereit: ${b.src === 'zip' ? 'eigene ZIP „' + esc(b.name || '') + '“' : 'offiziell von Kodi (GitHub)'} · ${b.count} Dateien · ${(b.size / 1048576).toFixed(1)} MB · ${new Date(b.date).toLocaleDateString('de-DE')}`) : (tiGen() ? (S.titan.gsid ? '⚪ Für „' + esc(S.titan.gname) + '“ ist keine ZIP geladen – bitte unten die ZIP dieses Skins wählen.' : '⚪ Noch kein Skin geladen – wähle unten die Skin-ZIP.') : '⚪ Noch nicht geladen – das passiert beim Export automatisch, oder jetzt mit dem Knopf.');
     }
 
     // ---------- Werkstatt ----------
+    let TGENUI = null;
+    function tiSync() { if (TGENUI !== !!S.titan.gen) showTitan(); else tiRe(); }
     function showTitan(t) {
       if (t) S.titan.tab = t;
-      modal(`<div class="flex justify-between items-start gap-2 mb-3"><div><b class="text-lg ti-grad">⚡ Titan-Modus</b><div class="hint">Dein eigener, echter Kodi-Skin · Stufe A: Estuary umbauen</div></div><div class="flex gap-1.5 shrink-0"><button class="btn" id="ti-undo" aria-label="Rückgängig" title="Rückgängig (Strg+Z)" onclick="tiUndo()">↶</button><button class="btn" id="ti-redo" aria-label="Wiederholen" title="Wiederholen (Strg+Y)" onclick="tiRedo()">↷</button><button class="btn" onclick="closeModal()">Schließen</button></div></div>
+      const g = tiGen(); TGENUI = g;
+      modal(`<div class="flex justify-between items-start gap-2 mb-3"><div><b class="text-lg ti-grad">⚡ Titan-Modus</b><div class="hint">${g ? 'Skin-Modus: ' + esc(S.titan.gname || 'fremden Skin bearbeiten') : 'Dein eigener, echter Kodi-Skin · Stufe A: Estuary umbauen'}</div></div><div class="flex gap-1.5 shrink-0"><button class="btn" id="ti-undo" aria-label="Rückgängig" title="Rückgängig (Strg+Z)" onclick="tiUndo()">↶</button><button class="btn" id="ti-redo" aria-label="Wiederholen" title="Wiederholen (Strg+Y)" onclick="tiRedo()">↷</button><button class="btn" onclick="closeModal()">Schließen</button></div></div>
         <div class="grid lg:grid-cols-2 gap-4 items-start">
-          <div class="ti-pvbox"><div id="tpv-wrap"><div id="tpv-stage" onclick="tiPvClick(event)"></div></div><p class="hint mt-1">Vorschau im Estuary-Stil – tippe auf einen Menüpunkt. Die echten Bilder und Titel füllt Kodi.</p></div>
+          ${g ? `<div><div id="tpv-stage" style="display:none"></div><div id="ti-geninfo">${tiGenInfo()}</div></div>` : `<div class="ti-pvbox"><div id="tpv-wrap"><div id="tpv-stage" onclick="tiPvClick(event)"></div></div><p class="hint mt-1">Vorschau im Estuary-Stil – tippe auf einen Menüpunkt. Die echten Bilder und Titel füllt Kodi.</p></div>`}
           <div class="min-w-0"><div class="flex flex-wrap gap-1.5 mb-3" id="ti-tabs"></div><div id="ti-body"></div></div>
         </div>`, 'titan');
       $('modal-in').style.maxWidth = '86rem';
-      new ResizeObserver(tiFit).observe($('tpv-wrap'));
+      if ($('tpv-wrap')) new ResizeObserver(tiFit).observe($('tpv-wrap'));
       tiLayBind();
       tiTab(S.titan.tab); tiFit(); tiHistInit();
     }
     function tiFit() { const w = $('tpv-wrap'), s = $('tpv-stage'); if (!w || !s || !w.clientWidth) return; s.style.transform = `scale(${w.clientWidth / 1920})`; }
     function tiTab(t) {
       if (!$('ti-body')) return;
+      if (S.titan.gen && !TGENTABS.includes(t)) t = 'basis';
       S.titan.tab = t; save(); if (t !== 'win') WIN.dirty = true;
-      $('ti-tabs').innerHTML = TTABS.map(x => `<button class="btn ${x[0] === t ? 'titb' : ''}" onclick="tiTab('${x[0]}')">${x[1]}</button>`).join('');
+      $('ti-tabs').innerHTML = TTABS.filter(x => !S.titan.gen || TGENTABS.includes(x[0])).map(x => `<button class="btn ${x[0] === t ? 'titb' : ''}" onclick="tiTab('${x[0]}')">${x[1]}</button>`).join('');
       const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, win: tiWin, pro: tiPro, export: tiExport };
       $('ti-body').innerHTML = (R[t] || tiBasis)();
       tiPv();
@@ -5166,7 +5256,7 @@ if __name__ == '__main__':
     }
     function tiTxtPv(t) { return String(t || '').replace(/\[CR\]/g, '\n').replace(/\$INFO\[([^\]]*)\]/g, (m, k) => { const f = LIVEPV[k]; return typeof f === 'function' ? f() : f != null ? String(f) : k; }); }
     function tiPv() {
-      const st = $('tpv-stage'); if (!st) return;
+      const st = $('tpv-stage'); if (!st || S.titan.gen) return;
       const T = S.titan, C = T.col, L = T.lay, lay = T.tab === 'layout', vis = T.menu.filter(m => m.show && m.id !== 'disc'), cur = vis.find(m => m.id === T.cur) || vis[0], btn = L.mm === 'btn', single = L.tm === 'single';
       let h = T.bg.mode === 'image' && T.bg.img
         ? `<div style="position:absolute;inset:0;background:url('${T.bg.img}') center/cover"></div><div style="position:absolute;inset:0;background:rgba(0,0,0,${T.bg.dim / 100})"></div>`
@@ -5671,7 +5761,7 @@ if __name__ == '__main__':
     const tiSame = (x, y) => { if (x.length !== y.length) return false; for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return false; return true; };
     async function tiProBase() {
       const T = S.titan; let b = await tiGetBase(T.kodi, true);
-      if (!b) { tiProg('ti-pro-prog', 'Estuary wird zuerst geladen …', 0); b = await tiLoadGithub(); }
+      if (!b && !T.gen) { tiProg('ti-pro-prog', 'Estuary wird zuerst geladen …', 0); b = await tiLoadGithub(); }
       return b || null;
     }
     async function tiProCalc() {
@@ -5721,14 +5811,14 @@ if __name__ == '__main__':
     function tiProReset() { const p = TPRO.edit; if (!p) return; delete S.titan.ov[p]; save(); tiRe(); toast('Zurück zur erzeugten Fassung.'); }
     function tiProOvDel(p) { delete S.titan.ov[p]; save(); tiRe(); }
     // Suchen & Ersetzen
-    function tiRrAdd() { if (S.titan.rr.length >= 30) return; S.titan.rr.push({ f: 'xml/Home.xml', a: '', b: '', re: false }); save(); tiRe(); }
+    function tiRrAdd() { if (S.titan.rr.length >= 30) return; S.titan.rr.push({ f: tiXp('Home.xml'), a: '', b: '', re: false }); save(); tiRe(); }
     function tiRrSet(i, k, v) { const r = S.titan.rr[i]; if (!r) return; r[k] = v; save(); }
     function tiRrDel(i) { S.titan.rr.splice(i, 1); save(); tiRe(); }
     function tiRrTest() {
       if (!TPRO.raw) return toast('Erst „Skin berechnen“ im Block „Änderungen“.');
       const dec = new TextDecoder(), out = S.titan.rr.map((rl, i) => {
         if (!rl.a) return `#${i + 1}: leer`;
-        const pat = String(rl.f || '').trim() || 'xml/Home.xml', rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'); let n = 0, nf = 0;
+        const pat = String(rl.f || '').trim() || tiXp('Home.xml'), rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'); let n = 0, nf = 0;
         Object.keys(TPRO.raw).filter(p => tiIsText(p) && (rx.test(p) || rx.test(p.split('/').pop()))).forEach(p => { try { const t = dec.decode(TPRO.raw[p]), c = rl.re ? (t.match(new RegExp(rl.a, 'g')) || []).length : t.split(rl.a).length - 1; if (c) { n += c; nf++; } } catch (e) {} });
         return `#${i + 1}: ${n} Treffer in ${nf} Datei(en)`;
       });
@@ -5740,7 +5830,7 @@ if __name__ == '__main__':
       fs.forEach(f => {
         if (f.size > 2.5e6) return toast(f.name + ' ist zu groß (max. 2,5 MB).');
         const r = new FileReader(); r.onload = () => {
-          const n = f.name.replace(/[^A-Za-z0-9._-]+/g, '_'), dir = /\.(png|jpe?g|gif|webp|svg)$/i.test(n) ? 'media/titan/' : /\.(ttf|otf)$/i.test(n) ? 'fonts/' : /\.xml$/i.test(n) ? 'xml/' : /\.(wav|mp3|ogg)$/i.test(n) ? 'sounds/' : 'extras/';
+          const n = f.name.replace(/[^A-Za-z0-9._-]+/g, '_'), dir = /\.(png|jpe?g|gif|webp|svg)$/i.test(n) ? 'media/titan/' : /\.(ttf|otf)$/i.test(n) ? 'fonts/' : /\.xml$/i.test(n) ? tiDir() + '/' : /\.(wav|mp3|ogg)$/i.test(n) ? 'sounds/' : 'extras/';
           S.titan.xf.push({ p: dir + n, d: r.result, n: f.name }); save(); tiRe();
         }; r.readAsDataURL(f);
       });
@@ -5783,7 +5873,7 @@ if __name__ == '__main__':
     function tiPfUse(name) {
       const t = TPF.list && TPF.list[name] && tiPfParse(name); if (!t) return toast('Dieses Profil ist beschädigt.');
       if (!confirm('Dein aktuelles Titan-Projekt wird durch das Profil „' + name + '“ ersetzt (mit „Rückgängig“ kommst du zurück). Fortfahren?')) return;
-      S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; save(); tiRe(); toast('Profil „' + name + '“ geladen.');
+      S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; WIN.dirty = true; save(); tiSync(); toast('Profil „' + name + '“ geladen.');
     }
     function tiPfFile(name) { const t = TPF.list && TPF.list[name] && tiPfParse(name); if (!t) return toast('Dieses Profil ist beschädigt.'); tiDownloadProj(t, name); }
     async function tiPfDel(name) { if (!TPF.list || !TPF.list[name] || !confirm('Profil „' + name + '“ wirklich löschen?')) return; delete TPF.list[name]; await tiPfStore(); tiRe(); }
@@ -5793,7 +5883,7 @@ if __name__ == '__main__':
         let o; try { o = JSON.parse(r.result); } catch (e) { return toast('Die Datei ist keine gültige Projektdatei.'); }
         const t = o && o.format === 'kfe-titan' ? o.titan : null; if (!t || typeof t !== 'object' || !Array.isArray(t.menu)) return toast('Das ist keine Titan-Projektdatei.');
         if (!confirm('Dein aktuelles Titan-Projekt wird durch die Datei ersetzt (mit „Rückgängig“ kommst du zurück). Fortfahren?')) return;
-        S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; save(); tiRe(); toast('Titan-Projekt geladen.');
+        S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; WIN.dirty = true; save(); tiSync(); toast('Titan-Projekt geladen.');
       }; r.readAsText(f);
     }
     // ---------- Reiter: Fenster (Video-OSD & Co.) ----------
@@ -5854,23 +5944,33 @@ if __name__ == '__main__':
     // Bekannte Bedienelemente der Estuary-Video-OSD (Nummer → Name)
     const TWOSD = { 200: 'Gruppe: alle OSD-Knöpfe', 201: 'Knopfreihe 1 (Wiedergabe)', 202: 'Knopfreihe 2 (Zusatzknöpfe)', 698: 'Gruppe: Wiedergabe-Knopf', 6000: 'Zeitleisten-Gruppe', 600: 'Vorheriger Titel', 601: 'Zurückspulen', 602: 'Wiedergabe / Pause', 603: 'Stopp', 606: 'Vorspulen', 607: 'Nächster Titel', 608: 'Aufnehmen', 804: 'Startseite', 70040: 'Senderliste', 70041: 'Programm (EPG)', 70042: 'Wiedergabeliste', 70043: 'Information', 70044: 'Lesezeichen', 70045: 'Videotext', 70046: 'Streams', 70047: 'Stereoskopie', 70048: 'Einstellungen' };
     let WIN = { imgT: '', fit: true, ctlOpen: '', cur: '', filt: '', b: null, raw: null, kodi: '', dirty: true, tried: false, tk: '', busy: false, err: '', diff: false, op: { g0: true } };
-    const tiWinInfo = p => { for (const g of TWINCAT) { const x = g[1].find(q => q[0] === p); if (x) return x; } return null; };
+    const TCATC = new WeakMap();
+    // Katalog der bekannten Fenster; bei fremden Skins mit dem echten Ordner und der echten Schreibweise der Dateien
+    function tiCat() {
+      const b = WIN.b; if (!tiGen() || !b) return TWINCAT;
+      let c = TCATC.get(b); if (c) return c;
+      const dir = tiDir(b);
+      c = TWINCAT.map(g => [g[0], g[1].map(x => { const q = x[0].replace(/^xml\//, dir + '/'); return [tiReal(b, q) || q, x[1], /Home\.xml$/i.test(q) ? 'Das Hauptfenster (Startseite) des Skins.' : x[2]]; })]);
+      TCATC.set(b, c); return c;
+    }
+    const tiWinInfo = p => { for (const g of tiCat()) { const x = g[1].find(q => q[0] === p); if (x) return x; } return null; };
     const tiWinDec = u => new TextDecoder().decode(u || new Uint8Array());
     // Grundlage + berechnete Fassung (ohne von Hand ersetzte Dateien); null, solange Estuary noch nicht geladen ist
     function tiWinBase() {
-      const T = S.titan, b = (TIB && TIB.kodi === T.kodi) ? TIB : null;
-      if (WIN.tk !== T.kodi) { WIN.tk = T.kodi; WIN.tried = false; }
+      const T = S.titan, b = tiBaseOk(TIB) ? TIB : null, tk = T.kodi + (T.gen ? 'g' : '');
+      if (WIN.tk !== tk) { WIN.tk = tk; WIN.tried = false; }
       if (!b) {
         if (!WIN.tried && !WIN.busy) { WIN.busy = true; tiGetBase(T.kodi, true).catch(() => null).then(() => { WIN.busy = false; WIN.tried = true; if (S.titan && S.titan.tab === 'win') tiRe(); }); }
         return null;
       }
-      if (WIN.dirty || WIN.b !== b || WIN.kodi !== T.kodi) {
+      if (WIN.dirty || WIN.b !== b || WIN.kodi !== tk) {
         try { WIN.raw = tiTransform(b, true); WIN.err = ''; } catch (e) { WIN.raw = b.files; WIN.err = e.message || 'Berechnung fehlgeschlagen'; }
-        WIN.b = b; WIN.kodi = T.kodi; WIN.dirty = false;
+        WIN.b = b; WIN.kodi = tk; WIN.dirty = false;
       }
       return b;
     }
     async function tiWinLoad() {
+      if (tiGen()) return tiTab('basis');
       tiProg('ti-win-prog', 'Estuary wird geladen – das dauert einen Moment …', 0); WIN.tried = true;
       try { await tiLoadGithub(); } catch (e) {}
       tiRe();
@@ -5895,12 +5995,96 @@ if __name__ == '__main__':
         if (t.dx || t.dy) anim(c, 'slide', { start: '0,0', end: (t.dx || 0) + ',' + (t.dy || 0) });
         if (t.z && t.z !== 100) anim(c, 'zoom', { start: '100', end: String(t.z), center: 'auto' });
         if (t.c) { [...c.children].filter(k => k.tagName === 'colordiffuse').forEach(k => c.removeChild(k)); const e = d.createElement('colordiffuse'); e.textContent = 'FF' + t.c; c.appendChild(e); }
+        // Ausblenden ersetzt die Sichtbarkeit; die Skin-Einstellung kommt als weitere Bedingung dazu (mehrere <visible> verknüpft Kodi mit UND)
         const vis = hide.has(id) ? 'false' : t.s ? '!Skin.HasSetting(' + t.s + ')' : '';
-        if (vis) { [...c.children].filter(k => k.tagName === 'visible').forEach(k => c.removeChild(k)); const v = d.createElement('visible'); v.textContent = vis; c.insertBefore(v, c.firstChild); }
+        if (vis) { if (hide.has(id)) [...c.children].filter(k => k.tagName === 'visible').forEach(k => c.removeChild(k)); const v = d.createElement('visible'); v.textContent = vis; c.insertBefore(v, c.firstChild); }
       });
       return { txt: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(d).replace(/^\s*<\?xml[^>]*\?>\s*/, '') + '\n', n: found.size, miss: want.size - found.size };
     }
     function tiHideApply(txt, ids) { const r = tiCtlApply(txt, ids, {}); return r && { txt: r.txt, n: r.n }; }
+    // ---------- Bausteine (Includes) auflösen ----------
+    // Fremde Skins legen die Knöpfe ihrer Fenster meist in Include-Dateien. Hier wird ein Fenster mit allen Bausteinen zu einem Baum zusammengesetzt;
+    // jedes Element merkt sich in data-src, in welcher Datei es wirklich steht (dort greifen Ausblenden und Verschieben).
+    const TXC = new Map();
+    function tiXdoc(p, txt) {
+      const c = TXC.get(p); if (c && c.t === txt) return c.d;
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length || !d.documentElement) return null;
+      TXC.set(p, { t: txt, d }); if (TXC.size > 400) TXC.delete(TXC.keys().next().value); return d;
+    }
+    const tiWinGetter = (p, txt) => f => (f === p && txt != null) ? txt : tiWinCur(f);
+    function tiWinIdx(get) {
+      const defs = {}, cons = {}, raw = WIN.raw || {}, dir = tiDir() + '/';
+      [...new Set([...Object.keys(raw), ...Object.keys(S.titan.ov)])].filter(p => p.startsWith(dir) && /\.xml$/i.test(p)).sort().forEach(p => {
+        const t = get(p); if (!t || !/<includes[\s>]/.test(t.slice(0, 4000))) return;
+        const d = tiXdoc(p, t); if (!d || d.documentElement.tagName !== 'includes') return;
+        [...d.documentElement.children].forEach(e => {
+          const n = e.getAttribute('name'); if (!n) return;
+          if (e.tagName === 'include') { if (!defs[n]) defs[n] = { e, p }; }
+          else if (e.tagName === 'constant' || e.tagName === 'expression') { if (cons[n] == null) cons[n] = e.textContent.trim(); }
+        });
+      });
+      return { defs, cons };
+    }
+    function tiXExpand(p, get, idx) {
+      const d0 = tiXdoc(p, get(p)); if (!d0) return null;
+      const out = document.implementation.createDocument(null, d0.documentElement.tagName, null), root = out.documentElement; let nodes = 0;
+      const sub = (x, pr) => String(x).replace(/\$PARAM\[([^\]]+)\]/g, (m, k) => (pr && pr[k] != null) ? pr[k] : m).replace(/\$(?:CONSTANT|EXP)\[([^\]]+)\]/g, (m, k) => idx.cons[k] != null ? idx.cons[k] : m);
+      const clone = (e, src, pr, par, depth) => {
+        if (++nodes > 30000) return;
+        const n = out.createElement(e.tagName);
+        [...e.attributes].forEach(a => n.setAttribute(a.name, sub(a.value, pr)));
+        if (e.tagName === 'control') { n.setAttribute('data-src', src); if (/\$PARAM\[/.test(e.getAttribute('id') || '')) n.setAttribute('data-dyn', '1'); }
+        par.appendChild(n); walk(e, src, pr, n, depth);
+      };
+      const walk = (e, src, pr, tgt, depth) => {
+        let prevCond = false;
+        [...e.childNodes].forEach(k => {
+          if (k.nodeType === 3 || k.nodeType === 4) { const t = k.nodeValue; if (t.trim() || !e.children.length) tgt.appendChild(out.createTextNode(sub(t, pr))); return; }
+          if (k.nodeType !== 1) return;
+          if (k.tagName === 'include') { const cnd = !!k.getAttribute('condition'), n0 = tgt.children.length; inc(k, src, pr, tgt, depth); if (cnd && prevCond) [...tgt.children].slice(n0).forEach(n => n.setAttribute('data-alt', '1')); prevCond = cnd; }
+          else { clone(k, src, pr, tgt, depth); prevCond = false; }
+        });
+      };
+      const inc = (k, src, pr, tgt, depth) => {
+        const kidsEl = [...k.children], name = sub(k.getAttribute('content') || (kidsEl.length ? '' : k.textContent.trim()) || k.getAttribute('name') || '', pr), def = idx.defs[name];
+        if (!def || depth > 10) { clone(k, src, pr, tgt, depth); return; }
+        const ps = {};
+        kidsEl.filter(c => c.tagName === 'param').forEach(c => {
+          const n = c.getAttribute('name'); if (!n) return;
+          const v = sub(c.getAttribute('value') != null ? c.getAttribute('value') : c.textContent, pr); ps[n] = v;
+          const cp = out.createElement('param'); cp.setAttribute('name', n); cp.setAttribute('value', v); tgt.appendChild(cp);
+        });
+        const dfn = [...def.e.children].find(c => c.tagName === 'definition'), pr2 = {};
+        [...def.e.children, ...(dfn ? [...dfn.children] : [])].filter(c => c.tagName === 'param').forEach(c => { if (c.getAttribute('default') != null && c.getAttribute('name')) pr2[c.getAttribute('name')] = c.getAttribute('default'); });
+        Object.assign(pr2, ps);
+        const body = dfn ? [...dfn.children] : [...def.e.children];
+        body.filter(c => c.tagName !== 'param' && c.tagName !== 'definition').forEach(c => { if (c.tagName === 'include') inc(c, def.p, pr2, tgt, depth + 1); else clone(c, def.p, pr2, tgt, depth + 1); });
+      };
+      walk(d0.documentElement, p, {}, root, 0);
+      return out;
+    }
+    // Das Fenster als Baum: bei Fenster-Dateien mit aufgelösten Bausteinen, sonst die Datei selbst
+    function tiWinDoc(p, txt) {
+      p = p || WIN.cur;
+      const get = tiWinGetter(p, txt), t = get(p); if (!t) return null;
+      const d0 = tiXdoc(p, t); if (!d0) return null;
+      if (d0.documentElement.tagName !== 'window') return d0;
+      try { return tiXExpand(p, get, tiWinIdx(get)) || d0; } catch (e) { return d0; }
+    }
+    // Alle Bedienelemente mit fester Nummer, mit der Datei, in der sie wirklich stehen
+    function tiWinCtlX(p, txt) {
+      const d = tiWinDoc(p, txt); if (!d) return null;
+      const seen = new Set(), out = [];
+      [...d.getElementsByTagName('control')].forEach(c => {
+        const id = c.getAttribute('id'); if (!/^\d+$/.test(id || '') || c.getAttribute('data-dyn')) return;
+        const src = c.getAttribute('data-src') || p, key = src + '|' + id; if (seen.has(key)) return; seen.add(key);
+        const par = [...c.getElementsByTagName('param')].find(x => x.getAttribute('name') === 'texture'), oc = [...c.children].find(k => k.tagName === 'onclick'), lb = [...c.children].find(k => k.tagName === 'label');
+        const tx = [...c.children].find(k => /^texture(focus|nofocus)?$/.test(k.tagName) && /\.\w+$/.test(k.textContent.trim()));
+        const hint = par ? String(par.getAttribute('value') || '').split('/').pop().replace(/\.\w+$/, '') : tx ? tx.textContent.trim().split('/').pop().replace(/\.\w+$/, '') : oc ? oc.textContent.trim() : lb ? lb.textContent.trim() : '';
+        out.push({ id, src, type: c.getAttribute('type') || '', hint: hint.slice(0, 48) });
+      });
+      return out.sort((a, b) => (+a.id) - (+b.id) || a.src.localeCompare(b.src)).slice(0, 300);
+    }
     // Alle Bedienelemente mit fester Nummer (Nummer, Art, Hinweis)
     function tiWinCtl(txt) {
       const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return null;
@@ -5934,20 +6118,22 @@ if __name__ == '__main__':
     function tiWinFilt(v) { WIN.filt = v; const sel = $('ti-win-files'); if (sel) sel.innerHTML = tiWinOpts(); }
     function tiWinOpts() {
       if (!WIN.raw) return '';
-      const f = WIN.filt.toLowerCase(), known = new Set(); TWINCAT.forEach(g => g[1].forEach(x => known.add(x[0])));
-      const ks = new Set(Object.keys(WIN.raw).filter(p => /^(xml\/|colors\/).*\.xml$/i.test(p)));
-      Object.keys(S.titan.ov).filter(p => /^xml\/.*\.xml$/i.test(p)).forEach(p => ks.add(p));
+      const f = WIN.filt.toLowerCase(), known = new Set(); tiCat().forEach(g => g[1].forEach(x => known.add(x[0])));
+      const dir = tiDir(), rx = new RegExp('^(' + tiRx(dir) + '/|colors/).*\\.xml$', 'i'), ox = new RegExp('^' + tiRx(dir) + '/.*\\.xml$', 'i'), pre = new RegExp('^' + tiRx(dir) + '/');
+      const ks = new Set(Object.keys(WIN.raw).filter(p => rx.test(p)));
+      Object.keys(S.titan.ov).filter(p => ox.test(p)).forEach(p => ks.add(p));
       return [...ks].filter(p => !known.has(p) && (!f || p.toLowerCase().includes(f))).sort((a, b) => a.localeCompare(b)).slice(0, 400)
-        .map(p => `<option value="${esc(p)}" ${p === WIN.cur ? 'selected' : ''}>${tiWinState(p).length ? tiWinState(p)[0].slice(0, 2) + ' ' : ''}${esc(p.replace(/^xml\//, ''))}</option>`).join('');
+        .map(p => `<option value="${esc(p)}" ${p === WIN.cur ? 'selected' : ''}>${tiWinState(p).length ? tiWinState(p)[0].slice(0, 2) + ' ' : ''}${esc(p.replace(pre, ''))}</option>`).join('');
     }
     function tiWinHide(p, id, on) {
       const T = S.titan, a = new Set(T.hide[p] || []); if (on) a.add(String(id)); else a.delete(String(id));
       if (a.size) T.hide[p] = [...a]; else delete T.hide[p];
       save(); tiRe();
     }
-    function tiWinShowAll(p) { delete S.titan.hide[p]; save(); tiRe(); }
+    function tiWinShowAll(p) { delete S.titan.hide[p]; (WIN.srcs || []).forEach(q => { delete S.titan.hide[q]; }); save(); tiRe(); }
     function tiWinTg(k, el) { const was = !!WIN.op[k]; WIN.op[k] = el.open; if (k === 'sk' && el.open && !was) tiRe(); }
     function tiWinCtlOpen(id) { WIN.ctlOpen = WIN.ctlOpen === id ? '' : id; tiRe(); }
+    const tiWinCtlKey = c => c.src + '|' + c.id;
     function tiWinTwSet(p, id, fn) {
       const T = S.titan, cur = Object.assign({ dx: 0, dy: 0, z: 100, c: '', mv: 0, s: '' }, (T.tweak[p] || {})[id] || {}); fn(cur);
       const v = tiTweakNorm(cur);
@@ -5968,9 +6154,15 @@ if __name__ == '__main__':
         <button class="btn w-full mt-1" ${d} onclick="tiWinTwReset(this.dataset.p,this.dataset.i)">Alles für #${c.id} zurücksetzen</button></div>`;
     }
     // Eigene Skin-Einstellungen
-    function tiSksetId(keys) { const used = new Set(keys.map(x => (String(x).match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean)); for (let i = 1199; i >= 1100; i--) if (!used.has(String(i))) return i; return 1199; }
-    function tiSksetFor(keys) { const id = tiSksetId(keys.filter(x => !/_TitanOptionen\.xml$/i.test(x))); return { id, p: 'xml/Custom_' + id + '_TitanOptionen.xml' }; }
-    function tiSksetInfo() { if (!S.titan.skset.length) return null; const b = WIN.b || TIB; return tiSksetFor([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov)]); }
+    function tiUsedWids(keys, b) {
+      const u = new Set(keys.map(x => (String(x).match(/(?:^|\/)Custom_(\d+)_/i) || [])[1]).filter(Boolean));
+      ((b && b.wids) || []).forEach(i => u.add(String(i)));
+      Object.keys(S.titan.ov).forEach(p => { if (/_TitanOptionen\.xml$/i.test(p)) return; const m = String(S.titan.ov[p]).slice(0, 4000).match(/<window\b[^>]*\bid\s*=\s*"(\d+)"/i); if (m) u.add(m[1]); });
+      return u;
+    }
+    function tiSksetId(keys, b) { const used = tiUsedWids(keys, b); for (let i = 1199; i >= 1100; i--) if (!used.has(String(i))) return i; return 1199; }
+    function tiSksetFor(keys, b) { b = b || WIN.b || TIB; const id = tiSksetId(keys.filter(x => !/_TitanOptionen\.xml$/i.test(x)), b); return { id, p: tiDir(b) + '/Custom_' + id + '_TitanOptionen.xml' }; }
+    function tiSksetInfo() { if (!S.titan.skset.length) return null; const b = WIN.b || TIB; return tiSksetFor([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov)], b); }
     function tiSkAdd() { const T = S.titan; if (T.skset.length >= 20) return; const used = new Set(T.skset.map(x => x.n)); let i = 1; while (used.has('titan_option' + i)) i++; T.skset.push({ n: 'titan_option' + i, l: 'Neue Einstellung ' + i }); WIN.dirty = true; save(); tiRe(); }
     function tiSkLabel(i, v) { const x = S.titan.skset[i]; if (!x) return; x.l = String(v).slice(0, 60) || 'Einstellung'; WIN.dirty = true; save(); }
     function tiSkDel(i) {
@@ -5980,8 +6172,9 @@ if __name__ == '__main__':
     }
     function tiSkMenu() { const si = tiSksetInfo(); if (!si) return; tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + si.id + ')' }; m.label = 'Skin-Optionen'; save(); tiRe(); toast('Menüpunkt „Skin-Optionen“ öffnet das Einstellungsfenster – ganz oben im Hauptmenü.'); }
     // Bilder eines Fensters finden und gegen eigene tauschen (landen als „Eigene Datei“ am Originalpfad)
-    function tiWinImgs(txt) {
-      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length || !WIN.b) return [];
+    function tiWinImgs(p, txt) {
+      if (txt === undefined) { txt = p; p = WIN.cur; }
+      const d = tiWinDoc(p, txt); if (!d || !WIN.b) return [];
       const map = new Map(), isImg = v => /^[\w\-./ ]+\.(png|jpe?g|gif|webp)$/i.test(v) && !/^(https?:|special:|\/)/.test(v);
       const note = (v, el) => {
         v = String(v || '').trim(); if (!isImg(v)) return;
@@ -5989,12 +6182,12 @@ if __name__ == '__main__':
         const o = map.get(v) || { v, ids: new Set() }; if (id) o.ids.add(id); map.set(v, o);
       };
       [...d.getElementsByTagName('*')].forEach(e => { if (e.tagName === 'param') note(e.getAttribute('value'), e); else if (!e.children.length) note(e.textContent, e); });
-      const out = []; map.forEach(o => { const p = ['media/' + o.v, o.v].find(x => WIN.b.files[x]); if (p) out.push({ v: o.v, p, ids: [...o.ids] }); });
+      const out = []; map.forEach(o => { const q = ['media/' + o.v, o.v].map(x => tiReal(WIN.b, x)).find(Boolean); if (q) out.push({ v: o.v, p: q, ids: [...o.ids] }); });
       return out.slice(0, 80);
     }
     const tiImgMime = f => /\.jpe?g$/i.test(f) ? 'image/jpeg' : /\.gif$/i.test(f) ? 'image/gif' : /\.webp$/i.test(f) ? 'image/webp' : 'image/png';
     function tiWinImgBlock(p, txt, op) {
-      const T = S.titan, im = tiWinImgs(txt); if (!im.length) return '';
+      const T = S.titan, im = tiWinImgs(p, txt); if (!im.length) return '';
       const rows = im.map(x => {
         const xf = T.xf.find(q => q.p === x.p), src = xf ? xf.d : extBytesToData(WIN.b.files[x.p], tiImgMime(x.p));
         return `<div class="row mt-1 text-xs" style="gap:8px"><img src="${src}" alt="" style="width:44px;height:44px;object-fit:contain;background:repeating-conic-gradient(#334155 0 25%,#1e293b 0 50%) 50%/12px 12px;border-radius:6px;flex-shrink:0" onload="this.nextElementSibling.querySelector('[data-dim]').textContent=this.naturalWidth+'×'+this.naturalHeight"><span class="flex-1 min-w-0"><b style="word-break:break-all">${esc(x.v)}</b>${xf ? ' <span style="color:#fbbf24">✎ ersetzt</span>' : ''}<br><span class="hint" data-dim></span>${x.ids.length ? ' <span class="hint">· #' + x.ids.slice(0, 6).join(' #') + '</span>' : ''}</span><button class="btn" data-p="${esc(x.p)}" onclick="tiWinImgPick(this.dataset.p)">🖼 Tauschen</button>${xf ? `<button class="btn" aria-label="Original wiederherstellen" data-p="${esc(x.p)}" onclick="tiWinImgReset(this.dataset.p)">↺</button>` : ''}</div>`;
@@ -6035,22 +6228,25 @@ if __name__ == '__main__':
       r.readAsDataURL(f);
     }
     // Schemaskizze eines Fensters (Größen und Plätze geschätzt)
-    function tiWinSketch(txt) {
-      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return '';
-      const root = [...d.documentElement.children].find(k => k.tagName === 'controls'); if (!root) return '';
+    function tiWinSketch(p, txt) {
+      if (txt === undefined) { txt = p; p = WIN.cur; }
+      const d = tiWinDoc(p, txt); if (!d) return '';
+      const SW = tiBw(), SH = tiBh(), SK = SH / 1080, SU = SW / 1920, nn = (a, c) => a != null ? a : c;
+      const root = [...d.documentElement.children].find(k => k.tagName === 'controls'); if (!root) return '<p class="hint mt-2">Diese Datei enthält kein Fenster mit Bedienelementen (oft nur Bausteine) – eine Skizze gibt es für die Fenster, die sie benutzen.</p>';
       const kid = (c, tag) => [...c.children].find(x => x.tagName === tag), kids = (c, tag) => [...c.children].filter(x => x.tagName === tag);
       const num = (c, tag, ref) => { const k = kid(c, tag); if (!k) return null; const t = k.textContent.trim(); if (/^-?\d+(\.\d+)?$/.test(t)) return +t; const m = t.match(/^(-?\d+(?:\.\d+)?)%$/); return m && ref ? +m[1] * ref / 100 : null; };
       const DEF = { button: [90, 90], radiobutton: [90, 90], togglebutton: [90, 90], label: [400, 40], fadelabel: [400, 40], textbox: [500, 160], list: [500, 400], fixedlist: [500, 400], panel: [600, 400], wraplist: [600, 200], slider: [400, 24], sliderex: [400, 24], progress: [400, 20], edit: [400, 60], spincontrol: [200, 60], scrollbar: [20, 400], videowindow: [640, 360], visualisation: [640, 360], rss: [600, 40] };
       const COL = { button: '#38bdf8', radiobutton: '#38bdf8', togglebutton: '#38bdf8', label: '#94a3b8', fadelabel: '#94a3b8', textbox: '#94a3b8', list: '#a78bfa', fixedlist: '#a78bfa', panel: '#a78bfa', wraplist: '#a78bfa', slider: '#34d399', sliderex: '#34d399', progress: '#34d399', edit: '#fbbf24', spincontrol: '#fbbf24', scrollbar: '#64748b', videowindow: '#f472b6', visualisation: '#f472b6' };
-      const out = [], hid = [], cond = []; let cnt = 0;
+      const out = [], hid = [], cond = []; let cnt = 0, altN = 0;
       const walk = (par, ox, oy, pw, ph, draw) => {
         const isList = par.getAttribute && par.getAttribute('type') === 'grouplist', horiz = isList && String((kid(par, 'orientation') || {}).textContent || '').trim() === 'horizontal', gap = isList ? (num(par, 'itemgap') || 0) : 0;
         let fx = 0, fy = 0, mx = 0, my = 0;
         kids(par, 'control').forEach(c => {
+          if (c.getAttribute('data-alt')) { if (draw) altN++; return; }
           const type = c.getAttribute('type') || '', id = c.getAttribute('id') || '', vis = kids(c, 'visible').map(k => k.textContent.trim());
           if (vis.includes('false')) { if (draw && id) hid.push(id); return; }
           if (draw && id && vis.some(v => /^!Skin\.HasSetting/.test(v))) cond.push(id);
-          const box = type === 'group' || type === 'grouplist', dd = DEF[type];
+          const box = type === 'group' || type === 'grouplist', dd = DEF[type] && DEF[type].map(v => v * SK);
           let w = num(c, 'width', pw), h = num(c, 'height', ph);
           if ((w == null || h == null) && box && isList) { const m = walk(c, 0, 0, pw, ph, false); if (w == null) w = m[0]; if (h == null) h = m[1]; }
           if (w == null) w = dd ? dd[0] : box ? pw : 0;
@@ -6058,7 +6254,7 @@ if __name__ == '__main__':
           let x, y;
           if (isList) { x = fx; y = fy; if (horiz) fx += w + gap; else fy += h + gap; }
           else {
-            const l = num(c, 'left', pw), t = num(c, 'top', ph), r = num(c, 'right', pw), bt = num(c, 'bottom', ph), cl = num(c, 'centerleft', pw), ct = num(c, 'centertop', ph);
+            const l = nn(num(c, 'left', pw), num(c, 'posx', pw)), t = nn(num(c, 'top', ph), num(c, 'posy', ph)), r = num(c, 'right', pw), bt = num(c, 'bottom', ph), cl = num(c, 'centerleft', pw), ct = num(c, 'centertop', ph);
             x = cl != null ? cl - w / 2 : l != null ? l : r != null ? pw - r - w : 0; y = ct != null ? ct - h / 2 : t != null ? t : bt != null ? ph - bt - h : 0;
           }
           let sx = 0, sy = 0, z = 1;
@@ -6069,7 +6265,7 @@ if __name__ == '__main__':
           });
           const ax = ox + x + sx + w * (1 - z) / 2, ay = oy + y + sy + h * (1 - z) / 2, aw = w * z, ah = h * z;
           if (draw && cnt < 400 && aw > 0 && ah > 0 && !(box && aw >= pw && ah >= ph && !isList)) {
-            cnt++; const cd = kid(c, 'colordiffuse'), fill = cd && /^[0-9A-Fa-f]{8}$/.test(cd.textContent.trim()) ? '#' + cd.textContent.trim().slice(2) : COL[type] || '#64748b', fs = Math.max(14, Math.min(26, ah * .35));
+            cnt++; const cd = kid(c, 'colordiffuse'), fill = cd && /^[0-9A-Fa-f]{8}$/.test(cd.textContent.trim()) ? '#' + cd.textContent.trim().slice(2) : COL[type] || '#64748b', fs = Math.max(14 * SU, Math.min(26 * SU, ah * .35));
             if (box) out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" fill="none" stroke="#475569" stroke-dasharray="8 6" stroke-width="2"/>`);
             else if (type === 'image' || type === 'multiimage') out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" fill="none" stroke="#334155" stroke-width="2"/>`);
             else out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" rx="8" fill="${fill}" fill-opacity=".28" stroke="${fill}" stroke-width="2"/>${id ? `<text x="${(ax + aw / 2).toFixed(0)}" y="${(ay + ah / 2 + fs / 3).toFixed(0)}" text-anchor="middle" font-size="${fs.toFixed(0)}" fill="#e2e8f0" font-family="sans-serif">#${esc(id)}</text>` : ''}`);
@@ -6079,10 +6275,10 @@ if __name__ == '__main__':
         });
         return [mx, my];
       };
-      walk(root, 0, 0, 1920, 1080, true);
+      walk(root, 0, 0, SW, SH, true);
       if (!out.length) return '<p class="hint mt-2">Keine zeichenbaren Elemente mit festen Maßen gefunden.</p>';
-      return `<svg viewBox="0 0 1920 1080" style="width:100%;height:auto;background:#020617;border:1px solid #334155;border-radius:8px;margin-top:8px" role="img" aria-label="Schemaskizze des Fensters"><rect x="1" y="1" width="1918" height="1078" fill="none" stroke="#1e293b" stroke-width="2"/>${out.join('')}</svg>
-        <p class="hint mt-1">Schemaskizze: Plätze und Größen sind geschätzt (Estuary legt vieles über Bausteine fest), Reihenfolge, Verschiebung, Zoom und Ausgeblendetes stimmen.${hid.length ? ' <b>Ausgeblendet:</b> ' + [...new Set(hid)].map(x => '#' + esc(x)).join(' ') + '.' : ''}${cond.length ? ' <b>Je nach Skin-Einstellung:</b> ' + [...new Set(cond)].map(x => '#' + esc(x)).join(' ') + '.' : ''}</p>`;
+      return `<svg viewBox="0 0 ${SW} ${SH}" style="width:100%;height:auto;background:#020617;border:1px solid #334155;border-radius:8px;margin-top:8px" role="img" aria-label="Schemaskizze des Fensters"><rect x="1" y="1" width="${SW - 2}" height="${SH - 2}" fill="none" stroke="#1e293b" stroke-width="2"/>${out.join('')}</svg>
+        <p class="hint mt-1">Schemaskizze: Plätze und Größen sind geschätzt (Estuary legt vieles über Bausteine fest), Reihenfolge, Verschiebung, Zoom und Ausgeblendetes stimmen.${altN ? ' Bei Bausteinen mit Bedingung (z. B. „Stil 1 / Stil 2“) zeigt die Skizze nur die erste Variante.' : ''}${hid.length ? ' <b>Ausgeblendet:</b> ' + [...new Set(hid)].map(x => '#' + esc(x)).join(' ') + '.' : ''}${cond.length ? ' <b>Je nach Skin-Einstellung:</b> ' + [...new Set(cond)].map(x => '#' + esc(x)).join(' ') + '.' : ''}</p>`;
     }
     function tiWinSave() {
       const p = WIN.cur, ta = $('ti-wed'); if (!p || !ta) return;
@@ -6097,7 +6293,7 @@ if __name__ == '__main__':
     }
     function tiWinOrigSet() {
       const p = WIN.cur, o = tiWinOrig(p); if (!p || !o) return;
-      S.titan.ov[p] = o; delete S.titan.hide[p]; delete S.titan.tweak[p]; save(); tiRe(); toast('Original von Estuary eingesetzt – ohne Änderungen des Generators.');
+      S.titan.ov[p] = o; delete S.titan.hide[p]; delete S.titan.tweak[p]; save(); tiRe(); toast('Original ' + (S.titan.gen ? 'des Skins' : 'von Estuary') + ' eingesetzt – ohne Änderungen des Generators.');
     }
     function tiWinDiff() { WIN.diff = !WIN.diff; tiRe(); }
     function tiWinDiffHtml(p) {
@@ -6111,16 +6307,29 @@ if __name__ == '__main__':
         const c = o[0] === '+' ? 'background:rgba(34,197,94,.18);color:#86efac' : o[0] === '-' ? 'background:rgba(239,68,68,.18);color:#fca5a5' : 'color:#94a3b8';
         out += `<div style="${c};white-space:pre">${o[0]} ${esc(o[1])}</div>`;
       });
-      if (!add && !del) return '<p class="hint mt-2">Kein Unterschied zum Estuary-Original.</p>';
-      return `<p class="hint mt-2">${add} Zeilen neu, ${del} Zeilen entfernt gegenüber Estuary${xml ? ' (XML einheitlich eingerückt)' : ''}.</p><div style="font:12px/1.45 ui-monospace,monospace;max-height:300px;overflow:auto;background:#020617;border-radius:8px;padding:6px">${out}</div>`;
+      if (!add && !del) return '<p class="hint mt-2">Kein Unterschied zum ' + (S.titan.gen ? 'Original' : 'Estuary-Original') + '.</p>';
+      return `<p class="hint mt-2">${add} Zeilen neu, ${del} Zeilen entfernt gegenüber ${S.titan.gen ? 'dem Original' : 'Estuary'}${xml ? ' (XML einheitlich eingerückt)' : ''}.</p><div style="font:12px/1.45 ui-monospace,monospace;max-height:300px;overflow:auto;background:#020617;border-radius:8px;padding:6px">${out}</div>`;
     }
     // Vorlagen für neue Fenster
     function tiWinTpl(kind, id, title, b, extra, FF) {
+      const t = tiWinTpl0(kind, id, title, b, extra, FF), k = (b.h || 1080) / 1080;
+      if (Math.abs(k - 1) < .001) return t;
+      return t.replace(/<(left|top|width|height|right|bottom|itemgap|centerleft|centertop)>(-?\d+)<\/\1>/g, (m, tag, v) => `<${tag}>${Math.round(+v * k)}</${tag}>`);
+    }
+    function tiWinTpl0(kind, id, title, b, extra, FF) {
       const C = S.titan.col, hx = c => String(c).slice(1).toUpperCase(), xe = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const wt = Object.keys(b.files).find(p => /^media\/(?:.+\/)?white\.png$/i.test(p)), W = wt ? wt.replace(/^media\//, '') : '';
-      let fonts = [];
-      try { const fd = new DOMParser().parseFromString(tiWinDec((FF && FF['xml/Font.xml']) || (WIN.raw && WIN.raw['xml/Font.xml']) || b.files['xml/Font.xml']), 'application/xml'); fonts = [...fd.getElementsByTagName('font')].map(f => { const n = [...f.children].find(k => k.tagName === 'name'); return n ? n.textContent.trim() : ''; }).filter(Boolean); } catch (e) {}
-      const fp = (...w) => w.find(x => fonts.includes(x)) || '', f1 = fp('font13', 'font12', 'font10'), f2 = fp('font14', 'font30', 'font13');
+      let fonts = [], fobj = [];
+      try {
+        const fx = tiReal(b, (b.dir || 'xml') + '/Font.xml') || (b.dir || 'xml') + '/Font.xml', fd = new DOMParser().parseFromString(tiWinDec((FF && FF[fx]) || (WIN.raw && WIN.raw[fx]) || b.files[fx]), 'application/xml');
+        const sets = [...fd.getElementsByTagName('fontset')], fs0 = sets.find(q => q.getAttribute('id') === 'Default') || sets[0] || fd;
+        fobj = [...fs0.getElementsByTagName('font')].map(f => { const g = t => { const n = [...f.children].find(k => k.tagName === t); return n ? n.textContent.trim() : ''; }; return { n: g('name'), sz: parseFloat(g('size')) || 0, bold: /bold/i.test(g('style') + ' ' + g('filename')), file: g('filename') }; }).filter(x => x.n);
+        fonts = [...fd.getElementsByTagName('font')].map(f => { const n = [...f.children].find(k => k.tagName === 'name'); return n ? n.textContent.trim() : ''; }).filter(Boolean);
+      } catch (e) {}
+      // Wunschgröße der Schrift ~ Bildhöhe (24 bei 1080, 16 bei 720); ohne Estuary-Namen wird die passendste Schrift des Skins genommen
+      const near = (sz, bold) => { const c = fobj.filter(x => x.sz > 0 && !/icon|symbol|flag|weather|glyph|awesome/i.test(x.n + ' ' + x.file) && x.bold === bold); const pool = c.length ? c : fobj.filter(x => x.sz > 0 && !/icon|symbol|flag|weather|glyph|awesome/i.test(x.n + ' ' + x.file)); let best = null; pool.forEach(x => { if (!best || Math.abs(x.sz - sz) < Math.abs(best.sz - sz)) best = x; }); return best ? best.n : ''; };
+      const kH = (b.h || 1080) / 1080;
+      const fp = (...w) => w.find(x => fonts.includes(x)) || '', f1 = (b.gen ? '' : fp('font13', 'font12', 'font10')) || near(30 * kH, false), f2 = (b.gen ? '' : fp('font14', 'font30', 'font13')) || near(42 * kH, true);
       const ft = f => f ? `\n\t\t\t\t<font>${f}</font>` : '', tc = `\n\t\t\t\t<textcolor>FF${hx(C.text)}</textcolor>`;
       const bg = (w, h) => W ? `\t\t\t<control type="image">\n\t\t\t\t<left>0</left>\n\t\t\t\t<top>0</top>\n\t\t\t\t<width>${w}</width>\n\t\t\t\t<height>${h}</height>\n\t\t\t\t<texture colordiffuse="F2${hx(C.dialog)}">${W}</texture>\n\t\t\t</control>\n` : '';
       const lab = (l, t, w, h, txt, f, al, vis) => `\t\t\t<control type="label">\n\t\t\t\t<left>${l}</left>\n\t\t\t\t<top>${t}</top>\n\t\t\t\t<width>${w}</width>\n\t\t\t\t<height>${h}</height>\n\t\t\t\t<label>${txt}</label>${ft(f)}${tc}${al ? '\n\t\t\t\t<align>' + al + '</align>' : ''}\n\t\t\t\t<aligny>center</aligny>${vis ? '\n\t\t\t\t<visible>' + vis + '</visible>' : ''}\n\t\t\t</control>\n`;
@@ -6153,56 +6362,59 @@ if __name__ == '__main__':
       const b = tiWinBase(); if (!b) return;
       const id = parseInt($('ti-wn-id').value, 10), kind = $('ti-wn-tpl').value, title = String($('ti-wn-name').value || '').trim().slice(0, 60) || 'Mein Fenster';
       if (!(id >= 1100 && id <= 1199)) return toast('Die Fensternummer muss zwischen 1100 und 1199 liegen.');
-      const nm = (title.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '') || 'Fenster').slice(0, 24), p = `xml/Custom_${id}_${nm}.xml`;
-      const used = new Set([...Object.keys(b.files), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])].map(x => (x.match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean));
-      if (used.has(String(id))) return toast('Die Nummer ' + id + ' ist schon vergeben (Estuary oder dein eigenes Fenster).');
+      const nm = (title.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '') || 'Fenster').slice(0, 24), p = `${tiDir(b)}/Custom_${id}_${nm}.xml`;
+      const used = tiUsedWids([...Object.keys(b.files), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])], b);
+      if (used.has(String(id))) return toast('Die Nummer ' + id + ' ist schon vergeben (' + (tiGen() ? 'im Skin' : 'Estuary') + ' oder dein eigenes Fenster).');
       S.titan.ov[p] = tiWinTpl(kind, id, title, b); save(); WIN.cur = p; WIN.diff = false; tiRe();
-      toast('Fenster angelegt. Öffnen mit ActivateWindow(' + id + ') – z. B. über einen Menüpunkt.');
+      toast('Fenster angelegt. Öffnen mit ActivateWindow(' + id + ')' + (tiGen() ? ' – z. B. über einen Menüpunkt, den du im Skin selbst anlegst.' : ' – z. B. über einen Menüpunkt.'));
     }
     function tiWinFreeId() {
-      const b = WIN.b, used = new Set([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])].map(x => (x.match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean));
+      const b = WIN.b, used = tiUsedWids([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])], b);
       for (let i = 1150; i < 1200; i++) if (!used.has(String(i))) return i;
       for (let i = 1100; i < 1150; i++) if (!used.has(String(i))) return i;
       return 1150;
     }
     function tiWinMenu(id) {
-      tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + id + ')' }; m.label = (WIN.cur.match(/^xml\/Custom_\d+_(.+)\.xml$/) || [])[1] || 'Mein Fenster'; save(); tiRe();
+      tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + id + ')' }; m.label = (WIN.cur.match(/Custom_\d+_(.+)\.xml$/) || [])[1] || 'Mein Fenster'; save(); tiRe();
       toast('Menüpunkt „' + m.label + '“ öffnet jetzt das Fenster ' + id + ' – ganz oben im Hauptmenü.');
     }
     function tiWin() {
       const T = S.titan, b = tiWinBase(), op = k => `${WIN.op[k] ? 'open' : ''} ontoggle="tiWinTg('${k}',this)"`;
       let h = `<p class="hint mb-2">Hier bearbeitest du die Fenster des Skins – vom Bedienfeld beim Film (<b>Video-OSD</b>) über Dialoge bis zu den Einstellungen. Du kannst einzelne Knöpfe <b>ausblenden</b>, den XML-Text <b>von Hand ändern</b> oder ein <b>ganz neues Fenster</b> anlegen. Alles wird bei jedem Bauen automatisch angewendet.</p><div id="ti-win-prog" class="mb-2"></div><input type="file" id="f-wimg" accept="image/*" class="hidden" onchange="tiWinImgSet(this)">`;
+      if (!b && T.gen && (WIN.tried || !T.gsid)) return h + `<div class="card"><b class="text-xs">🎭 Es ist noch kein Skin geladen</b><p class="hint mt-1">Lade im Reiter „🧬 Basis“ die ZIP des Skins, den du bearbeiten möchtest.</p><button class="btn titb w-full mt-2" onclick="tiTab('basis')">Zum Reiter „Basis“</button></div>`;
       if (!b) {
-        if (!WIN.tried) return h + '<p class="hint">Estuary wird aus dem Zwischenspeicher gelesen …</p>';
+        if (!WIN.tried) return h + '<p class="hint">' + (T.gen ? 'Der Skin' : 'Estuary') + ' wird aus dem Zwischenspeicher gelesen …</p>';
         return h + `<div class="card"><b class="text-xs">🧬 Estuary ist noch nicht geladen</b><p class="hint mt-1">Die Fenster-Dateien kommen aus Estuary ${esc(TKODI[T.kodi][0])}. Einmal laden, dann bleiben sie im Browser gespeichert. (Ohne Internet: Reiter „🧬 Basis“ → eigene Skin-ZIP.)</p><button class="btn titb w-full mt-2" onclick="tiWinLoad()">⬇ Estuary laden (offiziell von Kodi)</button></div>`;
       }
       if (WIN.err) h += `<p class="hint mb-2" style="color:#fbbf24">⚠️ Die Generator-Änderungen konnten nicht berechnet werden (${esc(WIN.err)}). Gezeigt werden die Originale von Estuary.</p>`;
       const has = p => !!b.files[p] || T.ov[p] != null, p = WIN.cur && has(WIN.cur) ? WIN.cur : '';
       if (p) {
-        const inf = tiWinInfo(p), xml = /\.xml$/i.test(p), txt = tiWinCur(p), ctl = xml ? tiWinCtl(tiWinGen(p) || txt) : null, hid = T.hide[p] || [], hasOv = T.ov[p] != null, inBase = !!b.files[p];
-        const cm = p.match(/^xml\/Custom_(\d+)_/);
+        const inf = tiWinInfo(p), xml = /\.xml$/i.test(p), txt = tiWinCur(p), ctl = xml ? tiWinCtlX(p, tiWinGen(p) || txt) : null, hid = T.hide[p] || [], hasOv = T.ov[p] != null, inBase = !!b.files[p];
+        const cm = tiGen() ? null : p.match(/^xml\/Custom_(\d+)_/);
         h += `<div class="card" id="ti-win-ed" style="border-color:#f59e0b"><div class="flex items-center gap-2"><b class="text-xs flex-1 min-w-0">${esc(inf ? inf[1] : p)}</b><button class="btn" aria-label="Schließen" onclick="WIN.cur='';tiRe()">✕</button></div>
           <code class="lk" style="word-break:break-all">${esc(p)}</code> ${tiWinState(p).map(x => `<span class="hint">· ${esc(x)}</span>`).join(' ')}
-          <p class="hint mt-1">${esc(inf ? inf[2] : inBase ? 'Eine Datei von Estuary.' : 'Dein eigenes Fenster.')}</p>`;
+          <p class="hint mt-1">${esc(inf ? inf[2] : inBase ? (T.gen ? 'Eine Datei des Skins.' : 'Eine Datei von Estuary.') : 'Dein eigenes Fenster.')}</p>`;
         if (ctl && ctl.length) {
-          h += `<details class="card mt-2" ${op('ctl')}><summary class="text-xs font-bold cursor-pointer">👁 Bedienelemente: ausblenden, verschieben, vergrößern${hid.length || Object.keys(T.tweak[p] || {}).length ? ' (' + (hid.length + Object.keys(T.tweak[p] || {}).length) + ' angepasst)' : ''}</summary>
-            <p class="hint mt-2">Haken = ausblenden (der Skin springt dann beim Bedienen über den Knopf). <b>⚙</b> = verschieben, vergrößern, umfärben, in der Reihenfolge verschieben oder je nach eigener Skin-Einstellung ausblenden. Das Verschieben wirkt nur auf die Darstellung, nicht auf die Bedien-Reihenfolge. ${hasOv ? '<b style="color:#fbbf24">Du hast diese Datei von Hand ersetzt – das Ausblenden wirkt dort nicht mehr.</b> Entweder „Zurück zur erzeugten“ oder im Text unten arbeiten.' : 'Speichere Textänderungen vorher, sonst gehen sie beim Umschalten verloren.'}</p>
+          const srcs = [...new Set(ctl.map(c => c.src))]; WIN.srcs = srcs;
+          const hidOf = c => (T.hide[c.src] || []).includes(c.id), twOf = c => !!(T.tweak[c.src] || {})[c.id], nHid = ctl.filter(hidOf).length, nTw = ctl.filter(twOf).length;
+          h += `<details class="card mt-2" ${op('ctl')}><summary class="text-xs font-bold cursor-pointer">👁 Bedienelemente: ausblenden, verschieben, vergrößern${nHid || nTw ? ' (' + (nHid + nTw) + ' angepasst)' : ''}</summary>
+            <p class="hint mt-2">Haken = ausblenden (der Skin springt dann beim Bedienen über den Knopf). <b>⚙</b> = verschieben, vergrößern, umfärben, in der Reihenfolge verschieben oder je nach eigener Skin-Einstellung ausblenden. Das Verschieben wirkt nur auf die Darstellung, nicht auf die Bedien-Reihenfolge. ${srcs.length > 1 || srcs[0] !== p ? '<b>„in Datei …“</b> heißt: Das Element steht in einem Baustein; eine Änderung dort wirkt in <b>allen</b> Fenstern, die diesen Baustein benutzen. ' : ''}${hasOv ? '<b style="color:#fbbf24">Du hast diese Datei von Hand ersetzt – das Ausblenden wirkt dort nicht mehr.</b> Entweder „Zurück zur erzeugten“ oder im Text unten arbeiten.' : 'Speichere Textänderungen vorher, sonst gehen sie beim Umschalten verloren.'}</p>
             <div style="max-height:380px;overflow:auto" class="mt-1">${ctl.map(c => {
-              const nm = p === 'xml/VideoOSD.xml' && TWOSD[c.id] ? TWOSD[c.id] : '', tw = !!(T.tweak[p] || {})[c.id];
-              return `<div class="row mt-1 text-xs" style="gap:6px"><label style="display:flex;gap:8px;flex:1;min-width:0;cursor:pointer;align-items:center"><input type="checkbox" ${hid.includes(c.id) ? 'checked' : ''} data-p="${esc(p)}" data-i="${c.id}" onchange="tiWinHide(this.dataset.p,this.dataset.i,this.checked)"><b>#${c.id}</b><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm ? esc(nm) + ' · ' : ''}<span class="hint">${esc(c.type)}${c.hint ? ' · ' + esc(c.hint) : ''}</span></span></label><button class="btn" aria-label="Feineinstellungen für ${c.id}" style="${tw ? 'border-color:#f59e0b;color:#fbbf24' : ''}" data-i="${c.id}" onclick="tiWinCtlOpen(this.dataset.i)">⚙</button></div>${WIN.ctlOpen === c.id ? tiWinTwPanel(p, c) : ''}`;
+              const nm = !T.gen && p === 'xml/VideoOSD.xml' && TWOSD[c.id] ? TWOSD[c.id] : '', tw = twOf(c), key = tiWinCtlKey(c);
+              return `<div class="row mt-1 text-xs" style="gap:6px"><label style="display:flex;gap:8px;flex:1;min-width:0;cursor:pointer;align-items:center"><input type="checkbox" ${hidOf(c) ? 'checked' : ''} data-p="${esc(c.src)}" data-i="${c.id}" onchange="tiWinHide(this.dataset.p,this.dataset.i,this.checked)"><b>#${c.id}</b><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm ? esc(nm) + ' · ' : ''}<span class="hint">${esc(c.type)}${c.hint ? ' · ' + esc(c.hint) : ''}${c.src !== p ? ' · in ' + esc(c.src.split('/').pop()) : ''}</span></span></label><button class="btn" aria-label="Feineinstellungen für ${c.id}" style="${tw ? 'border-color:#f59e0b;color:#fbbf24' : ''}" data-i="${esc(key)}" onclick="tiWinCtlOpen(this.dataset.i)">⚙</button></div>${WIN.ctlOpen === key || WIN.ctlOpen === c.id ? tiWinTwPanel(c.src, c) : ''}`;
             }).join('')}</div>
-            ${hid.length ? `<button class="btn w-full mt-2" data-p="${esc(p)}" onclick="tiWinShowAll(this.dataset.p)">Alle wieder einblenden</button>` : ''}</details>`;
+            ${nHid ? `<button class="btn w-full mt-2" data-p="${esc(p)}" onclick="tiWinShowAll(this.dataset.p)">Alle wieder einblenden</button>` : ''}</details>`;
         }
         if (xml) h += tiWinImgBlock(p, tiWinGen(p) || txt, op('img'));
-        if (xml) h += `<details class="card mt-2" ${op('sk')}><summary class="text-xs font-bold cursor-pointer">🖼 Vorschau (Skizze)</summary>${WIN.op.sk ? tiWinSketch(txt) : '<p class="hint mt-2">Wird beim Aufklappen gezeichnet.</p>'}</details>`;
+        if (xml) h += `<details class="card mt-2" ${op('sk')}><summary class="text-xs font-bold cursor-pointer">🖼 Vorschau (Skizze)</summary>${WIN.op.sk ? tiWinSketch(p, txt) : '<p class="hint mt-2">Wird beim Aufklappen gezeichnet.</p>'}</details>`;
         h += `<textarea id="ti-wed" class="inp mt-2" rows="16" wrap="off" spellcheck="false" style="font:12px/1.45 ui-monospace,monospace;white-space:pre">${esc(txt)}</textarea>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiWinSave()">💾 Meine Fassung speichern</button><button class="btn" onclick="tiWinReset()" ${hasOv ? '' : 'disabled'}>${inBase ? '↺ Zurück zur erzeugten' : '🗑 Fenster löschen'}</button></div>
-          <div class="grid grid-cols-2 gap-2 mt-2">${inBase ? `<button class="btn" onclick="tiWinDiff()">🔍 ${WIN.diff ? 'Vergleich schließen' : 'Vergleich mit Estuary'}</button><button class="btn" onclick="if(confirm('Die Originaldatei von Estuary einsetzen? Änderungen des Generators an dieser Datei entfallen dann.'))tiWinOrigSet()">⤺ Estuary-Original</button>` : ''}${cm ? `<button class="btn titb" style="grid-column:span 2" onclick="tiWinMenu(${cm[1]})">＋ Menüpunkt im Hauptmenü, der dieses Fenster öffnet</button>` : ''}</div>
+          <div class="grid grid-cols-2 gap-2 mt-2">${inBase ? `<button class="btn" onclick="tiWinDiff()">🔍 ${WIN.diff ? 'Vergleich schließen' : 'Vergleich mit ' + (T.gen ? 'Original' : 'Estuary')}</button><button class="btn" onclick="if(confirm('Die Originaldatei ' + (S.titan.gen ? 'des Skins' : 'von Estuary') + ' einsetzen? Änderungen des Generators an dieser Datei entfallen dann.'))tiWinOrigSet()">⤺ ${T.gen ? 'Skin' : 'Estuary'}-Original</button>` : ''}${cm ? `<button class="btn titb" style="grid-column:span 2" onclick="tiWinMenu(${cm[1]})">＋ Menüpunkt im Hauptmenü, der dieses Fenster öffnet</button>` : ''}</div>
           ${WIN.diff && inBase ? tiWinDiffHtml(p) : ''}
           <p class="hint mt-2">Deine Fassung <b>ersetzt die Datei komplett</b>; spätere Änderungen im Generator (Farben, Menü …) wirken dort dann nicht mehr. Ist der Text kein gültiges XML, wird er nicht gespeichert.</p></div>`;
       }
       const hot = k => tiWinState(k).length ? `<span class="hint">${esc(tiWinState(k).join(' · '))}</span>` : '';
-      h += TWINCAT.map((g, gi) => {
+      h += tiCat().map((g, gi) => {
         const it = g[1].filter(x => has(x[0])); if (!it.length) return '';
         return `<details class="card mt-2" ${op('g' + gi)}><summary class="text-xs font-bold cursor-pointer">${g[0]} (${it.length})</summary>${it.map(x => `<div class="row mt-1" style="flex-direction:column;align-items:stretch;gap:2px;cursor:pointer;${x[0] === p ? 'border-color:#f59e0b' : ''}" data-p="${esc(x[0])}" onclick="tiWinSel(this.dataset.p)"><b class="text-xs">${esc(x[1])}</b><span class="hint">${esc(x[0].replace(/^xml\//, ''))} ${hot(x[0])}</span></div>`).join('')}</details>`;
       }).join('');
@@ -6210,20 +6422,24 @@ if __name__ == '__main__':
           <input class="inp mt-2" placeholder="Dateien filtern, z. B. Dialog" value="${esc(WIN.filt)}" oninput="tiWinFilt(this.value)"><select id="ti-win-files" class="inp mt-1" size="6" onchange="tiWinSel(this.value)">${tiWinOpts()}</select>
           <p class="hint mt-1">Für Dateien außerhalb von <code>xml/</code> (Farben, Sprache, Bilder) nimm den Reiter „🔧 Profi“.</p></details>
         <details class="card mt-2" ${op('new')}><summary class="text-xs font-bold cursor-pointer">＋ Neues eigenes Fenster</summary>
-          <p class="hint mt-2">Legt eine neue Datei <code>xml/Custom_NUMMER_Name.xml</code> an. Kodi hat dafür die Nummern 1100–1199 vorgesehen. Geöffnet wird das Fenster mit <code>ActivateWindow(NUMMER)</code> – zum Beispiel über einen eigenen Menüpunkt.</p>
+          <p class="hint mt-2">Legt eine neue Datei <code>${esc(tiDir(b))}/Custom_NUMMER_Name.xml</code> an. Kodi hat dafür die Nummern 1100–1199 vorgesehen. Geöffnet wird das Fenster mit <code>ActivateWindow(NUMMER)</code> – zum Beispiel über einen eigenen Menüpunkt.${T.gen ? ' Bei einem fremden Skin legst du diesen Menüpunkt im Skin selbst an (meist unter Skin-Einstellungen → Hauptmenü bearbeiten; als Befehl <code>ActivateWindow(NUMMER)</code>).' : ''}</p>
           <div class="grid grid-cols-2 gap-2 mt-1"><div><label class="l">Nummer (1100–1199)</label><input id="ti-wn-id" class="inp" type="number" min="1100" max="1199" value="${tiWinFreeId()}"></div><div><label class="l">Titel</label><input id="ti-wn-name" class="inp" maxlength="60" value="Mein Fenster"></div></div>
           <label class="l mt-1">Vorlage</label><select id="ti-wn-tpl" class="inp"><option value="popup">Hinweis-Fenster mit Titel, Text und Schließen-Knopf</option><option value="menu">Schnellmenü mit vier Knöpfen</option><option value="info">Info-Anzeige zum laufenden Titel (nur Text)</option></select>
           <button class="btn titb w-full mt-2" onclick="tiWinNew()">＋ Fenster anlegen und bearbeiten</button></details>
         <details class="card mt-2" ${op('sk2')}><summary class="text-xs font-bold cursor-pointer">⚙ Eigene Skin-Einstellungen${T.skset.length ? ' (' + T.skset.length + ')' : ''}</summary>
           <p class="hint mt-2">Lege Schalter an, die du in Kodi ein- und ausschalten kannst, ohne den Skin neu zu bauen – z. B. „Stopp-Knopf im OSD ausblenden“. Der Generator erzeugt dafür ein Fenster <b>Skin-Optionen</b>. Verknüpfe einen Schalter mit einem Element: Fenster wählen → Bedienelemente → ⚙ → Sichtbarkeit. Das Element ist dann ausgeblendet, solange der Schalter <b>An</b> steht.</p>
           ${T.skset.map((x, i) => `<div class="row mt-1.5"><input class="inp" value="${esc(x.l)}" maxlength="60" aria-label="Name der Einstellung" oninput="tiSkLabel(${i},this.value)"><code class="lk shrink-0 text-xs" title="Interner Name">${esc(x.n)}</code><button class="btn" aria-label="Einstellung löschen" onclick="tiSkDel(${i})">🗑</button></div>`).join('')}
-          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiSkAdd()" ${T.skset.length >= 20 ? 'disabled' : ''}>＋ Einstellung</button><button class="btn" onclick="tiSkMenu()" ${T.skset.length ? '' : 'disabled'}>＋ Menüpunkt „Skin-Optionen“</button></div>
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiSkAdd()" ${T.skset.length >= 20 ? 'disabled' : ''}>＋ Einstellung</button>${T.gen ? '' : `<button class="btn" onclick="tiSkMenu()" ${T.skset.length ? '' : 'disabled'}>＋ Menüpunkt „Skin-Optionen“</button>`}</div>
           ${T.skset.length ? `<p class="hint mt-1">Das Fenster liegt als <code>${esc((tiSksetInfo() || {}).p || '')}</code> (öffnen mit <code>ActivateWindow(${(tiSksetInfo() || {}).id})</code>). <button class="btn" data-p="${esc((tiSksetInfo() || {}).p || '')}" onclick="tiWinSel(this.dataset.p)">Fenster ansehen</button></p>` : ''}</details>
         <div class="row mt-2"><span class="hint flex-1">Nach Änderungen an Farben, Menü oder Layout zeigt der Reiter beim nächsten Öffnen automatisch die neue erzeugte Fassung.</span></div>`;
       return h;
     }
 
     function tiPro() {
+      const h = tiPro0();
+      return S.titan.gen ? h.replace(/<details class="card mt-2" [^>]*ontoggle="TPRO\.op\['wh'\]=this\.open"[^>]*>[\s\S]*?<\/details>/, '').replace(/gegenüber Estuary/g, 'gegenüber dem Original-Skin').replace(/was der Generator an Estuary ändert/g, 'was der Generator am Skin ändert').replace(/Eine gleichnamige Datei von Estuary wird ersetzt/g, 'Eine gleichnamige Datei des Skins wird ersetzt').replace(/ und blende einzelne Estuary-Widgetreihen aus/g, '') : h;
+    }
+    function tiPro0() {
       if (TPF.list === null) { TPF.list = {}; tiPfLoad().then(() => { if (S.titan && S.titan.tab === 'pro') tiRe(); }); }
       const T = S.titan, op = k => `${TPRO.op[k] ? 'open' : ''} ontoggle="TPRO.op['${k}']=this.open"`, ok = TPRO.fin && TPRO.kodi === T.kodi;
       const sum = ok ? (() => { const ks = Object.keys(TPRO.changed), nn = ks.filter(p => TPRO.changed[p] === 'new').length, cc = ks.length - nn; return `<p class="hint">${cc} Dateien geändert, ${nn} neu. Tippe auf eine Datei für den Vergleich.</p>${ks.sort((a, b) => ((TPRO.changed[b] === 'new') - (TPRO.changed[a] === 'new')) || a.localeCompare(b)).map(p => `<div class="row mt-1" style="cursor:pointer;flex-direction:column;align-items:stretch" onclick="tiProView('${esc(p)}')"><div class="flex gap-2 items-center"><span class="text-xs" style="color:${TPRO.changed[p] === 'new' ? '#86efac' : '#fcd34d'}">${TPRO.changed[p] === 'new' ? '＋ neu' : '● geändert'}</span><code class="lk flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis">${esc(p)}</code></div>${TPRO.view === p ? `<div onclick="event.stopPropagation()" style="cursor:default">${tiProDiffHtml(p)}</div>` : ''}</div>`).join('')}`; })() : '<p class="hint">Noch nicht berechnet.</p>';
@@ -6264,6 +6480,7 @@ if __name__ == '__main__':
     // ---------- Reiter: Basis ----------
     function tiBasis() {
       const T = S.titan;
+      if (T.gen) return tiBasisGen();
       return field('Für welche Kodi-Version?', `<select class="inp" onchange="TIB=null;tiSet('kodi',this.value,true)">${Object.keys(TKODI).map(v => `<option value="${v}" ${v === T.kodi ? 'selected' : ''}>Kodi ${v} ${TKODI[v][0]}</option>`).join('')}</select>`, 'Ein Skin passt immer genau zu einer Kodi-Version. Dafür wird das passende Estuary geladen.') +
         `<div class="grid grid-cols-2 gap-2"><div>${field('Name des Skins', `<input class="inp" value="${esc(T.name)}" placeholder="Titan Skin" oninput="tiSet('name',this.value);$('ti-id').textContent=tiId()">`)}</div><div>${field('Version', `<div class="flex gap-1"><input id="ti-ver" class="inp" value="${esc(T.ver)}" oninput="tiSet('ver',this.value)"><button class="btn" aria-label="Version erhöhen" onclick="tiBump()">＋</button></div>`)}</div></div>
         <p class="hint">Technische ID: <code class="lk" id="ti-id">${esc(tiId())}</code></p>
@@ -6273,7 +6490,21 @@ if __name__ == '__main__':
           <div class="flex flex-wrap gap-2 mt-2"><button class="btn titb" onclick="tiLoadGithub()">⬇ Estuary laden (offiziell von Kodi)</button><button class="btn" onclick="$('f-tzip').click()">📦 Eigene Skin-ZIP</button><button class="btn" onclick="tiClear()">🗑 Zwischenspeicher leeren</button></div>
           <div id="ti-prog" class="mt-2"></div>
           <p class="hint mt-2">Estuary kommt direkt aus dem offiziellen Kodi-Archiv auf GitHub (rund 900 Dateien, 10 MB) und bleibt danach im Browser gespeichert. Ohne Internet: den Ordner <b>skin.estuary</b> deiner Kodi-Installation als ZIP hochladen.</p></div>
+        <div class="card mt-3"><b class="text-xs">🎭 Anderen Skin bearbeiten (Skin-Modus)</b><p class="hint mt-1">Du kannst auch Skins außer Estuary laden (z. B. Bello, Aeon, Arctic …) und deren Fenster bearbeiten, Bilder tauschen und das Ergebnis als eigenen Skin bauen. Farben, Menü und Widgets bleiben dabei beim Skin selbst.</p>
+          <div class="flex flex-wrap gap-2 mt-2"><button class="btn titb" onclick="$('f-gzip').click()">📦 Skin-ZIP laden (Skin-Modus)</button>${S.tstash && S.tstash.g ? `<button class="btn" onclick="tiMode(true)">↪ Weiter mit „${esc(S.tstash.g.gname || 'Skin')}“</button>` : ''}</div></div>
         <div class="card mt-3"><b class="text-xs">⚖ Lizenz von Estuary</b><p class="hint mt-1">Estuary stammt von phil65 und Team Kodi: Code unter GPL-2.0, Grafiken unter CC BY-SA 4.0. Ein daraus gebauter Skin steht automatisch unter denselben freien Lizenzen und nennt Estuary als Grundlage. Der Generator selbst bleibt geschützt.</p></div>`;
+    }
+    function tiBasisGen() {
+      const T = S.titan, m = T.gmeta || {};
+      return `<div class="card"><b class="text-xs">🎭 Skin-Modus${T.gname ? ' · Grundlage: ' + esc(T.gname) : ''}</b><div id="ti-base" class="hint mt-1">wird geprüft …</div>
+          <div class="flex flex-wrap gap-2 mt-2"><button class="btn titb" onclick="$('f-gzip').click()">📦 ${T.gsid ? 'Anderen Skin laden (ZIP)' : 'Skin-ZIP laden'}</button><button class="btn" onclick="tiMode(false)">↩ Zurück zum Estuary-Modus</button><button class="btn" onclick="tiClear()">🗑 Zwischenspeicher leeren</button></div>
+          <div id="ti-prog" class="mt-2"></div>
+          <p class="hint mt-2">Lade die ZIP eines Kodi-Skins (zum Beispiel aus dem Ordner <b>addons</b> deiner Kodi-Installation, als ZIP gepackt, oder eine Skin-ZIP aus dem Netz). Der Generator erkennt den Fenster-Ordner selbst, auch wenn er nicht <code>xml</code> heißt (z. B. <code>720p</code>).</p></div>
+        <div class="grid grid-cols-2 gap-2 mt-3"><div>${field('Name des neuen Skins', `<input class="inp" value="${esc(T.name)}" placeholder="${esc(tiNameDef())}" oninput="tiSet('name',this.value);$('ti-id').textContent=tiId()">`)}</div><div>${field('Version', `<div class="flex gap-1"><input id="ti-ver" class="inp" value="${esc(T.ver)}" oninput="tiSet('ver',this.value)"><button class="btn" aria-label="Version erhöhen" onclick="tiBump()">＋</button></div>`)}</div></div>
+        <p class="hint">Technische ID: <code class="lk" id="ti-id">${esc(tiId())}</code> – eine neue ID, damit dein Skin neben dem Original in Kodi installiert werden kann.</p>
+        ${field('Autor der Anpassung', `<input class="inp" value="${esc(T.author)}" placeholder="${esc(S.meta.author || 'Ich')}" oninput="tiSet('author',this.value)">`)}
+        ${field('Sprachen', `<select class="inp" onchange="tiSet('langs',this.value)"><option value="de" ${T.langs !== 'all' ? 'selected' : ''}>Deutsch + Englisch (kleiner)</option><option value="all" ${T.langs === 'all' ? 'selected' : ''}>Alle Sprachen des Skins</option></select>`)}
+        <div class="card mt-3"><b class="text-xs">⚖ Lizenz des Original-Skins</b><p class="hint mt-1">${T.gsid ? `„${esc(T.gname)}“ von ${esc(m.prov || 'unbekannt')} steht unter: <b>${esc(m.lic || 'siehe LICENSE.txt')}</b>.` : 'Sobald ein Skin geladen ist, steht hier seine Lizenz.'} Diese Lizenz gilt auch für deine veränderte Fassung. Der Generator nennt den Original-Autor im Skin (addon.xml, ANPASSUNG.txt) und lässt die LICENSE.txt unverändert. Achte besonders auf Bedingungen wie „nicht kommerziell“ oder „Weitergabe unter gleichen Bedingungen“, bevor du den Skin weitergibst.</p></div>`;
     }
     function tiBump() { const p = String(S.titan.ver || '1.0.0').split('.'), n = parseInt(p[p.length - 1], 10); if (isNaN(n)) p.push('1'); else p[p.length - 1] = String(n + 1); S.titan.ver = p.join('.'); save(); if ($('ti-ver')) $('ti-ver').value = S.titan.ver; toast('Skin-Version: ' + S.titan.ver); }
 
@@ -6428,6 +6659,7 @@ if __name__ == '__main__':
       return '';
     }
     function tiCheck() {
+      if (S.titan.gen) return tiCheckGen();
       const T = S.titan, r = [], vis = T.menu.filter(m => m.show);
       if (!vis.length && T.lay.b.menu.show !== false) r.push(['w', 'Im Hauptmenü ist kein Punkt sichtbar.']);
       T.menu.forEach(m => {
@@ -6460,7 +6692,34 @@ if __name__ == '__main__':
       if (T.fontScale !== 100) r.push(['i', `Schriftgröße ${T.fontScale} % – prüfe in Kodi, ob lange Texte noch passen.`]);
       return r;
     }
+    function tiCheckGen() {
+      const T = S.titan, r = [], m = T.gmeta || {};
+      if (!T.gsid) r.push(['w', 'Es ist noch kein Skin geladen (Reiter „🧬 Basis“).']);
+      else {
+        r.push(['i', `Lizenz des Original-Skins „${T.gname}“: ${m.lic || 'siehe LICENSE.txt'} – sie gilt auch für deine Fassung (Namensnennung, ggf. nicht kommerziell, Weitergabe unter gleichen Bedingungen).`]);
+        if (m.req && m.req.length) r.push(['i', 'Der Skin braucht weitere Addons: ' + m.req.join(', ') + '. Kodi bietet sie bei der Installation meist selbst an; sonst vorher aus dem Kodi-Repository installieren.']);
+        r.push(['i', `Neue ID ${tiId()}: Einstellungen und Hauptmenü des Original-Skins werden nicht übernommen, der Skin fängt mit seinen Standardwerten an.`]);
+      }
+      T.rr.forEach((x, i) => { if (x.re) { try { new RegExp(x.a); } catch (e) { r.push(['w', `Ersetzen ${i + 1}: ungültiger Ausdruck.`]); } } });
+      Object.keys(T.ov).forEach(p => r.push(['i', 'Von Hand geändert: ' + p + ' (deine Fassung ersetzt die erzeugte Datei).']));
+      if (T.skset.length) { const si = tiSksetInfo(); r.push(['i', `Eigene Skin-Schalter: Das Fenster „Skin-Optionen“ öffnest du in Kodi mit ActivateWindow(${si ? si.id : ''}) – lege dafür im Skin selbst einen Menüpunkt oder Favoriten an.`]); }
+      return r;
+    }
+    function tiExportGen() {
+      const T = S.titan, r = tiCheckGen();
+      return `<div class="card"><b class="text-sm">${esc(tiName())}</b> <span class="hint">· <code class="lk">${esc(tiId())}</code> · Version ${esc(T.ver)} · Grundlage ${esc(T.gname || '–')}</span>
+          <ul class="text-xs text-slate-300 mt-2 space-y-1">${r.length ? r.map(x => `<li>${x[0] === 'w' ? '⚠️' : '💡'} ${esc(x[1])}</li>`).join('') : '<li>✅ Alles bereit.</li>'}</ul></div>
+        <button class="btn titb w-full mt-3" style="padding:12px;font-size:14px" onclick="tiBuild()">⚡ Skin-ZIP bauen</button>
+        <div id="ti-prog2" class="mt-2"></div>
+        <div class="card mt-3"><b class="text-xs">So kommt der Skin in Kodi</b><ol class="text-xs text-slate-300 list-decimal pl-5 mt-2 space-y-1">
+          <li>ZIP auf das Kodi-Gerät kopieren.</li>
+          <li><b>Einstellungen → Addons → Aus ZIP-Datei installieren</b> (beim ersten Mal „Unbekannte Quellen“ erlauben).</li>
+          <li>Kodi fragt, ob du zum neuen Skin wechseln willst → <b>Ja</b>, danach „Änderung beibehalten?“ → <b>Ja</b>.</li>
+          <li>Zurück zum Original: <b>Einstellungen → Oberfläche → Skin → Skin</b> → ${esc(T.gname || 'Original-Skin')}.</li></ol>
+          <p class="hint mt-2">Update: Version erhöhen (Reiter „🧬 Basis“) und erneut installieren.</p></div>`;
+    }
     function tiExport() {
+      if (S.titan.gen) return tiExportGen();
       const T = S.titan, r = tiCheck();
       return `<div class="card"><b class="text-sm">${esc(tiName())}</b> <span class="hint">· <code class="lk">${esc(tiId())}</code> · Version ${esc(T.ver)} · Kodi ${T.kodi} ${TKODI[T.kodi][0]}</span>
           <ul class="text-xs text-slate-300 mt-2 space-y-1">${r.length ? r.map(x => `<li>${x[0] === 'w' ? '⚠️' : '💡'} ${esc(x[1])}</li>`).join('') : '<li>✅ Alles bereit.</li>'}</ul></div>
@@ -6498,6 +6757,21 @@ if __name__ == '__main__':
       const kids = (e, tag) => [...e.children].filter(c => c.tagName === tag);
       const H = h => String(h).slice(1).toUpperCase(), A = pct => Math.round(Math.max(0, Math.min(100, pct)) * 2.55).toString(16).padStart(2, '0').toUpperCase();
       const nl = (d, n) => d.createTextNode('\n' + '\t'.repeat(n));
+      if (b.gen) {
+        // Fremder Skin: nur ID, Name, Version und Hinweise ändern – alles andere bleibt, wie es ist
+        const ad = getX('addon.xml'), ar = ad.documentElement, id = tiId(), orig = ar.getAttribute('provider-name') || b.sprov || '';
+        ar.setAttribute('id', id); ar.setAttribute('name', tiName()); ar.setAttribute('version', String(T.ver || '1.0.0').trim() || '1.0.0');
+        ar.setAttribute('provider-name', (orig ? orig + ' · ' : '') + 'angepasst von ' + tiAuthor());
+        const meta = kids(ar, 'extension').find(e => e.getAttribute('point') === 'xbmc.addon.metadata');
+        if (meta) {
+          kids(meta, 'news').forEach(e => meta.removeChild(e));
+          meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'news', {}, 'v' + T.ver + ': angepasst mit dem Kodi Video-Addon Generator (Basis: ' + (b.sname || '') + ' ' + (b.sver || '') + (orig ? ' von ' + orig : '') + ')')); meta.appendChild(nl(ad, 1));
+        }
+        putX('addon.xml', ad);
+        const cl = F['changelog.txt'] ? dec.decode(F['changelog.txt']) : '';
+        F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: angepasst mit dem Kodi Video-Addon Generator (Skin-Modus)\n- Grundlage: ${b.sname || ''} ${b.sver || ''}${orig ? ' (' + orig + ')' : ''}\n` + (cl ? '\n' + cl : ''));
+        F['ANPASSUNG.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor der Anpassung: ${tiAuthor()}\n\nDieser Skin ist eine veränderte Fassung von „${b.sname || ''}“ ${b.sver || ''}${orig ? ' von ' + orig : ''}.\nLizenz des Originals: ${b.lic || 'siehe LICENSE.txt'}\nSie gilt auch für diese Fassung; die LICENSE.txt des Originals liegt unverändert bei.\n\nAngepasst mit dem Kodi Video-Addon Generator v9.0 Pro – Skin-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\nDer Generator selbst ist Freeware und bleibt geschützt; der Skin-Inhalt unterliegt der Lizenz des Original-Skins.\n`);
+      } else {
 
       // 1) addon.xml – neue ID, Name, Version, Beschreibung, Bilder
       const ad = getX('addon.xml'), ar = ad.documentElement, id = tiId();
@@ -6857,10 +7131,11 @@ if __name__ == '__main__':
 
       // 6) Hinweise und Änderungsprotokoll
       F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: erstellt mit dem Kodi Video-Addon Generator (Titan-Modus)\n- Grundlage: Estuary ${b.branch || TKODI[T.kodi][0]} (phil65, Team Kodi)\n`);
-      F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Video-Addon Generator v8.1 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
+      F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Video-Addon Generator v9.0 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
+      }
       // Eigene Skin-Einstellungen: erzeugtes Fenster „Skin-Optionen“
       if ((T.skset || []).length) {
-        try { const si = tiSksetFor(Object.keys(F).concat(Object.keys(T.ov))); F[si.p] = enc.encode(tiWinTpl('settings', si.id, 'Skin-Optionen', b, T.skset, F)); }
+        try { const si = tiSksetFor(Object.keys(F).concat(Object.keys(T.ov)), b); F[si.p] = enc.encode(tiWinTpl('settings', si.id, 'Skin-Optionen', b, T.skset, F)); }
         catch (e) { TLAYWARN.push('Skin-Optionen konnten nicht erzeugt werden: ' + (e.message || e)); }
       }
       if (!raw) {
@@ -6868,7 +7143,7 @@ if __name__ == '__main__':
         // Suchen & Ersetzen
         (T.rr || []).forEach(rl => {
           if (!rl.a) return;
-          const pat = String(rl.f || '').trim() || 'xml/Home.xml', rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
+          const pat = String(rl.f || '').trim() || ((b.dir || 'xml') + '/Home.xml'), rx = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
           let n = 0, nf = 0;
           Object.keys(F).filter(p => isT(p) && (rx.test(p) || rx.test(p.split('/').pop()))).forEach(p => {
             const t = dec.decode(F[p]); let t2 = t, c = 0;
@@ -6905,6 +7180,7 @@ if __name__ == '__main__':
       const T = S.titan;
       if (tiCheck().some(x => x[0] === 'w') && !confirm('Es gibt noch Warnungen (siehe Liste). Trotzdem bauen?')) return;
       let b = await tiGetBase(T.kodi, true);
+      if (!b && T.gen) return tiProg('ti-prog2', '⚠️ Es ist noch kein Skin geladen – Reiter „🧬 Basis“ → Skin-ZIP laden.', null);
       if (!b) { tiProg('ti-prog2', 'Estuary wird zuerst geladen …', 0); b = await tiLoadGithub(); if (!b) return; }
       try {
         tiProg('ti-prog2', 'Skin wird umgebaut …', .3);

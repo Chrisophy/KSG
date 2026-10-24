@@ -1,13 +1,11 @@
-# 📖 Handbuch – Kodi Video-Addon Generator v8.1 Pro by IT('s) Possible
+# 📖 Handbuch – Kodi Video-Addon Generator v9.0 Pro by IT('s) Possible
 
 Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail – mit dem **⚡ Titan-Modus** baust du sogar einen echten Kodi-Skin für ganz Kodi (Teil G) – und mit **📦 Fremd-Addon** packst du ein vorhandenes Addon (ZIP) in dein Menü und zeigst es im eigenen Skin, mit eigenem Kontextmenü und Favoriten (Teil H).
 
 > 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-
-**Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
-
+**Verschiedene Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
 ---
 
 ## Inhalt
@@ -84,6 +82,7 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 50. [Layout: alles frei verschieben](#k50)
 51. [Fenster (Video-OSD & Co.) und Profi-Reiter](#k51)
 52. [Export und Installation](#k52)
+    - 52a. [Andere Skins bearbeiten (Skin-Modus)](#k52a)
 
 **Teil H – Fremd-Addon, Live-Browser und Kontextmenü**
 
@@ -1204,7 +1203,7 @@ Mit dem Titan-Modus baust du einen **echten Kodi-Skin** – also das Aussehen vo
 **Stufe A (jetzt verfügbar): Estuary umbauen.** Grundlage ist Estuary, der offizielle Standard-Skin von Kodi. Alles, was Estuary kann – Bibliothek, Ansichten, Player, Einstellungen, Dialoge – funktioniert weiter. Darüber legst du dein eigenes Design: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte und Widgets.
 
 - **Öffnen:** **⚡ Titan** in der Kopfzeile oder **7 · ⚡ Titan-Modus** in den Einstellungen.
-- **Aufbau:** links (auf dem Handy oben) eine **Live-Vorschau im Estuary-Stil**, rechts neun Reiter: 🧬 Basis · 🎨 Farben · 📋 Hauptmenü · 🧩 Widgets · 📐 Layout · 🖼 Bilder & Schrift · 🪟 Fenster · 🔧 Profi · 📦 Export.
+- **Aufbau:** links (auf dem Handy oben) eine **Live-Vorschau im Estuary-Stil**, rechts neun Reiter (bei fremden Skins vier, siehe Kapitel 52a): 🧬 Basis · 🎨 Farben · 📋 Hauptmenü · 🧩 Widgets · 📐 Layout · 🖼 Bilder & Schrift · 🪟 Fenster · 🔧 Profi · 📦 Export.
 - Auf dem Handy bleibt die Vorschau beim Scrollen oben stehen – du siehst jede Änderung sofort.
 - Alle Titan-Einstellungen gehören zu deinem Projekt und werden mit **💾 Speichern** mitgesichert.
 
@@ -1407,6 +1406,36 @@ Im Reiter **📦 Export** prüft der Generator deine Einstellungen (fehlende Nam
 | Ein Widget bleibt leer | Inhalte in der Bibliothek vorhanden? Pfad korrekt? Leere Reihen blendet Kodi aus. |
 | Hintergrund zu dunkel oder zu hell | Regler „Abdunkeln“ unter 🖼 Bilder & Schrift. |
 
+<a id="k52a"></a>
+
+## 52a. Andere Skins bearbeiten (Skin-Modus)
+
+Der Titan-Modus kann mehr als Estuary: Du kannst die ZIP **jedes Kodi-Skins** laden (getestet mit **Bello 10**) und seine **Fenster** umbauen. Farben, Hauptmenü, Widgets und Layout sind dabei Sache des Skins selbst – dafür hat jeder Skin eigene Einstellungen in Kodi. Der Generator erkennt, wo die Fenster-Dateien liegen (Ordner `xml`, `720p`, `1080i` …), und lässt alles andere unverändert.
+
+**So geht es:**
+
+1. **⚡ Titan → 🧬 Basis → 🎭 „Skin-ZIP laden (Skin-Modus)“** und die ZIP des Skins wählen (z. B. den Ordner aus `addons` deiner Kodi-Installation als ZIP packen oder die Skin-ZIP aus dem Netz). Lädst du über „📦 Eigene Skin-ZIP“ einen Skin, der nicht wie Estuary aufgebaut ist, schaltet der Generator von selbst in den Skin-Modus.
+2. Oben rechts bleiben vier Reiter: **🧬 Basis · 🪟 Fenster · 🔧 Profi · 📦 Export**. Links siehst du Name, Version, Autor, Lizenz, Auflösung und die Zusatz-Addons des Skins.
+3. **🧬 Basis:** Name, Version und Autor der Anpassung festlegen. Der neue Skin bekommt eine **neue ID** (z. B. `skin.bello10mod`), damit er neben dem Original installiert werden kann.
+4. **🪟 Fenster:** Wie in Kapitel 51 – Knöpfe ausblenden, verschieben, vergrößern, umfärben, Bilder tauschen, XML ändern, neue Fenster, eigene Skin-Schalter.
+5. **📦 Export:** **⚡ Skin-ZIP bauen** erzeugt `skin.<neue-id>-<version>.zip`. Installation wie in Kapitel 52.
+
+**Was anders ist als bei Estuary:**
+
+| Thema | Im Skin-Modus |
+|---|---|
+| **Bausteine (Includes)** | Fremde Skins legen die Knöpfe ihrer Fenster meist in Include-Dateien (bei Bello z. B. `IncludesOSD.xml`). Der Generator setzt ein Fenster mit allen Bausteinen zusammen und zeigt jedes Element mit dem Zusatz **„in Datei …“**. Ausblenden und Verschieben wirken dort, wo das Element wirklich steht – also **in allen Fenstern, die denselben Baustein benutzen**. |
+| **Bedingte Varianten** | Hat ein Fenster mehrere Stile (z. B. Bello-OSD „Stil 1/Stil 2“), werden alle Varianten aufgelistet; die Skizze zeigt nur die erste. |
+| **Elemente mit berechneter Nummer** | Kommt die Nummer eines Elements erst aus einem Parameter des Bausteins, kann es nicht einzeln geändert werden (es fehlt in der Liste). |
+| **Fensternummern** | Neue Fenster und das Fenster „Skin-Optionen“ bekommen eine freie Nummer (1100–1199), die der Skin nicht schon benutzt. Die Größen der Vorlagen passen sich der Auflösung des Skins an. |
+| **Menüpunkt für ein neues Fenster** | Das Hauptmenü gehört dem Skin. Lege den Menüpunkt dort selbst an (bei vielen Skins: Skin-Einstellungen → Hauptmenü bearbeiten) mit dem Befehl `ActivateWindow(NUMMER)`. |
+| **Einstellungen und Menü des Originals** | Wegen der neuen ID startet der Skin mit seinen Standardwerten; Einstellungen und selbst gebautes Hauptmenü des Originals werden nicht übernommen. |
+| **Zwei Projekte** | Dein Estuary-Projekt und dein Skin-Projekt bleiben getrennt gespeichert. Mit **↩ Zurück zum Estuary-Modus** bzw. **↪ Weiter mit „…“** wechselst du hin und her; lädst du einen anderen Skin, beginnt das Skin-Projekt neu (der Generator fragt vorher). |
+
+**Lizenz beachten:** Ein veränderter Skin bleibt eine Abwandlung des Originals – es gilt dessen Lizenz (Bello z. B. CC BY-NC-SA: Namensnennung, nicht kommerziell, Weitergabe unter gleichen Bedingungen). Der Generator trägt den Original-Autor in die `addon.xml` ein, legt `ANPASSUNG.txt` bei, ergänzt `changelog.txt` und lässt die `LICENSE.txt` unverändert. Im Reiter 📦 Export stehen die Lizenz und die nötigen Zusatz-Addons als Hinweis.
+
+---
+
 ---
 
 # Teil H – Fremd-Addon, Live-Browser und Kontextmenü
@@ -1589,7 +1618,7 @@ Der **Generator selbst** bleibt unter der IT('s) Possible Freeware-Lizenz gesch�
 ---
 
 ```text
-Kodi Video-Addon Generator v8.1 Pro – Copyright (c) 2026 Team IT('s) Possible
+Kodi Video-Addon Generator v9.0 Pro – Copyright (c) 2026 Team IT('s) Possible
 Handbuch · Stand 2026.10.23. Alle Rechte vorbehalten.
 
 Kostenlos für die Kodi-Community, aber nicht Open Source. Ohne schriftliche Erlaubnis
