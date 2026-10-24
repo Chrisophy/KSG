@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kodi Dev - Medien & Kodi Umrechner</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    header {
+      background: #161b22;
+      padding: 12px 16px;
+      border-bottom: 1px solid #30363d;
+      font-size: 16px;
+      font-weight: bold;
+      color: #58a6ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 12px;
+      gap: 12px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    @media(min-width: 768px) {
+      .main-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+    label {
+      font-size: 12px;
+      color: #8b949e;
+      font-weight: bold;
+    }
+    input, select {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      padding: 10px;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus {
+      border-color: #58a6ff;
+      outline: none;
+    }
+    .result-box {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #58a6ff;
+      word-break: break-all;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .row > div {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span>📐 Kodi & Medien Umrechner</span>
+    <span style="font-size: 12px; color: #8b949e;">Tools v1.0</span>
+  </header>
+
+  <div class="main-container">
+
+    <!-- 1. Kodi ARGB Farbkonverter -->
+    <div class="card">
+      <label>1. KODI ARGB FARB-KONVERTER</label>
+      <div class="row">
+        <div>
+          <label style="font-size:10px;">HEX Farbe</label>
+          <input type="text" id="hex-input" value="#FF5733" oninput="convertColor()">
+        </div>
+        <div>
+          <label style="font-size:10px;">Transparenz (Alpha %)</label>
+          <input type="number" id="alpha-input" value="100" min="0" max="100" oninput="convertColor()">
+        </div>
+      </div>
+      <label style="font-size:10px; margin-top:4px;">Kodi ARGB Code (für XML Skins):</label>
+      <div class="result-box" id="argb-result">0xFFFF5733</div>
+    </div>
+
+    <!-- 2. Skin Koordinaten / Auflösungs-Skalierer -->
+    <div class="card">
+      <label>2. KOORDINATEN-SKALIERER (720p ↔ 1080p)</label>
+      <div class="row">
+        <div>
+          <label style="font-size:10px;">Wert / Pixel</label>
+          <input type="number" id="coord-input" value="100" oninput="scaleCoord()">
+        </div>
+        <div>
+          <label style="font-size:10px;">Richtung</label>
+          <select id="coord-mode" onchange="scaleCoord()">
+            <option value="720to1080">720p ➔ 1080p (faktor 1.5)</option>
+            <option value="1080to720">1080p ➔ 720p (faktor 0.666)</option>
+          </select>
+        </div>
+      </div>
+      <label style="font-size:10px; margin-top:4px;">Skaliert:</label>
+      <div class="result-box" id="coord-result">150 px</div>
+    </div>
+
+    <!-- 3. Bitraten Rechner -->
+    <div class="card">
+      <label>3. STREAM-BITRATE (Kbps ➔ Mbps)</label>
+      <label style="font-size:10px;">Bitrate in Kbps</label>
+      <input type="number" id="bitrate-input" value="5000" oninput="convertBitrate()">
+      <label style="font-size:10px; margin-top:4px;">Ergebnis:</label>
+      <div class="result-box" id="bitrate-result">5.0 Mbps (~ 2.25 GB / Stunde)</div>
+    </div>
+
+    <!-- 4. Dateigrößen Rechner -->
+    <div class="card">
+      <label>4. DATEIGRÖßEN (MB ➔ GB)</label>
+      <label style="font-size:10px;">Größe in Megabyte (MB)</label>
+      <input type="number" id="size-input" value="1024" oninput="convertSize()">
+      <label style="font-size:10px; margin-top:4px;">Ergebnis:</label>
+      <div class="result-box" id="size-result">1.00 GB</div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. Farbkonverter
+    function convertColor() {
+      let hex = document.getElementById('hex-input').value.trim();
+      let alphaPercent = parseInt(document.getElementById('alpha-input').value) || 100;
+      
+      if (hex.startsWith('#')) hex = hex.substring(1);
+      if (hex.length !== 6) {
+        document.getElementById('argb-result').innerText = "Ungültiger HEX-Code (nutze RRGGBB)";
+        return;
+      }
+
+      // Alpha in Hex (0 - 255)
+      let alphaVal = Math.round((alphaPercent / 100) * 255);
+      let alphaHex = alphaVal.toString(16).toUpperCase().padStart(2, '0');
+
+      let kodiColor = `0x${alphaHex}${hex.toUpperCase()}`;
+      document.getElementById('argb-result').innerText = kodiColor;
+    }
+
+    // 2. Koordinaten Skalierer
+    function scaleCoord() {
+      let val = parseFloat(document.getElementById('coord-input').value) || 0;
+      let mode = document.getElementById('coord-mode').value;
+      let res = 0;
+
+      if (mode === '720to1080') {
+        res = val * 1.5;
+      } else {
+        res = val / 1.5;
+      }
+      document.getElementById('coord-result').innerText = `${res.toFixed(2)} px (gerundet: ${Math.round(res)} px)`;
+    }
+
+    // 3. Bitrate Umrechner
+    function convertBitrate() {
+      let kbps = parseFloat(document.getElementById('bitrate-input').value) || 0;
+      let mbps = kbps / 1000;
+      // 1 Stunde Video = (Mbps * 1000 * 3600) / 8 / 1024 / 1024 GB
+      let gbPerHour = (mbps * 0.45).toFixed(2); // Grobe Faustformel für komprimierte Streams
+      document.getElementById('bitrate-result').innerText = `${mbps.toFixed(2)} Mbps (~ ${gbPerHour} GB / Stunde)`;
+    }
+
+    // 4. Dateigrößen Umrechner
+    function convertSize() {
+      let mb = parseFloat(document.getElementById('size-input').value) || 0;
+      let gb = mb / 1024;
+      document.getElementById('gb-result');
+      document.getElementById('size-result').innerText = `${gb.toFixed(2)} GB (${(mb).toFixed(0)} MB)`;
+    }
+
+    // Initiale Berechnung beim Laden
+    convertColor();
+    scaleCoord();
+    convertBitrate();
+    convertSize();
+  </script>
+
+</body>
+</html>

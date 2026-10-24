@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kodi Dev Terminal</title>
+  <!-- xterm.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0d1117;
+      overflow: hidden;
+      font-family: monospace;
+    }
+    #terminal-container {
+      width: 100vw;
+      height: 100vh;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal-container"></div>
+
+  <script>
+    // Dynamische Schriftgröße für Mobilgeräte
+    const isMobile = window.innerWidth < 600;
+
+    const term = new Terminal({
+      cursorBlink: true,
+      fontSize: isMobile ? 11 : 14, // Kleinere Schrift auf Mobilgeräten
+      convertEol: true,
+      theme: {
+        background: '#0d1117',
+        foreground: '#c9d1d9',
+        cursor: '#58a6ff',
+        selectionBackground: '#1f6feb',
+        black: '#484f58',
+        red: '#ff7b72',
+        green: '#3fb950',
+        yellow: '#d29922',
+        blue: '#58a6ff',
+        magenta: '#bc8cff',
+        cyan: '#39c5cf',
+        white: '#b1bac4'
+      }
+    });
+
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(document.getElementById('terminal-container'));
+
+    // Bessere Anpassung beim Initialisieren
+    setTimeout(() => {
+      fitAddon.fit();
+    }, 100);
+
+    window.addEventListener('resize', () => fitAddon.fit());
+
+    const prompt = '\r\n\x1b[32mkodi-dev@builder\x1b[0m:\x1b[34m~\x1b[0m$ ';
+    let currentInput = '';
+
+    // Kürzere Header-Linie, damit sie auf Handys nicht umbricht
+    const divider = isMobile 
+      ? '\x1b[1;36m========================================\x1b[0m'
+      : '\x1b[1;36m====================================================\x1b[0m';
+
+    term.writeln(divider);
+    term.writeln('\x1b[1;36m KODI VIDEO-ADDON GENERATOR v9.0 - TERMINAL \x1b[0m');
+    term.writeln(divider);
+    term.writeln('Tippe \x1b[33mhelp\x1b[0m für verfügbare Befehle.\r\n');
+    term.write(prompt);
+
+    term.onData(e => {
+      switch (e) {
+        case '\r': // Enter
+          term.writeln('');
+          handleCommand(currentInput.trim());
+          currentInput = '';
+          term.write(prompt);
+          break;
+        case '\u007F': // Backspace
+          if (currentInput.length > 0) {
+            currentInput = currentInput.slice(0, -1);
+            term.write('\b \b');
+          }
+          break;
+        default:
+          if (e >= ' ' || e === '\t') {
+            currentInput += e;
+            term.write(e);
+          }
+      }
+    });
+
+    function handleCommand(cmd) {
+      const parts = cmd.split(' ');
+      const mainCmd = parts[0].toLowerCase();
+
+      switch (mainCmd) {
+        case '':
+          break;
+        case 'help':
+          term.writeln('\x1b[33mVerfügbare Befehle:\x1b[0m');
+          term.writeln('  \x1b[32mhelp\x1b[0m        - Zeigt diese Hilfe an');
+          term.writeln('  \x1b[32mversion\x1b[0m     - Generator-Version');
+          term.writeln('  \x1b[32mskin-check\x1b[0m  - XML-Prüfung');
+          term.writeln('  \x1b[32mbuild\x1b[0m       - Addon packen');
+          term.writeln('  \x1b[32mclear\x1b[0m       - Bild leeren');
+          term.writeln('  \x1b[32mecho [text]\x1b[0m - Text ausgeben');
+          break;
+
+        case 'version':
+          term.writeln('\x1b[35mKodi Generator v9.0 Pro (CLI Engine v1.0.4)\x1b[0m');
+          term.writeln('Kodi Target: Nexus (v20) / Omega (v21)');
+          break;
+
+        case 'skin-check':
+          term.writeln('\x1b[33m[INFO] Starte Kodi Skin XML-Prüfung...\x1b[0m');
+          setTimeout(() => term.writeln('  [OK] home.xml - Keine Syntaxfehler.'), 200);
+          setTimeout(() => term.writeln('  [OK] addon.xml - IDs korrekt.'), 400);
+          setTimeout(() => term.writeln('  [OK] includes.xml - Einbindung OK.'), 600);
+          setTimeout(() => term.writeln('\x1b[32m[SUCCESS] Prüfungen erfolgreich!\x1b[0m'), 800);
+          break;
+
+        case 'build':
+          term.writeln('\x1b[33m[BUILD] Paketierung gestartet...\x1b[0m');
+          setTimeout(() => term.writeln('  -> Generiere addon.py'), 150);
+          setTimeout(() => term.writeln('  -> Erstelle Texturen'), 350);
+          setTimeout(() => term.writeln('  -> Komprimiere ZIP...'), 600);
+          setTimeout(() => term.writeln('\x1b[32m[SUCCESS] Ready to Export!\x1b[0m'), 900);
+          break;
+
+        case 'clear':
+          term.clear();
+          break;
+
+        case 'echo':
+          term.writeln(parts.slice(1).join(' '));
+          break;
+
+        default:
+          term.writeln(`\x1b[31mBefehl nicht gefunden: "${cmd}". Tippe "help".\x1b[0m`);
+          break;
+      }
+    }
+  </script>
+</body>
+</html>
