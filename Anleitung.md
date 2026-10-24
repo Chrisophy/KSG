@@ -6,6 +6,7 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 
+**Demos:** [chrisophy.github.io/KSG](https://github.com/Chrisophy/KSG/tree/main/Demos)
 ---
 
 ## Inhalt
