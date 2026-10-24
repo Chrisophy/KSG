@@ -6,7 +6,6 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 
-**Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
 ---
 
 ## Inhalt
@@ -81,7 +80,7 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 48. [Hauptmenü und eigene Menüpunkte](#k48)
 49. [Widgets im Skin](#k49)
 50. [Layout: alles frei verschieben](#k50)
-51. [Profi-Reiter: vergleichen, ersetzen, eigene Dateien, Profile](#k51)
+51. [Fenster (Video-OSD & Co.) und Profi-Reiter](#k51)
 52. [Export und Installation](#k52)
 
 **Teil H – Fremd-Addon, Live-Browser und Kontextmenü**
@@ -1203,7 +1202,7 @@ Mit dem Titan-Modus baust du einen **echten Kodi-Skin** – also das Aussehen vo
 **Stufe A (jetzt verfügbar): Estuary umbauen.** Grundlage ist Estuary, der offizielle Standard-Skin von Kodi. Alles, was Estuary kann – Bibliothek, Ansichten, Player, Einstellungen, Dialoge – funktioniert weiter. Darüber legst du dein eigenes Design: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte und Widgets.
 
 - **Öffnen:** **⚡ Titan** in der Kopfzeile oder **7 · ⚡ Titan-Modus** in den Einstellungen.
-- **Aufbau:** links (auf dem Handy oben) eine **Live-Vorschau im Estuary-Stil**, rechts acht Reiter: 🧬 Basis · 🎨 Farben · 📋 Hauptmenü · 🧩 Widgets · 📐 Layout · 🖼 Bilder & Schrift · 🔧 Profi · 📦 Export.
+- **Aufbau:** links (auf dem Handy oben) eine **Live-Vorschau im Estuary-Stil**, rechts neun Reiter: 🧬 Basis · 🎨 Farben · 📋 Hauptmenü · 🧩 Widgets · 📐 Layout · 🖼 Bilder & Schrift · 🪟 Fenster · 🔧 Profi · 📦 Export.
 - Auf dem Handy bleibt die Vorschau beim Scrollen oben stehen – du siehst jede Änderung sofort.
 - Alle Titan-Einstellungen gehören zu deinem Projekt und werden mit **💾 Speichern** mitgesichert.
 
@@ -1349,7 +1348,27 @@ Wie im Addon-Designer: Element hinzufügen, an die gewünschte Stelle ziehen, an
 
 <a id="k51"></a>
 
-## 51. Profi-Reiter: vergleichen, ersetzen, eigene Dateien, Profile
+## 51. Fenster (Video-OSD & Co.) und Profi-Reiter
+
+### Reiter 🪟 Fenster
+
+Hier bearbeitest du die einzelnen Fenster des Skins – zum Beispiel das **Video-OSD** (das Bedienfeld, das beim Film mit OK/Enter erscheint), die Zeitleiste, Dialoge, die Musik-Ansicht oder die Einstellungen. Der Reiter braucht die geladene Estuary-Grundlage (Reiter 🧬 Basis); ist sie noch nicht da, bietet er den Download an.
+
+| Bereich | Wofür |
+|---|---|
+| **Katalog** | Die wichtigsten Fenster mit Name und Beschreibung, in Gruppen (Video-Wiedergabe, Musik, Live-TV, Bibliothek, Dialoge, Einstellungen, Grundbausteine). Angezeigt wird nur, was deine Estuary-Version wirklich enthält. Neben dem Namen steht, ob du die Datei geändert hast (✎), Knöpfe ausgeblendet sind (👁) oder der Generator sie angepasst hat (●). |
+| **👁 Bedienelemente: ausblenden, verschieben, vergrößern** | Listet alle Elemente der gewählten Datei mit fester Nummer, auch Gruppen und Knopfreihen. Beim Video-OSD tragen die bekannten Knöpfe ihren Namen (z.B. #601 Zurückspulen, #603 Stopp, #606 Vorspulen). Ein Haken blendet das Element aus (der Generator setzt `<visible>false</visible>`). Hinter **⚙** stellst du je Element ein: **Rechts/links und unten/oben** in Pixeln, **Größe** in Prozent, **Farbe**, **Reihenfolge** (↑ ↓ innerhalb der Geschwister) und **Sichtbarkeit je nach eigener Skin-Einstellung**. Verschieben und Vergrößern wirken über eine Animation nur auf die Darstellung, nicht auf die Bedien-Reihenfolge. Wer eine ganze Knopfreihe verschieben will, stellt die Gruppe ein (z.B. #201 beim Video-OSD). Der Rest der Datei bleibt unverändert und wird bei jedem Bauen neu angewendet. |
+| **🖼 Vorschau (Skizze)** | Zeichnet die Elemente der Datei als Kästchen mit Nummer: Ausgeblendetes fehlt, Verschobenes steht am neuen Platz, Elemente mit Skin-Einstellung sind unten aufgelistet. Die Skizze ist **geschätzt** – Größen und Plätze, die Estuary über Bausteine festlegt, kennt der Generator nicht genau. Sie ersetzt keinen Test in Kodi. |
+| **⚙ Eigene Skin-Einstellungen** | Lege Schalter an (z.B. „Stopp-Knopf im Video-OSD ausblenden“). Der Generator erzeugt dafür das Fenster **Skin-Optionen** (`xml/Custom_NUMMER_TitanOptionen.xml`) mit An/Aus-Knöpfen; **＋ Menüpunkt „Skin-Optionen“** legt einen Hauptmenüpunkt dafür an. Verknüpfe einen Schalter über ⚙ → Sichtbarkeit mit einem Element: Es ist ausgeblendet, solange der Schalter **An** steht. Kodi speichert die Schalter selbst (`Skin.ToggleSetting`, `Skin.HasSetting`), du musst den Skin dafür nicht neu bauen. Löschst du einen Schalter, löst der Generator die Verknüpfungen auf. |
+| **Text von Hand ändern** | Der komplette XML-Text der Datei. **💾 Meine Fassung speichern** ersetzt die Datei **komplett** (ungültiges XML wird nicht gespeichert); spätere Änderungen im Generator wirken an dieser Datei dann nicht mehr, und das Ausblenden dort auch nicht. **↺ Zurück zur erzeugten** nimmt es zurück, **⤺ Estuary-Original** setzt die unveränderte Estuary-Datei ein, **🔍 Vergleich mit Estuary** zeigt jede Abweichung. |
+| **📂 Alle weiteren Fenster-Dateien** | Alle übrigen `xml/`-Dateien von Estuary, mit Filter. Dateien außerhalb von `xml/` (Farben, Sprache, Bilder) erreichst du über den Reiter 🔧 Profi. |
+| **＋ Neues eigenes Fenster** | Legt `xml/Custom_NUMMER_Name.xml` aus einer Vorlage an: Hinweis-Fenster, Schnellmenü mit vier Knöpfen oder Info-Anzeige zum laufenden Titel. Kodi hat für eigene Fenster die Nummern 1100–1199 vorgesehen; vergebene Nummern lehnt der Generator ab. Schrift, Farben und die weiße Grundfläche übernimmt er aus deinem Skin. Geöffnet wird das Fenster mit `ActivateWindow(NUMMER)`; **＋ Menüpunkt im Hauptmenü** legt dafür gleich einen Menüpunkt an. |
+
+💡 Nach Änderungen an Farben, Menü oder Layout zeigt der Reiter beim nächsten Öffnen automatisch die neu erzeugte Fassung.
+
+⚠️ Das Ausblenden, Verschieben, die Skin-Einstellungen und die Vorlagen sind im Generator mit einer Test-Fassung von Estuary geprüft, aber **noch nicht auf einem echten Kodi-Gerät**. Prüfe den Skin nach dem Bauen am besten zuerst in Kodi auf dem PC. Wenn Estuary in einer neueren Version Elemente umbaut, kann eine Nummer fehlen – der Generator meldet das dann beim Bauen als Warnung.
+
+### Reiter 🔧 Profi
 
 Der Reiter **🔧 Profi** ist für Kodi-Bastler. Alles hier wird bei jedem Bauen automatisch angewendet.
 
@@ -1423,7 +1442,9 @@ Der Generator liest den Code des Fremd-Addons und schlägt Einträge vor, die si
 |---|---|
 | **Parameter-Name** (z.B. `mode` oder `action`) | Bestimmt die Adressen neuer Einträge, z.B. `plugin://plugin.video.xyz/?mode=search`. |
 | **Eintrag** | Beschriftung, Art und Adresse. Nur Einträge mit Beschriftung werden übernommen. |
-| **Nicht als Button geeignet** | Manche Aktionen brauchen Angaben aus der vorherigen Liste (z.B. welche Rubrik oder welches Video). Der Generator listet sie auf, bietet sie aber nicht als Button an. |
+| **Nicht als Button geeignet** | Manche Aktionen brauchen Angaben aus der vorherigen Liste (z.B. welches Video). Der Generator listet sie auf, bietet sie aber nicht als Button an. |
+| **Rubriken** | Steht im Addon eine feste Liste (z.B. `CATEGORIES = {"Politik": …}`) oder eine Schleife, die daraus Menüeinträge baut, übernimmt der Generator jede Rubrik **mit allen Parametern** als eigenen Eintrag (z.B. `?mode=list&feed=…&title=Politik&page=1`). Das ist eine Vermutung aus dem Code – prüfe die Liste vor dem Übernehmen. |
+| **Weitere erkannte Muster** | Listen aus Tupeln (`MENU = [("Neu", "new", "icon.png"), …]`, auch mit `for name, mode, icon in MENU`), Listen aus Wörterbüchern mit festen Werten (mindestens zwei, z.B. `{'title': 'Politik', 'mode': 'list', 'feed': '…'}`), Verteiler-Tabellen (`ROUTES = {'live': show_live, …}`; liest die Funktion weitere Parameter, gilt der Pfad als „nicht als Button geeignet“), Pfade mit `@plugin.route('/movies')` (ohne Platzhalter) und **Menüs aus JSON-Dateien des Addons** (Listen von Objekten mit Titel und `url`, oder mit dem Modus-Schlüssel, optional mit Unterobjekt `params`). Titel und Bild-Schlüssel (`icon`, `thumb` …) werden nicht als Parameter übernommen. Auch hier gilt: Vermutung aus dem Code, bitte prüfen. |
 
 **Stile** – so erscheinen die Einträge in deinem Menü:
 
@@ -1436,6 +1457,8 @@ Der Generator liest den Code des Fremd-Addons und schlägt Einträge vor, die si
 | 🐧 Linux-Desktop | Symbole wie auf einem Desktop |
 
 Bei den Button-Stilen wird die **Browser-Seite automatisch mit angelegt**, damit Ordner in deinem Skin aufgehen.
+
+**Kodierte Adressen:** Manche Addons und Kodis Favoriten schreiben Adressen verschlüsselt, z.B. `feed=https%3a%2f%2f…` oder mit `&amp;` statt `&`. Der Generator entschlüsselt solche Adressen beim Einlesen und bringt sie in eine einheitliche Form; das fertige Addon macht dasselbe beim Öffnen von Ordnern, Direkt-Links und beim Vergleichen mit Favoriten. Dadurch greifen Einträge mit mehreren Parametern, und Favoriten werden auch dann wiedererkannt, wenn Groß- und Kleinschreibung der Kodierung abweicht.
 
 <a id="k55"></a>
 

@@ -2684,6 +2684,36 @@ def rpc(method, params, quiet=False):
     return res.get('result')
 
 
+def fix_url(u):
+    """Macht Adressen aus Favoriten, Logs und XML brauchbar: &amp; wird zu &, ganz kodierte
+    Adressen (plugin%3A%2F%2F...) werden wieder normal."""
+    if not isinstance(u, str):
+        return u
+    s = u.strip().strip('"')
+    for _ in range(3):
+        low = s.lower()
+        if '&amp;' in low or '&#38;' in low or '&#038;' in low:
+            for bad in ('&amp;', '&AMP;', '&Amp;', '&#38;', '&#038;'):
+                s = s.replace(bad, '&')
+        else:
+            break
+    if s.lower().startswith(('plugin%3a', 'special%3a', 'videodb%3a', 'musicdb%3a', 'smb%3a', 'nfs%3a', 'http%3a', 'https%3a', 'addons%3a')):
+        from urllib.parse import unquote
+        s = unquote(s)
+    return s
+
+
+def url_key(u):
+    """Vergleichsschluessel fuer Adressen: gleich, egal ob &amp; oder &, %3a oder %3A, Reihenfolge der Parameter."""
+    from urllib.parse import urlsplit, parse_qsl
+    s = fix_url(u or '')
+    try:
+        parts = urlsplit(s)
+        return (parts.scheme.lower(), parts.netloc.lower(), parts.path, tuple(sorted(parse_qsl(parts.query, keep_blank_values=True))))
+    except Exception:
+        return s
+
+
 # ---------- Widgets: Bilder und Infos zu jedem Eintrag ----------
 WIDGET_PROPS = ['title', 'thumbnail', 'art', 'year', 'rating', 'plot', 'runtime', 'genre',
                 'season', 'episode', 'showtitle', 'artist', 'resume']
@@ -2949,7 +2979,7 @@ def fav_find(fav):
     want = fav.get('windowparameter') if fav.get('type') == 'window' else fav.get('path')
     for item in res.get('favourites') or []:
         have = item.get('windowparameter') if fav.get('type') == 'window' else item.get('path')
-        if have and want and have.strip('"') == want:
+        if have and want and (have.strip('"') == want or url_key(have) == url_key(want)):
             return True
     return False
 
@@ -3055,7 +3085,7 @@ class MenuBase(object):
             cur = self.cur.get(cid) if nav else None
             if nav:
                 limit = max(limit, 500)
-            params = {'directory': cur[0] if cur else data.get('dir', ''), 'media': media}
+            params = {'directory': fix_url(cur[0] if cur else data.get('dir', '')), 'media': media}
             res = None
             if nav:
                 # Mit customproperties erfahren wir, ob ein Eintrag abspielbar ist (ab Kodi 20)
@@ -3236,9 +3266,9 @@ class MenuBase(object):
         elif kind == 'browse':
             target = act.get('p') or CONFIG.get('browse')
             if target not in PAGES:
-                self.run_cmd('ActivateWindow(Videos,"%s",return)' % act.get('v', ''))
+                self.run_cmd('ActivateWindow(Videos,"%s",return)' % fix_url(act.get('v', '')))
                 return
-            PENDING[target] = (act.get('v', ''), act.get('l', ''))
+            PENDING[target] = (fix_url(act.get('v', '')), act.get('l', ''))
             self.finish(('page', target))
         elif kind == 'py':
             if not hooks():
@@ -3496,7 +3526,7 @@ def start_stack():
     stack = [ROOT]
     target = None
     if OPTS.get('deeplinks') and len(sys.argv) > 2 and sys.argv[2]:
-        params = dict(parse_qsl(sys.argv[2].lstrip('?')))
+        params = dict(parse_qsl(fix_url(sys.argv[2].lstrip('?'))))
         target = params.get('page')
         if target and target not in PAGES:
             for p in PAGES.values():
@@ -3505,7 +3535,7 @@ def start_stack():
                     break
         if target in PAGES and params.get('path'):
             # Favorit auf einen Ordner: im eigenen Browser genau dort starten
-            PENDING[target] = (params.get('path'), params.get('title', ''))
+            PENDING[target] = (fix_url(params.get('path')), params.get('title', ''))
     if not target and OPTS.get('remember'):
         target = STATE.get('last')
     if target in PAGES and target != ROOT:
@@ -3665,7 +3695,7 @@ def on_page(window, page_id):
         deps: (Array.isArray(e.deps) ? e.deps : []).map(String).filter(d => /^[A-Za-z0-9_.\-]+$/.test(d)).slice(0, 30),
         need: (Array.isArray(e.need) ? e.need : []).map(String).filter(d => /^[A-Za-z0-9_.\-]+$/.test(d)).slice(0, 30),
         more: (Array.isArray(e.more) ? e.more : []).map(String).filter(v => /^[\w\-]{1,32}$/.test(v)).slice(0, 30),
-        entries: (Array.isArray(e.entries) ? e.entries : []).filter(x => x && typeof x === 'object').slice(0, 60).map(x => ({ l: String(x.l || '').slice(0, 60), u: String(x.u || '').slice(0, 400), k: ok(x.k) ? x.k : 'dir' }))
+        entries: (Array.isArray(e.entries) ? e.entries : []).filter(x => x && typeof x === 'object').slice(0, 60).map(x => ({ l: String(x.l || '').slice(0, 60), u: extUrl(x.u).slice(0, 600), k: ok(x.k) ? x.k : 'dir' }))
       };
     }
     function extBytesToData(u8, mime) { let b = ''; for (let i = 0; i < u8.length; i += 8192) b += String.fromCharCode.apply(null, u8.subarray(i, i + 8192)); return 'data:' + (mime || 'application/zip') + ';base64,' + btoa(b); }
@@ -3708,8 +3738,153 @@ def on_page(window, page_id):
       }
       const re3 = new RegExp('[?&]' + key + '=([\\w\\-]+)(&?)', 'g'); while ((m = re3.exec(txt))) { add(m[1]); vote(m[2] ? need : free, m[1]); }
       const isFree = v => branch[v] ? branch[v] === 'free' : !!free[v] || !need[v];
+      const LBL = /^(title|titel|name|label|text|caption|heading)$/i, ART = /^(icon|thumb|thumbnail|image|img|fanart|poster|plot|description|desc|summary|art|info|year|rating|duration)$/i;
+      // 3b) Verteiler-Tabellen: ROUTES = {'search': search_fn, …} – liest die Funktion weitere Parameter, braucht der Pfad Angaben
+      const rdp = /^[ \t]*(\w*(?:ROUTE|MODE|ACTION|DISPATCH|HANDLER|COMMAND)S?\w*)\s*=\s*\{([^{}]{0,4000})\}/gim;
+      while ((m = rdp.exec(txt))) {
+        const prs = [], rp2 = /['"]([\w\-]{2,32})['"]\s*:\s*([A-Za-z_][\w.]*)\s*(?=,|\}|\n|$)/g; let q;
+        while ((q = rp2.exec(m[2]))) prs.push([q[1], q[2]]);
+        if (prs.length < 3) continue;
+        prs.forEach(([v, fn]) => {
+          const dm = new RegExp('^[ \\t]*def[ \\t]+' + fn.split('.').pop() + '\\b[^\\n]*\\n', 'm').exec(txt); let nd = false;
+          if (dm) { let seg = txt.slice(dm.index + dm[0].length, dm.index + dm[0].length + 1500); const cut = seg.search(/\n(?![ \t\n])\S/); if (cut > 0) seg = seg.slice(0, cut); nd = otherParam(seg); }
+          add(v); if (ok(v)) branch[v] = branch[v] === 'need' || nd ? 'need' : 'free';
+        });
+      }
+      // 4) Adressen mit festen Werten: Wörterbuch (Name -> Adresse), Liste von Tupeln (Name, Modus, …) und eine Schleife, die daraus
+      //    build_url({...}) baut, oder ein build_url({...}) nur mit festen Werten. Daraus entstehen fertige, richtig kodierte Einträge.
+      const ents = [], seen = new Set(), resolved = new Set();
+      const consts = {};
+      const bal = (t, i) => {
+        let d = 0, q = '';
+        for (let j = i; j < Math.min(t.length, i + 12000); j++) {
+          const ch = t[j];
+          if (q) { if (ch === '\\') j++; else if (ch === q) q = ''; continue; }
+          if (ch === '"' || ch === "'") { q = ch; continue; }
+          if (ch === '#') { const e = t.indexOf('\n', j); if (e < 0) break; j = e; continue; }
+          if (ch === '[' || ch === '(' || ch === '{') d++; else if (ch === ']' || ch === ')' || ch === '}') { d--; if (d === 0) return t.slice(i, j + 1); }
+        }
+        return '';
+      };
+      const rc = /^[ \t]*([A-Za-z_]\w*)\s*=\s*\{([^{}]{0,8000})\}/gm;
+      while ((m = rc.exec(txt))) {
+        const pairs = [], rp = /['"]([^'"\n]{1,80})['"]\s*:\s*['"]([^'"\n]{0,400})['"]/g; let q;
+        while ((q = rp.exec(m[2]))) pairs.push([q[1], q[2]]);
+        if (pairs.length >= 2) consts[m[1]] = pairs;
+      }
+      const rt = /^[ \t]*([A-Za-z_]\w*)\s*=\s*(?=[\[(])/gm;
+      while ((m = rt.exec(txt))) {
+        if (consts[m[1]]) continue;
+        const body = bal(txt, m.index + m[0].length); if (!body) continue;
+        const rows = [], rr = /\(\s*((?:(?:['"][^'"\n]{0,400}['"]|-?\d+)\s*,?\s*){2,6})\)/g; let q;
+        while ((q = rr.exec(body))) rows.push((q[1].match(/['"][^'"\n]{0,400}['"]|-?\d+/g) || []).map(x => /^['"]/.test(x) ? x.slice(1, -1) : x));
+        if (rows.length >= 2 && rows.length <= 80) consts[m[1]] = rows;
+      }
+      const lit = v => { v = String(v).trim(); let x = /^(['"])(.*)\1$/.exec(v); if (x) return x[2]; if (/^-?\d+$/.test(v)) return v; return null; };
+      const parseDict = body => { const items = [], ri = /['"](\w+)['"]\s*:\s*([^,}\n]+)/g; let q; while ((q = ri.exec(body))) items.push([q[1], q[2].trim()]); return items; };
+      const pushEnt = (label, params) => {
+        const mode = params.find(x => x[0] === key); if (!mode) return;
+        const u = 'plugin://' + '\u0001' + '/?' + params.map(x => encQ(x[0]) + '=' + encQ(x[1])).join('&');
+        if (seen.has(u) || ents.length >= 50) return; seen.add(u); resolved.add(mode[1]);
+        ents.push({ l: String(label).replace(/\s+/g, ' ').trim().slice(0, 60) || extNice(mode[1]), u });
+      };
+      const urlCall = '(?:build_url|urlencode|make_url|get_url|url_for|geturl|buildurl|build_plugin_url|plugin_url)\\s*\\(\\s*\\{([^{}]{0,600})\\}';
+      const rl = /^([ \t]*)for[ \t]+\(?[ \t]*(\w+(?:[ \t]*,[ \t]*\w+){0,3})[ \t]*\)?[ \t]+in[ \t]+(\w+)(?:\.(items|keys|values)\(\))?[ \t]*:/gm;
+      while ((m = rl.exec(txt))) {
+        const rows = consts[m[3]]; if (!rows) continue;
+        const vars = m[2].split(',').map(x => x.trim()), how = m[4] || (vars.length > 1 ? 'items' : 'tuple');
+        const ind = m[1].length, start = m.index + m[0].length;
+        let seg = txt.slice(start, start + 2500); const lines = seg.split('\n'); let keep = [lines[0]];
+        for (let i = 1; i < lines.length; i++) { const t = lines[i]; if (t.trim() && (t.match(/^[ \t]*/)[0].length <= ind)) break; keep.push(t); }
+        seg = keep.join('\n');
+        const dm = new RegExp(urlCall).exec(seg); if (!dm) continue;
+        const items = parseDict(dm[1]); if (!items.some(x => x[0] === key)) continue;
+        const li = vars.findIndex(v => /^(title|name|label|text|caption|heading|titel)/i.test(v));
+        rows.forEach(pr => {
+          const params = []; let okAll = true;
+          items.forEach(([k, v]) => {
+            let val = lit(v);
+            if (val == null) {
+              const ix = vars.indexOf(v);
+              if (how === 'items' && ix >= 0) val = pr[ix];
+              else if (how === 'keys' && ix === 0) val = pr[0];
+              else if (how === 'values' && ix === 0) val = pr[1];
+              else if (how === 'tuple') { const t = new RegExp('^' + vars[0] + '\\[(\\d)\\]$').exec(v); if (t) val = pr[+t[1]]; else if (v === vars[0]) val = pr[0]; }
+              if (val === undefined) val = null;
+              if (val == null) okAll = false;
+            }
+            params.push([k, val]);
+          });
+          if (okAll) pushEnt(how === 'values' ? pr[1] : (how === 'items' && li >= 0 ? pr[li] : pr[0]), params);
+        });
+      }
+      const rd = new RegExp(urlCall, 'g');
+      while ((m = rd.exec(txt))) {
+        const items = parseDict(m[1]); if (items.length < 2 || !items.some(x => x[0] === key)) continue;
+        const vs = items.map(x => lit(x[1])); if (vs.some(v => v == null)) continue;
+        const params = items.map((x, i) => [x[0], vs[i]]), nm = params.find(x => /^(title|name|label)$/.test(x[0]));
+        pushEnt(nm ? nm[1] : '', params);
+      }
+      // 4b) Listen aus Name/Modus-Paaren, deren Modus der Verteiler weiter oben kennt (z. B. add_dir(name, mode) in einer Schleife)
+      Object.keys(consts).forEach(cn => {
+        const rows = consts[cn]; if (rows.length < 2) return;
+        const w = Math.max(...rows.map(r => r.length));
+        for (let j = 0; j < w; j++) {
+          const col = rows.map(r => r[j]).filter(v => v != null);
+          if (col.length < rows.length * 0.6 || col.filter(v => vals[v]).length < Math.max(2, col.length * 0.6)) continue;
+          let li = -1; for (let i = 0; i < w; i++) if (i !== j && rows.every(r => typeof r[i] === 'string' && r[i].trim() && !/^-?\d+$/.test(r[i]))) { li = i; break; }
+          rows.forEach(r => { const v = r[j]; if (v == null || !vals[v] || !isFree(v)) return; pushEnt(li >= 0 ? r[li] : '', [[key, v]]); });
+        }
+      });
+      // 4c) Listen von Wörterbüchern mit festen Werten: [{'title': 'Politik', 'mode': 'list', 'feed': '…'}, …]
+      const rb = /\{[^{}]{0,700}\}/g, cand = [];
+      while ((m = rb.exec(txt))) {
+        const body = m[0], pairs = [], rp = /['"](\w+)['"]\s*:\s*(?:['"]([^'"\n]{0,400})['"]|(-?\d+))\s*(?=,|\}|\n)/g; let q;
+        while ((q = rp.exec(body))) pairs.push([q[1], q[2] != null ? q[2] : q[3]]);
+        if ((body.match(/['"]\w+['"]\s*:/g) || []).length !== pairs.length) continue;
+        const mode = pairs.find(x => x[0] === key), lb = pairs.find(x => LBL.test(x[0])); if (!mode || !lb) continue;
+        cand.push([lb[1], pairs.filter(x => !LBL.test(x[0]) && !ART.test(x[0]))]);
+      }
+      if (cand.length >= 2) cand.forEach(c => pushEnt(c[0], c[1]));   // ein einzelnes Wörterbuch ist eher Zufall als eine Menü-Liste
+      // 4d) Pfade mit @plugin.route('/pfad') ohne Platzhalter
+      const rr2 = /@\w+\.route\(\s*['"](\/[\w\-\/]*)['"]\s*[,)]/g;
+      while ((m = rr2.exec(txt))) { const u = 'plugin://\u0001' + m[1]; if (m[1] === '/' || seen.has(u) || ents.length >= 50) continue; seen.add(u); ents.push({ l: extNice(m[1].split('/').filter(Boolean).pop() || 'Start'), u }); }
+      // 5) Menüs aus JSON-Dateien des Addons: Listen von Objekten mit Titel und Adresse (plugin://… oder ?…) oder mit dem Modus-Schlüssel
+      const urlKeys = /^(url|link|path|plugin|uri|href|target|plugin_url)$/i;
+      const jcand = o => {
+        if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+        const lb = Object.keys(o).find(k => LBL.test(k) && typeof o[k] === 'string' && o[k].trim()); if (!lb) return null;
+        const uk = Object.keys(o).find(k => urlKeys.test(k) && typeof o[k] === 'string' && /^(?:plugin%3a|plugin:\/\/|\?)/i.test(o[k].trim()));
+        if (uk) { let u = extUrl(o[uk]); if (u[0] === '?') u = 'plugin://\u0001/' + u; return { l: o[lb], u }; }
+        const sub = ['params', 'args', 'query', 'parameters'].map(k => o[k]).find(v => v && typeof v === 'object' && !Array.isArray(v));
+        const src = sub ? Object.assign({}, typeof o[key] === 'string' ? { [key]: o[key] } : {}, sub) : o;
+        if (typeof src[key] !== 'string') return null;
+        const params = [[key, src[key]]].concat(Object.keys(src).filter(k => k !== key && !LBL.test(k) && !ART.test(k) && (typeof src[k] === 'string' || typeof src[k] === 'number') && String(src[k]).length <= 400).map(k => [k, String(src[k])]));
+        return { l: o[lb], params };
+      };
+      Object.keys(all).filter(p => p.startsWith(pre) && /\.json$/i.test(p) && all[p].length < 400000).slice(0, 25).forEach(p => {
+        let j; try { j = JSON.parse(td.decode(all[p])); } catch (e) { return; }
+        let nodes = 0;
+        const walkJ = (v, d) => {
+          if (++nodes > 4000 || d > 6) return;
+          if (Array.isArray(v)) {
+            const os = v.filter(x => x && typeof x === 'object' && !Array.isArray(x)), cs = os.map(jcand).filter(Boolean);
+            if (os.length >= 2 && cs.length >= os.length * 0.5) {
+              cs.forEach(c => {
+                if (c.params) { pushEnt(c.l, c.params); return; }
+                if (seen.has(c.u) || ents.length >= 50) return; seen.add(c.u);
+                const mm = new RegExp('[?&]' + key + '=([\\w\\-]+)').exec(c.u); if (mm) resolved.add(mm[1]);
+                ents.push({ l: String(c.l).replace(/\s+/g, ' ').trim().slice(0, 60), u: c.u });
+              });
+              return;
+            }
+            v.forEach(x => walkJ(x, d + 1));
+          } else if (v && typeof v === 'object') Object.keys(v).forEach(k => walkJ(v[k], d + 1));
+        };
+        walkJ(j, 0);
+      });
       const all2 = Object.keys(vals).sort((a, b) => vals[b] - vals[a] || a.localeCompare(b)).slice(0, 30);
-      return { key, vals: all2.filter(isFree), more: all2.filter(v => !isFree(v)), n: py.length };
+      return { key, vals: all2.filter(isFree), more: all2.filter(v => !isFree(v) && !resolved.has(v)), ents, n: py.length };
     }
     // Welche Python-Module importiert der Code? (oberste Ebene, ohne relative Importe)
     function pyImports(txt) {
@@ -3753,10 +3928,21 @@ def on_page(window, page_id):
       return [...new Set([...depList(), ...autoDeps().map(d => d.id)])].filter(d => d !== own && d !== 'xbmc.python' && !bundled.has(d));
     }
     const extNice = v => String(v).replace(/[_\-]+/g, ' ').replace(/^./, c => c.toUpperCase());
-    function extEntries(ex, vals) {
+    // Adressen aus Favoriten, Logs oder XML sind oft kodiert (&amp;, %3a, plugin%3A%2F%2F …) – hier werden sie normal
+    function extUrl(u) {
+      let t = String(u == null ? '' : u).trim().replace(/^["']+|["']+$/g, '');
+      for (let i = 0; i < 3 && /&(?:amp|#0?38);/i.test(t); i++) t = t.replace(/&amp;/gi, '&').replace(/&#0?38;/g, '&');
+      if (/^(?:plugin|special|videodb|musicdb|smb|nfs|https?|addons)%3a/i.test(t)) { try { t = decodeURIComponent(t); } catch (e) {} }
+      return t;
+    }
+    // wie Python urllib.parse.quote_plus
+    const encQ = s => encodeURIComponent(String(s)).replace(/%20/g, '+').replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+    function extEntries(ex, vals, ents) {
       if (ex.kind === 'script') return [{ l: ex.name, u: ex.id, k: 'script' }];
       const e = [{ l: 'Startseite', u: 'plugin://' + ex.id + '/', k: 'dir' }];
-      (vals || []).forEach(v => e.push({ l: extNice(v), u: 'plugin://' + ex.id + '/?' + ex.key + '=' + v, k: 'dir' }));
+      const eu = new Set((ents || []).map(x => String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/')));
+      (vals || []).forEach(v => { const u = 'plugin://' + ex.id + '/?' + ex.key + '=' + v; if (!eu.has(u)) e.push({ l: extNice(v), u, k: 'dir' }); });
+      (ents || []).forEach(x => e.push({ l: x.l, u: String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/'), k: 'dir' }));
       return e;
     }
     // Die Seite, auf der Ordner im eigenen Skin angezeigt werden: erste Seite mit einer Liste „Automatisch aus Kodi“ und Ordner-Navigation
@@ -3786,11 +3972,11 @@ def on_page(window, page_id):
           const ex = extClean({ id, name: root.getAttribute('name') || id, ver: root.getAttribute('version') || '0', size: f.size, prov, kind, key: det.key, deps, need, more: det.more, entries: [] });
           if (!ex) { toast('„' + f.name + '“ konnte nicht gelesen werden.'); continue; }
           const old = S.ext.find(x => x.id === id);
-          ex.entries = old && old.entries.length ? old.entries : extEntries(ex, det.vals);
+          ex.entries = old && old.entries.length ? old.entries : extEntries(ex, det.vals, det.ents);
           if (old) { Object.assign(old, ex); } else S.ext.push(ex);
           EXTZ[id] = extBytesToData(new Uint8Array(buf)); tiDbPut('ext:' + id, EXTZ[id]);
           if (!S.mod.hooks) { S.mod.hooks = true; toast('Python-Hooks wurden eingeschaltet – dein custom.py bekommt den Bereich für „' + ex.name + '“.'); }
-          else toast('✅ „' + ex.name + '“ ' + ex.ver + ' eingebunden (' + det.vals.length + ' Menü-Pfade erkannt).');
+          else toast('✅ „' + ex.name + '“ ' + ex.ver + ' eingebunden (' + (det.vals.length + (det.ents || []).length) + ' Menü-Pfade erkannt).');
           save(); if (typeof fc === 'function') fc();
         } catch (e) { toast('„' + f.name + '“: ' + (e.message || 'konnte nicht gelesen werden.')); }
       }
@@ -3800,7 +3986,7 @@ def on_page(window, page_id):
       const e = S.ext[i]; if (!e || !confirm('„' + e.name + '“ wieder aus dem Projekt entfernen?')) return;
       S.ext.splice(i, 1); delete EXTZ[e.id]; tiDbDo('readwrite', st => st.delete('ext:' + e.id)).catch(() => {}); save(); showExt();
     }
-    function extSet(i, j, k, v) { const e = S.ext[i], en = e && e.entries[j]; if (!en) return; en[k] = String(v).slice(0, 400); save(); }
+    function extSet(i, j, k, v) { const e = S.ext[i], en = e && e.entries[j]; if (!en) return; en[k] = String(v).slice(0, 600); save(); }
     function extKind(i, j, v) { const en = S.ext[i] && S.ext[i].entries[j]; if (!en) return; en.k = EXT_KINDS.some(x => x[0] === v) ? v : 'dir'; save(); }
     function extEntAdd(i) { const e = S.ext[i]; if (!e || e.entries.length >= 60) return; e.entries.push({ l: 'Neuer Eintrag', u: 'plugin://' + e.id + '/?' + e.key + '=', k: 'dir' }); save(); showExt(); }
     function extEntDel(i, j) { const e = S.ext[i]; if (!e) return; e.entries.splice(j, 1); save(); showExt(); }
@@ -3810,17 +3996,17 @@ def on_page(window, page_id):
       if (!EXTZ[e.id]) return toast('Die ZIP fehlt im Speicher – bitte unten erneut auswählen.');
       try {
         const all = await tiReadZip(b64ToBytes(b64(EXTZ[e.id]))), ax = Object.keys(all).filter(p => /(^|\/)addon\.xml$/.test(p)).sort((a, b) => a.split('/').length - b.split('/').length)[0];
-        const det = extDetect(all, ax.slice(0, -'addon.xml'.length)), have = new Set(e.entries.map(x => x.u));
+        const det = extDetect(all, ax.slice(0, -'addon.xml'.length)), have = new Set(e.entries.map(x => extUrl(x.u)));
         e.key = det.key; e.more = det.more;
-        if (reset) { e.entries = extEntries(e, det.vals); save(); showExt(); return toast('Einträge neu aufgebaut: ' + e.entries.length + ' Pfade, die ohne weitere Angaben funktionieren.'); }
-        let n = 0; extEntries(e, det.vals).forEach(x => { if (!have.has(x.u) && e.entries.length < 60) { e.entries.push(x); n++; } });
+        if (reset) { e.entries = extEntries(e, det.vals, det.ents); save(); showExt(); return toast('Einträge neu aufgebaut: ' + e.entries.length + ' Pfade, die ohne weitere Angaben funktionieren.'); }
+        let n = 0; extEntries(e, det.vals, det.ents).forEach(x => { if (!have.has(extUrl(x.u)) && e.entries.length < 60) { e.entries.push(x); n++; } });
         save(); showExt(); toast(n ? n + ' neue Einträge erkannt (Vermutung – bitte prüfen).' : 'Keine neuen Menü-Pfade gefunden.');
       } catch (x) { toast('Lesen fehlgeschlagen: ' + (x.message || x)); }
     }
     function extReset(i) { const e = S.ext[i]; if (!e || !confirm('Alle Einträge von „' + e.name + '“ durch die neu erkannten ersetzen?')) return; extRedetect(i, true); }
     // Aktion für einen Eintrag
     function extAct(ex, en) {
-      const u = String(en.u || '').trim(), w = EXT_WIN[ex.prov] || 'videos';
+      const u = extUrl(en.u), w = EXT_WIN[ex.prov] || 'videos';
       if (en.k === 'play') return { t: 'custom', v: 'PlayMedia(' + u + ')' };
       if (en.k === 'run') return { t: 'custom', v: 'RunPlugin(' + u + ')' };
       if (en.k === 'script') return { t: 'custom', v: 'RunAddon(' + (u || ex.id) + ')' };
@@ -3897,7 +4083,7 @@ def on_page(window, page_id):
       const cards = S.ext.map((e, i) => `<div class="card mt-3" style="padding:12px">
           <div class="flex items-start gap-2"><div class="flex-1 min-w-0"><b class="text-sm">🧩 ${esc(e.name)}</b> <span class="hint">v${esc(e.ver)} · ${fmt(e.size)}</span><div class="hint break-all">${esc(e.id)} · ${e.kind === 'plugin' ? 'Plugin (' + esc(e.prov) + ')' : e.kind === 'script' ? 'Script' : 'Sonstiges'}${EXTZ[e.id] ? '' : ' · <b style="color:#fca5a5">ZIP fehlt im Speicher – unten erneut wählen</b>'}</div></div><button class="btn" aria-label="Addon entfernen" onclick="extDel(${i})">🗑</button></div>
           ${e.deps.length || e.need.length ? `<p class="hint mt-1">Braucht: ${[...new Set([...e.deps, ...e.need])].map(d => esc(d) + (e.need.includes(d) ? ' <b style="color:#fde68a">(fehlt in seiner addon.xml – wird automatisch ergänzt)</b>' : '')).join(', ')}. Bekannte Kodi-Module trägt der Generator in <b>deine</b> addon.xml ein, damit Kodi sie beim Installieren gleich mitholt (Internet nötig).</p>` : ''}
-          <p class="hint mt-2"><b>Menüeinträge</b> für Buttons (Tipp: Der 📂 Live-Browser braucht keine – er zeigt das Addon so, wie es selbst seine Listen liefert):</p>
+          <p class="hint mt-2"><b>Menüeinträge</b> für Buttons (Tipp: Der 📂 Live-Browser braucht keine – er zeigt das Addon so, wie es selbst seine Listen liefert). Adressen aus Favoriten oder Logs dürfen kodiert sein (<code>%3a</code>, <code>&amp;amp;</code>) – beim Export werden sie normalisiert:</p>
           ${e.kind === 'plugin' ? `<div class="flex gap-1.5 items-center mt-1"><span class="hint shrink-0">Parametername</span><input class="inp" style="width:110px" value="${esc(e.key)}" oninput="extKey(${i},this.value)" aria-label="Parametername"><span class="hint">z. B. mode oder action – bestimmt die Adressen neuer Einträge</span></div>` : ''}
           ${e.entries.map((x, j) => `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:5px"><div class="flex gap-1.5"><input class="inp" value="${esc(x.l)}" placeholder="Beschriftung" oninput="extSet(${i},${j},'l',this.value)"><button class="btn" aria-label="Eintrag löschen" onclick="extEntDel(${i},${j})">✖</button></div>
             <input class="inp" value="${esc(x.u)}" placeholder="plugin://${esc(e.id)}/?mode=…" oninput="extSet(${i},${j},'u',this.value)" style="font-family:monospace;font-size:12px"><select class="inp" onchange="extKind(${i},${j},this.value)">${EXT_KINDS.map(k => `<option value="${k[0]}" ${x.k === k[0] ? 'selected' : ''}>${k[1]}</option>`).join('')}</select></div>`).join('')}
@@ -3939,7 +4125,7 @@ def on_page(window, page_id):
 # =====================================================================
 MENUE = [
 `;
-      S.ext.forEach(e => { o += `    # ${e.name}\n`; e.entries.filter(x => String(x.l || '').trim()).forEach(x => { o += `    (${q(x.l)}, '${kmap[x.k] || 'ordner'}', ${q(x.u || (x.k === 'script' ? e.id : ''))}),\n`; }); });
+      S.ext.forEach(e => { o += `    # ${e.name}\n`; e.entries.filter(x => String(x.l || '').trim()).forEach(x => { o += `    (${q(x.l)}, '${kmap[x.k] || 'ordner'}', ${q(extUrl(x.u) || (x.k === 'script' ? e.id : ''))}),\n`; }); });
       o += `]
 
 
@@ -3973,7 +4159,7 @@ def menue(window):
 
 def ${fn}(window):
     """${String(x.l).replace(/"/g, "'").replace(/\n/g, ' ')}"""
-    return befehl('${kmap[x.k] || 'ordner'}', ${q(x.u || (x.k === 'script' ? e.id : ''))}${EXT_WIN[e.prov] && EXT_WIN[e.prov] !== 'videos' && x.k === 'dir' ? ', ' + q(EXT_WIN[e.prov]) : ''})
+    return befehl('${kmap[x.k] || 'ordner'}', ${q(extUrl(x.u) || (x.k === 'script' ? e.id : ''))}${EXT_WIN[e.prov] && EXT_WIN[e.prov] !== 'videos' && x.k === 'dir' ? ', ' + q(EXT_WIN[e.prov]) : ''})
 `;
       }));
       return o;
@@ -4715,7 +4901,7 @@ if __name__ == '__main__':
       ['Petrol', { focus: '#009688', bg: '#00665C', pat: '#F07942', patA: 20, dialog: '#222A2A', sel: '#C67F03' }],
       ['Violett', { focus: '#C050FF', bg: '#5B1C80', pat: '#FFB3D7', patA: 20, dialog: '#27222A', sel: '#FF0054' }]
     ];
-    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['pro', '🔧 Profi'], ['export', '📦 Export']];
+    const TTABS = [['basis', '🧬 Basis'], ['farben', '🎨 Farben'], ['menu', '📋 Hauptmenü'], ['widgets', '🧩 Widgets'], ['layout', '📐 Layout'], ['look', '🖼 Bilder & Schrift'], ['win', '🪟 Fenster'], ['pro', '🔧 Profi'], ['export', '📦 Export']];
     // Frei verschiebbare Bausteine der Estuary-Startseite: [Schlüssel, Symbol, Name, Beschreibung, Standard-Rechteck in der Vorschau, Farbe, ausblendbar?]
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
@@ -4752,7 +4938,7 @@ if __name__ == '__main__':
         kodi: '21', name: '', ver: '1.0.0', author: '', langs: 'de',
         col: Object.assign({ text: '#F0F0F0', grey: '#A0A0A0' }, TCOLS[1][1]),
         bg: { mode: 'estuary', img: null, dim: 45 }, logo: null, fontScale: 100, font: null,
-        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {}, dimgs: {}, ov: {}, rr: [], xf: [], wh: {},
+        top: { power: true, settings: true, search: true }, assets: 'auto', imgs: {}, dimgs: {}, ov: {}, rr: [], xf: [], wh: {}, hide: {}, tweak: {}, skset: [],
         menu: TMENU.map(m => ({ id: m[0], show: true, label: '', icon: '', w: 'keep', wl: [] })),
         cur: 'movies', tab: 'basis', lay: defLay()
       };
@@ -4769,6 +4955,22 @@ if __name__ == '__main__':
       S.titan.rr = (Array.isArray(S.titan.rr) ? S.titan.rr : []).filter(r => r && typeof r === 'object').slice(0, 30).map(r => ({ f: String(r.f || '').slice(0, 200), a: String(r.a || '').slice(0, 2000), b: String(r.b || '').slice(0, 2000), re: r.re === true }));
       S.titan.xf = (Array.isArray(S.titan.xf) ? S.titan.xf : []).filter(r => r && typeof r === 'object' && typeof r.d === 'string' && r.p).slice(0, 30).map(r => ({ p: String(r.p).replace(/^\/+/, '').replace(/\.\.+/g, '.').slice(0, 200), d: r.d, n: String(r.n || '').slice(0, 80) }));
       if (!S.titan.wh || typeof S.titan.wh !== 'object' || Array.isArray(S.titan.wh)) S.titan.wh = {};
+      {
+        const h0 = (S.titan.hide && typeof S.titan.hide === 'object' && !Array.isArray(S.titan.hide)) ? S.titan.hide : {}, h = {};
+        Object.keys(h0).slice(0, 60).forEach(p => { const a = (Array.isArray(h0[p]) ? h0[p] : []).map(String).filter(x => /^\d{1,9}$/.test(x)); if (a.length) h[String(p).replace(/^\/+/, '').replace(/\.\.+/g, '.').slice(0, 200)] = [...new Set(a)].slice(0, 200); });
+        S.titan.hide = h;
+      }
+      {
+        const t0 = (S.titan.tweak && typeof S.titan.tweak === 'object' && !Array.isArray(S.titan.tweak)) ? S.titan.tweak : {}, t = {};
+        Object.keys(t0).slice(0, 60).forEach(p => {
+          const m0 = t0[p]; if (!m0 || typeof m0 !== 'object') return; const m = {};
+          Object.keys(m0).slice(0, 100).forEach(id => { if (!/^\d{1,9}$/.test(id)) return; const v = tiTweakNorm(m0[id]); if (v) m[id] = v; });
+          if (Object.keys(m).length) t[String(p).replace(/^\/+/, '').replace(/\.\.+/g, '.').slice(0, 200)] = m;
+        });
+        S.titan.tweak = t;
+        const seen = new Set();
+        S.titan.skset = (Array.isArray(S.titan.skset) ? S.titan.skset : []).filter(x => x && typeof x === 'object' && /^[a-z0-9_]{1,40}$/.test(String(x.n)) && !seen.has(String(x.n)) && seen.add(String(x.n))).slice(0, 20).map(x => ({ n: String(x.n), l: String(x.l || '').slice(0, 60) || 'Einstellung' }));
+      }
       if (!TKODI[S.titan.kodi]) S.titan.kodi = '21';
       {
         const L0 = (T.lay && typeof T.lay === 'object') ? T.lay : {}, L = defLay();
@@ -4939,9 +5141,9 @@ if __name__ == '__main__':
     function tiFit() { const w = $('tpv-wrap'), s = $('tpv-stage'); if (!w || !s || !w.clientWidth) return; s.style.transform = `scale(${w.clientWidth / 1920})`; }
     function tiTab(t) {
       if (!$('ti-body')) return;
-      S.titan.tab = t; save();
+      S.titan.tab = t; save(); if (t !== 'win') WIN.dirty = true;
       $('ti-tabs').innerHTML = TTABS.map(x => `<button class="btn ${x[0] === t ? 'titb' : ''}" onclick="tiTab('${x[0]}')">${x[1]}</button>`).join('');
-      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, pro: tiPro, export: tiExport };
+      const R = { basis: tiBasis, farben: tiFarben, menu: tiMenu, widgets: tiWidgets, layout: tiLayout, look: tiLook, win: tiWin, pro: tiPro, export: tiExport };
       $('ti-body').innerHTML = (R[t] || tiBasis)();
       tiPv();
       if (t === 'basis') tiBaseStatus();
@@ -5594,6 +5796,377 @@ if __name__ == '__main__':
         S.titan = t; normTitan(); S.titan.tab = 'pro'; TIB = null; save(); tiRe(); toast('Titan-Projekt geladen.');
       }; r.readAsText(f);
     }
+    // ---------- Reiter: Fenster (Video-OSD & Co.) ----------
+    // [Gruppe, [[Datei, Name, Beschreibung], …]] – angezeigt wird nur, was in der geladenen Estuary-Version wirklich existiert
+    const TWINCAT = [
+      ['🎬 Video-Wiedergabe', [
+        ['xml/VideoOSD.xml', 'Video-OSD (Bedienfeld)', 'Das Bedienfeld während des Films: Wiedergabe/Pause, Stopp, Vor- und Zurückspulen, nächster Titel, Zusatzknöpfe.'],
+        ['xml/VideoFullScreen.xml', 'Video-Vollbild', 'Was neben dem Bild eingeblendet wird: Pause-Anzeige, Spul-Hinweise, Zeitanzeige, Untertitel-Hinweise.'],
+        ['xml/DialogSeekBar.xml', 'Zeitleiste', 'Die Fortschrittsleiste mit Zeitangaben beim Spulen.'],
+        ['xml/DialogFullScreenInfo.xml', 'Info-Einblendung (Video)', 'Die Info-Anzeige, die mit der Info-Taste während des Films erscheint.'],
+        ['xml/DialogSubtitles.xml', 'Untertitel suchen', 'Der Dialog zum Suchen und Laden von Untertiteln.'],
+        ['xml/DialogPlayerProcessInfo.xml', 'Technik-Info (Codec)', 'Die technische Anzeige zu Codec, Auflösung und Bildrate.']
+      ]],
+      ['🎵 Musik', [
+        ['xml/MusicOSD.xml', 'Musik-OSD (Bedienfeld)', 'Das Bedienfeld bei laufender Musik.'],
+        ['xml/MusicVisualisation.xml', 'Visualisierung', 'Die Ansicht mit Visualisierung und Titelinfo.'],
+        ['xml/MyMusicNav.xml', 'Musik-Bibliothek', 'Die Listen- und Rasteransichten der Musik-Bibliothek.'],
+        ['xml/DialogMusicInfo.xml', 'Musik-Info', 'Das Info-Fenster zu Album, Interpret oder Lied.']
+      ]],
+      ['📺 Live-TV', [
+        ['xml/DialogPVRChannelsOSD.xml', 'Senderliste im OSD', 'Die Senderliste, die beim Fernsehen über das Bild gelegt wird.'],
+        ['xml/MyPVRChannels.xml', 'TV-Sender', 'Die Senderliste im Hauptfenster.'],
+        ['xml/MyPVRGuide.xml', 'TV-Programm (EPG)', 'Das Programmheft.']
+      ]],
+      ['📚 Bibliothek & Listen', [
+        ['xml/MyVideoNav.xml', 'Video-Bibliothek', 'Die Listen- und Rasteransichten für Filme, Serien und Ordner.'],
+        ['xml/DialogVideoInfo.xml', 'Video-Info', 'Das Info-Fenster zu Film, Serie oder Folge (Handlung, Besetzung, Knöpfe).'],
+        ['xml/MyPics.xml', 'Bilder', 'Die Bilder-Ansicht.'],
+        ['xml/MyPrograms.xml', 'Addons-Ansicht', 'Die Ansicht für Programme und Addons.']
+      ]],
+      ['💬 Dialoge & Hinweise', [
+        ['xml/DialogContextMenu.xml', 'Kontextmenü', 'Das Menü, das mit langem Druck oder der Menü-Taste aufgeht.'],
+        ['xml/DialogSelect.xml', 'Auswahl-Liste', 'Der Dialog, in dem du einen Eintrag aus einer Liste wählst.'],
+        ['xml/DialogYesNo.xml', 'Ja/Nein-Frage', 'Bestätigungsdialoge.'],
+        ['xml/DialogOK.xml', 'Hinweis mit OK', 'Meldungen mit einem OK-Knopf.'],
+        ['xml/DialogKeyboard.xml', 'Tastatur', 'Die Bildschirm-Tastatur.'],
+        ['xml/DialogNumeric.xml', 'Zahleneingabe', 'Zahlen- und Datumseingabe.'],
+        ['xml/DialogNotification.xml', 'Kurz-Hinweise (Toast)', 'Die kleinen Hinweise oben im Bild.'],
+        ['xml/DialogKaiToast.xml', 'Kurz-Hinweise (Kai-Toast)', 'Die Einblendung für Meldungen wie „Bibliothek wird aktualisiert“.'],
+        ['xml/DialogBusy.xml', 'Warte-Anzeige', 'Der Kreisel bei Ladevorgängen.'],
+        ['xml/DialogVolumeBar.xml', 'Lautstärke-Anzeige', 'Der Balken beim Ändern der Lautstärke.']
+      ]],
+      ['⚙ Einstellungen', [
+        ['xml/SettingsCategory.xml', 'Einstellungen (Seite)', 'Das Layout aller Kodi-Einstellungsseiten.'],
+        ['xml/SkinSettings.xml', 'Skin-Einstellungen', 'Die Seite mit den Einstellungen des Skins.'],
+        ['xml/DialogSettings.xml', 'Einstellungs-Dialog', 'Der Dialog für Einstellungen mit Kategorien (z. B. in Addons).']
+      ]],
+      ['🧱 Grundbausteine', [
+        ['xml/Home.xml', 'Startseite', 'Das Hauptfenster. Menü, Farben und Widgets stellst du in den anderen Reitern ein.'],
+        ['xml/Includes.xml', 'Gemeinsame Bausteine', 'Wiederverwendete Teile (Hintergründe, Knöpfe, Animationen) für viele Fenster.'],
+        ['xml/Includes_Home.xml', 'Bausteine der Startseite', 'Widgets und Menü der Startseite.'],
+        ['xml/Variables.xml', 'Variablen', 'Bedingte Werte, z. B. welches Bild oder welcher Text wann gezeigt wird.'],
+        ['xml/Defaults.xml', 'Voreinstellungen', 'Standardwerte für Knöpfe, Listen und Texte.'],
+        ['xml/Font.xml', 'Schriften', 'Welche Schriftart in welcher Größe unter welchem Namen läuft.'],
+        ['xml/Startup.xml', 'Startbildschirm', 'Das Fenster beim Starten von Kodi.']
+      ]]
+    ];
+    // Bekannte Bedienelemente der Estuary-Video-OSD (Nummer → Name)
+    const TWOSD = { 200: 'Gruppe: alle OSD-Knöpfe', 201: 'Knopfreihe 1 (Wiedergabe)', 202: 'Knopfreihe 2 (Zusatzknöpfe)', 698: 'Gruppe: Wiedergabe-Knopf', 6000: 'Zeitleisten-Gruppe', 600: 'Vorheriger Titel', 601: 'Zurückspulen', 602: 'Wiedergabe / Pause', 603: 'Stopp', 606: 'Vorspulen', 607: 'Nächster Titel', 608: 'Aufnehmen', 804: 'Startseite', 70040: 'Senderliste', 70041: 'Programm (EPG)', 70042: 'Wiedergabeliste', 70043: 'Information', 70044: 'Lesezeichen', 70045: 'Videotext', 70046: 'Streams', 70047: 'Stereoskopie', 70048: 'Einstellungen' };
+    let WIN = { ctlOpen: '', cur: '', filt: '', b: null, raw: null, kodi: '', dirty: true, tried: false, tk: '', busy: false, err: '', diff: false, op: { g0: true } };
+    const tiWinInfo = p => { for (const g of TWINCAT) { const x = g[1].find(q => q[0] === p); if (x) return x; } return null; };
+    const tiWinDec = u => new TextDecoder().decode(u || new Uint8Array());
+    // Grundlage + berechnete Fassung (ohne von Hand ersetzte Dateien); null, solange Estuary noch nicht geladen ist
+    function tiWinBase() {
+      const T = S.titan, b = (TIB && TIB.kodi === T.kodi) ? TIB : null;
+      if (WIN.tk !== T.kodi) { WIN.tk = T.kodi; WIN.tried = false; }
+      if (!b) {
+        if (!WIN.tried && !WIN.busy) { WIN.busy = true; tiGetBase(T.kodi, true).catch(() => null).then(() => { WIN.busy = false; WIN.tried = true; if (S.titan && S.titan.tab === 'win') tiRe(); }); }
+        return null;
+      }
+      if (WIN.dirty || WIN.b !== b || WIN.kodi !== T.kodi) {
+        try { WIN.raw = tiTransform(b, true); WIN.err = ''; } catch (e) { WIN.raw = b.files; WIN.err = e.message || 'Berechnung fehlgeschlagen'; }
+        WIN.b = b; WIN.kodi = T.kodi; WIN.dirty = false;
+      }
+      return b;
+    }
+    async function tiWinLoad() {
+      tiProg('ti-win-prog', 'Estuary wird geladen – das dauert einen Moment …', 0); WIN.tried = true;
+      try { await tiLoadGithub(); } catch (e) {}
+      tiRe();
+    }
+    // Ausblenden + Feineinstellungen (verschieben, zoomen, Farbe, Reihenfolge, Sichtbarkeit per Skin-Einstellung) in einem Durchgang
+    function tiTweakNorm(o) {
+      if (!o || typeof o !== 'object') return null;
+      const cl = (v, a, b, d) => { v = Math.round(+v); return isFinite(v) ? Math.max(a, Math.min(b, v)) : d; }, c = String(o.c || '').replace('#', '');
+      const t = { dx: cl(o.dx, -1920, 1920, 0), dy: cl(o.dy, -1080, 1080, 0), z: cl(o.z, 20, 300, 100), c: /^[0-9a-fA-F]{6}$/.test(c) ? c.toUpperCase() : '', mv: cl(o.mv, -30, 30, 0), s: /^[a-z0-9_]{1,40}$/.test(String(o.s || '')) ? String(o.s) : '' };
+      return (t.dx || t.dy || t.z !== 100 || t.c || t.mv || t.s) ? t : null;
+    }
+    function tiCtlApply(txt, hideIds, tw) {
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return null;
+      tw = tw || {}; const hide = new Set((hideIds || []).map(String)), want = new Set([...hide, ...Object.keys(tw)]), found = new Set();
+      const anim = (c, effect, at) => { const a = d.createElement('animation'); a.setAttribute('effect', effect); Object.keys(at).forEach(k => a.setAttribute(k, at[k])); a.setAttribute('time', '0'); a.setAttribute('condition', 'true'); a.textContent = 'Conditional'; c.appendChild(a); };
+      [...d.getElementsByTagName('control')].filter(c => want.has(c.getAttribute('id'))).forEach(c => {
+        const id = c.getAttribute('id'), t = tiTweakNorm(tw[id]) || {}; found.add(id);
+        if (t.mv) {
+          const par = c.parentNode, sib = [...par.children].filter(k => k.tagName === 'control'), i = sib.indexOf(c), j = Math.max(0, Math.min(sib.length - 1, i + t.mv));
+          if (j > i) par.insertBefore(c, sib[j].nextSibling); else if (j < i) par.insertBefore(c, sib[j]);
+        }
+        if (t.dx || t.dy) anim(c, 'slide', { start: '0,0', end: (t.dx || 0) + ',' + (t.dy || 0) });
+        if (t.z && t.z !== 100) anim(c, 'zoom', { start: '100', end: String(t.z), center: 'auto' });
+        if (t.c) { [...c.children].filter(k => k.tagName === 'colordiffuse').forEach(k => c.removeChild(k)); const e = d.createElement('colordiffuse'); e.textContent = 'FF' + t.c; c.appendChild(e); }
+        const vis = hide.has(id) ? 'false' : t.s ? '!Skin.HasSetting(' + t.s + ')' : '';
+        if (vis) { [...c.children].filter(k => k.tagName === 'visible').forEach(k => c.removeChild(k)); const v = d.createElement('visible'); v.textContent = vis; c.insertBefore(v, c.firstChild); }
+      });
+      return { txt: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(d).replace(/^\s*<\?xml[^>]*\?>\s*/, '') + '\n', n: found.size, miss: want.size - found.size };
+    }
+    function tiHideApply(txt, ids) { const r = tiCtlApply(txt, ids, {}); return r && { txt: r.txt, n: r.n }; }
+    // Alle Bedienelemente mit fester Nummer (Nummer, Art, Hinweis)
+    function tiWinCtl(txt) {
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return null;
+      const seen = new Set(), out = [];
+      [...d.getElementsByTagName('control')].forEach(c => {
+        const id = c.getAttribute('id'); if (!/^\d+$/.test(id || '') || seen.has(id)) return; seen.add(id);
+        const par = [...c.getElementsByTagName('param')].find(x => x.getAttribute('name') === 'texture'), oc = [...c.children].find(k => k.tagName === 'onclick'), lb = [...c.children].find(k => k.tagName === 'label');
+        const hint = par ? String(par.getAttribute('value') || '').split('/').pop().replace(/\.\w+$/, '') : oc ? oc.textContent.trim() : lb ? lb.textContent.trim() : '';
+        out.push({ id, type: c.getAttribute('type') || '', hint: hint.slice(0, 48) });
+      });
+      return out.sort((a, b) => (+a.id) - (+b.id)).slice(0, 200);
+    }
+    // Erzeugte Fassung einer Datei: Generator-Änderungen + ausgeblendete Elemente
+    function tiWinGen(p) {
+      const raw = WIN.raw && WIN.raw[p] ? tiWinDec(WIN.raw[p]) : '', ids = (S.titan.hide || {})[p] || [], tw = (S.titan.tweak || {})[p] || {};
+      if (raw && (ids.length || Object.keys(tw).length)) { const r = tiCtlApply(raw, ids, tw); if (r) return r.txt; }
+      return raw;
+    }
+    const tiWinCur = p => S.titan.ov[p] != null ? S.titan.ov[p] : tiWinGen(p);
+    const tiWinOrig = p => (WIN.b && WIN.b.files[p]) ? tiWinDec(WIN.b.files[p]) : '';
+    function tiWinState(p) {
+      const T = S.titan, a = [];
+      if (T.ov[p] != null) a.push('✎ eigene Fassung');
+      if ((T.hide[p] || []).length) a.push('👁 ' + T.hide[p].length + ' ausgeblendet');
+      if (Object.keys(T.tweak[p] || {}).length) a.push('⚙ ' + Object.keys(T.tweak[p]).length + ' angepasst');
+      if (WIN.b && WIN.b.files[p] && WIN.raw && WIN.raw[p] && WIN.raw[p] !== WIN.b.files[p] && !tiSame(WIN.b.files[p], WIN.raw[p])) a.push('● vom Generator angepasst');
+      if (WIN.b && !WIN.b.files[p] && T.ov[p] != null) a.push('neu');
+      return a;
+    }
+    function tiWinSel(p) { WIN.cur = p; WIN.diff = false; tiRe(); setTimeout(() => { const e = $('ti-win-ed'); if (e && e.scrollIntoView) e.scrollIntoView({ block: 'nearest' }); }, 30); }
+    function tiWinFilt(v) { WIN.filt = v; const sel = $('ti-win-files'); if (sel) sel.innerHTML = tiWinOpts(); }
+    function tiWinOpts() {
+      if (!WIN.raw) return '';
+      const f = WIN.filt.toLowerCase(), known = new Set(); TWINCAT.forEach(g => g[1].forEach(x => known.add(x[0])));
+      const ks = new Set(Object.keys(WIN.raw).filter(p => /^(xml\/|colors\/).*\.xml$/i.test(p)));
+      Object.keys(S.titan.ov).filter(p => /^xml\/.*\.xml$/i.test(p)).forEach(p => ks.add(p));
+      return [...ks].filter(p => !known.has(p) && (!f || p.toLowerCase().includes(f))).sort((a, b) => a.localeCompare(b)).slice(0, 400)
+        .map(p => `<option value="${esc(p)}" ${p === WIN.cur ? 'selected' : ''}>${tiWinState(p).length ? tiWinState(p)[0].slice(0, 2) + ' ' : ''}${esc(p.replace(/^xml\//, ''))}</option>`).join('');
+    }
+    function tiWinHide(p, id, on) {
+      const T = S.titan, a = new Set(T.hide[p] || []); if (on) a.add(String(id)); else a.delete(String(id));
+      if (a.size) T.hide[p] = [...a]; else delete T.hide[p];
+      save(); tiRe();
+    }
+    function tiWinShowAll(p) { delete S.titan.hide[p]; save(); tiRe(); }
+    function tiWinTg(k, el) { const was = !!WIN.op[k]; WIN.op[k] = el.open; if (k === 'sk' && el.open && !was) tiRe(); }
+    function tiWinCtlOpen(id) { WIN.ctlOpen = WIN.ctlOpen === id ? '' : id; tiRe(); }
+    function tiWinTwSet(p, id, fn) {
+      const T = S.titan, cur = Object.assign({ dx: 0, dy: 0, z: 100, c: '', mv: 0, s: '' }, (T.tweak[p] || {})[id] || {}); fn(cur);
+      const v = tiTweakNorm(cur);
+      if (v) { T.tweak[p] = T.tweak[p] || {}; T.tweak[p][id] = v; } else if (T.tweak[p]) { delete T.tweak[p][id]; if (!Object.keys(T.tweak[p]).length) delete T.tweak[p]; }
+      save(); tiRe();
+    }
+    function tiWinTw(p, id, k, v) { tiWinTwSet(p, id, t => { if (k === 'c') t.c = String(v); else if (k === 's') t.s = String(v); else t[k] = k === 'z' ? (Math.round(+v) || 100) : (Math.round(+v) || 0); }); }
+    function tiWinMv(p, id, dir) { tiWinTwSet(p, id, t => { t.mv = (t.mv || 0) + dir; }); }
+    function tiWinTwReset(p, id) { tiWinTwSet(p, id, t => { t.dx = 0; t.dy = 0; t.z = 100; t.c = ''; t.mv = 0; t.s = ''; }); }
+    function tiWinTwPanel(p, c) {
+      const T = S.titan, t = Object.assign({ dx: 0, dy: 0, z: 100, c: '', mv: 0, s: '' }, (T.tweak[p] || {})[c.id] || {}), d = `data-p="${esc(p)}" data-i="${c.id}"`, g = k => `tiWinTw(this.dataset.p,this.dataset.i,'${k}',this.value)`;
+      const num = (k, l, min, max, step) => `<label class="text-xs flex-1 min-w-0"><span class="hint">${l}</span><input class="inp" type="number" min="${min}" max="${max}" step="${step}" value="${t[k]}" ${d} onchange="${g(k)}"></label>`;
+      return `<div class="card" style="margin:2px 0 6px 14px;border-color:#475569">
+        <div class="flex gap-2">${num('dx', 'Rechts (+) / links (−) in px', -1920, 1920, 10)}${num('dy', 'Unten (+) / oben (−) in px', -1080, 1080, 10)}${num('z', 'Größe in %', 20, 300, 5)}</div>
+        <div class="flex items-center gap-2 mt-1 flex-wrap"><span class="hint">Farbe</span><input type="color" aria-label="Farbe" value="#${t.c || 'ffffff'}" ${d} onchange="${g('c')}"><span class="hint">${t.c ? '#' + t.c : 'Original'}</span>${t.c ? `<button class="btn" ${d} onclick="tiWinTw(this.dataset.p,this.dataset.i,'c','')">Original</button>` : ''}
+          <span class="hint" style="margin-left:auto">Reihenfolge</span><button class="btn" aria-label="Eins nach vorn" ${d} onclick="tiWinMv(this.dataset.p,this.dataset.i,-1)">↑</button><button class="btn" aria-label="Eins nach hinten" ${d} onclick="tiWinMv(this.dataset.p,this.dataset.i,1)">↓</button><span class="hint">${t.mv ? (t.mv > 0 ? '+' : '') + t.mv : ''}</span></div>
+        <label class="text-xs mt-1" style="display:block"><span class="hint">Sichtbarkeit</span><select class="inp" ${d} onchange="${g('s')}"><option value="">immer (Original)</option>${T.skset.map(x => `<option value="${x.n}" ${t.s === x.n ? 'selected' : ''}>ausgeblendet, wenn „${esc(x.l)}“ an ist</option>`).join('')}${t.s && !T.skset.some(x => x.n === t.s) ? `<option value="${esc(t.s)}" selected>(Einstellung gelöscht)</option>` : ''}</select></label>
+        <button class="btn w-full mt-1" ${d} onclick="tiWinTwReset(this.dataset.p,this.dataset.i)">Alles für #${c.id} zurücksetzen</button></div>`;
+    }
+    // Eigene Skin-Einstellungen
+    function tiSksetId(keys) { const used = new Set(keys.map(x => (String(x).match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean)); for (let i = 1199; i >= 1100; i--) if (!used.has(String(i))) return i; return 1199; }
+    function tiSksetFor(keys) { const id = tiSksetId(keys.filter(x => !/_TitanOptionen\.xml$/i.test(x))); return { id, p: 'xml/Custom_' + id + '_TitanOptionen.xml' }; }
+    function tiSksetInfo() { if (!S.titan.skset.length) return null; const b = WIN.b || TIB; return tiSksetFor([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov)]); }
+    function tiSkAdd() { const T = S.titan; if (T.skset.length >= 20) return; const used = new Set(T.skset.map(x => x.n)); let i = 1; while (used.has('titan_option' + i)) i++; T.skset.push({ n: 'titan_option' + i, l: 'Neue Einstellung ' + i }); WIN.dirty = true; save(); tiRe(); }
+    function tiSkLabel(i, v) { const x = S.titan.skset[i]; if (!x) return; x.l = String(v).slice(0, 60) || 'Einstellung'; WIN.dirty = true; save(); }
+    function tiSkDel(i) {
+      const T = S.titan, x = T.skset[i]; if (!x) return; T.skset.splice(i, 1);
+      Object.keys(T.tweak).forEach(p => { Object.keys(T.tweak[p]).forEach(id => { if (T.tweak[p][id].s === x.n) { T.tweak[p][id].s = ''; if (!tiTweakNorm(T.tweak[p][id])) delete T.tweak[p][id]; } }); if (!Object.keys(T.tweak[p]).length) delete T.tweak[p]; });
+      WIN.dirty = true; save(); tiRe();
+    }
+    function tiSkMenu() { const si = tiSksetInfo(); if (!si) return; tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + si.id + ')' }; m.label = 'Skin-Optionen'; save(); tiRe(); toast('Menüpunkt „Skin-Optionen“ öffnet das Einstellungsfenster – ganz oben im Hauptmenü.'); }
+    // Schemaskizze eines Fensters (Größen und Plätze geschätzt)
+    function tiWinSketch(txt) {
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return '';
+      const root = [...d.documentElement.children].find(k => k.tagName === 'controls'); if (!root) return '';
+      const kid = (c, tag) => [...c.children].find(x => x.tagName === tag), kids = (c, tag) => [...c.children].filter(x => x.tagName === tag);
+      const num = (c, tag, ref) => { const k = kid(c, tag); if (!k) return null; const t = k.textContent.trim(); if (/^-?\d+(\.\d+)?$/.test(t)) return +t; const m = t.match(/^(-?\d+(?:\.\d+)?)%$/); return m && ref ? +m[1] * ref / 100 : null; };
+      const DEF = { button: [90, 90], radiobutton: [90, 90], togglebutton: [90, 90], label: [400, 40], fadelabel: [400, 40], textbox: [500, 160], list: [500, 400], fixedlist: [500, 400], panel: [600, 400], wraplist: [600, 200], slider: [400, 24], sliderex: [400, 24], progress: [400, 20], edit: [400, 60], spincontrol: [200, 60], scrollbar: [20, 400], videowindow: [640, 360], visualisation: [640, 360], rss: [600, 40] };
+      const COL = { button: '#38bdf8', radiobutton: '#38bdf8', togglebutton: '#38bdf8', label: '#94a3b8', fadelabel: '#94a3b8', textbox: '#94a3b8', list: '#a78bfa', fixedlist: '#a78bfa', panel: '#a78bfa', wraplist: '#a78bfa', slider: '#34d399', sliderex: '#34d399', progress: '#34d399', edit: '#fbbf24', spincontrol: '#fbbf24', scrollbar: '#64748b', videowindow: '#f472b6', visualisation: '#f472b6' };
+      const out = [], hid = [], cond = []; let cnt = 0;
+      const walk = (par, ox, oy, pw, ph, draw) => {
+        const isList = par.getAttribute && par.getAttribute('type') === 'grouplist', horiz = isList && String((kid(par, 'orientation') || {}).textContent || '').trim() === 'horizontal', gap = isList ? (num(par, 'itemgap') || 0) : 0;
+        let fx = 0, fy = 0, mx = 0, my = 0;
+        kids(par, 'control').forEach(c => {
+          const type = c.getAttribute('type') || '', id = c.getAttribute('id') || '', vis = kids(c, 'visible').map(k => k.textContent.trim());
+          if (vis.includes('false')) { if (draw && id) hid.push(id); return; }
+          if (draw && id && vis.some(v => /^!Skin\.HasSetting/.test(v))) cond.push(id);
+          const box = type === 'group' || type === 'grouplist', dd = DEF[type];
+          let w = num(c, 'width', pw), h = num(c, 'height', ph);
+          if ((w == null || h == null) && box && isList) { const m = walk(c, 0, 0, pw, ph, false); if (w == null) w = m[0]; if (h == null) h = m[1]; }
+          if (w == null) w = dd ? dd[0] : box ? pw : 0;
+          if (h == null) h = dd ? dd[1] : box ? ph : 0;
+          let x, y;
+          if (isList) { x = fx; y = fy; if (horiz) fx += w + gap; else fy += h + gap; }
+          else {
+            const l = num(c, 'left', pw), t = num(c, 'top', ph), r = num(c, 'right', pw), bt = num(c, 'bottom', ph), cl = num(c, 'centerleft', pw), ct = num(c, 'centertop', ph);
+            x = cl != null ? cl - w / 2 : l != null ? l : r != null ? pw - r - w : 0; y = ct != null ? ct - h / 2 : t != null ? t : bt != null ? ph - bt - h : 0;
+          }
+          let sx = 0, sy = 0, z = 1;
+          kids(c, 'animation').forEach(a => {
+            if (a.textContent.trim() !== 'Conditional' || a.getAttribute('condition') !== 'true') return;
+            if (a.getAttribute('effect') === 'slide') { const e = String(a.getAttribute('end') || '').split(','); sx += +e[0] || 0; sy += +e[1] || 0; }
+            else if (a.getAttribute('effect') === 'zoom') z *= (+a.getAttribute('end') || 100) / 100;
+          });
+          const ax = ox + x + sx + w * (1 - z) / 2, ay = oy + y + sy + h * (1 - z) / 2, aw = w * z, ah = h * z;
+          if (draw && cnt < 400 && aw > 0 && ah > 0 && !(box && aw >= pw && ah >= ph && !isList)) {
+            cnt++; const cd = kid(c, 'colordiffuse'), fill = cd && /^[0-9A-Fa-f]{8}$/.test(cd.textContent.trim()) ? '#' + cd.textContent.trim().slice(2) : COL[type] || '#64748b', fs = Math.max(14, Math.min(26, ah * .35));
+            if (box) out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" fill="none" stroke="#475569" stroke-dasharray="8 6" stroke-width="2"/>`);
+            else if (type === 'image' || type === 'multiimage') out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" fill="none" stroke="#334155" stroke-width="2"/>`);
+            else out.push(`<rect x="${ax.toFixed(0)}" y="${ay.toFixed(0)}" width="${aw.toFixed(0)}" height="${ah.toFixed(0)}" rx="8" fill="${fill}" fill-opacity=".28" stroke="${fill}" stroke-width="2"/>${id ? `<text x="${(ax + aw / 2).toFixed(0)}" y="${(ay + ah / 2 + fs / 3).toFixed(0)}" text-anchor="middle" font-size="${fs.toFixed(0)}" fill="#e2e8f0" font-family="sans-serif">#${esc(id)}</text>` : ''}`);
+          }
+          if (box) walk(c, ox + x + sx, oy + y + sy, w, h, draw);
+          mx = Math.max(mx, x + w); my = Math.max(my, y + h);
+        });
+        return [mx, my];
+      };
+      walk(root, 0, 0, 1920, 1080, true);
+      if (!out.length) return '<p class="hint mt-2">Keine zeichenbaren Elemente mit festen Maßen gefunden.</p>';
+      return `<svg viewBox="0 0 1920 1080" style="width:100%;height:auto;background:#020617;border:1px solid #334155;border-radius:8px;margin-top:8px" role="img" aria-label="Schemaskizze des Fensters"><rect x="1" y="1" width="1918" height="1078" fill="none" stroke="#1e293b" stroke-width="2"/>${out.join('')}</svg>
+        <p class="hint mt-1">Schemaskizze: Plätze und Größen sind geschätzt (Estuary legt vieles über Bausteine fest), Reihenfolge, Verschiebung, Zoom und Ausgeblendetes stimmen.${hid.length ? ' <b>Ausgeblendet:</b> ' + [...new Set(hid)].map(x => '#' + esc(x)).join(' ') + '.' : ''}${cond.length ? ' <b>Je nach Skin-Einstellung:</b> ' + [...new Set(cond)].map(x => '#' + esc(x)).join(' ') + '.' : ''}</p>`;
+    }
+    function tiWinSave() {
+      const p = WIN.cur, ta = $('ti-wed'); if (!p || !ta) return;
+      if (/\.xml$/i.test(p) && new DOMParser().parseFromString(ta.value, 'application/xml').getElementsByTagName('parsererror').length) return toast('Das ist kein gültiges XML – bitte prüfen (nicht gespeichert).');
+      if (WIN.b && WIN.b.files[p] && ta.value === tiWinGen(p)) { delete S.titan.ov[p]; save(); tiRe(); return toast('Entspricht der erzeugten Fassung – keine eigene Fassung nötig.'); }
+      S.titan.ov[p] = ta.value; save(); tiRe(); toast('Deine Fassung von ' + p + ' wird beim Bauen verwendet.');
+    }
+    function tiWinReset() {
+      const p = WIN.cur; if (!p) return; delete S.titan.ov[p];
+      if (WIN.b && !WIN.b.files[p]) WIN.cur = '';
+      save(); tiRe(); toast('Zurück zur erzeugten Fassung.');
+    }
+    function tiWinOrigSet() {
+      const p = WIN.cur, o = tiWinOrig(p); if (!p || !o) return;
+      S.titan.ov[p] = o; delete S.titan.hide[p]; delete S.titan.tweak[p]; save(); tiRe(); toast('Original von Estuary eingesetzt – ohne Änderungen des Generators.');
+    }
+    function tiWinDiff() { WIN.diff = !WIN.diff; tiRe(); }
+    function tiWinDiffHtml(p) {
+      const orig = tiWinOrig(p), cur = tiWinCur(p), xml = /\.xml$/i.test(p);
+      const la = orig ? (xml ? tiPretty(orig) : orig.split('\n')) : [], lb = xml ? tiPretty(cur) : cur.split('\n'), ops = tiDiff(la, lb), keep = new Uint8Array(ops.length);
+      ops.forEach((o, i) => { if (o[0] !== ' ') for (let k = Math.max(0, i - 2); k <= Math.min(ops.length - 1, i + 2); k++) keep[k] = 1; });
+      let out = '', n = 0, gap = false, add = 0, del = 0; ops.forEach(o => { if (o[0] === '+') add++; else if (o[0] === '-') del++; });
+      ops.forEach((o, i) => {
+        if (!keep[i]) { gap = true; return; } if (n > 500) return; n++;
+        if (gap && out) out += '<div style="color:#64748b">⋯</div>'; gap = false;
+        const c = o[0] === '+' ? 'background:rgba(34,197,94,.18);color:#86efac' : o[0] === '-' ? 'background:rgba(239,68,68,.18);color:#fca5a5' : 'color:#94a3b8';
+        out += `<div style="${c};white-space:pre">${o[0]} ${esc(o[1])}</div>`;
+      });
+      if (!add && !del) return '<p class="hint mt-2">Kein Unterschied zum Estuary-Original.</p>';
+      return `<p class="hint mt-2">${add} Zeilen neu, ${del} Zeilen entfernt gegenüber Estuary${xml ? ' (XML einheitlich eingerückt)' : ''}.</p><div style="font:12px/1.45 ui-monospace,monospace;max-height:300px;overflow:auto;background:#020617;border-radius:8px;padding:6px">${out}</div>`;
+    }
+    // Vorlagen für neue Fenster
+    function tiWinTpl(kind, id, title, b, extra, FF) {
+      const C = S.titan.col, hx = c => String(c).slice(1).toUpperCase(), xe = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const wt = Object.keys(b.files).find(p => /^media\/(?:.+\/)?white\.png$/i.test(p)), W = wt ? wt.replace(/^media\//, '') : '';
+      let fonts = [];
+      try { const fd = new DOMParser().parseFromString(tiWinDec((FF && FF['xml/Font.xml']) || (WIN.raw && WIN.raw['xml/Font.xml']) || b.files['xml/Font.xml']), 'application/xml'); fonts = [...fd.getElementsByTagName('font')].map(f => { const n = [...f.children].find(k => k.tagName === 'name'); return n ? n.textContent.trim() : ''; }).filter(Boolean); } catch (e) {}
+      const fp = (...w) => w.find(x => fonts.includes(x)) || '', f1 = fp('font13', 'font12', 'font10'), f2 = fp('font14', 'font30', 'font13');
+      const ft = f => f ? `\n\t\t\t\t<font>${f}</font>` : '', tc = `\n\t\t\t\t<textcolor>FF${hx(C.text)}</textcolor>`;
+      const bg = (w, h) => W ? `\t\t\t<control type="image">\n\t\t\t\t<left>0</left>\n\t\t\t\t<top>0</top>\n\t\t\t\t<width>${w}</width>\n\t\t\t\t<height>${h}</height>\n\t\t\t\t<texture colordiffuse="F2${hx(C.dialog)}">${W}</texture>\n\t\t\t</control>\n` : '';
+      const lab = (l, t, w, h, txt, f, al, vis) => `\t\t\t<control type="label">\n\t\t\t\t<left>${l}</left>\n\t\t\t\t<top>${t}</top>\n\t\t\t\t<width>${w}</width>\n\t\t\t\t<height>${h}</height>\n\t\t\t\t<label>${txt}</label>${ft(f)}${tc}${al ? '\n\t\t\t\t<align>' + al + '</align>' : ''}\n\t\t\t\t<aligny>center</aligny>${vis ? '\n\t\t\t\t<visible>' + vis + '</visible>' : ''}\n\t\t\t</control>\n`;
+      const btn = (idn, l, t, w, h, txt, act, extra) => `\t\t\t<control type="button" id="${idn}">\n\t\t\t\t<left>${l}</left>\n\t\t\t\t<top>${t}</top>\n\t\t\t\t<width>${w}</width>\n\t\t\t\t<height>${h}</height>\n\t\t\t\t<label>${xe(txt)}</label>${ft(f1)}\n\t\t\t\t<textcolor>FF${hx(C.text)}</textcolor>\n\t\t\t\t<focusedcolor>FFFFFFFF</focusedcolor>\n\t\t\t\t<align>center</align>\n\t\t\t\t<aligny>center</aligny>${W ? `\n\t\t\t\t<texturefocus colordiffuse="FF${hx(C.focus)}">${W}</texturefocus>\n\t\t\t\t<texturenofocus colordiffuse="33FFFFFF">${W}</texturenofocus>` : ''}\n\t\t\t\t<onclick>${act}</onclick>${extra || ''}\n\t\t\t</control>\n`;
+      const head = def => `<?xml version="1.0" encoding="UTF-8"?>\n<window type="dialog" id="${id}">\n${def ? '\t<defaultcontrol always="true">' + def + '</defaultcontrol>\n' : ''}\t<controls>\n`;
+      const T = xe(title);
+      if (kind === 'settings') {
+        const items = extra || [], n = items.length, H = Math.min(960, 200 + (n + 1) * 82);
+        const rows = items.map((it, i) => `\t\t\t\t<control type="group">\n\t\t\t\t\t<width>620</width>\n\t\t\t\t\t<height>70</height>\n` +
+          btn(21 + i, 0, 0, 620, 70, it.l, 'Skin.ToggleSetting(' + it.n + ')') + lab(430, 0, 160, 70, 'An', f1, 'right', 'Skin.HasSetting(' + it.n + ')') + lab(430, 0, 160, 70, 'Aus', f1, 'right', '!Skin.HasSetting(' + it.n + ')') + `\t\t\t\t</control>\n`).join('') +
+          `\t\t\t\t<control type="group">\n\t\t\t\t\t<width>620</width>\n\t\t\t\t\t<height>70</height>\n` + btn(21 + n, 0, 0, 620, 70, 'Schließen', 'Action(PreviousMenu)') + `\t\t\t\t</control>\n`;
+        return head(21) + `\t\t<control type="group">\n\t\t\t<centerleft>50%</centerleft>\n\t\t\t<centertop>50%</centertop>\n\t\t\t<width>700</width>\n\t\t\t<height>${H}</height>\n` + bg(700, H) + lab(40, 24, 620, 60, T, f2) +
+          `\t\t\t<control type="grouplist" id="20">\n\t\t\t\t<left>40</left>\n\t\t\t\t<top>110</top>\n\t\t\t\t<width>620</width>\n\t\t\t\t<height>${H - 140}</height>\n\t\t\t\t<itemgap>12</itemgap>\n\t\t\t\t<orientation>vertical</orientation>\n\t\t\t\t<onback>Action(PreviousMenu)</onback>\n` + rows + `\t\t\t</control>\n\t\t</control>\n\t</controls>\n</window>\n`;
+      }
+      if (kind === 'menu') {
+        return head(21) + `\t\t<control type="group">\n\t\t\t<centerleft>50%</centerleft>\n\t\t\t<centertop>50%</centertop>\n\t\t\t<width>700</width>\n\t\t\t<height>520</height>\n` + bg(700, 520) + lab(40, 24, 620, 60, T, f2) +
+          `\t\t\t<control type="grouplist" id="20">\n\t\t\t\t<left>40</left>\n\t\t\t\t<top>110</top>\n\t\t\t\t<width>620</width>\n\t\t\t\t<height>380</height>\n\t\t\t\t<itemgap>12</itemgap>\n\t\t\t\t<orientation>vertical</orientation>\n\t\t\t\t<onback>Action(PreviousMenu)</onback>\n` +
+          [[21, 'Startseite', 'ActivateWindow(home)'], [22, 'Wiedergabe stoppen', 'PlayerControl(Stop)'], [23, 'Ton an/aus', 'Mute'], [24, 'Schließen', 'Action(PreviousMenu)']].map(x => btn(x[0], 0, 0, 620, 70, x[1], x[2]).replace(/^\t\t\t/gm, '\t\t\t\t')).join('') +
+          `\t\t\t</control>\n\t\t</control>\n\t</controls>\n</window>\n`;
+      }
+      if (kind === 'info') {
+        return head(0) + `\t\t<control type="group">\n\t\t\t<left>60</left>\n\t\t\t<top>60</top>\n\t\t\t<visible>Player.HasVideo | Player.HasAudio</visible>\n` + bg(900, 260) +
+          lab(30, 20, 840, 60, '$INFO[Player.Title]', f2) + lab(30, 90, 840, 50, '$INFO[Player.Time] / $INFO[Player.Duration]', f1) +
+          lab(30, 150, 840, 50, '$INFO[VideoPlayer.Genre]$INFO[MusicPlayer.Artist, – ]', f1) + `\t\t</control>\n\t</controls>\n</window>\n`;
+      }
+      return head(10) + `\t\t<control type="group">\n\t\t\t<centerleft>50%</centerleft>\n\t\t\t<centertop>50%</centertop>\n\t\t\t<width>900</width>\n\t\t\t<height>420</height>\n` + bg(900, 420) + lab(40, 24, 820, 60, T, f2) +
+        `\t\t\t<control type="textbox">\n\t\t\t\t<left>40</left>\n\t\t\t\t<top>100</top>\n\t\t\t\t<width>820</width>\n\t\t\t\t<height>200</height>\n\t\t\t\t<label>Hier steht dein Text.</label>${ft(f1)}${tc}\n\t\t\t</control>\n` + btn(10, 300, 330, 300, 60, 'Schließen', 'Action(PreviousMenu)') + `\t\t</control>\n\t</controls>\n</window>\n`;
+    }
+    function tiWinNew() {
+      const b = tiWinBase(); if (!b) return;
+      const id = parseInt($('ti-wn-id').value, 10), kind = $('ti-wn-tpl').value, title = String($('ti-wn-name').value || '').trim().slice(0, 60) || 'Mein Fenster';
+      if (!(id >= 1100 && id <= 1199)) return toast('Die Fensternummer muss zwischen 1100 und 1199 liegen.');
+      const nm = (title.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '') || 'Fenster').slice(0, 24), p = `xml/Custom_${id}_${nm}.xml`;
+      const used = new Set([...Object.keys(b.files), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])].map(x => (x.match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean));
+      if (used.has(String(id))) return toast('Die Nummer ' + id + ' ist schon vergeben (Estuary oder dein eigenes Fenster).');
+      S.titan.ov[p] = tiWinTpl(kind, id, title, b); save(); WIN.cur = p; WIN.diff = false; tiRe();
+      toast('Fenster angelegt. Öffnen mit ActivateWindow(' + id + ') – z. B. über einen Menüpunkt.');
+    }
+    function tiWinFreeId() {
+      const b = WIN.b, used = new Set([...(b ? Object.keys(b.files) : []), ...Object.keys(S.titan.ov), ...(tiSksetInfo() ? [tiSksetInfo().p] : [])].map(x => (x.match(/^xml\/Custom_(\d+)_/i) || [])[1]).filter(Boolean));
+      for (let i = 1150; i < 1200; i++) if (!used.has(String(i))) return i;
+      for (let i = 1100; i < 1150; i++) if (!used.has(String(i))) return i;
+      return 1150;
+    }
+    function tiWinMenu(id) {
+      tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + id + ')' }; m.label = (WIN.cur.match(/^xml\/Custom_\d+_(.+)\.xml$/) || [])[1] || 'Mein Fenster'; save(); tiRe();
+      toast('Menüpunkt „' + m.label + '“ öffnet jetzt das Fenster ' + id + ' – ganz oben im Hauptmenü.');
+    }
+    function tiWin() {
+      const T = S.titan, b = tiWinBase(), op = k => `${WIN.op[k] ? 'open' : ''} ontoggle="tiWinTg('${k}',this)"`;
+      let h = `<p class="hint mb-2">Hier bearbeitest du die Fenster des Skins – vom Bedienfeld beim Film (<b>Video-OSD</b>) über Dialoge bis zu den Einstellungen. Du kannst einzelne Knöpfe <b>ausblenden</b>, den XML-Text <b>von Hand ändern</b> oder ein <b>ganz neues Fenster</b> anlegen. Alles wird bei jedem Bauen automatisch angewendet.</p><div id="ti-win-prog" class="mb-2"></div>`;
+      if (!b) {
+        if (!WIN.tried) return h + '<p class="hint">Estuary wird aus dem Zwischenspeicher gelesen …</p>';
+        return h + `<div class="card"><b class="text-xs">🧬 Estuary ist noch nicht geladen</b><p class="hint mt-1">Die Fenster-Dateien kommen aus Estuary ${esc(TKODI[T.kodi][0])}. Einmal laden, dann bleiben sie im Browser gespeichert. (Ohne Internet: Reiter „🧬 Basis“ → eigene Skin-ZIP.)</p><button class="btn titb w-full mt-2" onclick="tiWinLoad()">⬇ Estuary laden (offiziell von Kodi)</button></div>`;
+      }
+      if (WIN.err) h += `<p class="hint mb-2" style="color:#fbbf24">⚠️ Die Generator-Änderungen konnten nicht berechnet werden (${esc(WIN.err)}). Gezeigt werden die Originale von Estuary.</p>`;
+      const has = p => !!b.files[p] || T.ov[p] != null, p = WIN.cur && has(WIN.cur) ? WIN.cur : '';
+      if (p) {
+        const inf = tiWinInfo(p), xml = /\.xml$/i.test(p), txt = tiWinCur(p), ctl = xml ? tiWinCtl(tiWinGen(p) || txt) : null, hid = T.hide[p] || [], hasOv = T.ov[p] != null, inBase = !!b.files[p];
+        const cm = p.match(/^xml\/Custom_(\d+)_/);
+        h += `<div class="card" id="ti-win-ed" style="border-color:#f59e0b"><div class="flex items-center gap-2"><b class="text-xs flex-1 min-w-0">${esc(inf ? inf[1] : p)}</b><button class="btn" aria-label="Schließen" onclick="WIN.cur='';tiRe()">✕</button></div>
+          <code class="lk" style="word-break:break-all">${esc(p)}</code> ${tiWinState(p).map(x => `<span class="hint">· ${esc(x)}</span>`).join(' ')}
+          <p class="hint mt-1">${esc(inf ? inf[2] : inBase ? 'Eine Datei von Estuary.' : 'Dein eigenes Fenster.')}</p>`;
+        if (ctl && ctl.length) {
+          h += `<details class="card mt-2" ${op('ctl')}><summary class="text-xs font-bold cursor-pointer">👁 Bedienelemente: ausblenden, verschieben, vergrößern${hid.length || Object.keys(T.tweak[p] || {}).length ? ' (' + (hid.length + Object.keys(T.tweak[p] || {}).length) + ' angepasst)' : ''}</summary>
+            <p class="hint mt-2">Haken = ausblenden (der Skin springt dann beim Bedienen über den Knopf). <b>⚙</b> = verschieben, vergrößern, umfärben, in der Reihenfolge verschieben oder je nach eigener Skin-Einstellung ausblenden. Das Verschieben wirkt nur auf die Darstellung, nicht auf die Bedien-Reihenfolge. ${hasOv ? '<b style="color:#fbbf24">Du hast diese Datei von Hand ersetzt – das Ausblenden wirkt dort nicht mehr.</b> Entweder „Zurück zur erzeugten“ oder im Text unten arbeiten.' : 'Speichere Textänderungen vorher, sonst gehen sie beim Umschalten verloren.'}</p>
+            <div style="max-height:380px;overflow:auto" class="mt-1">${ctl.map(c => {
+              const nm = p === 'xml/VideoOSD.xml' && TWOSD[c.id] ? TWOSD[c.id] : '', tw = !!(T.tweak[p] || {})[c.id];
+              return `<div class="row mt-1 text-xs" style="gap:6px"><label style="display:flex;gap:8px;flex:1;min-width:0;cursor:pointer;align-items:center"><input type="checkbox" ${hid.includes(c.id) ? 'checked' : ''} data-p="${esc(p)}" data-i="${c.id}" onchange="tiWinHide(this.dataset.p,this.dataset.i,this.checked)"><b>#${c.id}</b><span class="flex-1 min-w-0" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm ? esc(nm) + ' · ' : ''}<span class="hint">${esc(c.type)}${c.hint ? ' · ' + esc(c.hint) : ''}</span></span></label><button class="btn" aria-label="Feineinstellungen für ${c.id}" style="${tw ? 'border-color:#f59e0b;color:#fbbf24' : ''}" data-i="${c.id}" onclick="tiWinCtlOpen(this.dataset.i)">⚙</button></div>${WIN.ctlOpen === c.id ? tiWinTwPanel(p, c) : ''}`;
+            }).join('')}</div>
+            ${hid.length ? `<button class="btn w-full mt-2" data-p="${esc(p)}" onclick="tiWinShowAll(this.dataset.p)">Alle wieder einblenden</button>` : ''}</details>`;
+        }
+        if (xml) h += `<details class="card mt-2" ${op('sk')}><summary class="text-xs font-bold cursor-pointer">🖼 Vorschau (Skizze)</summary>${WIN.op.sk ? tiWinSketch(txt) : '<p class="hint mt-2">Wird beim Aufklappen gezeichnet.</p>'}</details>`;
+        h += `<textarea id="ti-wed" class="inp mt-2" rows="16" wrap="off" spellcheck="false" style="font:12px/1.45 ui-monospace,monospace;white-space:pre">${esc(txt)}</textarea>
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiWinSave()">💾 Meine Fassung speichern</button><button class="btn" onclick="tiWinReset()" ${hasOv ? '' : 'disabled'}>${inBase ? '↺ Zurück zur erzeugten' : '🗑 Fenster löschen'}</button></div>
+          <div class="grid grid-cols-2 gap-2 mt-2">${inBase ? `<button class="btn" onclick="tiWinDiff()">🔍 ${WIN.diff ? 'Vergleich schließen' : 'Vergleich mit Estuary'}</button><button class="btn" onclick="if(confirm('Die Originaldatei von Estuary einsetzen? Änderungen des Generators an dieser Datei entfallen dann.'))tiWinOrigSet()">⤺ Estuary-Original</button>` : ''}${cm ? `<button class="btn titb" style="grid-column:span 2" onclick="tiWinMenu(${cm[1]})">＋ Menüpunkt im Hauptmenü, der dieses Fenster öffnet</button>` : ''}</div>
+          ${WIN.diff && inBase ? tiWinDiffHtml(p) : ''}
+          <p class="hint mt-2">Deine Fassung <b>ersetzt die Datei komplett</b>; spätere Änderungen im Generator (Farben, Menü …) wirken dort dann nicht mehr. Ist der Text kein gültiges XML, wird er nicht gespeichert.</p></div>`;
+      }
+      const hot = k => tiWinState(k).length ? `<span class="hint">${esc(tiWinState(k).join(' · '))}</span>` : '';
+      h += TWINCAT.map((g, gi) => {
+        const it = g[1].filter(x => has(x[0])); if (!it.length) return '';
+        return `<details class="card mt-2" ${op('g' + gi)}><summary class="text-xs font-bold cursor-pointer">${g[0]} (${it.length})</summary>${it.map(x => `<div class="row mt-1" style="flex-direction:column;align-items:stretch;gap:2px;cursor:pointer;${x[0] === p ? 'border-color:#f59e0b' : ''}" data-p="${esc(x[0])}" onclick="tiWinSel(this.dataset.p)"><b class="text-xs">${esc(x[1])}</b><span class="hint">${esc(x[0].replace(/^xml\//, ''))} ${hot(x[0])}</span></div>`).join('')}</details>`;
+      }).join('');
+      h += `<details class="card mt-2" ${op('all')}><summary class="text-xs font-bold cursor-pointer">📂 Alle weiteren Fenster-Dateien</summary>
+          <input class="inp mt-2" placeholder="Dateien filtern, z. B. Dialog" value="${esc(WIN.filt)}" oninput="tiWinFilt(this.value)"><select id="ti-win-files" class="inp mt-1" size="6" onchange="tiWinSel(this.value)">${tiWinOpts()}</select>
+          <p class="hint mt-1">Für Dateien außerhalb von <code>xml/</code> (Farben, Sprache, Bilder) nimm den Reiter „🔧 Profi“.</p></details>
+        <details class="card mt-2" ${op('new')}><summary class="text-xs font-bold cursor-pointer">＋ Neues eigenes Fenster</summary>
+          <p class="hint mt-2">Legt eine neue Datei <code>xml/Custom_NUMMER_Name.xml</code> an. Kodi hat dafür die Nummern 1100–1199 vorgesehen. Geöffnet wird das Fenster mit <code>ActivateWindow(NUMMER)</code> – zum Beispiel über einen eigenen Menüpunkt.</p>
+          <div class="grid grid-cols-2 gap-2 mt-1"><div><label class="l">Nummer (1100–1199)</label><input id="ti-wn-id" class="inp" type="number" min="1100" max="1199" value="${tiWinFreeId()}"></div><div><label class="l">Titel</label><input id="ti-wn-name" class="inp" maxlength="60" value="Mein Fenster"></div></div>
+          <label class="l mt-1">Vorlage</label><select id="ti-wn-tpl" class="inp"><option value="popup">Hinweis-Fenster mit Titel, Text und Schließen-Knopf</option><option value="menu">Schnellmenü mit vier Knöpfen</option><option value="info">Info-Anzeige zum laufenden Titel (nur Text)</option></select>
+          <button class="btn titb w-full mt-2" onclick="tiWinNew()">＋ Fenster anlegen und bearbeiten</button></details>
+        <details class="card mt-2" ${op('sk2')}><summary class="text-xs font-bold cursor-pointer">⚙ Eigene Skin-Einstellungen${T.skset.length ? ' (' + T.skset.length + ')' : ''}</summary>
+          <p class="hint mt-2">Lege Schalter an, die du in Kodi ein- und ausschalten kannst, ohne den Skin neu zu bauen – z. B. „Stopp-Knopf im OSD ausblenden“. Der Generator erzeugt dafür ein Fenster <b>Skin-Optionen</b>. Verknüpfe einen Schalter mit einem Element: Fenster wählen → Bedienelemente → ⚙ → Sichtbarkeit. Das Element ist dann ausgeblendet, solange der Schalter <b>An</b> steht.</p>
+          ${T.skset.map((x, i) => `<div class="row mt-1.5"><input class="inp" value="${esc(x.l)}" maxlength="60" aria-label="Name der Einstellung" oninput="tiSkLabel(${i},this.value)"><code class="lk shrink-0 text-xs" title="Interner Name">${esc(x.n)}</code><button class="btn" aria-label="Einstellung löschen" onclick="tiSkDel(${i})">🗑</button></div>`).join('')}
+          <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiSkAdd()" ${T.skset.length >= 20 ? 'disabled' : ''}>＋ Einstellung</button><button class="btn" onclick="tiSkMenu()" ${T.skset.length ? '' : 'disabled'}>＋ Menüpunkt „Skin-Optionen“</button></div>
+          ${T.skset.length ? `<p class="hint mt-1">Das Fenster liegt als <code>${esc((tiSksetInfo() || {}).p || '')}</code> (öffnen mit <code>ActivateWindow(${(tiSksetInfo() || {}).id})</code>). <button class="btn" data-p="${esc((tiSksetInfo() || {}).p || '')}" onclick="tiWinSel(this.dataset.p)">Fenster ansehen</button></p>` : ''}</details>
+        <div class="row mt-2"><span class="hint flex-1">Nach Änderungen an Farben, Menü oder Layout zeigt der Reiter beim nächsten Öffnen automatisch die neue erzeugte Fassung.</span></div>`;
+      return h;
+    }
+
     function tiPro() {
       if (TPF.list === null) { TPF.list = {}; tiPfLoad().then(() => { if (S.titan && S.titan.tab === 'pro') tiRe(); }); }
       const T = S.titan, op = k => `${TPRO.op[k] ? 'open' : ''} ontoggle="TPRO.op['${k}']=this.open"`, ok = TPRO.fin && TPRO.kodi === T.kodi;
@@ -6229,6 +6802,11 @@ if __name__ == '__main__':
       // 6) Hinweise und Änderungsprotokoll
       F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: erstellt mit dem Kodi Video-Addon Generator (Titan-Modus)\n- Grundlage: Estuary ${b.branch || TKODI[T.kodi][0]} (phil65, Team Kodi)\n`);
       F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Video-Addon Generator v8.1 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
+      // Eigene Skin-Einstellungen: erzeugtes Fenster „Skin-Optionen“
+      if ((T.skset || []).length) {
+        try { const si = tiSksetFor(Object.keys(F).concat(Object.keys(T.ov))); F[si.p] = enc.encode(tiWinTpl('settings', si.id, 'Skin-Optionen', b, T.skset, F)); }
+        catch (e) { TLAYWARN.push('Skin-Optionen konnten nicht erzeugt werden: ' + (e.message || e)); }
+      }
       if (!raw) {
         const isT = p => /\.(xml|txt|json|po|md|py)$/i.test(p), xmlBad = t => new DOMParser().parseFromString(t, 'application/xml').getElementsByTagName('parsererror').length > 0;
         // Suchen & Ersetzen
@@ -6247,6 +6825,16 @@ if __name__ == '__main__':
             if (/\.xml$/i.test(p) && xmlBad(t2)) TLAYWARN.push('Ersetzen: ' + p + ' ist danach kein gültiges XML mehr');
           });
           TLAYWARN.push(n ? `Ersetzen „${rl.a.slice(0, 30)}“: ${n} Treffer in ${nf} Datei(en)` : `Ersetzen „${rl.a.slice(0, 30)}“: keine Treffer`);
+        });
+        // Steuerelemente ausblenden und feinjustieren (Reiter „Fenster“)
+        new Set([...Object.keys(T.hide || {}), ...Object.keys(T.tweak || {})]).forEach(p => {
+          const ids = (T.hide || {})[p] || [], tw = (T.tweak || {})[p] || {};
+          if (!ids.length && !Object.keys(tw).length) return;
+          if (!F[p]) { TLAYWARN.push('Fenster-Anpassung: ' + p + ' gibt es in dieser Estuary-Version nicht'); return; }
+          const r = tiCtlApply(dec.decode(F[p]), ids, tw);
+          if (!r) { TLAYWARN.push('Fenster-Anpassung: ' + p + ' ist kein gültiges XML'); return; }
+          F[p] = enc.encode(r.txt);
+          if (r.miss) TLAYWARN.push('Fenster-Anpassung in ' + p + ': ' + r.miss + ' Nummer(n) gibt es dort nicht');
         });
         // Eigene Dateien
         (T.xf || []).forEach(x => { try { F[x.p] = tiBytes(x.d); } catch (e) { TLAYWARN.push('Eigene Datei ' + x.p + ' konnte nicht gelesen werden'); } });
