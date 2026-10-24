@@ -3,10 +3,7 @@
 **Baue dein eigenes Kodi-Video-Addon mit individuellem Vollbild-Menü, einen kompletten Kodi-Skin oder ein Menü um ein vorhandenes Addon – ohne eine Zeile Code zu schreiben.**
 
 👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
-
-🪧 **Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
 
 > 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
@@ -20,7 +17,7 @@
 |---|---|---|
 | ⚡ | **Titan-Modus: dein eigener Kodi-Skin** | Der Generator baut den offiziellen Skin Estuary um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Export als `skin.<name>.zip`. |
 | 📐 | **Titan-Layout** | Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede Stelle ziehen. Das Hauptmenü auch als **einzelne Buttons, waagerecht oder senkrecht**, dazu **eigene Bilder als Dekoration**. |
-| 🪟 | **Titan-Fenster-Reiter** | Video-OSD, Zeitleiste, Dialoge, Musik- und Einstellungsfenster des Skins einzeln bearbeiten: Knöpfe **ausblenden, verschieben, vergrößern, umfärben**, Skizzen-Vorschau, **eigene Skin-Einstellungen** (Schalter in Kodi), XML von Hand ändern, mit Estuary vergleichen, **neue eigene Fenster** aus Vorlagen anlegen. |
+| 🪟 | **Titan-Fenster-Reiter** | Video-OSD, Zeitleiste, Dialoge, Musik- und Einstellungsfenster des Skins einzeln bearbeiten: Knöpfe **ausblenden, verschieben, vergrößern, umfärben**, Skizzen-Vorschau, **eigene Skin-Einstellungen** (Schalter in Kodi), XML von Hand ändern, mit Estuary vergleichen, **Bilder der Fenster gegen eigene tauschen**, **neue eigene Fenster** aus Vorlagen anlegen. |
 | 🔧 | **Titan-Profi-Reiter** | Änderungen an Estuary vergleichen und von Hand anpassen, Suchen-und-Ersetzen-Regeln, eigene Dateien im Skin, Estuary-Widgetreihen ausblenden, Profile für mehrere Varianten, Undo/Redo. |
 | 🧩 | **Fremd-Addon einbinden** | Du hast schon ein Addon (ZIP)? Der Generator packt es in dein Addon, entpackt und aktiviert es beim Installieren und zeigt es in deinem Menü: als Live-Browser, Kachel-Raster, Liste, Taschenrechner oder Linux-Desktop. |
 | 📂 | **Live-Browser** | Ordner eines Addons gehen in **deinem Skin** auf, Zurück geht eine Ebene hoch, Videos starten direkt. Kodis eigene Ansicht taucht nicht auf. |

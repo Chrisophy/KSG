@@ -643,7 +643,7 @@ System|♻|Kodi neu starten|RestartApp|Startet nur Kodi neu
 System|❌|Kodi beenden|Quit|Schließt Kodi
 System|😴|Ruhezustand|Suspend|Gerät in den Ruhezustand
 System|🔁|Gerät neu starten|Reboot|Startet das ganze Gerät neu
-System|🔌|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
+System|⏻|Gerät ausschalten|Powerdown|Fährt das Gerät herunter
 System|⏲|Sleep-Timer 30 Minuten|AlarmClock(Schlaftimer,Quit,30,silent)|Beendet Kodi nach 30 Minuten
 System|🚫|Sleep-Timer abbrechen|CancelAlarm(Schlaftimer)|Bricht den Sleep-Timer ab
 System|🐞|Debug-Log umschalten|ToggleDebug|Ausführliches Protokoll an/aus
@@ -803,7 +803,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       const title = t => mk('text', { label: t, x: 100, y: 50, w: 900, h: 110, font: 'font45', anim: ['left'] });
       const menu = [['Filme', '🎬', 'page', 'filme'], ['Serien', '📺', 'custom', 'ActivateWindow(videos,videodb://tvshows/titles/,return)'], ['Live TV', '📡', 'page', 'tv'], ['Musik', '🎵', 'page', 'musik'], ['Info', 'ℹ', 'page', 'info']]
         .map((m, i) => btn(m[0], m[1], 100, 270 + i * 116, m[2], m[3], { w: 440, h: 96, al: 'left', anim: ['left'], adelay: i * 80 }));
-      menu.push(btn('Beenden', '🔌', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
+      menu.push(btn('Beenden', '⏻', 100, 850, 'exit', '', { w: 440, h: 96, al: 'left', color: '#334155', ask: 'Kino-Hub wirklich verlassen?', anim: ['left'], adelay: 400 }));
       const tile = (l, cmd) => li(l, '', 'custom', cmd);
       return [
         p('home', 'Start', [
@@ -4906,13 +4906,13 @@ if __name__ == '__main__':
     const TBLK = [
       ['logo', '🏷', 'Logo', 'oben links', { x: 94, y: 30, w: 240, h: 56 }, '#f472b6', true],
       ['clock', '🕒', 'Uhr & Datum', 'obere Leiste rechts', { x: 1300, y: 18, w: 600, h: 110 }, '#38bdf8', true],
-      ['buttons', '🔌', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
+      ['buttons', '⏻', 'Knöpfe über dem Menü', 'Ausschalten, Einstellungen, Suche', { x: 0, y: 100, w: 462, h: 110 }, '#a78bfa', true],
       ['menu', '📋', 'Hauptmenü', 'die Liste mit Filme, Serien, Musik …', { x: 0, y: 240, w: 462, h: 760 }, '#f59e0b', true],
       ['widgets', '🧩', 'Widget-Bereich', 'alle Reihen rechts vom Menü', { x: 462, y: 60, w: 1458, h: 900 }, '#34d399', true],
       ['bottom', '🎵', 'Player-Leiste', 'unten, nur wenn etwas läuft', { x: 0, y: 972, w: 1920, h: 108 }, '#fb7185', true]
     ];
     // Knöpfe über dem Menü, wenn sie einzeln platziert werden: [Schlüssel, Symbol, Name]
-    const TTOP = [['power', '🔌', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
+    const TTOP = [['power', '⏻', 'Ausschalten'], ['settings', '⚙', 'Einstellungen'], ['search', '🔍', 'Suche']];
     const defTp = () => ({ power: { x: -8, y: 100 }, settings: { x: 172, y: 100 }, search: { x: 352, y: 100 } });
     const defLay = () => {
       const b = {}; TBLK.forEach(x => { b[x[0]] = { dx: 0, dy: 0, show: true }; });
@@ -5185,7 +5185,7 @@ if __name__ == '__main__':
         : `<div style="position:absolute;left:94px;top:30px;height:56px;display:flex;align-items:center;gap:10px;font:700 40px Arial;letter-spacing:4px;color:${C.text}"><span style="display:inline-block;width:44px;height:44px;border-radius:10px;background:${C.focus};transform:rotate(45deg) scale(.75)"></span>KODI</div>`;
       const now = new Date();
       P.clock = `<div style="position:absolute;left:1260px;width:600px;top:22px;text-align:right;color:${C.text}"><div style="font:400 64px Arial;line-height:1">${now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div><div style="font:400 26px Arial;color:${C.grey};margin-top:6px">${now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>`;
-      const tb = [['power', '🔌'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
+      const tb = [['power', '⏻'], ['settings', '⚙'], ['search', '🔍']].filter(x => T.top[x[0]]);
       P.buttons = single ? '' : `<div style="position:absolute;left:0;top:100px;width:462px;height:110px;display:flex;justify-content:space-around;align-items:center;font-size:52px;color:${C.text}">${tb.map(x => `<span style="opacity:.85">${x[1]}</span>`).join('')}</div>`;
       const tbs = !single ? '' : tb.map(x => { const p = L.tp[x[0]]; return `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;color:${C.text};opacity:.85">${x[1]}</div>`; }).join('');
       // Hauptmenü: Liste wie Estuary oder einzelne Buttons
@@ -5410,7 +5410,7 @@ if __name__ == '__main__':
           <div class="flex flex-wrap gap-1.5 mt-2 items-center"><span class="hint">Alle Buttons:</span><button class="btn" onclick="tiMbArrange('dh')" title="Abstände waagerecht angleichen">↔ verteilen</button><button class="btn" onclick="tiMbArrange('dv')" title="Abstände senkrecht angleichen">↕ verteilen</button><button class="btn" onclick="tiMbArrange('row')" title="alle auf die Höhe des ersten">≡ eine Reihe</button><button class="btn" onclick="tiMbArrange('col')" title="alle unter den ersten">‖ eine Spalte</button></div>` : '<p class="hint mt-1">Das Menü bleibt eine Liste wie bei Estuary und lässt sich als Ganzes verschieben. Für waagerechte Menüs und frei platzierte Buttons wähle „Einzelne Buttons“.</p>'}
         </div>`;
       h += btn ? tiMbList().map(m => tiLayRow('mb:' + m.id)).join('') : tiLayRow('menu');
-      h += `<div class="card mt-3"><b class="text-xs">🔌 Knöpfe über dem Menü</b>
+      h += `<div class="card mt-3"><b class="text-xs">⏻ Knöpfe über dem Menü</b>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${sgl ? '' : 'titb'}" onclick="tiLayTm('group')">Zusammen (Leiste)</button><button class="btn ${sgl ? 'titb' : ''}" onclick="tiLayTm('single')">Einzeln platzieren</button></div></div>`;
       h += sgl ? TTOP.map(x => tiLayRow('tb:' + x[0])).join('') : tiLayRow('buttons');
       ['widgets', 'logo', 'clock', 'bottom'].forEach(k => { h += tiLayRow(k); });
@@ -5853,7 +5853,7 @@ if __name__ == '__main__':
     ];
     // Bekannte Bedienelemente der Estuary-Video-OSD (Nummer → Name)
     const TWOSD = { 200: 'Gruppe: alle OSD-Knöpfe', 201: 'Knopfreihe 1 (Wiedergabe)', 202: 'Knopfreihe 2 (Zusatzknöpfe)', 698: 'Gruppe: Wiedergabe-Knopf', 6000: 'Zeitleisten-Gruppe', 600: 'Vorheriger Titel', 601: 'Zurückspulen', 602: 'Wiedergabe / Pause', 603: 'Stopp', 606: 'Vorspulen', 607: 'Nächster Titel', 608: 'Aufnehmen', 804: 'Startseite', 70040: 'Senderliste', 70041: 'Programm (EPG)', 70042: 'Wiedergabeliste', 70043: 'Information', 70044: 'Lesezeichen', 70045: 'Videotext', 70046: 'Streams', 70047: 'Stereoskopie', 70048: 'Einstellungen' };
-    let WIN = { ctlOpen: '', cur: '', filt: '', b: null, raw: null, kodi: '', dirty: true, tried: false, tk: '', busy: false, err: '', diff: false, op: { g0: true } };
+    let WIN = { imgT: '', fit: true, ctlOpen: '', cur: '', filt: '', b: null, raw: null, kodi: '', dirty: true, tried: false, tk: '', busy: false, err: '', diff: false, op: { g0: true } };
     const tiWinInfo = p => { for (const g of TWINCAT) { const x = g[1].find(q => q[0] === p); if (x) return x; } return null; };
     const tiWinDec = u => new TextDecoder().decode(u || new Uint8Array());
     // Grundlage + berechnete Fassung (ohne von Hand ersetzte Dateien); null, solange Estuary noch nicht geladen ist
@@ -5979,6 +5979,61 @@ if __name__ == '__main__':
       WIN.dirty = true; save(); tiRe();
     }
     function tiSkMenu() { const si = tiSksetInfo(); if (!si) return; tiMAdd('cmd'); const m = S.titan.menu[0]; m.act = { t: 'cmd', v: 'ActivateWindow(' + si.id + ')' }; m.label = 'Skin-Optionen'; save(); tiRe(); toast('Menüpunkt „Skin-Optionen“ öffnet das Einstellungsfenster – ganz oben im Hauptmenü.'); }
+    // Bilder eines Fensters finden und gegen eigene tauschen (landen als „Eigene Datei“ am Originalpfad)
+    function tiWinImgs(txt) {
+      const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length || !WIN.b) return [];
+      const map = new Map(), isImg = v => /^[\w\-./ ]+\.(png|jpe?g|gif|webp)$/i.test(v) && !/^(https?:|special:|\/)/.test(v);
+      const note = (v, el) => {
+        v = String(v || '').trim(); if (!isImg(v)) return;
+        let a = el, id = ''; while (a && a.nodeType === 1) { if (a.tagName === 'control' && /^\d+$/.test(a.getAttribute('id') || '')) { id = a.getAttribute('id'); break; } a = a.parentNode; }
+        const o = map.get(v) || { v, ids: new Set() }; if (id) o.ids.add(id); map.set(v, o);
+      };
+      [...d.getElementsByTagName('*')].forEach(e => { if (e.tagName === 'param') note(e.getAttribute('value'), e); else if (!e.children.length) note(e.textContent, e); });
+      const out = []; map.forEach(o => { const p = ['media/' + o.v, o.v].find(x => WIN.b.files[x]); if (p) out.push({ v: o.v, p, ids: [...o.ids] }); });
+      return out.slice(0, 80);
+    }
+    const tiImgMime = f => /\.jpe?g$/i.test(f) ? 'image/jpeg' : /\.gif$/i.test(f) ? 'image/gif' : /\.webp$/i.test(f) ? 'image/webp' : 'image/png';
+    function tiWinImgBlock(p, txt, op) {
+      const T = S.titan, im = tiWinImgs(txt); if (!im.length) return '';
+      const rows = im.map(x => {
+        const xf = T.xf.find(q => q.p === x.p), src = xf ? xf.d : extBytesToData(WIN.b.files[x.p], tiImgMime(x.p));
+        return `<div class="row mt-1 text-xs" style="gap:8px"><img src="${src}" alt="" style="width:44px;height:44px;object-fit:contain;background:repeating-conic-gradient(#334155 0 25%,#1e293b 0 50%) 50%/12px 12px;border-radius:6px;flex-shrink:0" onload="this.nextElementSibling.querySelector('[data-dim]').textContent=this.naturalWidth+'×'+this.naturalHeight"><span class="flex-1 min-w-0"><b style="word-break:break-all">${esc(x.v)}</b>${xf ? ' <span style="color:#fbbf24">✎ ersetzt</span>' : ''}<br><span class="hint" data-dim></span>${x.ids.length ? ' <span class="hint">· #' + x.ids.slice(0, 6).join(' #') + '</span>' : ''}</span><button class="btn" data-p="${esc(x.p)}" onclick="tiWinImgPick(this.dataset.p)">🖼 Tauschen</button>${xf ? `<button class="btn" aria-label="Original wiederherstellen" data-p="${esc(x.p)}" onclick="tiWinImgReset(this.dataset.p)">↺</button>` : ''}</div>`;
+      }).join('');
+      const n = im.filter(x => T.xf.some(q => q.p === x.p)).length;
+      return `<details class="card mt-2" ${op}><summary class="text-xs font-bold cursor-pointer">🖼 Bilder in diesem Fenster (${im.length})${n ? ' · ' + n + ' ersetzt' : ''}</summary>
+        <p class="hint mt-2">Tausche die Bilder dieses Fensters gegen eigene. Das neue Bild bekommt den Pfad des Originals, der Skin findet es also von selbst. Es erscheint auch unter „🔧 Profi → Eigene Dateien“ und lässt sich dort wieder entfernen.</p>
+        <label class="text-xs mt-1" style="display:flex;gap:6px;align-items:center"><input type="checkbox" ${WIN.fit !== false ? 'checked' : ''} onchange="WIN.fit=this.checked"> Auf die Größe des Originals bringen (Seitenverhältnis bleibt, Rand transparent)</label>
+        <div style="max-height:360px;overflow:auto" class="mt-1">${rows}</div></details>`;
+    }
+    function tiWinImgPick(path) { WIN.imgT = path; const e = $('f-wimg'); if (e) e.click(); }
+    function tiWinImgReset(path) { S.titan.xf = S.titan.xf.filter(q => q.p !== path); save(); tiRe(); toast('Original wiederhergestellt.'); }
+    function tiWinImgSet(inp) {
+      const f = inp.files[0], path = WIN.imgT; inp.value = ''; if (!f || !path || !WIN.b || !WIN.b.files[path]) return;
+      if (!/^image\//.test(f.type)) return toast('Bitte eine Bilddatei wählen (PNG, JPG …).');
+      if (f.size > 2.5e6) return toast(f.name + ' ist zu groß (max. 2,5 MB).');
+      const tm = /\.jpe?g$/i.test(path) ? 'image/jpeg' : /\.png$/i.test(path) ? 'image/png' : '';
+      if (!tm) return toast('Dieses Bildformat kann ich hier nicht umwandeln – bitte unter „Profi → Eigene Dateien“ eine passende Datei mit diesem Pfad hinzufügen.');
+      const r = new FileReader();
+      r.onload = () => {
+        const im = new Image(); im.onerror = () => toast('Das Bild konnte nicht gelesen werden.');
+        im.onload = () => {
+          const o = new Image();
+          const done = (W, H) => {
+            const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+            if (tm === 'image/jpeg') { x.fillStyle = '#000'; x.fillRect(0, 0, W, H); }
+            const k = Math.min(W / im.naturalWidth, H / im.naturalHeight), w = im.naturalWidth * k, h = im.naturalHeight * k; x.drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+            const ent = { p: path, d: c.toDataURL(tm, .92), n: f.name }, i = S.titan.xf.findIndex(q => q.p === path);
+            if (i >= 0) S.titan.xf[i] = ent; else if (S.titan.xf.length < 30) S.titan.xf.push(ent); else return toast('Maximal 30 eigene Dateien.');
+            save(); tiRe(); toast('Bild ersetzt: ' + path.split('/').pop() + ' (' + W + '×' + H + ')');
+          };
+          o.onload = () => done(WIN.fit !== false ? o.naturalWidth : im.naturalWidth, WIN.fit !== false ? o.naturalHeight : im.naturalHeight);
+          o.onerror = () => done(im.naturalWidth, im.naturalHeight);
+          o.src = extBytesToData(WIN.b.files[path], tm);
+        };
+        im.src = r.result;
+      };
+      r.readAsDataURL(f);
+    }
     // Schemaskizze eines Fensters (Größen und Plätze geschätzt)
     function tiWinSketch(txt) {
       const d = new DOMParser().parseFromString(txt, 'application/xml'); if (d.getElementsByTagName('parsererror').length) return '';
@@ -6116,7 +6171,7 @@ if __name__ == '__main__':
     }
     function tiWin() {
       const T = S.titan, b = tiWinBase(), op = k => `${WIN.op[k] ? 'open' : ''} ontoggle="tiWinTg('${k}',this)"`;
-      let h = `<p class="hint mb-2">Hier bearbeitest du die Fenster des Skins – vom Bedienfeld beim Film (<b>Video-OSD</b>) über Dialoge bis zu den Einstellungen. Du kannst einzelne Knöpfe <b>ausblenden</b>, den XML-Text <b>von Hand ändern</b> oder ein <b>ganz neues Fenster</b> anlegen. Alles wird bei jedem Bauen automatisch angewendet.</p><div id="ti-win-prog" class="mb-2"></div>`;
+      let h = `<p class="hint mb-2">Hier bearbeitest du die Fenster des Skins – vom Bedienfeld beim Film (<b>Video-OSD</b>) über Dialoge bis zu den Einstellungen. Du kannst einzelne Knöpfe <b>ausblenden</b>, den XML-Text <b>von Hand ändern</b> oder ein <b>ganz neues Fenster</b> anlegen. Alles wird bei jedem Bauen automatisch angewendet.</p><div id="ti-win-prog" class="mb-2"></div><input type="file" id="f-wimg" accept="image/*" class="hidden" onchange="tiWinImgSet(this)">`;
       if (!b) {
         if (!WIN.tried) return h + '<p class="hint">Estuary wird aus dem Zwischenspeicher gelesen …</p>';
         return h + `<div class="card"><b class="text-xs">🧬 Estuary ist noch nicht geladen</b><p class="hint mt-1">Die Fenster-Dateien kommen aus Estuary ${esc(TKODI[T.kodi][0])}. Einmal laden, dann bleiben sie im Browser gespeichert. (Ohne Internet: Reiter „🧬 Basis“ → eigene Skin-ZIP.)</p><button class="btn titb w-full mt-2" onclick="tiWinLoad()">⬇ Estuary laden (offiziell von Kodi)</button></div>`;
@@ -6138,6 +6193,7 @@ if __name__ == '__main__':
             }).join('')}</div>
             ${hid.length ? `<button class="btn w-full mt-2" data-p="${esc(p)}" onclick="tiWinShowAll(this.dataset.p)">Alle wieder einblenden</button>` : ''}</details>`;
         }
+        if (xml) h += tiWinImgBlock(p, tiWinGen(p) || txt, op('img'));
         if (xml) h += `<details class="card mt-2" ${op('sk')}><summary class="text-xs font-bold cursor-pointer">🖼 Vorschau (Skizze)</summary>${WIN.op.sk ? tiWinSketch(txt) : '<p class="hint mt-2">Wird beim Aufklappen gezeichnet.</p>'}</details>`;
         h += `<textarea id="ti-wed" class="inp mt-2" rows="16" wrap="off" spellcheck="false" style="font:12px/1.45 ui-monospace,monospace;white-space:pre">${esc(txt)}</textarea>
           <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn titb" onclick="tiWinSave()">💾 Meine Fassung speichern</button><button class="btn" onclick="tiWinReset()" ${hasOv ? '' : 'disabled'}>${inBase ? '↺ Zurück zur erzeugten' : '🗑 Fenster löschen'}</button></div>
@@ -6341,7 +6397,7 @@ if __name__ == '__main__':
           <label class="l">Abdunkeln <span class="text-amber-300" id="ti-dim">${T.bg.dim} %</span></label><input type="range" min="0" max="90" value="${T.bg.dim}" class="w-full" oninput="tiSet('bg.dim',+this.value);$('ti-dim').textContent=this.value+' %'">${T.bg.img ? '' : '<p class="hint">Noch kein Bild gewählt – bis dahin bleibt das Estuary-Muster.</p>'}` : '<p class="hint mt-1">Das Muster nimmt deine Farben aus „🎨 Farben“ an.</p>'}</div>
         <div class="card mt-3"><b class="text-xs">🏷 Logo oben links</b><p class="hint mt-1">Ersetzt das Kodi-Logo auf der Startseite. Am besten ein PNG mit durchsichtigem Hintergrund im Querformat.</p>
           <div class="flex gap-2 mt-2 items-center">${T.logo ? `<img src="${T.logo}" alt="Logo" style="height:32px;max-width:120px;object-fit:contain;background:#0b1220;border-radius:6px;padding:2px">` : ''}<button class="btn flex-1" onclick="$('f-tlogo').click()">🖼 ${T.logo ? 'Anderes Logo' : 'Logo wählen'}</button>${T.logo ? '<button class="btn" onclick="tiSet(\'logo\',null,true)">✖ Kodi-Logo</button>' : ''}</div></div>
-        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '🔌 Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
+        <div class="card mt-3"><b class="text-xs">⬆ Knöpfe über dem Menü</b>${tg('power', '⏻ Ausschalten-Menü')}${tg('settings', '⚙ Einstellungen')}${tg('search', '🔍 Suche')}</div>
         <div class="card mt-3"><b class="text-xs">🔤 Schrift</b>
           <label class="l">Schriftgröße <span class="text-amber-300" id="ti-fs">${T.fontScale} %</span></label><input type="range" min="80" max="130" step="5" value="${T.fontScale}" class="w-full" oninput="tiSet('fontScale',+this.value);$('ti-fs').textContent=this.value+' %'">
           <p class="hint">Gilt für den ganzen Skin. 100 % = wie Estuary.</p>
