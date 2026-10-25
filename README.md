@@ -1,12 +1,9 @@
-# 🔌 Kodi Video-Addon Generator v9.0 Pro by IT('s) Possible (-W.I.P.-)
+# 🔌 Kodi Addon & Skin Generator v9.1 Pro by IT('s) Possible (-W.I.P.-)
 
 **Baue dein eigenes Kodi-Video-Addon mit individuellem Vollbild-Menü, einen kompletten Kodi-Skin oder ein Menü um ein vorhandenes Addon – ohne eine Zeile Code zu schreiben.**
 
 👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
-
-🪧 **Verschiedene Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
 
 > 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
@@ -14,7 +11,7 @@
 
 ---
 
-## 🆕 Neu im Update vom 24.10.2026
+## 🆕 Neu im Update vom 23.10.2026
 
 | | Neuheit | Was sie bringt |
 |---|---|---|
@@ -23,6 +20,7 @@
 | 🪟 | **Titan-Fenster-Reiter** | Video-OSD, Zeitleiste, Dialoge, Musik- und Einstellungsfenster des Skins einzeln bearbeiten: Knöpfe **ausblenden, verschieben, vergrößern, umfärben**, Skizzen-Vorschau, **eigene Skin-Einstellungen** (Schalter in Kodi), XML von Hand ändern, mit Estuary vergleichen, **Bilder der Fenster gegen eigene tauschen**, **neue eigene Fenster** aus Vorlagen anlegen. |
 | 🎭 | **Skin-Modus für beliebige Skins** | Die ZIP eines anderen Kodi-Skins laden (getestet mit Bello 10): Der Generator erkennt den Fenster-Ordner und die Bausteine (Includes) selbst. Fenster bearbeiten (Knöpfe ausblenden/verschieben/umfärben, Bilder tauschen, neue Fenster, eigene Schalter) und als eigenen Skin mit neuer ID exportieren – Original-Autor und Lizenz bleiben erhalten. |
 | 🔧 | **Titan-Profi-Reiter** | Änderungen an Estuary vergleichen und von Hand anpassen, Suchen-und-Ersetzen-Regeln, eigene Dateien im Skin, Estuary-Widgetreihen ausblenden, Profile für mehrere Varianten, Undo/Redo. |
+| 📜 | **Script-Werkstatt** | Eigene **Programm-Addons, Scripte, Hintergrund-Dienste, Module und Kontextmenü-Einträge** bauen: fertiges Python-Gerüst mit Einstellungen, Code-Editor mit Bausteinen und Syntax-Sichtprüfung, ZIP-Export. Scripte lassen sich in jedem Menü-/Skin-Button per `RunScript(…)` aufrufen (Gruppe „Scripte“ in der Befehlsliste) oder ins Menü-Addon einbetten. |
 | 🧩 | **Fremd-Addon einbinden** | Du hast schon ein Addon (ZIP)? Der Generator packt es in dein Addon, entpackt und aktiviert es beim Installieren und zeigt es in deinem Menü: als Live-Browser, Kachel-Raster, Liste, Taschenrechner oder Linux-Desktop. |
 | 📂 | **Live-Browser** | Ordner eines Addons gehen in **deinem Skin** auf, Zurück geht eine Ebene hoch, Videos starten direkt. Kodis eigene Ansicht taucht nicht auf. |
 | 🔗 | **Abhängigkeiten automatisch** | Module wie `bs4`, `requests` oder `feedparser` erkennt der Generator im Code und trägt sie selbst in die `addon.xml` ein – kein `No module named …` mehr. |
@@ -142,7 +140,7 @@ plugin.video.<projektname>/
 **Kostenlos, aber nicht Open Source.** Es gilt die **[IT('s) Possible Freeware-Lizenz](LICENSE)**.
 
 ```text
-Kodi Video-Addon Generator v9.0 Pro – Copyright (c) 2026 Team IT('s) Possible
+Kodi Addon & Skin Generator v9.1 Pro – Copyright (c) 2026 Team IT('s) Possible
 Stand 2026.10.23. Alle Rechte vorbehalten.
 ```
 

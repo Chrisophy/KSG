@@ -1,11 +1,11 @@
-# 📖 Handbuch – Kodi Video-Addon Generator v9.0 Pro by IT('s) Possible
+# 📖 Handbuch – Kodi Addon & Skin Generator v9.1 Pro by IT('s) Possible
 
 Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail – mit dem **⚡ Titan-Modus** baust du sogar einen echten Kodi-Skin für ganz Kodi (Teil G) – und mit **📦 Fremd-Addon** packst du ein vorhandenes Addon (ZIP) in dein Menü und zeigst es im eigenen Skin, mit eigenem Kontextmenü und Favoriten (Teil H).
 
 > 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
 **Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-**Verschiedene Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
+
 ---
 
 ## Inhalt
@@ -83,6 +83,7 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 51. [Fenster (Video-OSD & Co.) und Profi-Reiter](#k51)
 52. [Export und Installation](#k52)
     - 52a. [Andere Skins bearbeiten (Skin-Modus)](#k52a)
+    - 52b. [Eigene Scripte, Programme und Dienste bauen (Script-Werkstatt)](#k52b)
 
 **Teil H – Fremd-Addon, Live-Browser und Kontextmenü**
 
@@ -1434,6 +1435,55 @@ Der Titan-Modus kann mehr als Estuary: Du kannst die ZIP **jedes Kodi-Skins** la
 
 **Lizenz beachten:** Ein veränderter Skin bleibt eine Abwandlung des Originals – es gilt dessen Lizenz (Bello z. B. CC BY-NC-SA: Namensnennung, nicht kommerziell, Weitergabe unter gleichen Bedingungen). Der Generator trägt den Original-Autor in die `addon.xml` ein, legt `ANPASSUNG.txt` bei, ergänzt `changelog.txt` und lässt die `LICENSE.txt` unverändert. Im Reiter 📦 Export stehen die Lizenz und die nötigen Zusatz-Addons als Hinweis.
 
+<a id="k52b"></a>
+
+## 52b. Eigene Scripte, Programme und Dienste bauen (Script-Werkstatt)
+
+Neben Video-Addons und Skins kannst du mit dem Generator auch **Programme, Scripte, Hintergrund-Dienste, Module und Kontextmenü-Einträge** anlegen. Der Generator schreibt das komplette Gerüst (`addon.xml`, Python-Dateien, Einstellungen, Symbole). **Deinen eigenen Python-Code** setzt du an die Stellen, die mit `>>> DEIN CODE` markiert sind.
+
+Öffnen: Kopfzeile **📜 Script** (oder im Bereich 5 · Addon-Bilder & Dateien → **📜 Script-Werkstatt**).
+
+**Die fünf Arten**
+
+| Art | ID beginnt mit | Wofür | Wie wird es gestartet? |
+|---|---|---|---|
+| 🕹 **Programm-Addon** | `plugin.program.` | Eine Liste mit Aktionen unter „Programme“; jeder Eintrag führt deinen Code aus. | Über Addons → Programm-Addons oder `RunAddon(ID)`; eine einzelne Aktion mit `RunPlugin(plugin://ID/?aktion=kennung)`. |
+| 📜 **Script** | `script.` | Code, den Menü, Skin oder Tastenbelegung aufrufen; optional auch unter „Programme“. | `RunScript(ID)` oder `RunScript(ID,befehl,angabe2,…)` – die Angaben kommen als Liste an. |
+| ⚙ **Dienst** | `service.` | Läuft unsichtbar im Hintergrund (Timer, Überwachung, Automatik). | Startet von selbst nach der Anmeldung (oder sofort beim Kodi-Start). |
+| 📚 **Modul** | `script.module.` | Sammlung von Funktionen für andere Addons (`import …`). | Andere Addons tragen die ID als Abhängigkeit ein. |
+| ☰ **Kontextmenü-Eintrag** | `context.` | Zusätzlicher Eintrag im Kontextmenü (lange drücken / Taste C), z. B. nur bei Filmen. | Wählt der Nutzer den Eintrag, läuft `context.py`. |
+
+**So geht's**
+
+1. Links unter **＋ Neu anlegen** die Art wählen.
+2. **📋 Angaben:** Name, ID, Version, Autor, Beschreibung und je nach Art die Besonderheiten:
+   - *Programm:* die **Aktionen** (Name + Kennung) und ob die erste Aktion ohne Liste direkt startet.
+   - *Script:* die **Befehle** (RunScript-Angaben) und ob es auch unter „Programme“ erscheint.
+   - *Dienst:* Start (nach Anmeldung / sofort) und **Intervall**; auf Wunsch als Einstellung änderbar.
+   - *Modul:* die **Funktionen**, die es anbietet.
+   - *Kontextmenü:* Text im Menü und wann es erscheint (Filme, Serien, Episoden, Musik, Addon-Einträge oder eine eigene Kodi-Bedingung).
+   - **⚙ Einstellungen** (Schalter, Text, Zahl, Auswahlliste): erscheinen in Kodi unter *Addon → Konfigurieren*; im Code liest du sie mit `cfg('kennung')`.
+   - **Abhängigkeiten:** Kodi-Module, die du mit `import` benutzt (z. B. `requests`, `bs4`), trägt der Generator selbst ein.
+3. **💻 Code:** Hier steht die Hauptdatei als fertiges Gerüst. Solange du den Code nicht selbst änderst, **passt er sich den Angaben automatisch an**. Dazu gibt es:
+   - **＋ Baustein einfügen:** fertige Python-Zeilen (Meldung, Ja/Nein-Frage, Texteingabe, Auswahlliste, Fortschrittsbalken, JSON-RPC, Einstellungen lesen/speichern, Dateien, Internet-Abruf, Video abspielen, Warteschleife …). Fehlende `import`-Zeilen werden mitgesetzt, die Einrückung passt sich an.
+   - **＋ Datei:** weitere Python-Dateien (landen in `resources/lib/`, Import mit `from resources.lib import name`).
+   - **🔄 Gerüst neu erzeugen** und **➕ Fehlende Einträge ergänzen** (trägt neue Aktionen/Befehle in schon bearbeiteten Code nach).
+   - **🔍 Prüfen:** Sichtprüfung auf offene Klammern, nicht geschlossene Texte, fehlende Doppelpunkte, gemischte Einrückung und Python-2-`print`. Das ist **kein echter Python-Lauf** – Kodi meldet echte Fehler erst beim Start im Log (*Einstellungen → System → Protokollierung*).
+4. **📦 Export & Einbinden:** zeigt, was in der ZIP steckt, und exportiert `ID.zip`. Installation: ZIP auf das Gerät kopieren → *Einstellungen → Addons → Aus ZIP-Datei installieren*.
+
+**Verbindung zu deinem Menü-Addon**
+
+- **📦 In mein Menü-Addon einbetten:** Das Script wird wie ein Fremd-Addon ([Kapitel 53](#k53)) in dein Menü-Addon gepackt und beim Installieren automatisch entpackt – eine Installation genügt. Die Befehle erscheinen als Menüeinträge.
+- **🔗 Als Abhängigkeit eintragen:** Kodi verlangt das Script dann beim Installieren. Das geht nur, wenn es aus einem Repository kommt oder schon installiert ist.
+- **Befehlsliste:** Deine Scripte erscheinen in der **📚 Befehlsliste** unter der Gruppe **Scripte** (z. B. `RunScript(script.mein_script,hallo)`). So kannst du sie jedem Button im Menü und im Titan-Skin zuweisen. Dort stehen auch allgemeine Befehle wie `StopScript(…)`, `RunPlugin(…)` und `AlarmClock(…)`.
+
+**Hinweise**
+
+- Die IDs müssen eindeutig sein (nur Kleinbuchstaben, Ziffern, Punkt, Unterstrich, Minus). Der Generator ergänzt die Vorsilbe (`script.`, `service.` …) selbst.
+- Die Python-Version der `addon.xml` richtet sich nach der gewählten Kodi-Version (19, 20, 21).
+- Die Werkstatt speichert bis zu 20 Scripte im Projekt (auch im JSON-Projekt-Export).
+- Hintergrund-Dienste sollten nie ohne Wartezeit laufen: Das Gerüst benutzt `monitor.waitForAbort(...)`, damit Kodi sauber beenden kann.
+
 ---
 
 ---
@@ -1451,6 +1501,8 @@ Du hast schon ein Addon – etwa eines, das du selbst geschrieben hast – und w
 1. Öffne **📦 Fremd-Addon** in der Kopfzeile (oder in Bereich 5 · Addon-Bilder & Dateien → **🧩 Fremd-Addon einbinden (ZIP)**).
 2. **＋ Addon-ZIP wählen.** Mehrere ZIPs sind möglich, z.B. das Addon und ein benötigtes Modul. Die Reihenfolge ist die der Einrichtung.
 3. Der Generator liest das Addon und zeigt eine Karte: Name, ID, Version, Größe, Art (Plugin, Script oder Sonstiges) und was es **braucht** (Abhängigkeiten).
+   - **Scripts (`script.…`)** werden mit `RunAddon(ID)` gestartet. Versteht das Script Angaben (`sys.argv[1] == 'clean'` …), erkennt der Generator sie und legt je Angabe einen Eintrag **„Script mit Angaben (RunScript)“** an, z. B. `RunScript(script.tool,clean)`. Eigene Scripte baust du in der [Script-Werkstatt](#k52b).
+   - **Module (`script.module.…`) und Dienste (`service.…`)** brauchen keine Menüeinträge: Sie werden nur mitinstalliert und eingeschaltet.
 4. Lege fest, welche Menüeinträge du übernimmst und in welchem Stil sie erscheinen ([Kapitel 54](#k54)).
 5. Exportiere dein Addon wie gewohnt und installiere es in Kodi.
 
@@ -1618,8 +1670,8 @@ Der **Generator selbst** bleibt unter der IT('s) Possible Freeware-Lizenz gesch�
 ---
 
 ```text
-Kodi Video-Addon Generator v9.0 Pro – Copyright (c) 2026 Team IT('s) Possible
-Handbuch · Stand 2026.10.23. Alle Rechte vorbehalten.
+Kodi Addon & Skin Generator v9.1 Pro – Copyright (c) 2026 Team IT('s) Possible
+Handbuch · Stand 2026.10.25. Alle Rechte vorbehalten.
 
 Kostenlos für die Kodi-Community, aber nicht Open Source. Ohne schriftliche Erlaubnis
 verboten: Verkaufen, Vermieten oder Anbieten gegen Bezahlung, Einbau von Werbung,

@@ -2,7 +2,7 @@
 <html lang="de" class="dark">
 <head>
   <!--
-    Kodi Video-Addon Generator v9.0 Pro
+    Kodi Addon & Skin Generator v9.1 Pro
     Copyright (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten. All rights reserved.
     IT('s) Possible Freeware-Lizenz: kostenlos für die Kodi-Community, aber NICHT Open Source.
     Ohne schriftliche Erlaubnis verboten: Verkauf, Vermietung, Angebot gegen Bezahlung, Werbung,
@@ -14,7 +14,7 @@
   <meta name="author" content="Team IT('s) Possible">
   <meta name="copyright" content="(c) 2026 Team IT('s) Possible – IT('s) Possible Freeware-Lizenz, Weiterverkauf verboten">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kodi Video-Addon Generator v9.0 Pro</title>
+  <title>Kodi Addon & Skin Generator v9.1 Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -55,6 +55,8 @@
     /* ⚡ Titan-Modus */
     .titb { background: linear-gradient(90deg, #f59e0b, #ea580c); border: 0; color: #fff; font-weight: 700; }
     .titb:hover { background: linear-gradient(90deg, #d97706, #c2410c); }
+    .scrb { background: linear-gradient(90deg, #22c55e, #059669); border: 0; color: #fff; font-weight: 700; }
+    .scrb:hover { background: linear-gradient(90deg, #16a34a, #047857); }
     .ti-grad { background: linear-gradient(90deg, #fbbf24, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .ti-pvbox { position: sticky; top: -24px; z-index: 5; background: #0f172a; padding: 4px 0 6px; }
     #tpv-wrap { width: 100%; aspect-ratio: 16 / 9; position: relative; overflow: hidden; border-radius: 12px; border: 2px solid #334155; background: #000; }
@@ -122,8 +124,8 @@
   <header id="hdr" class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-40">
     <div class="min-w-0">
       <h1 class="font-bold text-base bg-gradient-to-r from-sky-400 to-indigo-300 bg-clip-text text-transparent">
-        🔌 Kodi Video-Addon Generator by IT('s) Possible
-        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v9.0 Pro</span>
+        🔌 Kodi Addon & Skin Generator by IT('s) Possible
+        <span class="text-[10px] text-sky-400 border border-sky-500/30 rounded-full px-2 py-0.5 ml-1">v9.1 Pro</span>
         <span class="text-[10px] text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5 ml-1">💚 Gratis · nicht zum Verkauf</span>
       </h1>
       <p class="text-[11px] text-slate-400 hidden lg:block">Gestalte das Menü deines Addons (home.xml) mit Buttons, Listen, Schaltern, Widgets und Bildern und exportiere alles als installierbare ZIP.</p>
@@ -143,9 +145,10 @@
       <button class="btn" onclick="window.open('python.html', '_blank')">🐍 Python</button>
       <button class="btn" onclick="window.open('image-editor.html', '_blank')">🎨 Bild-Tool</button>
       <button class="btn" onclick="window.open('converter.html', '_blank')">📐 Umrechner</button>
-      <button class="btn" onclick="window.open('codec.html', '_blank')">🔤 Codec & XML</button>      
+      <button class="btn" onclick="window.open('codec.html', '_blank')">🔤 Codec & XML</button>            
       <button class="btn modb" onclick="showMod()">🛠 Modding</button>
       <button class="btn titb" onclick="showTitan()">⚡ Titan</button>
+      <button class="btn scrb" onclick="showScr()" title="Programme, Scripte, Dienste, Module bauen">📜 Script</button>
       <button class="btn pri" onclick="exportZip()">⬇ ZIP exportieren</button>
       <button class="btn exitb" onclick="exitApp()">🚪 Beenden</button>
     </div>
@@ -313,6 +316,7 @@
       <button class="btn w-full mt-3" onclick="showFiles()">📁 Ordner & Dateien verwalten</button>
       <button class="btn w-full mt-2" onclick="showExt()">🧩 Fremd-Addon einbinden (ZIP)</button>
       <button class="btn w-full mt-2" onclick="showSettings()">⚙ Einstellungen deines Addons bauen</button>
+      <button class="btn scrb w-full mt-2" onclick="showScr()">📜 Script-Werkstatt (Programm, Script, Dienst …)</button>
       <p class="hint mt-1" id="fcount"></p>
 
       <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">⬅ Zurück auf der Startseite</h3>
@@ -403,7 +407,7 @@
   <datalist id="dl-dir"></datalist>
 
   <script>
-    /* Kodi Video-Addon Generator v9.0 Pro – (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
+    /* Kodi Addon & Skin Generator v9.1 Pro – (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
        IT('s) Possible Freeware-Lizenz: Verkauf, Weiterverbreitung und veränderte Fassungen nur mit schriftlicher Erlaubnis. */
     const $ = id => document.getElementById(id);
     const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -661,6 +665,13 @@ Addons|🧩|Eigenes Addon starten|RunAddon(DEINE.ADDON.ID)|DEINE.ADDON.ID durch 
 Addons|🔧|Addon-Einstellungen öffnen|Addon.OpenSettings(plugin.video.youtube)|ID des Addons anpassen
 Addons|⬆|Veraltete Addons aktualisieren|ActivateWindow(addonbrowser,addons://outdated/)|Zeigt Addons mit Updates
 Addons|📜|Skript starten|RunScript(DEIN.SKRIPT.ID)|DEIN.SKRIPT.ID durch die echte ID ersetzen
+Scripte|📜|Script starten (ohne Angabe)|RunScript(script.deine.id)|Ersetze script.deine.id durch die echte ID des Scripts
+Scripte|📜|Script mit Angabe starten|RunScript(script.deine.id,befehl)|Alles nach dem Komma kommt im Script als sys.argv[1], sys.argv[2] … an
+Scripte|⏹|Laufendes Script beenden|StopScript(script.deine.id)|Beendet ein Script, das noch läuft
+Scripte|🐍|Eigene Python-Datei starten|RunScript(special://home/scripts/mein.py)|Eine .py-Datei aus dem Kodi-Ordner ausführen
+Scripte|🔌|Plugin im Hintergrund ausführen|RunPlugin(plugin://plugin.program.xyz/?aktion=start)|Führt ein Plugin ohne Fenster aus
+Scripte|⏱|Script nach 1 Minute starten|AlarmClock(meinscript,RunScript(script.deine.id),1,silent)|Zeitversetzter Start, ohne Meldung
+Scripte|🔧|Einstellungen eines Scripts|Addon.OpenSettings(script.deine.id)|Öffnet die Einstellungen des Addons
 Abspielen|🌐|Video direkt abspielen|PlayMedia(https://)|Adresse hinter PlayMedia( eintragen
 Abspielen|📁|Ordner / Playlist öffnen|ActivateWindow(videos,special://profile/playlists/video/,return)|Deine Video-Playlists
 Profi|🏷|Eigenschaft setzen (Home)|SetProperty(meinmenue.wert,1,home)|Globale Variable – abfragbar mit Window(Home).Property(meinmenue.wert)
@@ -845,7 +856,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
         p('info', 'Info', [
           mk('box', { x: 560, y: 230, w: 800, h: 620, color: '#14111f', op: 96, rad: 12, bw: 3, bc: '#be123c' }),
           mk('text', { label: 'Über dieses Addon', x: 600, y: 262, w: 720, h: 90, al: 'center', font: 'font37' }),
-          mk('tbox', { label: 'Dieses Menü wurde mit dem Kodi Video-Addon Generator gebaut.\n\nÄndere Texte, Farben und Bilder, füge Widgets hinzu und exportiere alles als ZIP – fertig ist dein eigenes Kodi-Addon.', x: 610, y: 370, w: 700, h: 290, al: 'center', scroll: false }),
+          mk('tbox', { label: 'Dieses Menü wurde mit dem Kodi Addon & Skin Generator gebaut.\n\nÄndere Texte, Farben und Bilder, füge Widgets hinzu und exportiere alles als ZIP – fertig ist dein eigenes Kodi-Addon.', x: 610, y: 370, w: 700, h: 290, al: 'center', scroll: false }),
           mk('text', { label: 'Kodi $INFO[System.BuildVersion]', x: 600, y: 668, w: 720, h: 50, al: 'center', color: '#94a3b8' }),
           btn('Schließen', '✖', 760, 740, 'back', '', { w: 400, h: 90 })
         ], { dlg: true, dim: 70 })
@@ -921,6 +932,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       gcImgs();
       if (!S.tstash || typeof S.tstash !== 'object' || Array.isArray(S.tstash)) S.tstash = {};
       normTitan();
+      try { normScr(); } catch (e) { S.scr = { items: [], cur: '', tab: 'info', file: -1 }; }
     }
 
     function gcImgs() {
@@ -1785,8 +1797,9 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       return a;
     }
 
-    function settingsXml() {
-      const all = allSettings(), cats = [...new Set(all.map(s => s.cat))];
+    function settingsXml() { return settingsXmlOf(allSettings()); }
+    function settingsXmlOf(all) {
+      const cats = [...new Set(all.map(s => s.cat))];
       const row = s => {
         const a = `id="${esc(s.id)}" label="${esc(s.l)}"`;
         if (s.t === 'bool') return `    <setting ${a} type="bool" default="${s.d === 'true' ? 'true' : 'false'}"/>`;
@@ -2599,7 +2612,7 @@ def ensure_bundles():
 `;
 
     const ADDON_PY = `# -*- coding: utf-8 -*-
-# Erzeugt mit dem Kodi Video-Addon Generator
+# Erzeugt mit dem Kodi Addon & Skin Generator
 # Die Seiten, Aktionen, Listen und Schalter stehen in pages.json.
 import os
 import sys
@@ -3690,7 +3703,7 @@ def on_page(window, page_id):
     const extHas = () => Array.isArray(S.ext) && S.ext.length > 0;
     const hooksOn = () => !!(S.mod.hooks || extHas());
     const extZipPath = id => 'resources/bundled/' + String(id).replace(/[^A-Za-z0-9_.\-]/g, '_') + '.zip';
-    const EXT_KINDS = [['dir', 'Liste / Ordner öffnen'], ['play', 'Abspielen'], ['run', 'Plugin-Befehl ausführen'], ['script', 'Addon starten']];
+    const EXT_KINDS = [['dir', 'Liste / Ordner öffnen'], ['play', 'Abspielen'], ['run', 'Plugin-Befehl ausführen'], ['script', 'Addon starten'], ['runscript', 'Script mit Angaben (RunScript)']];
     const EXT_WIN = { video: 'videos', audio: 'music', image: 'pictures', executable: 'programs' };
     function extClean(e) {
       if (!e || typeof e !== 'object' || !/^[A-Za-z0-9_.\-]+$/.test(String(e.id || ''))) return null;
@@ -3944,8 +3957,35 @@ def on_page(window, page_id):
     }
     // wie Python urllib.parse.quote_plus
     const encQ = s => encodeURIComponent(String(s)).replace(/%20/g, '+').replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+    // Ziel eines Eintrags für custom.py / RunScript: bei „Script mit Angaben“ immer mit vorangestellter Addon-ID
+    function extZiel(ex, en) {
+      const u = extUrl(en.u);
+      if (en.k === 'runscript') return !u ? ex.id : (u === ex.id || u.startsWith(ex.id + ',')) ? u : ex.id + ',' + u.replace(/^,+/, '');
+      return u || (en.k === 'script' ? ex.id : '');
+    }
+    // Welche Angaben versteht ein Script? (sys.argv[1] == 'xyz' …) – nur eine Hilfe, bitte prüfen
+    function scrArgsDetect(all, pre) {
+      const td = new TextDecoder(), py = Object.keys(all).filter(p => p.startsWith(pre) && /\.py$/.test(p) && all[p].length < 700000).slice(0, 80);
+      let txt = ''; py.forEach(p => { txt += '\n' + td.decode(all[p]); });
+      const names = ['sys\\.argv\\[1\\]', 'argv\\[1\\]', 'sys\\.argv\\[1\\](?:\\.\\w+\\(\\))?'], args = [];
+      let m; const rv = /^[ \t]*(\w+)\s*=\s*(?:sys\.)?argv\[1\]/gm;
+      while ((m = rv.exec(txt))) names.push('\\b' + m[1] + '\\b');
+      const lit = '[\'"]([\\w\\-]{1,32})[\'"]', add = (v, at) => { if (v && !/^\d+$/.test(v) && !args.some(x => x[0] === v) && args.length < 20) args.push([v, at]); };
+      names.forEach(n => {
+        const e1 = new RegExp('(?:' + n + ')(?:\\.\\w+\\(\\))?\\s*==\\s*' + lit, 'g'), e2 = new RegExp(lit + '\\s*==\\s*(?:' + n + ')', 'g'), e3 = new RegExp('(?:' + n + ')(?:\\.\\w+\\(\\))?\\s+in\\s*[\\(\\[{]([^\\)\\]}]{1,300})[\\)\\]}]', 'g');
+        while ((m = e1.exec(txt))) add(m[1], m.index);
+        while ((m = e2.exec(txt))) add(m[1], m.index);
+        while ((m = e3.exec(txt))) { const l = /[\'"]([\w\-]{1,32})[\'"]/g; let q; while ((q = l.exec(m[1]))) add(q[1], m.index + q.index); }
+      });
+      return args.sort((x, y) => x[1] - y[1]).map(x => x[0]);
+    }
+    function extDet(kind, id, all, pre) {
+      if (kind !== 'script') return extDetect(all, pre);
+      const a = scrArgsDetect(all, pre);
+      return { key: 'mode', vals: [], more: [], ents: a.map(v => ({ l: extNice(v), u: id + ',' + v })) };
+    }
     function extEntries(ex, vals, ents) {
-      if (ex.kind === 'script') return [{ l: ex.name, u: ex.id, k: 'script' }];
+      if (ex.kind === 'script') return [{ l: ex.name, u: ex.id, k: 'script' }].concat((ents || []).map(x => ({ l: x.l, u: x.u, k: 'runscript' })));
       const e = [{ l: 'Startseite', u: 'plugin://' + ex.id + '/', k: 'dir' }];
       const eu = new Set((ents || []).map(x => String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/')));
       (vals || []).forEach(v => { const u = 'plugin://' + ex.id + '/?' + ex.key + '=' + v; if (!eu.has(u)) e.push({ l: extNice(v), u, k: 'dir' }); });
@@ -3972,14 +4012,14 @@ def on_page(window, page_id):
           const exts = [...doc.getElementsByTagName('extension')], pl = exts.find(x => x.getAttribute('point') === 'xbmc.python.pluginsource'), sc = exts.find(x => x.getAttribute('point') === 'xbmc.python.script');
           const kind = pl ? 'plugin' : sc ? 'script' : 'other', prov = pl ? ((pl.getElementsByTagName('provides')[0] || {}).textContent || 'video').trim().split(/\s+/)[0] : 'executable';
           const deps = [...doc.getElementsByTagName('import')].map(i => i.getAttribute('addon')).filter(a => a && !/^(xbmc|kodi)\./.test(a));
-          const det = kind === 'plugin' ? extDetect(all, pre) : { key: 'mode', vals: [], more: [] };
+          const det = kind === 'plugin' || kind === 'script' ? extDet(kind, id, all, pre) : { key: 'mode', vals: [], more: [] }, noRun = kind === 'other' && exts.some(x => ['xbmc.python.module', 'xbmc.service'].includes(x.getAttribute('point')));
           const pyPaths = Object.keys(all).filter(p => p.startsWith(pre) && /\.py$/.test(p)), imps = new Set();
           pyPaths.forEach(p => { if (all[p].length < 700000) pyImports(td.decode(all[p])).forEach(n => imps.add(n)); });
           const need = needFromImports(imps, localMods(pyPaths.map(p => p.slice(pre.length))), deps);
           const ex = extClean({ id, name: root.getAttribute('name') || id, ver: root.getAttribute('version') || '0', size: f.size, prov, kind, key: det.key, deps, need, more: det.more, entries: [] });
           if (!ex) { toast('„' + f.name + '“ konnte nicht gelesen werden.'); continue; }
           const old = S.ext.find(x => x.id === id);
-          ex.entries = old && old.entries.length ? old.entries : extEntries(ex, det.vals, det.ents);
+          ex.entries = old && old.entries.length ? old.entries : noRun ? [] : extEntries(ex, det.vals, det.ents);
           if (old) { Object.assign(old, ex); } else S.ext.push(ex);
           EXTZ[id] = extBytesToData(new Uint8Array(buf)); tiDbPut('ext:' + id, EXTZ[id]);
           if (!S.mod.hooks) { S.mod.hooks = true; toast('Python-Hooks wurden eingeschaltet – dein custom.py bekommt den Bereich für „' + ex.name + '“.'); }
@@ -4003,7 +4043,7 @@ def on_page(window, page_id):
       if (!EXTZ[e.id]) return toast('Die ZIP fehlt im Speicher – bitte unten erneut auswählen.');
       try {
         const all = await tiReadZip(b64ToBytes(b64(EXTZ[e.id]))), ax = Object.keys(all).filter(p => /(^|\/)addon\.xml$/.test(p)).sort((a, b) => a.split('/').length - b.split('/').length)[0];
-        const det = extDetect(all, ax.slice(0, -'addon.xml'.length)), have = new Set(e.entries.map(x => extUrl(x.u)));
+        const det = extDet(e.kind, e.id, all, ax.slice(0, -'addon.xml'.length)), have = new Set(e.entries.map(x => extUrl(x.u)));
         e.key = det.key; e.more = det.more;
         if (reset) { e.entries = extEntries(e, det.vals, det.ents); save(); showExt(); return toast('Einträge neu aufgebaut: ' + e.entries.length + ' Pfade, die ohne weitere Angaben funktionieren.'); }
         let n = 0; extEntries(e, det.vals, det.ents).forEach(x => { if (!have.has(extUrl(x.u)) && e.entries.length < 60) { e.entries.push(x); n++; } });
@@ -4017,6 +4057,7 @@ def on_page(window, page_id):
       if (en.k === 'play') return { t: 'custom', v: 'PlayMedia(' + u + ')' };
       if (en.k === 'run') return { t: 'custom', v: 'RunPlugin(' + u + ')' };
       if (en.k === 'script') return { t: 'custom', v: 'RunAddon(' + (u || ex.id) + ')' };
+      if (en.k === 'runscript') return { t: 'custom', v: 'RunScript(' + extZiel(ex, en) + ')' };
       // Ordner öffnen sich im eigenen Browser – kein Wechsel zu Kodis Ansicht
       return { t: 'browse', v: u, l: String(en.l || '') };
     }
@@ -4088,9 +4129,9 @@ def on_page(window, page_id):
     function showExt() {
       const fmt = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
       const cards = S.ext.map((e, i) => `<div class="card mt-3" style="padding:12px">
-          <div class="flex items-start gap-2"><div class="flex-1 min-w-0"><b class="text-sm">🧩 ${esc(e.name)}</b> <span class="hint">v${esc(e.ver)} · ${fmt(e.size)}</span><div class="hint break-all">${esc(e.id)} · ${e.kind === 'plugin' ? 'Plugin (' + esc(e.prov) + ')' : e.kind === 'script' ? 'Script' : 'Sonstiges'}${EXTZ[e.id] ? '' : ' · <b style="color:#fca5a5">ZIP fehlt im Speicher – unten erneut wählen</b>'}</div></div><button class="btn" aria-label="Addon entfernen" onclick="extDel(${i})">🗑</button></div>
+          <div class="flex items-start gap-2"><div class="flex-1 min-w-0"><b class="text-sm">🧩 ${esc(e.name)}</b> <span class="hint">v${esc(e.ver)} · ${fmt(e.size)}</span><div class="hint break-all">${esc(e.id)} · ${e.kind === 'plugin' ? 'Plugin (' + esc(e.prov) + ')' : e.kind === 'script' ? 'Script' : /^script\.module\./.test(e.id) ? 'Modul (Bibliothek)' : /^service\./.test(e.id) ? 'Dienst' : 'Sonstiges'}${EXTZ[e.id] ? '' : ' · <b style="color:#fca5a5">ZIP fehlt im Speicher – unten erneut wählen</b>'}</div></div><button class="btn" aria-label="Addon entfernen" onclick="extDel(${i})">🗑</button></div>
           ${e.deps.length || e.need.length ? `<p class="hint mt-1">Braucht: ${[...new Set([...e.deps, ...e.need])].map(d => esc(d) + (e.need.includes(d) ? ' <b style="color:#fde68a">(fehlt in seiner addon.xml – wird automatisch ergänzt)</b>' : '')).join(', ')}. Bekannte Kodi-Module trägt der Generator in <b>deine</b> addon.xml ein, damit Kodi sie beim Installieren gleich mitholt (Internet nötig).</p>` : ''}
-          <p class="hint mt-2"><b>Menüeinträge</b> für Buttons (Tipp: Der 📂 Live-Browser braucht keine – er zeigt das Addon so, wie es selbst seine Listen liefert). Adressen aus Favoriten oder Logs dürfen kodiert sein (<code>%3a</code>, <code>&amp;amp;</code>) – beim Export werden sie normalisiert:</p>
+          ${e.kind === 'other' && /^(script\.module\.|service\.)/.test(e.id) ? `<p class="hint mt-2">${/^service\./.test(e.id) ? '⚙ Ein <b>Dienst</b> läuft von selbst im Hintergrund – er braucht keine Menüeinträge. Er wird mitinstalliert und eingeschaltet.' : '📚 Ein <b>Modul</b> ist nur eine Bibliothek für andere Addons – es braucht keine Menüeinträge. Es wird mitinstalliert, damit Addons, die es brauchen, es finden.'}</p>` : ''}<p class="hint mt-2"><b>Menüeinträge</b> für Buttons (Tipp: Der 📂 Live-Browser braucht keine – er zeigt das Addon so, wie es selbst seine Listen liefert). Adressen aus Favoriten oder Logs dürfen kodiert sein (<code>%3a</code>, <code>&amp;amp;</code>) – beim Export werden sie normalisiert:</p>
           ${e.kind === 'plugin' ? `<div class="flex gap-1.5 items-center mt-1"><span class="hint shrink-0">Parametername</span><input class="inp" style="width:110px" value="${esc(e.key)}" oninput="extKey(${i},this.value)" aria-label="Parametername"><span class="hint">z. B. mode oder action – bestimmt die Adressen neuer Einträge</span></div>` : ''}
           ${e.entries.map((x, j) => `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:5px"><div class="flex gap-1.5"><input class="inp" value="${esc(x.l)}" placeholder="Beschriftung" oninput="extSet(${i},${j},'l',this.value)"><button class="btn" aria-label="Eintrag löschen" onclick="extEntDel(${i},${j})">✖</button></div>
             <input class="inp" value="${esc(x.u)}" placeholder="plugin://${esc(e.id)}/?mode=…" oninput="extSet(${i},${j},'u',this.value)" style="font-family:monospace;font-size:12px"><select class="inp" onchange="extKind(${i},${j},this.value)">${EXT_KINDS.map(k => `<option value="${k[0]}" ${x.k === k[0] ? 'selected' : ''}>${k[1]}</option>`).join('')}</select></div>`).join('')}
@@ -4112,7 +4153,7 @@ def on_page(window, page_id):
     // Der Python-Teil für custom.py: Liste MENUE, Hilfsfunktionen und je Eintrag eine Funktion
     function extBlock() {
       const q = s => "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'", ids = S.ext.map(e => e.id);
-      const kmap = { dir: 'ordner', play: 'abspielen', run: 'plugin', script: 'addon' };
+      const kmap = { dir: 'ordner', play: 'abspielen', run: 'plugin', script: 'addon', runscript: 'skript' };
       let o = `
 
 # =====================================================================
@@ -4126,13 +4167,14 @@ def on_page(window, page_id):
 #     Art 'abspielen'  -> Adresse direkt abspielen
 #     Art 'plugin'     -> Plugin-Befehl ausfuehren (RunPlugin)
 #     Art 'addon'      -> Addon starten (Adresse = Addon-ID)
+#     Art 'skript'     -> Script mit Angaben starten (Adresse = Addon-ID,angabe1,angabe2)
 #  Im Generator: Aktion "Python-Funktion" mit dem Namen  menue  waehlen,
 #  dann erscheint beim Klick eine Auswahlliste mit allen Eintraegen.
 #  Oder fuer einen einzelnen Eintrag eine eigene Funktion schreiben (Beispiele unten).
 # =====================================================================
 MENUE = [
 `;
-      S.ext.forEach(e => { o += `    # ${e.name}\n`; e.entries.filter(x => String(x.l || '').trim()).forEach(x => { o += `    (${q(x.l)}, '${kmap[x.k] || 'ordner'}', ${q(extUrl(x.u) || (x.k === 'script' ? e.id : ''))}),\n`; }); });
+      S.ext.forEach(e => { o += `    # ${e.name}\n`; e.entries.filter(x => String(x.l || '').trim()).forEach(x => { o += `    (${q(x.l)}, '${kmap[x.k] || 'ordner'}', ${q(extZiel(e, x))}),\n`; }); });
       o += `]
 
 
@@ -4144,6 +4186,8 @@ def befehl(art, ziel, fenster='videos'):
         return 'RunPlugin(%s)' % ziel
     if art == 'addon':
         return 'RunAddon(%s)' % ziel
+    if art == 'skript':
+        return 'RunScript(%s)' % ziel
     if art == 'kodi':
         return 'ActivateWindow(%s,%s,return)' % (fenster, ziel)
     return 'browse:' + ziel
@@ -4166,7 +4210,7 @@ def menue(window):
 
 def ${fn}(window):
     """${String(x.l).replace(/"/g, "'").replace(/\n/g, ' ')}"""
-    return befehl('${kmap[x.k] || 'ordner'}', ${q(extUrl(x.u) || (x.k === 'script' ? e.id : ''))}${EXT_WIN[e.prov] && EXT_WIN[e.prov] !== 'videos' && x.k === 'dir' ? ', ' + q(EXT_WIN[e.prov]) : ''})
+    return befehl('${kmap[x.k] || 'ordner'}', ${q(extZiel(e, x))}${EXT_WIN[e.prov] && EXT_WIN[e.prov] !== 'videos' && x.k === 'dir' ? ', ' + q(EXT_WIN[e.prov]) : ''})
 `;
       }));
       return o;
@@ -4216,7 +4260,7 @@ if __name__ == '__main__':
     function buildFiles(raw) {
       const id = addonId(), m = S.meta, A = S.assets, M = S.mod, F = {}, pad = n => String(n + 1).padStart(2, '0'); TX = {};
       const shots = A.shots.map((d, i) => `resources/screenshot-${pad(i)}.jpg`);
-      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Video-Addon Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
+      const meta = `<extension point="xbmc.addon.metadata">\n <summary lang="de_DE">${esc(m.name)}</summary>\n <description lang="de_DE">${esc(m.desc && m.desc.trim() ? m.desc : m.name + ' – erstellt mit dem Kodi Addon & Skin Generator.')}</description>\n <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n <platform>all</platform>${m.web && m.web.trim() ? `\n <website>${esc(m.web.trim())}</website>` : ''}${m.news && m.news.trim() ? `\n <news>${esc(m.news.trim())}</news>` : ''}\n <assets>\n <icon>icon.png</icon>\n <fanart>fanart.jpg</fanart>${shots.map(x => `\n <screenshot>${x}</screenshot>`).join('')}\n </assets>\n </extension>`;
       
       F['icon.png'] = { b64: A.icon ? b64(A.icon) : mkImg(512, 512, 'image/png', 1) };
       F['fanart.jpg'] = { b64: A.fanart ? b64(A.fanart) : S.bgImg ? b64(S.bgImg) : mkImg(1920, 1080, 'image/jpeg', .12) };
@@ -4553,7 +4597,7 @@ if __name__ == '__main__':
     $('modal').addEventListener('pointerdown', e => { if (e.target === $('modal') && !window._ED) closeModal(); });
 
     function showHelp() {
-      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Mit dem <b>📂 Live-Browser</b> zeigst du das Addon direkt in deinem Skin – Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos starten sofort, Kodis eigene Ansicht taucht nicht auf. Oder du baust Buttons im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Benötigte Module (z. B. <code>bs4</code>, <code>requests</code>) erkennt der Generator und trägt sie selbst in die addon.xml ein. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>🖱 Kontextmenü (neu):</b> Lange drücken (Touch), Rechtsklick oder Taste C öffnet im fertigen Addon ein eigenes Menü: Öffnen, <b>Als Favorit speichern/entfernen</b> (Ordner aus dem Live-Browser öffnen sich als Favorit direkt in deinem Skin), Zur Wiedergabeliste, Beschreibung, Kodi-Favoriten und Addon-Einstellungen. Abschaltbar im 🛠 Modding, erweiterbar mit <code>kontextmenue()</code> in custom.py.</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
+      modal(`<h3 class="font-bold text-lg mb-3">So baust du dein eigenes Kodi-Addon mit Menü</h3> <ol class="text-sm text-slate-300 space-y-2 list-decimal pl-5"> <li><b>Name vergeben.</b> Der Generator erstellt ein <b>plugin.video-Addon</b>. Dessen Menü (<b>home.xml</b>) gestaltest du hier selbst und es öffnet sich beim Start des Addons im Vollbild – statt der Standard-Ansicht von Kodi.</li> <li><b>Elemente hinzufügen</b>: Buttons, Texte, Flächen und <b>eigene Bilder</b>. Mit dem Finger oder der Maus <b>verschieben</b>, an der weißen Ecke die <b>Größe ändern</b>.</li> <li><b>Bilder mit oder ohne Funktion</b>: Ein Bild ist erst einmal Deko. Wählst du rechts eine Aktion, wird es anklickbar (mit Fokus-Rahmen für Fernbedienung).</li> <li><b>Form & Stil</b>: Buttons und Bilder kannst du eckig, abgerundet oder als Pille formen, mit Rahmen und Deckkraft versehen – und Buttons bekommen auf Wunsch ein <b>eigenes Bild</b>. Die Standard-Rundung stellst du links unter „3 · Design“ ein.</li> <li><b>📚 Befehlsliste</b> öffnen: Befehl suchen (z.B. „Filme“, „Lautstärke“, „Neustart“) und mit einem Tipp in einen Button oder ein Bild einsetzen.</li> <li>Unter <b>5 · Addon-Bilder & Dateien</b> eigenes <b>Icon, Fanart und Screenshots</b> wählen. Eigene Ordner und Dateien gehen über <b>📁 Ordner & Dateien</b>.</li> <li><b>▶ Testen</b> zeigt, wie es sich anfühlt (inklusive Seitenwechsel, Listen, Schaltern und Zurück). <b>✔ Prüfen</b> findet vergessene Aktionen.</li> <li><b>⬇ ZIP exportieren</b> und in Kodi per „Aus ZIP-Datei installieren“ einspielen.</li> <li><b>Alles ist anklickbar:</b> Jedes Element – Text, Poster, Bild, Fläche, Cover, Fortschrittsbalken – kann eine Aktion bekommen. Markieren und rechts unter „⚡ Funktion“ wählen. Mit <b>🔐 Schutz</b> fragt Kodi vorher nach PIN oder Ja/Nein.</li> <li><b>Poster mit echtem Bild:</b> Poster markieren und ein Bild vom Gerät oder eine Bild-Adresse aus dem Internet eintragen.</li> <li><b>Seiten:</b> Jede Seite kann einen eigenen <b>🎨 Hintergrund</b> haben, sich duplizieren und mit ◀ ▶ sortieren lassen. Mit <b>👁 Wann sichtbar?</b> erscheinen Elemente nur in bestimmten Situationen.</li> <li><b>Mehr Kodi-Funktionen:</b> <b>Fortschrittsbalken</b> und <b>Cover</b> zeigen die laufende Wiedergabe, viele <b>Live-Infos</b>, Seitenübergänge, eigene <b>Addon-Einstellungen</b> (⚙), Abhängigkeiten, Begrüßung beim Start und Textdateien bearbeiten (✎).</li> <li><b>🛠 Modding-Werkstatt (neu):</b> <b>Listen</b> (auch automatisch aus der Bibliothek wie ein Widget), <b>Kachel-Raster</b>, <b>Karussell</b>, echte <b>Ein/Aus-Schalter</b>, <b>Regler</b> für Lautstärke und Spulen, <b>Textbox</b>, <b>Videofenster</b>, <b>Visualisierung</b>, <b>RSS</b>. Dazu Animationen pro Element, Fokus-Zoom, Tastenbelegung, Bedingungs-Baukasten, Dialog-Seiten, Seiten-Befehle, eigenes XML, Python-Hooks, Autostart, Direkt-Links, Inspektor mit allen Kodi-IDs und das komplette Projekt als JSON.</li> <li><b>Kodi-Startseite statt Kodi-Ansicht:</b> Beim Beenden landest du auf der Kodi-Startseite. Öffnet ein Button ein Kodi-Fenster (z.B. Filme) oder ein Video, kommst du mit Zurück bzw. nach dem Video wieder in dein Menü. Beides lässt sich im 🛠 Modding unter „Schalter“ abschalten.</li> <li><b>🧩 Widgets (neu):</b> Reihen wie im Kodi-Hauptmenü – Neue Filme, Weiterschauen, Neue Folgen, Zufällige Filme, Neue Alben, Inhalte aus Addons … Sie füllen sich in Kodi von selbst, mit Bildern und auf Wunsch mit Jahr, Bewertung und Inhalt. Dazu <b>Info-Widgets</b> (Uhr, Wetter, Jetzt läuft, System-Info), deren Teile sich zusammen bewegen.</li> <li><b>👁 Live-Ansicht (neu):</b> Sobald die große Vorschau nicht zu sehen ist (Einstellungen auf dem Handy, Modding-Werkstatt, beim Scrollen), zeigt ein kleines Fenster jede Änderung sofort. Am Kopf verschieben, mit ⤢ größer machen, mit ✖ ausblenden. Auch darin kannst du Elemente antippen und ziehen. Mit ◀ ▲ ▼ ▶ unter „Position & Größe“ verschiebst du Elemente punktgenau.</li> <li><b>⚡ Titan-Modus (neu):</b> Baue einen <b>echten Kodi-Skin</b> für ganz Kodi. Der Generator lädt den offiziellen Kodi-Skin Estuary passend zu deiner Kodi-Version und baut ihn um: Farben, Hintergrund, Logo, Schrift, Hauptmenü, eigene Menüpunkte (z.B. zu deinem Addon) und Widgets – mit Live-Vorschau. Im Reiter <b>📐 Layout</b> ziehst du Logo, Uhr, Knöpfe, Hauptmenü, Widget-Bereich und Player-Leiste an jede beliebige Stelle – das Hauptmenü auch als <b>einzelne Buttons, waagerecht oder senkrecht</b>, und mit <b>eigenen Bildern als Dekoration</b>. Export als <b>skin.&lt;name&gt;.zip</b>.</li> <li><b>📦 Fremd-Addon einbinden (neu):</b> Du hast schon ein Addon? Wähle seine ZIP unter <b>🧩 Fremd-Addon</b>. Sie wird in dein Addon gepackt und beim Installieren automatisch entpackt und eingeschaltet. Mit dem <b>📂 Live-Browser</b> zeigst du das Addon direkt in deinem Skin – Ordner öffnen sich in der Liste, Zurück geht eine Ebene hoch, Videos starten sofort, Kodis eigene Ansicht taucht nicht auf. Oder du baust Buttons im Stil <b>Taschenrechner, Linux-Desktop, Kacheln oder Liste</b>. Benötigte Module (z. B. <code>bs4</code>, <code>requests</code>) erkennt der Generator und trägt sie selbst in die addon.xml ein. Eigene Einträge stehen zusätzlich in <b>resources/lib/custom.py</b> (Liste <code>MENUE</code>).</li> <li><b>📜 Script-Werkstatt (neu):</b> Baue eigene <b>Programme, Scripte, Hintergrund-Dienste, Module und Kontextmenü-Einträge</b> mit fertigem Python-Gerüst, Bausteinen zum Einfügen und ZIP-Export. Scripte rufst du in jedem Button mit „RunScript“ aus der 📚 Befehlsliste (Gruppe „Scripte“) auf. Mehr in der Anleitung, Kapitel 52b.</li> <li><b>🖱 Kontextmenü (neu):</b> Lange drücken (Touch), Rechtsklick oder Taste C öffnet im fertigen Addon ein eigenes Menü: Öffnen, <b>Als Favorit speichern/entfernen</b> (Ordner aus dem Live-Browser öffnen sich als Favorit direkt in deinem Skin), Zur Wiedergabeliste, Beschreibung, Kodi-Favoriten und Addon-Einstellungen. Abschaltbar im 🛠 Modding, erweiterbar mit <code>kontextmenue()</code> in custom.py.</li> <li><b>✨ Beispiel zum Lernen:</b> Unter <b>📂 Vorlagen</b> wartet „Mein Kino-Hub“ – ein fertiges Menü mit 5 Seiten, das du nach Lust und Laune umbauen kannst.</li> <li><b>💻 Editor:</b> Alle erzeugten Dateien (addon.py, addon.xml, home.xml, pages.json …) kannst du von Hand ändern. Sie kommen genau so in die ZIP.</li> <li><b>🚪 Beenden:</b> Die Seite verlässt du nur mit diesem Button. Bei „Zurück“ oder Schließen des Tabs fragt der Generator vorher nach.</li> <li><b>Ausführliche Anleitung:</b> <a href="https://raw.githubusercontent.com/Chrisophy/KSG/main/Anleitung.md" target="_blank" class="text-sky-400 underline">Online-Dokumentation öffnen</a></li></ol> <p class="text-xs text-emerald-400 mt-4">💚 Dieses Werkzeug ist gratis für die Kodi-Community – für Anfänger und Profis. Deine damit gebauten Addons gehören dir.</p><p class="hint mt-1">© 2026 Team IT('s) Possible · IT('s) Possible Freeware-Lizenz: kostenlos, aber nicht Open Source – Verkauf, Weiterverkauf und Weiterverbreitung sind ohne Erlaubnis verboten. Original nur unter chrisophy.github.io/KSG.</p> <button class="btn pri mt-4" onclick="closeModal();try{localStorage.setItem('kfe5help','1')}catch(e){}">Los geht's</button>`);
     }
 
     function showTpl() {
@@ -4570,7 +4614,7 @@ if __name__ == '__main__':
         // Das Beispiel bringt sein eigenes Design mit
         S.theme = Object.assign({}, EX_THEME);
         try { S.bgImg = mkExampleBg(); } catch (e) {}
-        if (!String(S.meta.name || '').trim() || S.meta.name === 'Mein Kodi Projekt') S.meta = Object.assign({}, S.meta, { name: 'Mein Kino-Hub', desc: S.meta.desc || 'Mein eigenes Kino-Menü für Kodi – gebaut mit dem Kodi Video-Addon Generator.', welcome: S.meta.welcome || 'Willkommen im Kino-Hub!' });
+        if (!String(S.meta.name || '').trim() || S.meta.name === 'Mein Kodi Projekt') S.meta = Object.assign({}, S.meta, { name: 'Mein Kino-Hub', desc: S.meta.desc || 'Mein eigenes Kino-Menü für Kodi – gebaut mit dem Kodi Addon & Skin Generator.', welcome: S.meta.welcome || 'Willkommen im Kino-Hub!' });
       }
       S.overrides = {};
       norm(); hist = []; redoS = []; closeModal(); renderAll(); fit();
@@ -6770,12 +6814,12 @@ if __name__ == '__main__':
         const meta = kids(ar, 'extension').find(e => e.getAttribute('point') === 'xbmc.addon.metadata');
         if (meta) {
           kids(meta, 'news').forEach(e => meta.removeChild(e));
-          meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'news', {}, 'v' + T.ver + ': angepasst mit dem Kodi Video-Addon Generator (Basis: ' + (b.sname || '') + ' ' + (b.sver || '') + (orig ? ' von ' + orig : '') + ')')); meta.appendChild(nl(ad, 1));
+          meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'news', {}, 'v' + T.ver + ': angepasst mit dem Kodi Addon & Skin Generator (Basis: ' + (b.sname || '') + ' ' + (b.sver || '') + (orig ? ' von ' + orig : '') + ')')); meta.appendChild(nl(ad, 1));
         }
         putX('addon.xml', ad);
         const cl = F['changelog.txt'] ? dec.decode(F['changelog.txt']) : '';
-        F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: angepasst mit dem Kodi Video-Addon Generator (Skin-Modus)\n- Grundlage: ${b.sname || ''} ${b.sver || ''}${orig ? ' (' + orig + ')' : ''}\n` + (cl ? '\n' + cl : ''));
-        F['ANPASSUNG.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor der Anpassung: ${tiAuthor()}\n\nDieser Skin ist eine veränderte Fassung von „${b.sname || ''}“ ${b.sver || ''}${orig ? ' von ' + orig : ''}.\nLizenz des Originals: ${b.lic || 'siehe LICENSE.txt'}\nSie gilt auch für diese Fassung; die LICENSE.txt des Originals liegt unverändert bei.\n\nAngepasst mit dem Kodi Video-Addon Generator v9.0 Pro – Skin-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\nDer Generator selbst ist Freeware und bleibt geschützt; der Skin-Inhalt unterliegt der Lizenz des Original-Skins.\n`);
+        F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: angepasst mit dem Kodi Addon & Skin Generator (Skin-Modus)\n- Grundlage: ${b.sname || ''} ${b.sver || ''}${orig ? ' (' + orig + ')' : ''}\n` + (cl ? '\n' + cl : ''));
+        F['ANPASSUNG.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor der Anpassung: ${tiAuthor()}\n\nDieser Skin ist eine veränderte Fassung von „${b.sname || ''}“ ${b.sver || ''}${orig ? ' von ' + orig : ''}.\nLizenz des Originals: ${b.lic || 'siehe LICENSE.txt'}\nSie gilt auch für diese Fassung; die LICENSE.txt des Originals liegt unverändert bei.\n\nAngepasst mit dem Kodi Addon & Skin Generator v9.1 Pro – Skin-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\nDer Generator selbst ist Freeware und bleibt geschützt; der Skin-Inhalt unterliegt der Lizenz des Original-Skins.\n`);
       } else {
 
       // 1) addon.xml – neue ID, Name, Version, Beschreibung, Bilder
@@ -6785,8 +6829,8 @@ if __name__ == '__main__':
       const meta = kids(ar, 'extension').find(e => e.getAttribute('point') === 'xbmc.addon.metadata');
       if (meta) {
         kids(meta, 'summary').concat(kids(meta, 'description'), kids(meta, 'disclaimer'), kids(meta, 'source'), kids(meta, 'news')).forEach(e => meta.removeChild(e));
-        const sum = tiName() + ' – eigener Kodi-Skin (Basis: Estuary)', des = `${tiName()} ist ein eigener Kodi-Skin, gebaut mit dem Kodi Video-Addon Generator (Titan-Modus). Er basiert auf Estuary von phil65 und Team Kodi.`;
-        [['de_DE', sum, des], ['en_GB', tiName() + ' – custom Kodi skin (based on Estuary)', `${tiName()} is a custom Kodi skin made with the Kodi Video-Addon Generator (Titan mode). Based on Estuary by phil65 and Team Kodi.`]].forEach(x => { meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'summary', { lang: x[0] }, x[1])); meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'description', { lang: x[0] }, x[2])); });
+        const sum = tiName() + ' – eigener Kodi-Skin (Basis: Estuary)', des = `${tiName()} ist ein eigener Kodi-Skin, gebaut mit dem Kodi Addon & Skin Generator (Titan-Modus). Er basiert auf Estuary von phil65 und Team Kodi.`;
+        [['de_DE', sum, des], ['en_GB', tiName() + ' – custom Kodi skin (based on Estuary)', `${tiName()} is a custom Kodi skin made with the Kodi Addon & Skin Generator (Titan mode). Based on Estuary by phil65 and Team Kodi.`]].forEach(x => { meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'summary', { lang: x[0] }, x[1])); meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'description', { lang: x[0] }, x[2])); });
         meta.appendChild(nl(ad, 2)); meta.appendChild(xe(ad, 'news', {}, 'v' + T.ver + ': erstellt mit dem Titan-Modus'));
         if (T.assets !== 'estuary') {
           let as = kids(meta, 'assets')[0]; if (!as) { as = xe(ad, 'assets'); meta.appendChild(as); }
@@ -7135,8 +7179,8 @@ if __name__ == '__main__':
       T.menu.forEach(m => { if (m.show && String(m.icon).startsWith('img:') && T.imgs[m.icon.slice(4)]) F['media/titan/icon_' + m.icon.slice(4) + '.png'] = tiBytes(T.imgs[m.icon.slice(4)]); });
 
       // 6) Hinweise und Änderungsprotokoll
-      F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: erstellt mit dem Kodi Video-Addon Generator (Titan-Modus)\n- Grundlage: Estuary ${b.branch || TKODI[T.kodi][0]} (phil65, Team Kodi)\n`);
-      F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Video-Addon Generator v9.0 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
+      F['changelog.txt'] = enc.encode(`v${T.ver}\n- ${tiName()}: erstellt mit dem Kodi Addon & Skin Generator (Titan-Modus)\n- Grundlage: Estuary ${b.branch || TKODI[T.kodi][0]} (phil65, Team Kodi)\n`);
+      F['TITAN.txt'] = enc.encode(`${tiName()} (${id}) – Version ${T.ver}\nAutor: ${tiAuthor()}\n\nGebaut mit dem Kodi Addon & Skin Generator v9.1 Pro – Titan-Modus\n(c) 2026 Team IT('s) Possible – https://chrisophy.github.io/KSG/\n\nDieser Skin basiert auf Estuary von phil65 und Team Kodi.\nEstuary-Code: GNU General Public License 2.0 · Estuary-Grafiken: CC BY-SA 4.0 (siehe LICENSE.txt).\nDieser Skin wird unter denselben Lizenzen weitergegeben.\n`);
       }
       // Eigene Skin-Einstellungen: erzeugtes Fenster „Skin-Optionen“
       if ((T.skset || []).length) {
@@ -7199,6 +7243,529 @@ if __name__ == '__main__':
         tiProg('ti-prog2', `✅ Fertig: <b>${esc(a.download)}</b> (${(blob.size / 1048576).toFixed(1)} MB, ${E.length - 1} Dateien). Installation siehe unten.${TLAYMISS.length ? ' ⚠️ In dieser Estuary-Version nicht gefunden, Verschiebung dafür ignoriert: ' + esc(TLAYMISS.join(', ')) + '.' : ''}${TLAYWARN.length ? ' ⚠️ ' + esc(TLAYWARN.join('; ')) + '.' : ''}`, 1);
         toast('⚡ Skin gebaut: ' + a.download);
       } catch (e) { tiProg('ti-prog2', '⚠️ ' + esc(e.message || 'Der Umbau ist fehlgeschlagen.'), null); }
+    }
+
+    // ================= SCRIPT-WERKSTATT: Programm-, Script-, Dienst-, Modul- und Kontextmenü-Addons =================
+    // Baut aus einfachen Angaben ein fertiges Kodi-Addon mit Python-Gerüst. Der eigene Code kommt an die Stellen „DEIN CODE“.
+    const SCR_T = {
+      program: { n: 'Programm-Addon', pre: 'plugin.program.', ic: '🕹', d: 'Erscheint unter „Programme“ und zeigt eine Liste. Jeder Eintrag führt deinen Code aus.' },
+      script: { n: 'Script', pre: 'script.', ic: '📜', d: 'Wird mit RunScript(…) aus Menü, Skin oder Tastenbelegung gestartet – auf Wunsch auch aus „Programme“.' },
+      service: { n: 'Dienst', pre: 'service.', ic: '⚙', d: 'Läuft unsichtbar im Hintergrund, solange Kodi läuft (Timer, Überwachung, Automatik).' },
+      module: { n: 'Modul (Bibliothek)', pre: 'script.module.', ic: '📚', d: 'Sammlung von Funktionen, die andere Addons mit „import“ benutzen.' },
+      context: { n: 'Kontextmenü-Eintrag', pre: 'context.', ic: '☰', d: 'Zusätzlicher Eintrag im Kontextmenü (lange drücken / Taste C) von Filmen, Serien, Musik …' }
+    };
+    const SCR_VIS = {
+      all: ['Überall (jeder Eintrag)', '!String.IsEmpty(ListItem.Label)'], movie: ['Nur Filme', 'String.IsEqual(ListItem.DBType,movie)'],
+      tvshow: ['Nur Serien', 'String.IsEqual(ListItem.DBType,tvshow)'], episode: ['Nur Episoden', 'String.IsEqual(ListItem.DBType,episode)'],
+      song: ['Nur Musiktitel', 'String.IsEqual(ListItem.DBType,song)'], addon: ['Nur Addon-Einträge (plugin://)', 'String.StartsWith(ListItem.FileNameAndPath,plugin://)'],
+      custom: ['Eigene Bedingung …', '']
+    };
+    const PYKW = new Set(['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']);
+    const SCR_MARK = '>>> DEIN CODE';
+    const scrDef = type => ({
+      id: uid(), type: SCR_T[type] ? type : 'program', name: 'Mein Script', aid: 'mein_script', ver: '1.0.0', author: '', desc: '', deps: '',
+      ent: [{ k: 'start', l: 'Hallo sagen' }], settings: [], startup: 'login', interval: 60, intSet: false, showProg: true, direct: false,
+      ctxLabel: 'Mein Eintrag', ctxVis: 'all', ctxCond: '', code: '', man: false, files: []
+    });
+    const scrAid = (s, type) => { let a = String(s || '').toLowerCase().replace(/[^a-z0-9._-]+/g, '_').replace(/^[._-]+|[._-]+$/g, ''); const p = SCR_T[type] ? SCR_T[type].pre : ''; if (p && a.startsWith(p)) a = a.slice(p.length); return a; };
+    const scrFull = it => SCR_T[it.type].pre + (scrAid(it.aid, it.type) || 'mein_script');
+    const scrPkg = it => { let p = (scrAid(it.aid, it.type) || 'mein_modul').replace(/[^a-z0-9_]/g, '_'); if (/^\d/.test(p)) p = 'm_' + p; if (PYKW.has(p)) p += '_'; return p; };
+    const scrKey = s => { let k = String(s || '').toLowerCase().replace(/[äöüß]/g, c => ({ ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' }[c])).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); if (!k) k = 'aktion'; if (/^\d/.test(k)) k = 'a_' + k; return k.slice(0, 40); };
+    const scrVer = v => /^\d+(\.\d+){0,3}$/.test(String(v || '').trim()) ? String(v).trim() : '1.0.0';
+    const pyS = s => "'" + String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/[\r\n]+/g, ' ') + "'";
+    const pyC = s => String(s == null ? '' : s).replace(/[\r\n]+/g, ' ').replace(/["\\]/g, "'");
+    // Einträge mit eindeutigem Schlüssel (Funktions-/Befehlsname)
+    function scrEnts(it) {
+      const seen = new Set(), out = [];
+      (it.ent || []).forEach(e => {
+        let k = scrKey(e.k || e.l); const l = String(e.l || e.k || '').trim() || k;
+        if (it.type === 'module' && PYKW.has(k)) k += '_';
+        let b = k, n = 2; while (seen.has(k)) k = b + '_' + (n++); seen.add(k); out.push({ k, l });
+      });
+      if (it.type === 'program' && !out.length) out.push({ k: 'start', l: 'Start' });
+      return out;
+    }
+    // Einstellungen inkl. automatisch erzeugter (Intervall des Dienstes)
+    function scrSettings(it) {
+      if (it.type === 'module') return [];
+      const a = (it.settings || []).map(s => Object.assign({ cat: 'Allgemein' }, s));
+      if (it.type === 'service' && it.intSet && !a.some(s => s.id === 'intervall')) a.unshift({ id: 'intervall', t: 'number', l: 'Prüf-Intervall (Sekunden)', d: String(it.interval), v: '', cat: 'Allgemein' });
+      return a;
+    }
+    const scrVis = it => it.ctxVis === 'custom' ? (String(it.ctxCond || '').trim() || SCR_VIS.all[1]) : (SCR_VIS[it.ctxVis] || SCR_VIS.all)[1];
+
+    // ---- Python-Gerüste ----
+    function scrGen(it) {
+      const nm = pyC(it.name || 'Mein Script'), id = scrFull(it), E = scrEnts(it), T = it.type, L = [];
+      const P = (...a) => a.forEach(x => L.push(x));
+      const stub = (fname, label, arg, extra) => {
+        P('def ' + fname + '(' + (arg || '') + '):', '    # ' + pyC(label), '    # ' + SCR_MARK + ' – ersetze die nächste Zeile durch deinen eigenen Code:',
+          '    ' + (extra || "xbmcgui.Dialog().notification(NAME, " + pyS(label + ' wurde gestartet') + ", xbmcgui.NOTIFICATION_INFO, 3000)"), '', '');
+      };
+      const head = (imports, doc) => { P('# -*- coding: utf-8 -*-', '"""' + nm + ' – ' + doc + '', 'ID: ' + id + '"""', ...imports, ''); };
+      const common = () => P('ADDON = xbmcaddon.Addon()', 'NAME = ' + pyS(it.name || 'Mein Script'), '', '', 'def cfg(key, default=\'\'):', '    """Liest eine Einstellung dieses Addons (immer als Text)."""', '    return ADDON.getSetting(key) or default', '', '', 'def log(msg):', "    xbmc.log('[%s] %s' % (NAME, msg), xbmc.LOGINFO)", '', '');
+      if (T === 'program') {
+        head(['import sys', 'from urllib.parse import parse_qsl, urlencode', '', 'import xbmc', 'import xbmcaddon', 'import xbmcgui', 'import xbmcplugin'], 'Programm-Addon (erstellt mit dem Kodi Addon & Skin Generator)');
+        P('HANDLE = int(sys.argv[1])', 'BASIS = sys.argv[0]', '');
+        common();
+        P('# ---------------------------------------------------------------', '# Deine Aktionen. Schreibe deinen Code an die Stellen „DEIN CODE“.', '# ---------------------------------------------------------------');
+        E.forEach(e => stub('aktion_' + e.k, e.l));
+        P('AKTIONEN = [');
+        E.forEach(e => P('    (' + pyS(e.k) + ', ' + pyS(e.l) + ', aktion_' + e.k + '),'));
+        P(']', '', '', 'def liste():', '    """Zeigt die Aktionen als Liste unter Programme."""', '    for key, label, _fn in AKTIONEN:', '        li = xbmcgui.ListItem(label=label)', "        xbmcplugin.addDirectoryItem(HANDLE, BASIS + '?' + urlencode({'aktion': key}), li, False)", '    xbmcplugin.endOfDirectory(HANDLE)', '', '',
+          'def start(paramstring):', '    params = dict(parse_qsl(paramstring))', "    key = params.get('aktion')", '    for k, _label, fn in AKTIONEN:', '        if k == key:', '            fn()', '            return');
+        P(it.direct ? '    AKTIONEN[0][2]()  # ohne Liste direkt die erste Aktion starten' : '    liste()', '', '', "if __name__ == '__main__':", "    start(sys.argv[2][1:] if len(sys.argv) > 2 else '')");
+      } else if (T === 'script') {
+        head(['import sys', '', 'import xbmc', 'import xbmcaddon', 'import xbmcgui'], 'Script (erstellt mit dem Kodi Addon & Skin Generator)');
+        common();
+        P('# Aufruf aus Menü/Skin:  RunScript(' + id + ')  oder  RunScript(' + id + ',befehl,weitere,angaben)', '');
+        stub('standard', 'Start ohne Angaben', '');
+        E.forEach(e => stub('befehl_' + e.k, 'Befehl ' + e.k + (e.l && e.l !== e.k ? ' (' + e.l + ')' : ''), 'args', "xbmcgui.Dialog().notification(NAME, " + pyS('Befehl ' + e.k + ' – Angaben: ') + " + ', '.join(args), xbmcgui.NOTIFICATION_INFO, 3000)"));
+        P('BEFEHLE = {');
+        E.forEach(e => P('    ' + pyS(e.k) + ': befehl_' + e.k + ','));
+        P('}', '', '', 'def main(argv):', '    """argv[0] ist der Dateiname, danach kommen die Angaben aus RunScript(…)."""', '    args = argv[1:]', '    if not args:', '        standard()', '        return', '    fn = BEFEHLE.get(args[0])', '    if fn:', '        fn(args[1:])', '    else:', "        log('Unbekannter Befehl: %s' % args[0])", "        xbmcgui.Dialog().notification(NAME, 'Unbekannter Befehl: %s' % args[0], xbmcgui.NOTIFICATION_WARNING, 4000)", '', '', "if __name__ == '__main__':", '    main(sys.argv)');
+      } else if (T === 'service') {
+        head(['import xbmc', 'import xbmcaddon', 'import xbmcgui'], 'Dienst (erstellt mit dem Kodi Addon & Skin Generator)');
+        common();
+        P('def intervall():', '    """Wartezeit zwischen zwei Durchläufen in Sekunden."""');
+        if (it.intSet) P('    try:', "        return max(5, int(cfg('intervall', " + pyS(it.interval) + ")))", '    except ValueError:', '        return ' + (+it.interval || 60));
+        else P('    return ' + (+it.interval || 60));
+        P('', '', 'class Beobachter(xbmc.Monitor):', '    """Reagiert auf Ereignisse von Kodi."""', '', '    def onSettingsChanged(self):', "        log('Einstellungen wurden geändert')", '        # ' + SCR_MARK + ' (optional): Einstellungen neu einlesen', '', '');
+        stub('beim_start', 'Wird einmal beim Start des Dienstes ausgeführt', '', "log('Dienst gestartet')");
+        stub('durchlauf', 'Wird immer wieder ausgeführt (siehe intervall())', '', "log('Durchlauf')");
+        P('def main():', '    monitor = Beobachter()', '    beim_start()', '    while not monitor.abortRequested():', '        durchlauf()', '        if monitor.waitForAbort(intervall()):', '            break', "    log('Dienst beendet')", '', '', "if __name__ == '__main__':", '    main()');
+      } else if (T === 'module') {
+        const pk = scrPkg(it);
+        P('# -*- coding: utf-8 -*-', '"""' + nm + ' – Modul (erstellt mit dem Kodi Addon & Skin Generator)', '', 'So benutzt du es in einem anderen Addon:', '  1. In dessen addon.xml unter <requires> eintragen:', '       <import addon="' + id + '"/>', '  2. Im Python-Code:', '       import ' + pk, '       ' + pk + '.' + (E[0] ? E[0].k : 'hallo') + '()', '"""', 'import xbmc', '', "NAME = " + pyS(it.name || 'Mein Modul'), '', '', 'def log(msg):', "    xbmc.log('[%s] %s' % (NAME, msg), xbmc.LOGINFO)", '', '');
+        (E.length ? E : [{ k: 'hallo', l: 'Beispiel-Funktion' }]).forEach(e => {
+          P('def ' + e.k + '(*args):', '    """' + pyC(e.l) + '"""', '    # ' + SCR_MARK + ' – ersetze die nächste Zeile durch deinen eigenen Code:', "    log('" + e.k + " aufgerufen: %s' % (args,))", '    return None', '', '');
+        });
+      } else {
+        head(['import sys', '', 'import xbmc', 'import xbmcgui'], 'Kontextmenü-Eintrag (erstellt mit dem Kodi Addon & Skin Generator)');
+        P("NAME = " + pyS(it.name || 'Mein Eintrag'), '', '', 'def main():', '    """Wird aufgerufen, wenn der Eintrag im Kontextmenü gewählt wird."""', "    titel = xbmc.getInfoLabel('ListItem.Label')", "    pfad = xbmc.getInfoLabel('ListItem.FileNameAndPath')", "    art = xbmc.getInfoLabel('ListItem.DBType')  # movie, tvshow, episode, song …", "    dbid = xbmc.getInfoLabel('ListItem.DBID')", '    # Alternativ (Kodi 19+): item = sys.listitem  # das gewählte xbmcgui.ListItem', '    # ' + SCR_MARK + ' – ersetze die nächste Zeile durch deinen eigenen Code:', "    xbmcgui.Dialog().ok(NAME, 'Gewählt: %s\\nArt: %s\\nPfad: %s' % (titel, art, pfad))", '', '', "if __name__ == '__main__':", '    main()');
+      }
+      return L.join('\n').replace(/\n{4,}/g, '\n\n\n').replace(/\n+$/, '') + '\n';
+    }
+
+    // Abhängigkeiten: eigene Angaben + automatisch aus den import-Zeilen erkannte Kodi-Module
+    function scrDeps(it) {
+      const res = [], own = scrFull(it), add = (id, why) => { if (id !== own && id !== 'xbmc.python' && !res.some(x => x.id === id)) res.push({ id, why }); };
+      String(it.deps || '').split(/[\s,;]+/).filter(x => /^[A-Za-z0-9_.\-]+$/.test(x)).forEach(d => add(d, 'von dir eingetragen'));
+      const files = [{ n: 'Hauptdatei', c: it.code }].concat((it.files || []).map(f => ({ n: f.n, c: f.c }))), local = localMods((it.files || []).map(f => String(f.n || '') + '.py'));
+      files.forEach(f => [...pyImports(f.c || '')].forEach(n => { if (!local.has(n) && IMPORT_MAP[n]) add(IMPORT_MAP[n], 'import ' + n + ' in ' + f.n); }));
+      return res;
+    }
+
+    function scrAddonXml(it) {
+      const T = it.type, id = scrFull(it), py = PY[S.kodi] || '3.0.1', m = S.meta, desc = String(it.desc || '').trim() || (it.name + ' – erstellt mit dem Kodi Addon & Skin Generator.');
+      const deps = scrDeps(it).map(d => `    <import addon="${esc(d.id)}"/>`).join('\n');
+      let ext;
+      if (T === 'program') ext = `  <extension point="xbmc.python.pluginsource" library="default.py">\n    <provides>executable</provides>\n  </extension>`;
+      else if (T === 'script') ext = it.showProg ? `  <extension point="xbmc.python.script" library="default.py">\n    <provides>executable</provides>\n  </extension>` : `  <extension point="xbmc.python.script" library="default.py"/>`;
+      else if (T === 'service') ext = `  <extension point="xbmc.service" library="service.py" start="${it.startup === 'startup' ? 'startup' : 'login'}"/>`;
+      else if (T === 'module') ext = `  <extension point="xbmc.python.module" library="lib"/>`;
+      else ext = `  <extension point="kodi.context.item">\n    <menu id="kodi.core.main">\n      <item library="context.py">\n        <label>30000</label>\n        <visible>${esc(scrVis(it))}</visible>\n      </item>\n    </menu>\n  </extension>`;
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<addon id="${esc(id)}" name="${esc(it.name)}" version="${esc(scrVer(it.ver))}" provider-name="${esc(it.author || m.author || 'Ich')}">\n  <requires>\n    <import addon="xbmc.python" version="${py}"/>${deps ? '\n' + deps : ''}\n  </requires>\n${ext}\n  <extension point="xbmc.addon.metadata">\n    <summary lang="de_DE">${esc(it.name)}</summary>\n    <description lang="de_DE">${esc(desc)}</description>\n    <license>${esc(m.lic && m.lic.trim() ? m.lic : 'GPL-2.0-or-later')}</license>\n    <platform>all</platform>\n    <assets>\n      <icon>icon.png</icon>\n      <fanart>fanart.jpg</fanart>\n    </assets>\n  </extension>\n</addon>\n`;
+    }
+    const scrFileName = n => { let s = String(n || '').trim().replace(/\.py$/i, ''); return /^[A-Za-z_][A-Za-z0-9_]{0,40}$/.test(s) ? s + '.py' : ''; };
+    const scrMainPath = it => it.type === 'program' || it.type === 'script' ? 'default.py' : it.type === 'service' ? 'service.py' : it.type === 'context' ? 'context.py' : 'lib/' + scrPkg(it) + '.py';
+    function scrFiles(it) {
+      const F = {}, T = it.type, st = scrSettings(it);
+      F['addon.xml'] = scrAddonXml(it);
+      F[scrMainPath(it)] = it.code || '';
+      (it.files || []).forEach(f => { const n = scrFileName(f.n); if (n) F[(T === 'module' ? 'lib/' : 'resources/lib/') + n] = f.c || ''; });
+      if (T !== 'module') { F['resources/__init__.py'] = ''; if (!F['resources/lib/__init__.py']) F['resources/lib/__init__.py'] = ''; }
+      if (st.length) F['resources/settings.xml'] = settingsXmlOf(st);
+      if (T === 'context') {
+        const po = (lang, tr) => `# Kodi Media Center language file\nmsgid ""\nmsgstr ""\n"Content-Type: text/plain; charset=UTF-8\\n"\n"Language: ${lang}\\n"\n\nmsgctxt "#30000"\nmsgid "${String(it.ctxLabel || it.name).replace(/["\\\r\n]+/g, ' ')}"\nmsgstr "${tr ? String(it.ctxLabel || it.name).replace(/["\\\r\n]+/g, ' ') : ''}"\n`;
+        F['resources/language/resource.language.en_gb/strings.po'] = po('en_GB', false);
+        F['resources/language/resource.language.de_de/strings.po'] = po('de_DE', true);
+      }
+      F['changelog.txt'] = 'v' + scrVer(it.ver) + '\n- Erstellt mit dem Kodi Addon & Skin Generator\n';
+      const old = S.meta.name; S.meta.name = it.name || 'S';
+      try { F['icon.png'] = { b64: mkImg(512, 512, 'image/png', 1) }; F['fanart.jpg'] = { b64: mkImg(1920, 1080, 'image/jpeg', .12) }; } finally { S.meta.name = old; }
+      return F;
+    }
+    function scrZipEntries(it) {
+      const F = scrFiles(it), root = scrFull(it), enc = new TextEncoder(), E = [{ p: root, dir: 1 }], dirs = new Set();
+      Object.keys(F).forEach(k => { const p = k.split('/'); for (let i = 1; i < p.length; i++) dirs.add(p.slice(0, i).join('/')); });
+      [...dirs].sort().forEach(d => E.push({ p: root + '/' + d, dir: 1 }));
+      Object.keys(F).forEach(k => E.push({ p: root + '/' + k, d: typeof F[k] === 'string' ? enc.encode(F[k]) : b64ToBytes(F[k].b64) }));
+      return E;
+    }
+
+    // ---- Syntax-Sichtprüfung (kein echter Python-Lauf – findet nur typische Tippfehler) ----
+    function scrLint(src) {
+      const out = [], n = src.length, m = [], lineIn = [], depthAt = [0], st = [];
+      let i = 0, line = 1;
+      while (i < n) {
+        const c = src[i];
+        if (c === '\n') { line++; m.push('\n'); i++; depthAt[line] = st.length; lineIn[line] = false; continue; }
+        if (c === '#') { while (i < n && src[i] !== '\n') i++; continue; }
+        if (c === '"' || c === "'") {
+          const q3 = src.substr(i, 3) === c + c + c, q = q3 ? c + c + c : c, start = line; let closed = false;
+          m.push(q); i += q.length;
+          while (i < n) {
+            if (src[i] === '\\') { if (src[i + 1] === '\n') { line++; m.push('\n'); depthAt[line] = st.length; lineIn[line] = true; } else m.push('x'); i += 2; continue; }
+            if (src.substr(i, q.length) === q) { m.push(q); i += q.length; closed = true; break; }
+            if (src[i] === '\n') { if (!q3) break; line++; m.push('\n'); depthAt[line] = st.length; lineIn[line] = true; i++; continue; }
+            m.push('x'); i++;
+          }
+          if (!closed) out.push(['w', 'Zeile ' + start + ': Ein Text in Anführungszeichen wird nicht geschlossen.']);
+          continue;
+        }
+        if ('([{'.includes(c)) st.push([c, line]);
+        else if (')]}'.includes(c)) { const o = st.pop(); if (!o || '([{'.indexOf(o[0]) !== ')]}'.indexOf(c)) out.push(['w', 'Zeile ' + line + ': „' + c + '“ passt zu keiner öffnenden Klammer.']); }
+        m.push(c); i++;
+      }
+      st.forEach(([c, l]) => out.push(['w', 'Zeile ' + l + ': Die Klammer „' + c + '“ wird nie geschlossen.']));
+      const ml = m.join('').split('\n'), raw = src.split('\n');
+      let tabs = 0, sp = 0; raw.forEach((l, k) => { if (lineIn[k + 1]) return; if (/^\t/.test(l)) tabs++; else if (/^ +\S/.test(l)) sp++; });
+      if (tabs && sp) out.push(['w', 'Tabulatoren und Leerzeichen sind gemischt – Python verlangt eine einheitliche Einrückung (empfohlen: 4 Leerzeichen).']);
+      const codeLines = [];
+      ml.forEach((l, k) => { if (!lineIn[k + 1] && /\S/.test(l)) codeLines.push(k); });
+      codeLines.forEach((k, idx) => {
+        const l = ml[k].replace(/\s+$/, ''), ind = (/^[ \t]*/.exec(l)[0]).length, nx = codeLines[idx + 1], atTop = (depthAt[k + 1] || 0) === 0 && (depthAt[k + 2] || 0) === 0;
+        if (/^\s*print\s+[^(=\s]/.test(l)) out.push(['w', 'Zeile ' + (k + 1) + ': „print“ ohne Klammern ist Python 2 – in Kodi 19+ muss es print(…) heißen.']);
+        if (!atTop) return;
+        if (/^\s*(def|class|if|elif|else|for|while|try|except|finally|with)\b/.test(l) && !/:/.test(l)) out.push(['w', 'Zeile ' + (k + 1) + ': Hier fehlt am Ende vermutlich ein Doppelpunkt „:“.']);
+        if (/:$/.test(l) && /^\s*(def|class|if|elif|else|for|while|try|except|finally|with)\b/.test(l) && nx != null) {
+          const ni = (/^[ \t]*/.exec(ml[nx])[0]).length;
+          if (ni <= ind) out.push(['w', 'Zeile ' + (k + 1) + ': Nach dem Doppelpunkt fehlt der eingerückte Block (nächste Zeile muss weiter rechts beginnen).']);
+        }
+      });
+      const left = (src.match(/>>> DEIN CODE/g) || []).length;
+      if (left) out.push(['i', left + ' Stelle(n) mit „' + SCR_MARK + '“ – dort kommt noch dein eigener Code hin (die Beispielzeile darunter ist nur ein Platzhalter).']);
+      if (!/\S/.test(src)) out.push(['w', 'Die Datei ist leer.']);
+      return out.slice(0, 14);
+    }
+
+    // ---- Bausteine zum Einfügen ----
+    const SCR_SNIP = [
+      ['Meldung (OK-Fenster)', ['import xbmcgui'], ["xbmcgui.Dialog().ok('Titel', 'Text der Meldung')"]],
+      ['Kurze Benachrichtigung', ['import xbmcgui'], ["xbmcgui.Dialog().notification('Titel', 'Text', xbmcgui.NOTIFICATION_INFO, 3000)"]],
+      ['Ja/Nein-Frage', ['import xbmcgui'], ["if xbmcgui.Dialog().yesno('Frage', 'Wirklich fortfahren?'):", '    pass  # Ja', 'else:', '    pass  # Nein']],
+      ['Text eingeben lassen', ['import xbmcgui'], ["text = xbmcgui.Dialog().input('Bitte Text eingeben', type=xbmcgui.INPUT_ALPHANUM)", 'if text:', "    pass  # text enthält die Eingabe"]],
+      ['Auswahlliste', ['import xbmcgui'], ["auswahl = xbmcgui.Dialog().select('Bitte wählen', ['Eins', 'Zwei', 'Drei'])", 'if auswahl >= 0:', '    pass  # 0 = Eins, 1 = Zwei, 2 = Drei']],
+      ['Fortschrittsbalken', ['import xbmc', 'import xbmcgui'], ['dialog = xbmcgui.DialogProgress()', "dialog.create('Bitte warten', 'Arbeite …')", 'for schritt in range(1, 101):', '    if dialog.iscanceled():', '        break', "    dialog.update(schritt, 'Schritt %d von 100' % schritt)", '    xbmc.sleep(30)', 'dialog.close()']],
+      ['Kodi-Befehl ausführen', ['import xbmc'], ["xbmc.executebuiltin('ActivateWindow(home)')"]],
+      ['JSON-RPC (Filme abfragen)', ['import json', 'import xbmc'], ['antwort = json.loads(xbmc.executeJSONRPC(json.dumps({', "    'jsonrpc': '2.0', 'id': 1,", "    'method': 'VideoLibrary.GetMovies',", "    'params': {'properties': ['title', 'year'], 'limit': 10},", '})))', "filme = antwort.get('result', {}).get('movies', [])"]],
+      ['Einstellung lesen', ['import xbmcaddon'], ["wert = xbmcaddon.Addon().getSetting('meine_einstellung')"]],
+      ['Einstellung speichern', ['import xbmcaddon'], ["xbmcaddon.Addon().setSetting('meine_einstellung', 'neuer wert')"]],
+      ['Datei speichern (Addon-Daten)', ['import xbmcaddon', 'import xbmcvfs'], ["ordner = xbmcvfs.translatePath('special://profile/addon_data/%s/' % xbmcaddon.Addon().getAddonInfo('id'))", 'if not xbmcvfs.exists(ordner):', '    xbmcvfs.mkdirs(ordner)', "with open(ordner + 'daten.txt', 'w', encoding='utf-8') as f:", "    f.write('Hallo')"]],
+      ['Datei lesen (Addon-Daten)', ['import xbmcaddon', 'import xbmcvfs'], ["pfad = xbmcvfs.translatePath('special://profile/addon_data/%s/daten.txt' % xbmcaddon.Addon().getAddonInfo('id'))", 'if xbmcvfs.exists(pfad):', "    with open(pfad, 'r', encoding='utf-8') as f:", '        text = f.read()']],
+      ['Internet-Abruf (HTTP)', ['import urllib.request', 'import xbmc'], ['try:', "    with urllib.request.urlopen('https://example.com/daten.json', timeout=15) as antwort:", "        text = antwort.read().decode('utf-8')", 'except Exception as fehler:', "    xbmc.log('Abruf fehlgeschlagen: %s' % fehler, xbmc.LOGERROR)", "    text = ''"]],
+      ['Video abspielen', ['import xbmc'], ["xbmc.Player().play('https://example.com/video.mp4')"]],
+      ['Kodi-Info lesen', ['import xbmc'], ["titel = xbmc.getInfoLabel('ListItem.Label')", "laeuft = xbmc.getCondVisibility('Player.HasVideo')"]],
+      ['Globale Variable setzen/lesen', ['import xbmcgui'], ["xbmcgui.Window(10000).setProperty('mein.wert', '1')", "wert = xbmcgui.Window(10000).getProperty('mein.wert')"]],
+      ['Warteschleife mit Abbruch', ['import xbmc'], ['monitor = xbmc.Monitor()', 'while not monitor.abortRequested():', '    # ... deine Arbeit ...', '    if monitor.waitForAbort(10):  # Sekunden', '        break']],
+      ['Eintrag ins Kodi-Log', ['import xbmc'], ["xbmc.log('[Mein Addon] Text', xbmc.LOGINFO)"]],
+      ['Skin-Schalter setzen', ['import xbmc'], ["xbmc.executebuiltin('Skin.SetBool(meine_option)')"]],
+      ['Fehler abfangen (try/except)', [], ['try:', '    pass  # dein Code', 'except Exception as fehler:', "    pass  # Fehler behandeln: %s' % fehler"]]
+    ];
+    function scrAddImports(code, imps) {
+      const lines = code.split('\n'), miss = imps.filter(im => !new RegExp('^\\s*' + im.replace(/\./g, '\\.').replace(/^import /, 'import\\s+') + '\\b', 'm').test(code));
+      if (!miss.length) return { code, add: 0 };
+      let at = -1; lines.slice(0, 60).forEach((l, k) => { if (/^(import|from)\s/.test(l)) at = k; });
+      if (at < 0) { at = lines.findIndex(l => /^\s*#/.test(l)); }
+      const ins = miss.join('\n') + '\n';
+      let off = 0; for (let k = 0; k <= at; k++) off += lines[k].length + 1;
+      return { code: code.slice(0, off) + ins + code.slice(off), add: ins.length, at: off };
+    }
+
+    // ---- Zustand ----
+    function scrClean(x) {
+      const d = scrDef(SCR_T[x && x.type] ? x.type : 'program'), it = Object.assign(d, x && typeof x === 'object' ? x : {});
+      ['name', 'aid', 'ver', 'author', 'desc', 'deps', 'ctxLabel', 'ctxCond', 'code'].forEach(k => { it[k] = String(it[k] == null ? '' : it[k]); });
+      it.name = it.name.slice(0, 60); it.code = it.code.slice(0, 400000);
+      it.id = String(it.id || uid());
+      it.startup = it.startup === 'startup' ? 'startup' : 'login'; it.interval = Math.max(5, Math.min(86400, Math.round(+it.interval) || 60));
+      ['intSet', 'showProg', 'direct', 'man'].forEach(k => { it[k] = !!it[k]; });
+      if (!SCR_VIS[it.ctxVis]) it.ctxVis = 'all';
+      it.ent = (Array.isArray(it.ent) ? it.ent : []).filter(e => e && typeof e === 'object').slice(0, 40).map(e => ({ k: String(e.k || '').slice(0, 40), l: String(e.l || '').slice(0, 80) }));
+      it.settings = (Array.isArray(it.settings) ? it.settings : []).filter(s => s && typeof s === 'object').slice(0, 40).map(s => ({
+        id: String(s.id || '').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 40) || 'einstellung', t: SETT[s.t] ? s.t : 'text', l: String(s.l || '').slice(0, 80), d: String(s.d == null ? '' : s.d).slice(0, 200), v: String(s.v || '').slice(0, 300), cat: String(s.cat || 'Allgemein').slice(0, 40)
+      }));
+      it.files = (Array.isArray(it.files) ? it.files : []).filter(f => f && typeof f === 'object').slice(0, 12).map(f => ({ n: String(f.n || '').replace(/\.py$/i, '').replace(/[^A-Za-z0-9_]/g, '_').slice(0, 40), c: String(f.c == null ? '' : f.c).slice(0, 400000) }));
+      if (!it.code) { it.code = scrGen(it); it.man = false; }
+      return it;
+    }
+    function normScr() {
+      const o = (S.scr && typeof S.scr === 'object' && !Array.isArray(S.scr)) ? S.scr : {};
+      const items = (Array.isArray(o.items) ? o.items : []).slice(0, 20).map(scrClean);
+      S.scr = { items, cur: items.some(x => x.id === o.cur) ? o.cur : (items[0] ? items[0].id : ''), tab: ['info', 'code', 'out'].includes(o.tab) ? o.tab : 'info', file: -1 };
+      scrLibSync();
+    }
+    const scrIt = () => (S.scr && S.scr.items.find(x => x.id === S.scr.cur)) || null;
+
+    // ---- Befehlsliste: eigene Scripte erscheinen automatisch unter „Scripte“ ----
+    function scrLibLines() {
+      const r = [];
+      ((S.scr && S.scr.items) || []).forEach(it => {
+        const id = scrFull(it), n = it.name || id, add = (i, l, v, d) => r.push({ c: 'Scripte', i, l, v, d, own: true });
+        if (it.type === 'script') {
+          add('📜', n + ' starten', 'RunScript(' + id + ')', 'Dein Script aus dem Generator (Skript-Werkstatt)');
+          scrEnts(it).forEach(e => add('📜', n + ': ' + e.l, 'RunScript(' + id + ',' + e.k + ')', 'Befehl „' + e.k + '“ deines Scripts'));
+        } else if (it.type === 'program') {
+          add('🕹', n + ' öffnen', 'RunAddon(' + id + ')', 'Dein Programm-Addon aus dem Generator');
+          scrEnts(it).forEach(e => add('🕹', n + ': ' + e.l, 'RunPlugin(plugin://' + id + '/?aktion=' + e.k + ')', 'Führt die Aktion „' + e.k + '“ direkt aus'));
+        }
+        if ((it.type === 'script' || it.type === 'program' || it.type === 'service') && scrSettings(it).length) add('🔧', n + ': Einstellungen', 'Addon.OpenSettings(' + id + ')', 'Öffnet die Einstellungen deines Addons');
+      });
+      return r;
+    }
+    function scrLibSync() {
+      for (let i = LIB.length - 1; i >= 0; i--) if (LIB[i].own) LIB.splice(i, 1);
+      scrLibLines().forEach(x => LIB.push(x));
+    }
+
+    // ---- Oberfläche ----
+    function showScr() {
+      normScr();
+      modal('<div id="scr-box"></div>', 'scr');
+      $('modal-in').style.maxWidth = '70rem';
+      scrRender();
+    }
+    function scrNew(type) {
+      if (S.scr.items.length >= 20) return toast('Maximal 20 Scripte pro Projekt.');
+      const it = scrDef(type), T = SCR_T[type], base = { program: ['Mein Programm', 'mein_programm'], script: ['Mein Script', 'mein_script'], service: ['Mein Dienst', 'mein_dienst'], module: ['Mein Modul', 'mein_modul'], context: ['Mein Kontextmenü', 'mein_kontext'] }[type];
+      it.name = base[0]; it.aid = base[1]; it.author = S.meta.author || '';
+      it.ent = type === 'module' ? [{ k: 'hallo', l: 'Beispiel-Funktion' }] : type === 'script' ? [{ k: 'hallo', l: 'Hallo sagen' }, { k: 'aufraeumen', l: 'Aufräumen' }] : type === 'program' ? [{ k: 'hallo', l: 'Hallo sagen' }, { k: 'aufraeumen', l: 'Aufräumen' }] : [];
+      if (type === 'service') it.intSet = true;
+      it.code = scrGen(it); S.scr.items.push(it); S.scr.cur = it.id; S.scr.tab = 'info'; save(); scrLibSync(); scrRender();
+      toast(T.n + ' angelegt – rechts die Angaben ausfüllen, unter „Code“ deinen Code schreiben.');
+    }
+    function scrPick(id) { S.scr.cur = id; S.scr.file = -1; save(); scrRender(); }
+    function scrTab(t) { S.scr.tab = t; scrRender(); }
+    function scrDel() {
+      const it = scrIt(); if (!it || !confirm('„' + it.name + '“ samt Code wirklich aus dem Projekt löschen?')) return;
+      S.scr.items = S.scr.items.filter(x => x !== it); S.scr.cur = S.scr.items[0] ? S.scr.items[0].id : ''; save(); scrLibSync(); scrRender();
+    }
+    function scrDup() {
+      const it = scrIt(); if (!it || S.scr.items.length >= 20) return;
+      const c = JSON.parse(JSON.stringify(it)); c.id = uid(); c.name += ' (Kopie)'; c.aid = (scrAid(c.aid, c.type) || 'kopie') + '_kopie'; S.scr.items.push(c); S.scr.cur = c.id; save(); scrLibSync(); scrRender();
+    }
+    // Eingabefelder: Wert merken, Gerüst nachführen (solange der Code nicht von Hand geändert wurde)
+    function scrSet(k, v, re) {
+      const it = scrIt(); if (!it) return;
+      it[k] = (typeof it[k] === 'boolean') ? !!v : (k === 'interval' ? Math.max(5, Math.min(86400, Math.round(+v) || 60)) : String(v));
+      scrAuto(it); save(); scrLibSync(); if (re) scrRender(); else scrList();
+    }
+    function scrType(v) {
+      const it = scrIt(); if (!it || !SCR_T[v]) return;
+      it.type = v; if (v === 'service' && it.intSet === false && !it.settings.length) it.intSet = true;
+      if (!it.man) it.code = scrGen(it); save(); scrLibSync(); scrRender();
+      if (it.man) toast('Art geändert – dein Code bleibt, wie er ist. Mit „Gerüst neu erzeugen“ bekommst du das passende Gerüst.');
+    }
+    function scrAuto(it) { if (!it.man) { it.code = scrGen(it); const t = $('scr-ta'); if (t && S.scr.file === -1) t.value = it.code; } }
+    function scrEntSet(j, k, v) { const it = scrIt(); if (!it || !it.ent[j]) return; it.ent[j][k] = String(v).slice(0, 80); scrAuto(it); save(); scrLibSync(); }
+    function scrEntAdd() { const it = scrIt(); if (!it || it.ent.length >= 40) return; it.ent.push({ k: '', l: 'Neuer Eintrag' }); scrAuto(it); save(); scrLibSync(); scrRender(); }
+    function scrEntDel(j) { const it = scrIt(); if (!it) return; it.ent.splice(j, 1); scrAuto(it); save(); scrLibSync(); scrRender(); }
+    function scrStSet(j, k, v) { const it = scrIt(); if (!it || !it.settings[j]) return; const s = it.settings[j]; s[k] = k === 'id' ? String(v).toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 40) : String(v).slice(0, 300); save(); }
+    function scrStAdd() {
+      const it = scrIt(); if (!it || it.settings.length >= 40) return;
+      let n = it.settings.length + 1, id; do { id = 'einstellung_' + (n++); } while (it.settings.some(s => s.id === id));
+      it.settings.push({ id, t: 'text', l: 'Neue Einstellung', d: '', v: '', cat: 'Allgemein' }); save(); scrLibSync(); scrRender();
+    }
+    function scrStDel(j) { const it = scrIt(); if (!it) return; it.settings.splice(j, 1); save(); scrLibSync(); scrRender(); }
+    // Code
+    function scrFileSel(k) { S.scr.file = k; scrRender(); }
+    function scrCodeGet() { const it = scrIt(); if (!it) return ''; return S.scr.file === -1 ? it.code : ((it.files[S.scr.file] || {}).c || ''); }
+    function scrCodeSet(v) {
+      const it = scrIt(); if (!it) return;
+      if (S.scr.file === -1) { it.code = v; it.man = true; } else if (it.files[S.scr.file]) it.files[S.scr.file].c = v;
+      save(); clearTimeout(scrCodeSet.t); scrCodeSet.t = setTimeout(scrLintShow, 350);
+    }
+    function scrKeyDown(ev) {
+      if (ev.key === 'Tab' && !ev.shiftKey && !ev.ctrlKey && !ev.altKey && !ev.metaKey) {
+        ev.preventDefault(); const t = ev.target, a = t.selectionStart, b = t.selectionEnd;
+        t.value = t.value.slice(0, a) + '    ' + t.value.slice(b); t.selectionStart = t.selectionEnd = a + 4; scrCodeSet(t.value);
+      }
+    }
+    function scrLintShow() {
+      const box = $('scr-lint'); if (!box) return;
+      const r = scrLint(scrCodeGet());
+      box.innerHTML = r.length ? r.map(x => `<div class="hint" style="color:${x[0] === 'w' ? '#fde68a' : '#94a3b8'}">${x[0] === 'w' ? '⚠' : 'ℹ'} ${esc(x[1])}</div>`).join('') : '<div class="hint" style="color:#86efac">✔ Keine offensichtlichen Fehler gefunden. (Das ist eine Sichtprüfung – Kodi meldet echte Fehler erst beim Start im Log.)</div>';
+    }
+    function scrSnip() {
+      const sel = $('scr-snip'), t = $('scr-ta'), it = scrIt(); if (!sel || !t || !it || sel.value === '') return;
+      const sn = SCR_SNIP[+sel.value]; if (!sn) return;
+      let v = t.value; const a = t.selectionStart, b = t.selectionEnd;
+      const lineStart = v.lastIndexOf('\n', a - 1) + 1, lineEnd = (v.indexOf('\n', a) < 0 ? v.length : v.indexOf('\n', a)), before = v.slice(lineStart, a), full = v.slice(lineStart, lineEnd);
+      let at = a, ind = (/^[ \t]*/.exec(before)[0]), lead = false;
+      if (!/\S/.test(before)) {
+        lead = true;
+        // Cursor steht vor dem ersten Zeichen der Zeile: Einrückung der Zeile bzw. der Zeile davor übernehmen
+        at = lineStart;
+        if (/\S/.test(full)) ind = /^[ \t]*/.exec(full)[0];
+        else {
+          const prev = v.slice(0, lineStart).split('\n').reverse().find(l => /\S/.test(l)) || '';
+          ind = /^[ \t]*/.exec(prev)[0] + (/:\s*$/.test(prev) ? '    ' : '');
+          if (before.length > ind.length) ind = before;
+        }
+      }
+      const body = sn[2].map(l => ind + l).join('\n') + '\n', ins = (!lead ? sn[2].map((l, k) => (k ? ind : '') + l).join('\n') + '\n' : body);
+      v = v.slice(0, at) + ins + v.slice(b);
+      let pos = at + ins.length;
+      const r = scrAddImports(v, sn[1]);
+      if (r.add && r.at <= at) pos += r.add;
+      t.value = r.code; t.focus(); t.selectionStart = t.selectionEnd = pos; scrCodeSet(r.code); sel.value = '';
+      toast('Baustein eingefügt: ' + sn[0]);
+    }
+    function scrRegen() {
+      const it = scrIt(); if (!it) return;
+      if (S.scr.file !== -1) return toast('Das Gerüst gibt es nur für die Hauptdatei.');
+      if (it.man && !confirm('Dein bisheriger Code in der Hauptdatei wird durch ein neues Gerüst ersetzt. Fortfahren?')) return;
+      it.code = scrGen(it); it.man = false; save(); scrRender(); toast('Gerüst neu erzeugt.');
+    }
+    // Fehlende Einträge in einen von Hand bearbeiteten Code nachtragen
+    function scrSync() {
+      const it = scrIt(); if (!it) return;
+      if (S.scr.file !== -1) return toast('Das geht nur in der Hauptdatei.');
+      const T = it.type, E = scrEnts(it); if (!['program', 'script', 'module'].includes(T)) return toast('Für diese Art gibt es keine Einträge zum Ergänzen.');
+      let code = it.code, n = 0;
+      E.forEach(e => {
+        const fn = T === 'program' ? 'aktion_' + e.k : T === 'script' ? 'befehl_' + e.k : e.k;
+        if (new RegExp('^def\\s+' + fn + '\\s*\\(', 'm').test(code)) return;
+        const tab = T === 'program' ? /^AKTIONEN\s*=\s*\[/m : T === 'script' ? /^BEFEHLE\s*=\s*\{/m : null;
+        const stubTxt = T === 'module' ? 'def ' + fn + '(*args):\n    """' + pyC(e.l) + '"""\n    # ' + SCR_MARK + '\n    return None\n\n\n'
+          : 'def ' + fn + '(' + (T === 'script' ? 'args' : '') + '):\n    # ' + pyC(e.l) + '\n    # ' + SCR_MARK + ' – ersetze die nächste Zeile durch deinen eigenen Code:\n    xbmcgui.Dialog().notification(NAME, ' + pyS(e.l + ' wurde gestartet') + ', xbmcgui.NOTIFICATION_INFO, 3000)\n\n\n';
+        if (T === 'module') { code = code.replace(/\n*$/, '\n\n\n') + stubTxt.replace(/\n+$/, '\n'); n++; return; }
+        const m = tab.exec(code); if (!m) return;
+        code = code.slice(0, m.index) + stubTxt + code.slice(m.index); n++;
+        const m2 = tab.exec(code), close = T === 'program' ? '\n]' : '\n}', ci = code.indexOf(close, m2.index);
+        if (ci > 0) { const row = T === 'program' ? '\n    (' + pyS(e.k) + ', ' + pyS(e.l) + ', ' + fn + '),' : '\n    ' + pyS(e.k) + ': ' + fn + ','; code = code.slice(0, ci) + row + code.slice(ci); }
+      });
+      if (!n) return toast('Es fehlt nichts – alle Einträge sind schon im Code.');
+      it.code = code; save(); scrRender(); toast(n + ' fehlende(n) Eintrag/Einträge im Code ergänzt.');
+    }
+    function scrFileAdd() {
+      const it = scrIt(); if (!it || it.files.length >= 12) return;
+      let n = it.files.length + 1, nm; do { nm = 'hilfe' + (n > 1 ? n : ''); n++; } while (it.files.some(f => f.n === nm));
+      it.files.push({ n: nm, c: '# -*- coding: utf-8 -*-\n"""Zusätzliche Datei – so wird sie importiert:\n    from resources.lib import ' + nm + '\n"""\n\n\ndef hallo():\n    return \'Hallo\'\n' });
+      S.scr.file = it.files.length - 1; save(); scrRender();
+    }
+    function scrFileName2(v) {
+      const it = scrIt(), f = it && it.files[S.scr.file]; if (!f) return;
+      const n = String(v).replace(/\.py$/i, '').replace(/[^A-Za-z0-9_]/g, '_').slice(0, 40); f.n = n; save();
+    }
+    function scrFileDel() {
+      const it = scrIt(); if (!it || S.scr.file < 0 || !confirm('Diese Datei löschen?')) return;
+      it.files.splice(S.scr.file, 1); S.scr.file = -1; save(); scrRender();
+    }
+    // Export
+    function scrExport() {
+      const it = scrIt(); if (!it) return;
+      const bad = scrLint(it.code).filter(x => x[0] === 'w');
+      if (bad.length && !confirm('In der Hauptdatei gibt es ' + bad.length + ' Hinweis(e) zur Syntax (z. B. fehlende Klammer):\n\n' + bad.slice(0, 4).map(x => x[1]).join('\n') + '\n\nTrotzdem als ZIP exportieren?')) return;
+      let E; try { E = scrZipEntries(it); } catch (err) { return toast('Fehler beim Erstellen: ' + err.message); }
+      Promise.resolve().then(() => makeZip(E)).then(b => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = scrFull(it) + '.zip'; a.click();
+        toast('✅ ' + scrFull(it) + '.zip erstellt – in Kodi: Einstellungen → Addons → Aus ZIP-Datei installieren.');
+      });
+    }
+    function scrAsDep() {
+      const it = scrIt(); if (!it) return; const id = scrFull(it), l = depList();
+      if (!l.includes(id)) { l.push(id); S.meta.deps = l.join(', '); const f = $('m-deps'); if (f) f.value = S.meta.deps; save(); toast('„' + id + '“ ist jetzt Abhängigkeit deines Menü-Addons (Kodi installiert es mit, wenn es im Repository liegt – sonst vorher die ZIP des Scripts installieren).'); }
+      else toast('Schon als Abhängigkeit eingetragen.');
+    }
+    async function scrEmbed() {
+      const it = scrIt(); if (!it) return;
+      if (!('DecompressionStream' in window)) return toast('Dein Browser kann das nicht – bitte Chrome, Edge, Firefox oder Safari aktualisieren.');
+      try {
+        const b = makeZip(scrZipEntries(it)), f = new File([b], scrFull(it) + '.zip', { type: 'application/zip' });
+        await extAdd({ files: [f], value: '' });
+        const ex = S.ext.find(x => x.id === scrFull(it));
+        if (ex && it.type === 'script') { ex.entries = [{ l: it.name, u: ex.id, k: 'script' }].concat(scrEnts(it).map(e => ({ l: e.l, u: ex.id + ',' + e.k, k: 'runscript' }))); save(); }
+        else if (ex && it.type === 'program') { ex.entries = [{ l: it.name, u: ex.id, k: 'script' }].concat(scrEnts(it).map(e => ({ l: e.l, u: 'plugin://' + ex.id + '/?aktion=' + e.k, k: 'run' }))); save(); }
+        else if (ex && (it.type === 'module' || it.type === 'service' || it.type === 'context')) { ex.entries = []; save(); }
+        toast('✅ „' + it.name + '“ steckt jetzt im Menü-Addon (📦 Fremd-Addon). Beim Installieren wird es mit entpackt.');
+      } catch (e) { toast('Einbetten fehlgeschlagen: ' + (e.message || e)); }
+    }
+
+    function scrList() {
+      const el = $('scr-list'); if (!el) return;
+      el.innerHTML = S.scr.items.map(x => `<button class="row w-full text-left" style="${x.id === S.scr.cur ? 'border-color:#0ea5e9;background:rgba(14,165,233,.12)' : ''}" onclick="scrPick('${x.id}')"><span class="text-xl">${SCR_T[x.type].ic}</span><div class="flex-1 min-w-0"><b class="text-xs break-all">${esc(x.name)}</b><div class="hint break-all">${esc(scrFull(x))}</div></div></button>`).join('') || '<p class="hint">Noch nichts angelegt.</p>';
+    }
+    function scrRender() {
+      const box = $('scr-box'); if (!box) return;
+      const it = scrIt(), tabs = [['info', '📋 Angaben'], ['code', '💻 Code'], ['out', '📦 Export & Einbinden']];
+      const newBtns = Object.keys(SCR_T).map(k => `<button class="btn w-full text-left" style="white-space:normal" onclick="scrNew('${k}')">${SCR_T[k].ic} ${SCR_T[k].n}</button>`).join('');
+      let right = '';
+      if (!it) {
+        right = `<div class="card" style="padding:14px"><b>Was möchtest du bauen?</b><p class="hint mt-1">Wähle links eine Art. Der Generator schreibt das komplette Gerüst (addon.xml, Python-Dateien, Einstellungen, Symbole). Du setzt nur noch <b>deinen eigenen Code</b> an die Stellen „${SCR_MARK}“.</p>
+          ${Object.keys(SCR_T).map(k => `<div class="row mt-2"><span class="text-xl">${SCR_T[k].ic}</span><div class="flex-1 min-w-0"><b class="text-xs">${SCR_T[k].n}</b> <span class="hint">${SCR_T[k].pre}…</span><div class="hint">${SCR_T[k].d}</div></div><button class="btn" onclick="scrNew('${k}')">Anlegen</button></div>`).join('')}</div>`;
+      } else {
+        const tb = `<div class="flex flex-wrap gap-1.5 mb-3">${tabs.map(t => `<button class="btn ${S.scr.tab === t[0] ? 'pri' : ''}" onclick="scrTab('${t[0]}')">${t[1]}</button>`).join('')}<span class="flex-1"></span><button class="btn" onclick="scrDup()" aria-label="Duplizieren">⧉</button><button class="btn" onclick="scrDel()" aria-label="Löschen">🗑</button></div>`;
+        right = tb + (S.scr.tab === 'info' ? scrInfo(it) : S.scr.tab === 'code' ? scrCode(it) : scrOut(it));
+      }
+      box.innerHTML = `<div class="flex justify-between items-center mb-2"><b>📜 Script-Werkstatt</b><button class="btn" onclick="closeModal()">Schließen</button></div>
+        <p class="hint mb-3">Baue eigene <b>Programme, Scripte, Hintergrund-Dienste, Module und Kontextmenü-Einträge</b> für Kodi. Jedes wird eine eigene, installierbare ZIP – unabhängig von deinem Menü-Addon. Scripte lassen sich danach in jedem Menü- und Skin-Button über die 📚 Befehlsliste (Gruppe „Scripte“) aufrufen.</p>
+        <div class="flex flex-wrap gap-3"><div style="flex:1 1 200px;max-width:260px"><div id="scr-list" class="flex flex-col gap-1.5"></div><b class="text-xs block mt-3 mb-1">＋ Neu anlegen</b><div class="flex flex-col gap-1.5">${newBtns}</div></div>
+        <div style="flex:3 1 420px;min-width:0">${right}</div></div>`;
+      scrList();
+      if (it && S.scr.tab === 'code') scrLintShow();
+    }
+    const scrIn = (lab, val, k, ph, extra) => `<label class="block mt-2"><span class="hint">${lab}</span><input class="inp" value="${esc(val)}" placeholder="${esc(ph || '')}" oninput="scrSet('${k}',this.value)" ${extra || ''}></label>`;
+    function scrInfo(it) {
+      const T = it.type, E = it.ent, st = it.settings, id = scrFull(it);
+      const entTitle = { program: 'Aktionen in der Liste', script: 'Befehle (RunScript-Angaben)', module: 'Funktionen' }[T];
+      const entHint = { program: 'Jede Zeile wird ein Eintrag unter Programme. „Name“ ist der Text, „Kennung“ der interne Name (leer = aus dem Text).', script: 'Ohne Angabe läuft „standard()“. Mit <code>RunScript(' + esc(id) + ',kennung)</code> läuft der passende Befehl; weitere Angaben kommen als Liste an.', module: 'Jede Zeile wird eine Funktion im Modul.' }[T];
+      return `<div class="card" style="padding:12px">
+        <label class="block"><span class="hint">Art</span><select class="inp" onchange="scrType(this.value)">${Object.keys(SCR_T).map(k => `<option value="${k}" ${k === T ? 'selected' : ''}>${SCR_T[k].ic} ${SCR_T[k].n}</option>`).join('')}</select></label>
+        <p class="hint mt-1">${SCR_T[T].d}</p>
+        ${scrIn('Name (so heißt es in Kodi)', it.name, 'name', 'Mein Script')}
+        <label class="block mt-2"><span class="hint">ID – Kodi erkennt das Addon daran (nur Kleinbuchstaben, Ziffern, Punkt, Unterstrich, Minus)</span><div class="flex items-center gap-1.5"><code class="text-xs shrink-0">${esc(SCR_T[T].pre)}</code><input class="inp" value="${esc(it.aid)}" oninput="scrSet('aid',this.value);scrIdShow()" onblur="scrSet('aid',scrAid(this.value,'${T}')||'mein_script',true)"></div></label>
+        <div class="hint mt-1">Vollständige ID: <b id="scr-id">${esc(id)}</b></div>
+        <div class="grid grid-cols-2 gap-2">${scrIn('Version', it.ver, 'ver', '1.0.0')}${scrIn('Autor', it.author, 'author', S.meta.author || 'Ich')}</div>
+        ${scrIn('Beschreibung', it.desc, 'desc', 'Was macht es?')}
+        ${T === 'program' ? `<label class="text-xs flex items-center gap-1.5 mt-2"><input type="checkbox" ${it.direct ? 'checked' : ''} onchange="scrSet('direct',this.checked)">Ohne Liste direkt die erste Aktion starten</label>` : ''}
+        ${T === 'script' ? `<label class="text-xs flex items-center gap-1.5 mt-2"><input type="checkbox" ${it.showProg ? 'checked' : ''} onchange="scrSet('showProg',this.checked)">Auch unter „Programme“ anzeigen (Start ohne Angaben)</label>` : ''}
+        ${T === 'service' ? `<div class="grid grid-cols-2 gap-2 mt-2"><label class="block"><span class="hint">Start</span><select class="inp" onchange="scrSet('startup',this.value)"><option value="login" ${it.startup === 'login' ? 'selected' : ''}>Nach dem Anmelden (empfohlen)</option><option value="startup" ${it.startup === 'startup' ? 'selected' : ''}>Sofort beim Kodi-Start</option></select></label>
+          <label class="block"><span class="hint">Intervall (Sekunden)</span><input class="inp" type="number" min="5" value="${it.interval}" oninput="scrSet('interval',this.value)"></label></div>
+          <label class="text-xs flex items-center gap-1.5 mt-2"><input type="checkbox" ${it.intSet ? 'checked' : ''} onchange="scrSet('intSet',this.checked,true)">Intervall in den Addon-Einstellungen änderbar machen</label>` : ''}
+        ${T === 'context' ? `<div class="grid grid-cols-2 gap-2">${scrIn('Text im Kontextmenü', it.ctxLabel, 'ctxLabel', 'Mein Eintrag')}<label class="block mt-2"><span class="hint">Erscheint bei</span><select class="inp" onchange="scrSet('ctxVis',this.value,true)">${Object.keys(SCR_VIS).map(k => `<option value="${k}" ${it.ctxVis === k ? 'selected' : ''}>${SCR_VIS[k][0]}</option>`).join('')}</select></label></div>
+          ${it.ctxVis === 'custom' ? scrIn('Kodi-Bedingung (Sichtbarkeit)', it.ctxCond, 'ctxCond', 'String.IsEqual(ListItem.DBType,movie)', 'style="font-family:monospace"') : ''}
+          <p class="hint mt-1">Bedingung: <code>${esc(scrVis(it))}</code></p>` : ''}
+        ${entTitle ? `<b class="text-xs block mt-3">${entTitle}</b><p class="hint">${entHint}</p>
+          ${E.map((e, j) => `<div class="flex gap-1.5 mt-1.5"><input class="inp" value="${esc(e.l)}" placeholder="Name" oninput="scrEntSet(${j},'l',this.value)"><input class="inp" style="max-width:34%;font-family:monospace" value="${esc(e.k)}" placeholder="Kennung" oninput="scrEntSet(${j},'k',this.value)"><button class="btn" aria-label="Eintrag löschen" onclick="scrEntDel(${j})">✖</button></div>`).join('')}
+          <button class="btn mt-2" onclick="scrEntAdd()">＋ Eintrag</button>` : ''}
+        ${T !== 'module' ? `<b class="text-xs block mt-3">⚙ Einstellungen (Kodi: Addon → Konfigurieren)</b><p class="hint">Im Code mit <code>cfg('kennung')</code> lesen. ${T === 'service' && it.intSet ? 'Das Intervall wird automatisch ergänzt.' : ''}</p>
+          ${st.map((s, j) => `<div class="row mt-1.5" style="flex-direction:column;align-items:stretch;gap:5px"><div class="flex gap-1.5"><input class="inp" value="${esc(s.l)}" placeholder="Beschriftung" oninput="scrStSet(${j},'l',this.value)"><button class="btn" aria-label="Einstellung löschen" onclick="scrStDel(${j})">✖</button></div>
+            <div class="flex gap-1.5"><input class="inp" style="font-family:monospace" value="${esc(s.id)}" placeholder="kennung" oninput="scrStSet(${j},'id',this.value)"><select class="inp" onchange="scrStSet(${j},'t',this.value);scrRender()">${Object.keys(SETT).map(k => `<option value="${k}" ${s.t === k ? 'selected' : ''}>${SETT[k]}</option>`).join('')}</select></div>
+            <div class="flex gap-1.5"><input class="inp" value="${esc(s.d)}" placeholder="${s.t === 'bool' ? 'Vorgabe: true oder false' : 'Vorgabewert'}" oninput="scrStSet(${j},'d',this.value)">${s.t === 'select' ? `<input class="inp" value="${esc(s.v)}" placeholder="Auswahl, durch Komma getrennt" oninput="scrStSet(${j},'v',this.value)">` : ''}</div></div>`).join('')}
+          <button class="btn mt-2" onclick="scrStAdd()">＋ Einstellung</button>` : ''}
+        ${scrIn('Weitere Abhängigkeiten (Addon-IDs, durch Komma getrennt)', it.deps, 'deps', 'script.module.requests', 'style="font-family:monospace"')}
+        <p class="hint mt-1">Kodi-Module, die du mit <code>import</code> im Code benutzt (z. B. requests, bs4), werden beim Export automatisch ergänzt.</p></div>`;
+    }
+    function scrIdShow() { const it = scrIt(), el = $('scr-id'); if (it && el) el.textContent = scrFull(it); }
+    function scrCode(it) {
+      const f = S.scr.file, files = it.files, cur = f >= 0 ? files[f] : null;
+      if (f >= 0 && !cur) S.scr.file = -1;
+      const pill = (k, l) => `<button class="btn ${S.scr.file === k ? 'pri' : ''}" onclick="scrFileSel(${k})">${esc(l)}</button>`;
+      return `<div class="card" style="padding:12px">
+        <div class="flex flex-wrap gap-1.5 mb-2">${pill(-1, scrMainPath(it))}${files.map((x, k) => pill(k, (it.type === 'module' ? 'lib/' : 'resources/lib/') + (x.n || '?') + '.py')).join('')}${files.length < 12 ? '<button class="btn" onclick="scrFileAdd()">＋ Datei</button>' : ''}</div>
+        ${cur ? `<div class="flex gap-1.5 items-center mb-2"><span class="hint shrink-0">Dateiname</span><input class="inp" style="max-width:220px;font-family:monospace" value="${esc(cur.n)}" oninput="scrFileName2(this.value)" onblur="scrRender()"><span class="hint">.py</span><span class="flex-1"></span><button class="btn" onclick="scrFileDel()">🗑 Datei</button></div>` : ''}
+        <div class="flex flex-wrap gap-1.5 mb-2"><select id="scr-snip" class="inp" style="max-width:260px" onchange="scrSnip()"><option value="">＋ Baustein einfügen …</option>${SCR_SNIP.map((s, k) => `<option value="${k}">${esc(s[0])}</option>`).join('')}</select>
+          ${f === -1 ? `<button class="btn" onclick="scrRegen()">🔄 Gerüst neu erzeugen</button><button class="btn" onclick="scrSync()">➕ Fehlende Einträge ergänzen</button>` : ''}<button class="btn" onclick="scrLintShow()">🔍 Prüfen</button></div>
+        <textarea id="scr-ta" class="inp" rows="22" wrap="off" spellcheck="false" style="font-family:monospace;font-size:12px;white-space:pre;overflow:auto;tab-size:4" oninput="scrCodeSet(this.value)" onkeydown="scrKeyDown(event)">${esc(scrCodeGet())}</textarea>
+        <div id="scr-lint" class="mt-2"></div>
+        <p class="hint mt-1">Tab-Taste = 4 Leerzeichen. ${f === -1 ? (it.man ? 'Du hast den Code selbst bearbeitet – Änderungen an den Angaben ändern ihn nicht mehr automatisch (dafür „Fehlende Einträge ergänzen“).' : 'Solange du den Code nicht selbst änderst, passt sich das Gerüst den Angaben automatisch an.') : 'Aus der Hauptdatei so einbinden: <code>from resources.lib import ' + esc(cur.n) + '</code>'}</p></div>`;
+    }
+    function scrOut(it) {
+      const F = scrFiles(it), id = scrFull(it), deps = scrDeps(it), sz = k => { const v = F[k]; const n = typeof v === 'string' ? new TextEncoder().encode(v).length : Math.round(v.b64.length * .75); return n > 1024 ? Math.round(n / 1024) + ' KB' : n + ' B'; };
+      const lib = scrLibLines().filter(x => x.v.includes(id)), T = it.type;
+      return `<div class="card" style="padding:12px"><b class="text-sm">${SCR_T[T].ic} ${esc(it.name)}</b> <span class="hint">${esc(id)} · v${esc(scrVer(it.ver))}</span>
+        <p class="hint mt-2"><b>Das steckt in der ZIP:</b></p><div class="hint" style="font-family:monospace;line-height:1.6">${Object.keys(F).sort().map(k => esc(id + '/' + k) + ' <span style="opacity:.6">(' + sz(k) + ')</span>').join('<br>')}</div>
+        ${deps.length ? `<p class="hint mt-2"><b>Braucht:</b> ${deps.map(d => esc(d.id) + ' <span style="opacity:.7">(' + esc(d.why) + ')</span>').join(', ')}</p>` : ''}
+        <button class="btn pri w-full mt-3" onclick="scrExport()">⬇ ${esc(id)}.zip exportieren</button>
+        <p class="hint mt-2">Installieren: ZIP auf das Kodi-Gerät kopieren → <b>Einstellungen → Addons → Aus ZIP-Datei installieren</b>. ${T === 'program' ? 'Danach unter <b>Addons → Programm-Addons</b> (bzw. „Programme“) zu finden.' : T === 'script' ? 'Starten mit <code>RunScript(' + esc(id) + ')</code>' + (it.showProg ? ' oder über „Programme“.' : '.') : T === 'service' ? 'Der Dienst startet beim nächsten Kodi-Start (oder Addon aus- und wieder einschalten). Ausgaben stehen im Kodi-Log.' : T === 'module' ? 'Andere Addons tragen <code>' + esc(id) + '</code> als Abhängigkeit ein.' : 'Der Eintrag erscheint danach im Kontextmenü, wenn die Bedingung passt.'}</p>
+        <div class="mt-3 p-2 rounded-xl" style="background:rgba(139,92,246,.1)"><b class="text-xs">🧩 Mit deinem Menü-Addon verbinden</b>
+          <p class="hint mt-1"><b>Mitliefern:</b> Die ZIP wird in dein Menü-Addon eingebettet (wie ein Fremd-Addon) und beim Installieren automatisch entpackt – eine Installation genügt.</p>
+          <button class="btn w-full mt-1" onclick="scrEmbed()">📦 In mein Menü-Addon einbetten</button>
+          <p class="hint mt-2"><b>Als Abhängigkeit</b> eintragen: Kodi verlangt es dann beim Installieren (nur sinnvoll, wenn es aus einem Repository kommt oder vorher installiert wurde).</p>
+          <button class="btn w-full mt-1" onclick="scrAsDep()">🔗 Als Abhängigkeit eintragen</button></div>
+        ${lib.length ? `<p class="hint mt-3"><b>Befehle für Buttons</b> (stehen auch in der 📚 Befehlsliste unter „Scripte“):</p>${lib.map(x => `<div class="row mt-1"><div class="flex-1 min-w-0"><b class="text-xs">${esc(x.l)}</b><div class="hint break-all" style="font-family:monospace">${esc(x.v)}</div></div></div>`).join('')}` : ''}</div>`;
     }
 
     // ================= SEITE VERLASSEN: nur über den Beenden-Button, sonst Rückfrage =================
