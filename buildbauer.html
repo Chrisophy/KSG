@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's-Possible Wizard · Buildbauer-Anleitung</title>
+<style>
+:root{--bg:#0b0606;--bg2:#160909;--panel:#1d0b0b;--panel2:#260d0d;--line:#521717;--red:#ff3030;--red2:#b51d1d;--text:#eee5e5;--muted:#b9a5a5;--soft:#d8caca;--ok:#65d18a;--warn:#ffb04d;--code:#120707}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(135deg,var(--bg),#170707 55%,#090303);color:var(--text);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 10%,rgba(255,40,40,.16),transparent 32%),radial-gradient(circle at 90% 80%,rgba(160,20,20,.12),transparent 30%)}
+a{color:#ff8b8b;text-decoration:none}
+a:hover{color:#ffc1c1}
+header{position:sticky;top:0;z-index:20;background:rgba(12,5,5,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.header-inner{max-width:1500px;margin:auto;padding:16px 24px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+.brand h1{margin:0;font-size:23px;letter-spacing:.5px;color:var(--red)}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+button{cursor:pointer;border:1px solid #6b2020;background:#2a0d0d;color:var(--text);border-radius:8px;padding:8px 12px;font:inherit;font-size:13px}
+button:hover{border-color:var(--red);background:#3a1010}
+.layout{max-width:1500px;margin:auto;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;padding:24px}
+nav{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 112px);overflow:auto;border:1px solid var(--line);border-radius:14px;background:rgba(24,9,9,.9);padding:14px}
+nav h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:6px 8px 12px}
+#search{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #542020;background:#120707;color:var(--text);font:inherit;font-size:14px;margin-bottom:10px}
+#search:focus{outline:2px solid rgba(255,48,48,.35);border-color:var(--red)}
+nav a{display:block;padding:8px 10px;border-radius:7px;color:var(--soft);font-size:14px;border-left:2px solid transparent}
+nav a:hover{background:#2a0e0e;border-left-color:var(--red);color:#fff}
+main{min-width:0}
+.hero{border:1px solid var(--line);background:linear-gradient(120deg,#2a0d0d,#170808);border-radius:16px;padding:26px;margin-bottom:20px}
+.hero h2{margin:0 0 8px;font-size:31px;color:#fff}
+.hero p{margin:0;color:var(--muted);max-width:900px}
+.quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.quick a{display:block;background:#1b0909;border:1px solid #4a1717;border-radius:10px;padding:13px 15px}
+.quick strong{display:block;color:#fff;margin-bottom:3px}
+.quick span{font-size:13px;color:var(--muted)}
+.section{border:1px solid var(--line);background:rgba(24,9,9,.88);border-radius:14px;padding:24px;margin:0 0 18px}
+.section h2{margin:0 0 12px;color:#ff5a5a;font-size:26px;scroll-margin-top:100px}
+.section h3{margin:24px 0 8px;color:#ffd4d4;font-size:19px}
+.section h4{margin:18px 0 6px;color:#ffb0b0;font-size:16px}
+.section p,.section li{color:var(--soft)}
+.section ul,.section ol{padding-left:24px}
+.section li{margin:5px 0}
+.callout{border-left:4px solid var(--warn);background:#241407;padding:12px 15px;border-radius:8px;margin:14px 0;color:#f4d7ae}
+.callout.red{border-left-color:var(--red);background:#2a0d0d;color:#ffd0d0}
+.callout.green{border-left-color:var(--ok);background:#0d2015;color:#c7f2d7}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{border:1px solid #4a1717;background:#1b0909;border-radius:10px;padding:14px}
+.card h4{margin:0 0 6px}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+pre{position:relative;background:var(--code);border:1px solid #3f1515;border-radius:10px;padding:16px;overflow:auto;color:#f3dddd;font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;margin:12px 0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#160808;border:1px solid #351111;padding:1px 5px;border-radius:4px;color:#ffd2d2}
+pre code{background:none;border:0;padding:0;color:inherit}
+.copy{position:absolute;right:10px;top:10px;padding:5px 9px;font-size:12px;background:#2c0e0e;border-color:#6a2424}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+th,td{text-align:left;border-bottom:1px solid #3d1414;padding:9px 8px;vertical-align:top}
+th{color:#ffb0b0;background:#230c0c}
+tr:hover td{background:#1f0b0b}
+.tag{display:inline-block;font-size:12px;border:1px solid #6a2424;background:#2a0d0d;color:#ffbdbd;border-radius:999px;padding:2px 8px;margin:2px 3px 2px 0}
+.steps{counter-reset:step;list-style:none;padding:0}
+.steps li{position:relative;padding:0 0 18px 44px;margin:0}
+.steps li:before{counter-increment:step;content:counter(step);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--red2);color:#fff;text-align:center;line-height:28px;font-weight:700}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:10px;align-items:flex-start;margin:8px 0;background:#1b0909;border:1px solid #3d1414;border-radius:8px;padding:9px 11px}
+.checklist input{margin-top:4px;accent-color:var(--red)}
+.progress{height:8px;background:#2a0d0d;border-radius:99px;overflow:hidden;margin:12px 0}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#8f1717,#ff4646);transition:width .2s}
+.generator{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.generator label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.generator input,.generator select,.generator textarea{width:100%;padding:9px 10px;border:1px solid #4b1b1b;border-radius:7px;background:#120707;color:var(--text);font:inherit;font-size:14px}
+.generator .wide{grid-column:1/-1}
+.generator textarea{min-height:170px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.hidden{display:none!important}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:fixed;left:12px;top:-100px;z-index:100;background:#fff;color:#111;padding:10px 14px;border-radius:8px;font-weight:700;transition:top .15s}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid #ff7b7b;outline-offset:3px}
+.nav-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.nav-toggle{display:none;font-size:12px;padding:6px 10px}
+nav a.active{background:#361010;border-left-color:var(--red);color:#fff;font-weight:600}
+.eyebrow{margin:0 0 6px;text-transform:uppercase;letter-spacing:1.4px;font-size:12px;color:#ff9a9a;font-weight:700}
+.path-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+.path-card{display:block;border:1px solid #7a2727;background:linear-gradient(135deg,#2b0e0e,#180707);border-radius:12px;padding:18px;transition:transform .15s,border-color .15s}
+.path-card:hover{border-color:var(--red);transform:translateY(-2px)}
+.path-card strong{display:block;color:#fff;font-size:18px;margin-bottom:5px}
+.path-card span{display:block;color:var(--muted);font-size:14px}
+.path-card em{display:inline-block;margin-top:10px;color:#ff9f9f;font-style:normal;font-size:13px}
+.quick{margin-top:14px}
+.flow{display:block;width:100%;height:auto;margin:14px 0;border:1px solid #431616;border-radius:12px;background:#120707}
+.table-wrap{overflow-x:auto}
+.result{padding:11px 13px;border-radius:8px;border:1px solid #4a1717;background:#1b0909;margin:10px 0}
+.result.ok{border-color:#2e6b45;background:#0d2015;color:#c7f2d7}
+.result.warn{border-color:#7a591f;background:#241407;color:#f4d7ae}
+.result.error{border-color:#8c2727;background:#2a0d0d;color:#ffd0d0}
+.result ul{margin:8px 0 0;padding-left:22px}
+.validator textarea{width:100%;min-height:190px;padding:12px;border:1px solid #4b1b1b;border-radius:8px;background:#120707;color:var(--text);font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.validator-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.validator-actions select{flex:1 1 210px}
+.build-row,.source-row{border:1px solid #4a1717;border-radius:10px;background:#170808;padding:12px;margin:0 0 12px}
+.row-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.row-head strong{color:#ffd4d4;font-size:14px}
+.remove-build,.remove-source{font-size:11px;padding:4px 8px}
+.generator.compact{grid-template-columns:repeat(3,minmax(0,1fr));margin:0}
+.generator input[type=checkbox]{width:auto;accent-color:var(--red)}
+.mini-note{font-size:13px;color:var(--muted);margin:6px 0 0}
+#validator-output:empty{display:none}
+.search-empty{font-size:13px;color:#ffb04d;margin:0 8px 10px}.back-top{position:fixed;right:18px;bottom:18px;z-index:30;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.site-button{display:inline-block;background:linear-gradient(135deg,#b51d1d,#ff3030);color:#fff;border:1px solid #ff7b7b;border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;letter-spacing:.3px;margin:6px 0 4px}.site-button:hover{background:linear-gradient(135deg,#d32626,#ff5555);color:#fff}
+.back-top.show{display:block}
+details{border:1px solid #4a1717;border-radius:9px;background:#170808;padding:10px 12px;margin:9px 0}
+details summary{cursor:pointer;color:#ffe0e0;scroll-margin-top:100px}
+details[open] summary{color:#ff9a9a;margin-bottom:6px}
+details p{margin:6px 0 2px}
+.faq{border-left:3px solid #6b2020;padding-left:14px;margin:14px 0}
+footer{color:#866f6f;text-align:center;font-size:12px;padding:18px 0 40px}
+footer a{color:#e69a9a}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}nav{position:static;max-height:none;padding:0}.nav-head{padding:12px 14px;border-bottom:1px solid #351111}.nav-toggle{display:inline-block}#nav-body{padding:12px 14px}#guide-nav:not(.open) #nav-body{display:none}.quick,.grid3,.path-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.quick,.grid2,.grid3,.generator,.generator.compact,.path-grid{grid-template-columns:1fr}.layout{padding:14px}.section{padding:18px}.hero{padding:18px}.hero h2{font-size:25px}.header-inner{padding:13px 15px;align-items:flex-start}.brand h1{font-size:18px}.nav-head{padding:10px 0}.back-top{right:10px;bottom:10px}}
+@media print{body{background:#fff;color:#111}body:before,header,nav,.header-actions,.copy,.generator,.validator,.back-top,.nav-toggle,.skip{display:none!important}.layout{display:block;padding:0}.section,.hero{border-color:#bbb;background:#fff;color:#111;break-inside:auto}.section h2,.hero h2{color:#8b0000}.section p,.section li,.card p,.hero p,.path-card span{color:#222}.path-card{background:#fff;border-color:#bbb}pre{background:#f4f4f4;color:#111;border-color:#ccc;white-space:pre-wrap}code{background:#eee;color:#111;border-color:#ccc}details{background:#fff;border-color:#bbb;display:block}details > *{display:block!important}.result{color:#111;background:#fff}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main-content">Zum Inhalt springen</a>
+<header>
+<div class="header-inner">
+<div class="brand">
+<h1>IT'S-POSSIBLE WIZARD</h1>
+<p>Buildbauer-Anleitung · Kodi 19–22 · Version 2026.11.10.38</p>
+</div>
+<div class="header-actions">
+<button id="print-button" type="button">DRUCKEN / PDF</button>
+<a href="#checklist" role="button" style="border:1px solid #6b2020;background:#2a0d0d;padding:8px 12px;border-radius:8px;font-size:13px;color:#eee">CHECKLISTE</a>
+</div>
+</div>
+</header>
+<div class="layout">
+<nav id="guide-nav" aria-label="Inhaltsverzeichnis">
+<div class="nav-head">
+<h2>Inhalt</h2>
+<button class="nav-toggle" id="nav-toggle" type="button" aria-controls="nav-body" aria-expanded="false">MENÜ</button>
+</div>
+<div id="nav-body">
+<input id="search" type="search" placeholder="Suchen, z. B. Hosting, Pfad, Kodi 20">
+<p id="search-empty" class="search-empty hidden" role="status">Keine Treffer. Andere Begriffe versuchen.</p>
+<div id="nav-links">
+<a href="#start">Schnellstart</a>
+<a href="#basics">Glossar &amp; Einstieg</a>
+<a href="#install">Wizard installieren</a>
+<a href="#main">Hauptfenster</a>
+<a href="#create">Build erstellen</a>
+<a href="#install-build">Build installieren</a>
+<a href="#hosting">ZIP &amp; Liste hosten</a>
+<a href="#lists">Build-Listen</a>
+<a href="#config">itspossible.json</a>
+<a href="#manage">Verwalten</a>
+<a href="#maintenance">Wartung</a>
+<a href="#ftp">FTP-Server</a>
+<a href="#settings">Einstellungen</a>
+<a href="#help">Anleitung &amp; Browser</a>
+<a href="#skingenerator">Skin Generator</a>
+<a href="#paths">Plattformpfade</a>
+<a href="#update">Build aktualisieren</a>
+<a href="#compatibility">Kompatibilität</a>
+<a href="#troubleshooting">Fehlerbehebung</a>
+<a href="#checklist">Checkliste</a>
+</div>
+</div>
+</nav>
+<main id="main-content" tabindex="-1">
+<div class="hero">
+<p class="eyebrow">Buildbauer-Anleitung · Kodi 19 bis 22</p>
+<h2>Vom leeren Kodi zum fertigen Build</h2>
+<p>Diese Anleitung führt durch Installation, Build-Erstellung, Veröffentlichung, Build-Listen, die zentrale Datei <code>itspossible.json</code>, Wartung, FTP und Fehlerbehebung. Alle Beispiele sind Kopiervorlagen. Der Wizard bleibt nach einer Build-Installation erhalten.</p>
+<div class="path-grid">
+<a class="path-card" href="#install-build"><strong>Ich will nur einen Build installieren</strong><span>Wizard installieren, Build auswählen, vorher sichern und nach dem Neustart prüfen.</span><em>Direkt zur Installation →</em></a>
+<a class="path-card" href="#create"><strong>Ich will einen Build bauen</strong><span>Test-Kodi einrichten, Addons auswählen, ZIP erstellen, testen und veröffentlichen.</span><em>Direkt zum Build erstellen →</em></a>
+</div>
+<div class="quick">
+<a href="#hosting"><strong>ZIP und Liste hosten</strong><span>GitHub, Webspace und direkte Download-Links</span></a>
+<a href="#lists"><strong>Liste bauen und prüfen</strong><span>Generator und Validator für TXT, JSON und XML</span></a>
+<a href="#troubleshooting"><strong>Problem lösen</strong><span>Schwarzer Bildschirm, Addons, Download und Log</span></a>
+</div>
+</div>
+
+<section class="section" id="start">
+<h2>Schnellstart</h2>
+<ol class="steps">
+<li><strong>Wizard installieren.</strong> ZIP in Kodi über <em>Add-ons → Aus Zip-Datei installieren</em> einspielen und den Wizard starten.</li>
+<li><strong>Build erstellen.</strong> Im Hauptfenster <strong>BUILD ERSTELLEN</strong> wählen, Addons und Addondata markieren und den Build packen lassen.</li>
+<li><strong>Build testen.</strong> Die erzeugte ZIP auf einem Testgerät installieren. Erst danach veröffentlichen.</li>
+<li><strong>Build-Liste veröffentlichen.</strong> TXT, JSON oder XML mit Name, Version und direkter ZIP-Adresse anlegen und unter <strong>VERWALTEN → BUILD-QUELLEN</strong> eintragen.</li>
+<li><strong>Warten und aktualisieren.</strong> Unter <strong>WARTUNG</strong> Cache, Datenbanken und FTP verwalten; die Build-Liste bleibt zentral aktualisierbar.</li>
+</ol>
+<div class="callout green"><strong>Merksatz:</strong> Die ZIP ist der Build. Die Build-Liste ist nur der Weg dorthin. Beides muss erreichbar sein.</div>
+</section>
+
+
+<section class="section" id="basics">
+<h2>Glossar und Einstieg</h2>
+<p>Die Begriffe klingen ähnlicher, als sie sind. Ein <strong>Build</strong> ist die eigentliche ZIP. Eine <strong>Build-Liste</strong> ist nur die Datei, die dem Wizard sagt, wo diese ZIP liegt. Ein <strong>Repository</strong> ist eine Addon-Quelle und keine Build-Liste.</p>
+<div class="table-wrap"><table>
+<tr><th>Begriff</th><th>Bedeutung</th></tr>
+<tr><td>Build</td><td>Eine ZIP mit <code>addons/</code>, <code>userdata/</code> und weiteren Kodi-Ordnern. Sie enthält die eigentlichen Änderungen.</td></tr>
+<tr><td>Build-Liste</td><td>TXT-, JSON- oder XML-Datei mit Name, Version, <code>kodi</code> und direkter ZIP-Adresse. Sie enthält keinen Build-Inhalt.</td></tr>
+<tr><td>Repository</td><td>Addon-Quelle für Kodi. Wird für Addon-Installationen und Updates verwendet, nicht als Downloadadresse für einen Build.</td></tr>
+<tr><td>Userdata</td><td>Der persönliche Kodi-Konfigurationsordner unter <code>special://profile</code>. Enthält Einstellungen, Datenbanken, Favoriten und <code>addon_data</code>.</td></tr>
+<tr><td>Addondata</td><td>Einstellungen und Zugangsdaten einzelner Addons unter <code>userdata/addon_data</code>. Kann Tokens, Konten und Schlüssel enthalten.</td></tr>
+<tr><td>Skin</td><td>Die Kodi-Oberfläche. Ein Skin muss zur Kodi-Version und zu den mitgelieferten Addons passen.</td></tr>
+<tr><td>ZIP</td><td>Gepackter Build. Der Inhalt muss beim Selbstpacken direkt bei <code>addons/</code> und <code>userdata/</code> beginnen.</td></tr>
+<tr><td>JSON / XML / TXT</td><td>Drei Formate für dieselbe Build-Liste. JSON ist für mehrere Builds mit Bildern am komfortabelsten, TXT am einfachsten.</td></tr>
+<tr><td><code>special://home</code></td><td>Kodis Datenordner. Der genaue Pfad hängt von Windows, Android, Linux, LibreELEC, macOS oder iOS ab.</td></tr>
+</table></div>
+<h3>Einsteigerpfad</h3>
+<ol class="steps">
+<li><strong>Erst installieren:</strong> Wizard-ZIP in Kodi einspielen und unter <strong>Einstellungen → Speicherort</strong> einen beschreibbaren Ordner wählen.</li>
+<li><strong>Dann testen:</strong> Einen fremden oder eigenen Build auf einem Testgerät installieren. Vorher immer sichern.</li>
+<li><strong>Dann bauen:</strong> Ein sauberes Test-Kodi mit Skin und Addons einrichten, einmal starten und unter <strong>BUILD ERSTELLEN</strong> packen.</li>
+<li><strong>Zum Schluss veröffentlichen:</strong> ZIP und Liste hochladen, beide Adressen ohne Login prüfen und die Quelle im Wizard eintragen.</li>
+</ol>
+<div class="callout green"><strong>Merksatz:</strong> Erst der Build, dann die ZIP, dann die Liste, dann die Quelle. Wer diese Reihenfolge einhält, findet Fehler schneller.</div>
+</section>
+
+<section class="section" id="install">
+<h2>Installation</h2>
+<h3>Kodi 22 und Kodi 21</h3>
+<ol class="steps">
+<li>Die Datei <code>plugin.program.itspossiblewizard-39.zip</code> herunterladen.</li>
+<li>In Kodi <em>Add-ons → Add-on-Browser → Aus Zip-Datei installieren</em> öffnen.</li>
+<li>Die ZIP auswählen und die Warnung bestätigen.</li>
+<li>Unter <em>Programme → It's-Possible Wizard</em> starten.</li>
+</ol>
+<p>Unter <em>System → Add-ons</em> muss <strong>Unbekannte Quellen</strong> erlaubt sein. Die Addon-ID lautet <code>plugin.program.itspossiblewizard</code>.</p>
+<h3>Kodi 19: settings.xml tauschen</h3>
+<div class="callout"><strong>Wichtig für Kodi 19:</strong> Kodi 19 liest das neue Settingsformat nicht zuverlässig. Im Addon-Ordner <code>resources/settings19.xml</code> in <code>settings.xml</code> umbenennen. Die vorhandene <code>settings.xml</code> vorher sichern oder ersetzen. Danach Kodi neu starten. Ab Kodi 21 bleibt die normale <code>settings.xml</code> aktiv.</div>
+<pre><button class="copy" type="button">KOPIEREN</button><code>Kodi-Profil/addons/plugin.program.itspossiblewizard/resources/
+settings.xml        → aktuelle Einstellungen
+settings19.xml      → Kodi-19-Fallback
+
+Kodi 19:
+settings19.xml  in  settings.xml  umbenennen
+Kodi neu starten</code></pre>
+<h3>Nach der Installation</h3>
+<ul>
+<li>Build-Speicherort unter <strong>Einstellungen → Speicherort</strong> prüfen.</li>
+<li>Unter <strong>VERWALTEN</strong> Repository- und Build-Quellen pflegen.</li>
+<li>Die ausführliche Anleitung jederzeit über <strong>Einstellungen → HILFE &amp; ANLEITUNG → ANLEITUNG ÖFFNEN</strong> starten.</li>
+</ul>
+</section>
+
+<section class="section" id="main">
+<h2>Hauptfenster und alle Bereiche</h2>
+<div class="grid2">
+<div class="card"><h4>QUELLEN AUSWÄHLEN</h4><p>Repository-Quellen in einem eigenen Wizard-Fenster markieren. Alle markierten Repositories werden installiert und aktiviert; standardmäßig sind alle Quellen aus VERWALTEN aktiv.</p></div>
+<div class="card"><h4>ADDONS AUSWÄHLEN</h4><p>Media-Addons durchsuchen und installieren. Der Wizard lädt Addons und benötigte Abhängigkeiten direkt aus dem Kodi-Media-Repository. Dadurch entfällt Kodis zusätzliche Ja/Nein-Abfrage. Fehlt ein Modul, erscheint der Grund im Status.</p></div>
+<div class="card"><h4>BUILD INSTALLIEREN</h4><p>Online- oder lokale Builds wählen, Vorschau lesen, installieren und den Wizard behalten.</p></div>
+<div class="card"><h4>BUILD ERSTELLEN</h4><p>Addons und Addondata auswählen und daraus eine ZIP sowie optional eine Build-Liste erzeugen.</p></div>
+<div class="card"><h4>VERWALTEN</h4><p>Quellen, Addons und Build-Quellen hinzufügen, löschen und zwischen den Bereichen wechseln.</p></div>
+<div class="card"><h4>WARTUNG</h4><p>Cache, Pakete, Thumbnails, Datenbanken, Texturen, Log, System, Sicherungen, Neustart und FTP. Am rechten Rand des Hauptfensters regelst du die Theme-Lautstärke; das Theme startet bei 50 Prozent.</p></div>
+<div class="card"><h4>README LESEN</h4><p>Die kurze Hilfe im Addon. Die vollständige Buildbauer-Anleitung liegt als HTML im Browser.</p></div>
+<div class="card"><h4>BEENDEN</h4><p>Schließt den Wizard. Ein laufender FTP-Server bleibt im Dienst aktiv.</p></div>
+</div>
+</section>
+
+<section class="section" id="create">
+<h2>Build erstellen</h2>
+<p>Ein Build ist eine ZIP-Datei mit den Addons und den dazugehörigen Daten. Der Wizard kann den Build direkt aus der laufenden Kodi-Installation erstellen.</p>
+<h3>Vorbereitung</h3>
+<ul>
+<li>Kodi mit dem gewünschten Skin und den gewünschten Addons einrichten.</li>
+<li>Addons einmal starten, damit ihre Einstellungen und Datenbanken angelegt werden.</li>
+<li>Unter <strong>Einstellungen → Speicherort</strong> einen beschreibbaren Ordner wählen oder den automatischen Download-Ordner verwenden.</li>
+<li>Für reproduzierbare Builds eine Versionsnummer festlegen, z. B. <code>1.0.0</code>.</li>
+</ul>
+<h3>Schritte im Wizard</h3>
+<ol class="steps">
+<li><strong>BUILD ERSTELLEN</strong> öffnen.</li>
+<li>Name und Version eintragen. Der Name wird später auch für den Dateinamen verwendet.</li>
+<li>Addons markieren, die in den Build sollen. <strong>ALLE WÄHLEN</strong> und <strong>ALLE ABWÄHLEN</strong> helfen bei großen Installationen.</li>
+<li>Optional Addondata markieren. Damit nimmst du Einstellungen, Caches, Favoriten oder Datenbanken einzelner Addons mit.</li>
+<li><strong>ERSTELLEN</strong> starten. Turbo überspringt die abschließende Bestätigung; Sicher erstellt vorsichtiger und mit mehr Fortschrittsmeldungen.</li>
+<li>Nach dem Packen den Zielordner öffnen. Dort liegen die Build-ZIP und optional eine TXT-Build-Liste.</li>
+</ol>
+<div class="callout"><strong>Turbo-Erstellung:</strong> schneller, aber ohne letzte Rückfrage. <strong>Sichere Erstellung:</strong> vorsichtiger, mit Standardkomprimierung und Fortschritt pro Datei. Die Einstellungen gelten auch im Turbo-Modus und haben dort Vorrang.</div>
+<h3>Was in die ZIP gehört</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>Mein-Build-1.0.0.zip
+├── addons/            installierte Addons und Repositories
+├── userdata/          Kodi-Einstellungen, Addondata, Datenbanken
+├── media/             eigene Medien und Hintergründe
+├── system/            Systemdateien, falls vorhanden
+├── temp/              temporäre Build-Dateien, falls nötig
+└── ...                weitere Kodi-Ordner</code></pre>
+<h3>Automatisch ausgeschlossen</h3>
+<p>Der Wizard lässt Caches, Pakete und temporäre Dateien weg, damit Builds klein bleiben:</p>
+<ul>
+<li><code>addons/packages</code></li>
+<li><code>userdata/thumbnails</code>, <code>userdata/temp</code>, <code>userdata/cache</code></li>
+<li>eigene Build- und Sicherungsordner des Wizards</li>
+<li>alte Wizard-Installationen</li>
+<li><code>__pycache__</code>, <code>.pyc</code>, <code>.pyo</code>, <code>.log</code>, <code>.old</code>, <code>.DS_Store</code>, <code>Thumbs.db</code></li>
+</ul>
+<p>Datenbanken unter <code>userdata/Database</code> und Plattform-Addons werden mit installiert. Der Wizard selbst wird beim Installieren eines Builds nicht überschrieben.</p>
+<h3>Dateiname und Metadaten</h3>
+<p>Der Wizard bereinigt den Namen: Leerzeichen werden zu Bindestrichen, verbotene Zeichen ersetzt. Beispiel: <code>Mein Build</code> + <code>1.0.0</code> wird zu <code>Mein-Build-1.0.0.zip</code>. Für die Build-Liste werden zusätzlich Kodi-Version, Icon, Fanart und Beschreibung verwendet.</p>
+</section>
+
+<section class="section" id="install-build">
+<h2>Build installieren</h2>
+<p><strong>BUILD INSTALLIEREN</strong> öffnet die Build-Liste. Online zeigt die aktiven Build-Quellen, Lokal zeigt ZIPs im Build-Ordner.</p>
+<h3>Online-Builds</h3>
+<ul>
+<li>Mehrere Build-Quellen können gleichzeitig aktiv sein. <strong>BUILD QUELLEN</strong> öffnet die Mehrfachauswahl.</li>
+<li>Zu jeder Quelle werden Build-Anzahl und Zeitpunkt der letzten Zählung angezeigt.</li>
+<li>Größenangaben aus der Liste werden in MB angezeigt; lokale ZIPs zeigen ihre echte Dateigröße.</li>
+<li>Mit <strong>SORTIEREN</strong> sortierst du nach Name, Größe, Änderungsdatum, Quelle, Kodi-Version oder Build-Version, jeweils auf- oder absteigend.</li>
+<li>Builds ohne Größe, Datum oder Version stehen beim jeweiligen Kriterium am Ende.</li>
+<li>Adult-Builds werden nur mit <code>show_adult: true</code> eingeblendet.</li>
+</ul>
+<h3>Vorschau und Installation</h3>
+<ol class="steps">
+<li>Build markieren und die Vorschau mit Icon, Fanart, Version, Kodi-Version, Quelle und Beschreibung prüfen.</li>
+<li><strong>INSTALLIEREN</strong> wählen. Turbo installiert ohne Rückfrage und ohne Sicherung; sicher installiert vorsichtiger.</li>
+<li>Optional eine Sicherung der aktuellen Einstellungen auswählen. Die ZIP landet unter <code>userdata/itspossible_backups/</code>.</li>
+<li>Nach der Installation wird Kodi beendet, damit Addons, Skin und GUI-Einstellungen geladen werden. Kodi anschließend neu starten.</li>
+</ol>
+<div class="callout red"><strong>Wichtig:</strong> Ein Build überschreibt Addons und Userdata. Vorher eine Sicherung anlegen. Der Wizard selbst bleibt erhalten und wird wieder aktiviert.</div>
+<h3>Lokale Builds</h3>
+<p>Lege ZIPs in den Build-Ordner unter <strong>Einstellungen → Speicherort</strong>. Der Umschalter <strong>LOKAL</strong> zeigt sie mit Dateigröße und Änderungsdatum. Die ZIP muss direkt auswählbar sein und eine gültige Kodi-Build-Struktur enthalten.</p>
+</section>
+
+
+<section class="section" id="hosting">
+<h2>ZIP und Build-Liste veröffentlichen</h2>
+<p>Für andere Nutzer müssen zwei Dinge erreichbar sein: die Build-ZIP und die Build-Liste. Beide brauchen eine <strong>direkte HTTPS-Adresse ohne Login</strong>. Ein Link auf eine Vorschau- oder Freigabeseite reicht nicht.</p>
+<svg class="flow" viewBox="0 0 1040 190" role="img" aria-label="Ablauf: Build erstellen, ZIP hochladen, Liste anlegen, Quelle eintragen, Nutzer installiert">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ff8b8b"/></marker></defs>
+<rect x="16" y="45" width="170" height="78" rx="12" fill="#2a0d0d" stroke="#7a2727"/><text x="101" y="78" text-anchor="middle" fill="#fff" font-size="16">Build erstellen</text><text x="101" y="101" text-anchor="middle" fill="#b9a5a5" font-size="12">ZIP im Wizard</text>
+<line x1="190" y1="84" x2="228" y2="84" stroke="#ff8b8b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="232" y="45" width="170" height="78" rx="12" fill="#2a0d0d" stroke="#7a2727"/><text x="317" y="78" text-anchor="middle" fill="#fff" font-size="16">ZIP hochladen</text><text x="317" y="101" text-anchor="middle" fill="#b9a5a5" font-size="12">Releases oder Webspace</text>
+<line x1="406" y1="84" x2="444" y2="84" stroke="#ff8b8b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="448" y="45" width="170" height="78" rx="12" fill="#2a0d0d" stroke="#7a2727"/><text x="533" y="78" text-anchor="middle" fill="#fff" font-size="16">Liste anlegen</text><text x="533" y="101" text-anchor="middle" fill="#b9a5a5" font-size="12">TXT, JSON oder XML</text>
+<line x1="622" y1="84" x2="660" y2="84" stroke="#ff8b8b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="664" y="45" width="170" height="78" rx="12" fill="#2a0d0d" stroke="#7a2727"/><text x="749" y="78" text-anchor="middle" fill="#fff" font-size="16">Quelle eintragen</text><text x="749" y="101" text-anchor="middle" fill="#b9a5a5" font-size="12">im Wizard</text>
+<line x1="838" y1="84" x2="876" y2="84" stroke="#ff8b8b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="880" y="45" width="146" height="78" rx="12" fill="#2a0d0d" stroke="#7a2727"/><text x="953" y="78" text-anchor="middle" fill="#fff" font-size="16">Nutzer installiert</text><text x="953" y="101" text-anchor="middle" fill="#b9a5a5" font-size="12">Build aus Liste</text>
+</svg>
+<h3>GitHub</h3>
+<ul>
+<li><strong>Releases:</strong> Für große ZIPs am besten. Datei als Release-Asset hochladen und die direkte Asset-Adresse verwenden. Sie bleibt stabil, wenn kein Release gelöscht wird.</li>
+<li><strong>Raw:</strong> <code>raw.githubusercontent.com</code> eignet sich für kleine TXT-, JSON- oder XML-Listen. Die Adresse muss auf die Datei selbst zeigen, nicht auf die GitHub-Vorschau.</li>
+<li><strong>GitHub Pages:</strong> Kann ZIP und Liste unter einer eigenen Domain ausliefern. Dateigrößen- und Repository-Limits beachten; Pages ist kein beliebiger großer Dateispeicher.</li>
+<li><strong>Privat:</strong> Ein privates Repository ist kein öffentlicher Download. Die Datei muss ohne GitHub-Login abrufbar sein.</li>
+</ul>
+<h3>Eigener Webspace</h3>
+<ul>
+<li>ZIP und Liste per FTP/SFTP in einen öffentlichen Ordner hochladen.</li>
+<li>HTTPS verwenden. <code>http://</code> kann von Kodi, Android oder Netzwerken blockiert werden.</li>
+<li>Direkte Dateiadressen verwenden, keine Galerie, keinen Download-Zähler und keine Werbe-Zwischenseite.</li>
+<li>Nach dem Upload die Adresse im privaten Browserfenster öffnen: Es muss sofort die ZIP beziehungsweise der Dateiinhalt kommen.</li>
+</ul>
+<h3>Dropbox, Google Drive und ähnliche Dienste</h3>
+<div class="table-wrap"><table>
+<tr><th>Dienst</th><th>Wichtig</th></tr>
+<tr><td>Dropbox</td><td>Freigabelinks enden oft auf <code>?dl=0</code>. Für den direkten Download <code>?dl=1</code> verwenden. Der Link muss die Datei direkt ausliefern.</td></tr>
+<tr><td>Google Drive</td><td>Normale Freigabelinks öffnen eine Bestätigungs- oder Vorschauseite. Für Builds ist ein direkter Datei-Hosting-Dienst oder eigener Webspace zuverlässiger.</td></tr>
+<tr><td>OneDrive</td><td>Freigabelinks können eine Zwischenseite liefern. Direkt-Download-Link verwenden und im privaten Fenster prüfen.</td></tr>
+<tr><td>Discord, Foren, Messenger</td><td>Anhänge sind keine stabilen Downloadadressen. Sie können ablaufen, Login verlangen oder komprimiert werden.</td></tr>
+</table></div>
+<h3>Typische Stolperfallen</h3>
+<div class="table-wrap"><table>
+<tr><th>Problem</th><th>Prüfung</th></tr>
+<tr><td>Leerzeichen in der Adresse</td><td>Leerzeichen als <code>%20</code> schreiben oder Dateinamen ohne Leerzeichen verwenden.</td></tr>
+<tr><td><code>http</code> statt <code>https</code></td><td>Auf HTTPS wechseln. Manche Kodi- und Android-Versionen blockieren unverschlüsselte Downloads.</td></tr>
+<tr><td>Weiterleitung oder Login</td><td>Im privaten Fenster öffnen. Kommt eine Anmeldung, eine Vorschau oder eine Bestätigungsseite, ist der Link nicht direkt.</td></tr>
+<tr><td>Falsche Datei</td><td>Die ZIP-Adresse muss auf die ZIP enden, nicht auf eine HTML-Seite. Bei Query-Parametern zählt der Pfad vor <code>?</code>.</td></tr>
+<tr><td>Große Datei</td><td>Hosting-Limit, Zeitlimit und Speicherplatz prüfen. Releases oder Webspace sind für große Builds besser geeignet als Chat-Anhänge.</td></tr>
+<tr><td>Alte Liste</td><td>Nach dem Austausch die Liste im Browser neu laden und im Wizard die Build-Quelle aktualisieren.</td></tr>
+</table></div>
+<div class="callout red"><strong>Addondata ist nicht harmlos:</strong> <code>userdata/addon_data</code> kann Logins, API-Schlüssel, Debrid- und Trakt-Tokens, Cookies und persönliche Einstellungen enthalten. Eine veröffentlichte Build-ZIP ist öffentlich, auch wenn der Link nicht beworben wird. Vor dem Packen Konten und Tokens entfernen und nur Addons mitgeben, deren Weitergabe erlaubt ist.</div>
+</section>
+
+<section class="section" id="lists">
+<h2>Build-Listen: TXT, JSON und XML</h2>
+<p>Eine Build-Liste enthält einen oder mehrere Builds. <code>url</code> ist Pflicht und muss direkt auf eine ZIP-Datei zeigen. Relative Adressen werden gegen die Listenadresse aufgelöst, wenn die Liste von einer URL geladen wird.</p>
+<div class="table-wrap"><table>
+<tr><th>Format</th><th>Am besten für</th><th>Grenze</th></tr>
+<tr><td>TXT</td><td>Einsteiger, ein oder wenige Builds, schnelle Pflege per Texteditor.</td><td>Keine Bilder und keine erweiterten Felder in der einfachen Zeile.</td></tr>
+<tr><td>TXT mit Attributen</td><td>Bestehende einfache Tools, die <code>name="..."</code> erwarten.</td><td>Fehleranfälliger bei Anführungszeichen und Sonderzeichen.</td></tr>
+<tr><td>JSON</td><td>Mehrere Builds, Icon, Fanart, Adult-Flag und automatische Generator-Ausgabe.</td><td>Syntax muss exakt stimmen; ein fehlendes Komma bricht die ganze Datei.</td></tr>
+<tr><td>XML</td><td>Bestehende Feeds oder Systeme, die bereits XML verwenden.</td><td>Mehr Schreibarbeit; Sonderzeichen müssen maskiert werden.</td></tr>
+</table></div>
+<h3>TXT: Name, Version, URL</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>Mein Build|1.0|https://example.com/builds/mein-build.zip
+Zweiter Build|2.0|https://example.com/builds/zweiter-build.zip</code></pre>
+<p>Statt <code>|</code> funktioniert auch <code>;</code>. Zwei Teile bedeuten <code>Name|URL</code>. Eine einzelne URL pro Zeile ist ebenfalls erlaubt.</p>
+<pre><button class="copy" type="button">KOPIEREN</button><code>Mein Build|https://example.com/builds/mein-build.zip
+https://example.com/builds/zweiter-build.zip</code></pre>
+<h3>TXT: Attributformat</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>name="Mein Build"
+version="1.0"
+url="https://example.com/builds/mein-build.zip"
+kodi="22"
+icon="https://example.com/builds/icon.png"
+fanart="https://example.com/builds/fanart.jpg"
+adult="No"
+description="Mein Kodi-22-Build"
+
+name="Zweiter Build"
+version="2.0"
+url="https://example.com/builds/zweiter-build.zip"</code></pre>
+<h3>JSON: Standard mit builds</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>{
+  "builds": [
+    {
+      "name": "Mein Build",
+      "version": "1.0",
+      "kodi": "22",
+      "url": "https://example.com/builds/mein-build.zip",
+      "icon": "https://example.com/builds/icon.png",
+      "fanart": "https://example.com/builds/fanart.jpg",
+      "description": "Mein Kodi-22-Build",
+      "adult": false
+    }
+  ]
+}</code></pre>
+<p>Statt <code>builds</code> wird auch <code>items</code> gelesen. Eine direkte JSON-Liste <code>[ ... ]</code> ist ebenfalls gültig.</p>
+<pre><button class="copy" type="button">KOPIEREN</button><code>[
+  {
+    "name": "Mein Build",
+    "version": "1.0",
+    "url": "https://example.com/builds/mein-build.zip"
+  }
+]</code></pre>
+<h3>XML: build oder item</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;builds&gt;
+  &lt;build
+    name="Mein Build"
+    version="1.0"
+    kodi="22"
+    url="https://example.com/builds/mein-build.zip"
+    icon="https://example.com/builds/icon.png"
+    fanart="https://example.com/builds/fanart.jpg"
+    adult="No"
+    description="Mein Kodi-22-Build" /&gt;
+&lt;/builds&gt;</code></pre>
+<p><code>&lt;item&gt;</code> statt <code>&lt;build&gt;</code> funktioniert ebenfalls. Die Felder dürfen auch als Kindelemente stehen.</p>
+<pre><button class="copy" type="button">KOPIEREN</button><code>&lt;builds&gt;
+  &lt;item&gt;
+    &lt;name&gt;Mein Build&lt;/name&gt;
+    &lt;version&gt;1.0&lt;/version&gt;
+    &lt;url&gt;https://example.com/builds/mein-build.zip&lt;/url&gt;
+  &lt;/item&gt;
+&lt;/builds&gt;</code></pre>
+<h3>Build-Liste im Browser erzeugen</h3>
+<p>Mehrere Builds, Icon, Fanart und Adult-Flag werden direkt in die Ausgabe übernommen. Die Felder für Icon, Fanart und Adult gelten für alle Einträge.</p>
+<div class="generator">
+<div class="wide"><label for="gen-format">Format</label><select id="gen-format"><option value="txt">TXT: Name|Version|URL</option><option value="attribute">TXT: Attributformat</option><option value="json">JSON</option><option value="xml">XML</option></select></div>
+<div class="wide" id="build-rows"></div>
+<div class="wide"><button id="gen-add" type="button">WEITEREN BUILD HINZUFÜGEN</button></div>
+<div><label for="gen-icon">Icon-URL, optional</label><input id="gen-icon" placeholder="https://example.com/icon.png"></div>
+<div><label for="gen-fanart">Fanart-URL, optional</label><input id="gen-fanart" placeholder="https://example.com/fanart.jpg"></div>
+<div class="wide"><label><input id="gen-adult" type="checkbox"> Adult-Build, nur mit <code>show_adult: true</code> sichtbar</label></div>
+<div class="wide"><label for="gen-output">Ausgabe</label><textarea id="gen-output" readonly></textarea></div>
+<div class="wide"><button id="gen-copy" type="button">AUSGABE KOPIEREN</button></div>
+</div>
+<h3>build_sources für itspossible.json</h3>
+<p>Dieser Block gehört in <code>resources/itspossible.json</code>. Jede Quelle braucht eine eindeutige ID, einen Namen und die direkte Adresse der Build-Liste. Die aktiven IDs werden separat gespeichert.</p>
+<div class="generator">
+<div class="wide" id="source-rows"></div>
+<div class="wide"><button id="source-add" type="button">WEITERE QUELLE HINZUFÜGEN</button></div>
+<div class="wide"><label for="source-output">Ausgabe</label><textarea id="source-output" readonly></textarea></div>
+<div class="wide"><button id="source-copy" type="button">AUSGABE KOPIEREN</button></div>
+</div>
+<h3>Build-Liste prüfen</h3>
+<p>Der Validator prüft Syntax, fehlende <code>url</code>, fehlende Versionsangaben, die ZIP-Endung, unverschlüsselte Adressen und typische Freigabe-Links. Er ersetzt keinen echten Test auf einem Kodi-Gerät, findet aber die häufigsten Fehler vor dem Hochladen.</p>
+<div class="validator">
+<label for="validator-input">Liste einfügen</label>
+<textarea id="validator-input" spellcheck="false">Mein Build|1.0|https://example.com/builds/mein-build.zip
+Zweiter Build|2.0|https://example.com/builds/zweiter-build.zip</textarea>
+<div class="validator-actions">
+<select id="validator-format" aria-label="Format der Build-Liste"><option value="auto">Format automatisch erkennen</option><option value="txt">TXT</option><option value="json">JSON</option><option value="xml">XML</option></select>
+<button id="validate-button" type="button">LISTE PRÜFEN</button>
+</div>
+<div id="validator-output" aria-live="polite"></div>
+</div>
+</section>
+
+<section class="section" id="config">
+<h2>itspossible.json</h2>
+<p>Die zentrale Konfiguration liegt unter <code>resources/itspossible.json</code>. Sie wird vom Wizard gelesen und bei Änderungen über die Oberfläche neu geschrieben. Nach manuellen Änderungen den Wizard neu starten.</p>
+<h3>Vollständiges Beispiel</h3>
+<pre><button class="copy" type="button">KOPIEREN</button><code>{
+  "name": "It's-Possible Wizard",
+  "sources": [
+    {
+      "id": "repository.kodi.media",
+      "name": "Kodi Media Repository",
+      "zip": "https://example.com/repository.kodi.media-1.0.0.zip",
+      "repo": "https://example.com/index.html"
+    }
+  ],
+  "addons": [
+    {
+      "id": "plugin.video.youtube",
+      "name": "YouTube",
+      "version": "7.0.0",
+      "summary": "YouTube in Kodi",
+      "description": "Beispiel-Addon",
+      "icon": "https://example.com/icon.png",
+      "fanart": "https://example.com/fanart.jpg",
+      "zip": "https://example.com/plugin.video.youtube-7.0.0.zip",
+      "source": "Kodi Media Repository"
+    }
+  ],
+  "build_sources": [
+    {
+      "id": "meine-builds",
+      "name": "Meine Builds",
+      "url": "https://example.com/builds.json"
+    }
+  ],
+  "active_build_source": "meine-builds",
+  "active_build_sources": ["meine-builds"],
+  "show_adult": false,
+  "autostart": true,
+  "maintenance_autostart": ["cache", "packages"],
+  "installed_build": {
+    "name": "Mein Build",
+    "version": "1.0.0",
+    "url": "https://example.com/builds/mein-build.zip",
+    "kodi": "22"
+  },
+  "last_build_url": "https://example.com/builds/mein-build.zip",
+  "build_sort": "date",
+  "build_sort_desc": true
+}</code></pre>
+<h3>Felder</h3>
+<table>
+<tr><th>Feld</th><th>Bedeutung</th></tr>
+<tr><td><code>name</code></td><td>Anzeigename der Konfiguration.</td></tr>
+<tr><td><code>sources</code></td><td>Repository-Quellen mit <code>id</code>, <code>name</code>, <code>zip</code> und optional <code>repo</code>.</td></tr>
+<tr><td><code>addons</code></td><td>Addon-Einträge mit <code>id</code> und optional <code>name</code>, <code>version</code>, <code>summary</code>, <code>description</code>, <code>icon</code>, <code>fanart</code>, <code>zip</code>, <code>source</code>.</td></tr>
+<tr><td><code>build_sources</code></td><td>Build-Listen mit <code>id</code>, <code>name</code> und <code>url</code>. Die URL zeigt auf TXT, JSON oder XML.</td></tr>
+<tr><td><code>active_build_source</code></td><td>Ältere Einzelquelle. Wird aus Kompatibilitätsgründen weiter geschrieben.</td></tr>
+<tr><td><code>active_build_sources</code></td><td>Liste der aktiven Build-Quellen-IDs. Mehrere gleichzeitig möglich. Leer bedeutet keine Online-Quelle.</td></tr>
+<tr><td><code>show_adult</code></td><td><code>true</code> blendet Adult-Builds ein.</td></tr>
+<tr><td><code>autostart</code></td><td><code>true</code> startet den Wizard beim Kodi-Start, wenn kein Build installiert ist.</td></tr>
+<tr><td><code>maintenance_autostart</code></td><td> Aufgaben, die der Dienst beim Start ausführt: <code>cache</code>, <code>packages</code>, <code>thumbnails</code>, <code>database</code>, <code>textures</code>.</td></tr>
+<tr><td><code>installed_build</code></td><td>Wird nach einer Build-Installation automatisch gefüllt. Kann ein Objekt oder <code>null</code> sein.</td></tr>
+<tr><td><code>last_build_url</code></td><td>Zuletzt eingegebene ZIP-Adresse; füllt das ZIP-Feld vor.</td></tr>
+<tr><td><code>build_sort</code></td><td>Sortierkriterium: <code>name</code>, <code>size</code>, <code>date</code>, <code>source</code>, <code>kodi</code> oder <code>version</code>.</td></tr>
+<tr><td><code>build_sort_desc</code></td><td><code>true</code> sortiert absteigend, <code>false</code> aufsteigend.</td></tr>
+</table>
+<div class="callout"><strong>Nur diese Felder bleiben erhalten:</strong> Der Wizard entfernt unbekannte Schlüssel beim Speichern. Eigene Zusatzfelder gehören nicht in <code>itspossible.json</code>.</div>
+<h3>Quellen und Addons</h3>
+<p><code>sources</code> sind Repositories, nicht Build-Listen. <code>build_sources</code> sind Listen mit Builds. <code>addons</code> sind einzelne Addon-Einträge, die der Wizard installieren kann. Eine Addon-ID ohne ZIP wird über Kodis Repository-Installer aufgelöst.</p>
+<h3>Musterdatei</h3>
+<p><code>resources/muster.json</code> enthält eine vollständige Beispielkonfiguration mit allen Listenformaten. Sie wird nicht automatisch geladen. Zum Ausprobieren kopieren und als <code>itspossible.json</code> speichern.</p>
+</section>
+
+<section class="section" id="manage">
+<h2>Verwalten</h2>
+<ul>
+<li><strong>BEREICH WECHSELN</strong> schaltet zwischen Quellen, Addons und Build-Quellen um.</li>
+<li><strong>HINZUFÜGEN</strong> öffnet ein Formular für Name, ID und Adresse.</li>
+<li>Bei Repository-Quellen ist die ZIP-Adresse Pflicht. Die Repository-Adresse ist optional.</li>
+<li>Bei Addons ist die ZIP-Adresse optional; ohne ZIP wird die Addon-ID über eine eingerichtete Repository installiert.</li>
+<li>Bei Build-Quellen ist die Listenadresse Pflicht.</li>
+<li><strong>LÖSCHEN</strong> entfernt den markierten Eintrag nach Bestätigung.</li>
+</ul>
+<p>Doppelte IDs werden abgelehnt. Änderungen werden sofort in <code>itspossible.json</code> gespeichert; der Addon-Ordner muss beschreibbar sein.</p>
+</section>
+
+<section class="section" id="maintenance">
+<h2>Wartung</h2>
+<p>Das Wartungsfenster hat zwei Spalten mit zwölf Aktionen. Die ersten fünf können für den Hintergrundstart markiert werden. Darunter liegen die Aktionen für FTP, erweiterte Einstellungen, Autostart und den Auswahlmodus der Hintergrundaufgaben.</p>
+<table>
+<tr><th>Aktion</th><th>Wirkung</th></tr>
+<tr><td>CACHE LEEREN</td><td>Leert den temporären Kodi-Ordner; Logdateien bleiben erhalten.</td></tr>
+<tr><td>PAKETE LÖSCHEN</td><td>Entfernt heruntergeladene Addon-ZIPs aus dem Paketordner.</td></tr>
+<tr><td>THUMBNAILS LÖSCHEN</td><td>Entfernt zwischengespeicherte Vorschaubilder.</td></tr>
+<tr><td>DATENBANK BEREINIGEN</td><td>Bereinigt Video- und Musikdatenbank über Kodi.</td></tr>
+<tr><td>TEXTUREN-DATENBANK</td><td>Löscht Thumbnails und die Texturen-Datenbank; Kodi danach neu starten.</td></tr>
+<tr><td>ADDONS AKTIVIEREN</td><td>Aktiviert alle installierten, deaktivierten Addons über JSON-RPC.</td></tr>
+<tr><td>LOG ANZEIGEN</td><td>Zeigt die letzten 150.000 Zeichen der <code>kodi.log</code>.</td></tr>
+<tr><td>SYSTEM &amp; NETZ</td><td>Kodi, Gerät, CPU, RAM, Speicher, IP, MAC, Netzwerk, Laufzeit, Build und letzte Python-Fehler.</td></tr>
+<tr><td>SICHERUNG AUSWÄHLEN</td><td>Sichert GUI, Addondata, Skin, Favoriten, Quellen, Keymaps, Playlists, Profile und Datenbanken nach <code>userdata/itspossible_backups/</code>.</td></tr>
+<tr><td>WIEDERHERSTELLEN</td><td>Spielt eine Sicherung zurück; Kodi danach neu starten.</td></tr>
+<tr><td>KODI NEU STARTEN</td><td>Startet Kodi neu. Auf Android wird Kodi hart beendet und ein Neustart angefordert.</td></tr>
+<tr><td>ERWEITERTE EINSTELLUNGEN</td><td>Status der <code>advancedsettings.xml</code>, Sicherung, Bereinigung alter Tags und Cache-Verwaltung. Cache-Werte nur unter Kodi 19/20; ab Kodi 21 folgt der Hinweis auf die Kodi-Einstellungen.</td></tr>
+<tr><td>ZURÜCK</td><td>Schließt das Wartungsfenster.</td></tr>
+</table>
+<h3>Hintergrundaufgaben</h3>
+<p><strong>HINTERGRUND-AUFGABEN AUSWÄHLEN</strong> öffnet den Auswahlmodus. Ein Klick auf Cache, Pakete, Thumbnails, Datenbank oder Texturen setzt bzw. entfernt das Kästchen. Die Auswahl wird gespeichert und beim Kodi-Start vom Dienst ausgeführt, unabhängig vom Wizard-Autostart. Die Aktionen werden im Kodi-Log protokolliert.</p>
+<h3>Autostart</h3>
+<p><strong>AUTOSTART BEIM KODI-START</strong> schaltet den Wizard-Autostart um. Ein bereits installierter Build verhindert den automatischen Wizard-Start weiterhin.</p>
+<h3>FTP und Anleitung</h3>
+<p><strong>FTP-SERVER ÖFFNEN</strong> startet die FTP-Verwaltung. Die ausführliche HTML-Anleitung wird über <strong>Einstellungen → HILFE &amp; ANLEITUNG</strong> im Browser geöffnet.</p>
+<h3>Advancedsettings und Cache</h3>
+<p><strong>ERWEITERTE EINSTELLUNGEN</strong> öffnet ein eigenes Wizard-Fenster. Links steht der Status: ob die <code>advancedsettings.xml</code> vorhanden und lesbar ist, ob ein Cache-Block existiert und welche überholten Tags erkannt wurden. Rechts stehen nur die Aktionen, die zu dieser Datei und Kodi-Version passen. Vor jeder Änderung legt der Wizard eine Sicherung unter <code>userdata/itspossible_backups/</code> an.</p>
+<p>Unter Kodi 19 und 20 lassen sich 128, 256 oder 512 MB Cache setzen oder der Cache-Block wieder entfernen. Dabei werden die aktuellen Tags <code>buffermode</code>, <code>memorysize</code> und <code>readfactor</code> unter <code>&lt;cache&gt;</code> geschrieben. Kodi 21 und 22 ignorieren diese Tags; dort wird der Cache unter <strong>Einstellungen → Dienste → Caching</strong> geändert. Die Datei wird nur beim Kodi-Start gelesen, deshalb ist danach ein Neustart nötig.</p>
+<p>Überholte Netzwerk- und Video-Tags werden erst nach Bestätigung entfernt. Andere Einstellungen und ein gültiger Cache-Block unter Kodi 19/20 bleiben erhalten. Eine Sicherung wird in einem eigenen Auswahlfenster wiederhergestellt; die Datei lässt sich auch vollständig löschen.</p>
+<p>Die Funktion nutzt ausschließlich eigene Wizard-Fenster, keine Kodi-Popups. Mit dem Steuerkreuz werden Status und Aktionen erreicht, mit OK ausgewählt und mit Zurück abgebrochen. Es wird keine Bildschirmtastatur benötigt. Alle schreibenden Aktionen fragen vorher nach.</p>
+</section>
+
+<section class="section" id="ftp">
+<h2>FTP-Server</h2>
+<p>Der FTP-Server läuft im Wizard-Dienst. Er bleibt aktiv, wenn das FTP-Fenster geschlossen wird, und endet mit Kodi.</p>
+<h3>Server starten</h3>
+<ol class="steps">
+<li><strong>WARTUNG → FTP-SERVER ÖFFNEN</strong> wählen.</li>
+<li>Adresse, Ordner und Anmeldung prüfen.</li>
+<li><strong>FTP-SERVER STARTEN</strong> wählen. Der Status wechselt auf <strong>LÄUFT</strong>.</li>
+<li>Im FTP-Client <code>ftp://IP:PORT</code> eintragen und mit Benutzername/Passwort oder anonym verbinden.</li>
+<li>Zum Beenden <strong>FTP-SERVER STOPPEN</strong> wählen.</li>
+</ol>
+<h3>Einstellungen</h3>
+<table>
+<tr><th>Einstellung</th><th>Bedeutung</th></tr>
+<tr><td>FTP-Server beim Kodi-Start starten</td><td>Automatischer Start mit Kodi. Standardmäßig aus.</td></tr>
+<tr><td>Nur lokal erreichbar</td><td>Bindet an <code>127.0.0.1</code>; andere Geräte können nicht zugreifen.</td></tr>
+<tr><td>FTP-Port</td><td>Standard <code>2121</code>. Bei Belegung werden <code>2100</code>, <code>21212</code>, <code>21000</code> und <code>21210</code> probiert.</td></tr>
+<tr><td>Anonymen Zugang erlauben</td><td>Login ohne Benutzername und Passwort. Standardmäßig aus.</td></tr>
+<tr><td>Benutzername / Passwort</td><td>Zugangsdaten bei ausgeschaltetem anonymen Zugang. Standard <code>kodi</code> / <code>kodi</code>.</td></tr>
+<tr><td>FTP-Ordner</td><td>Freigegebener Ordner, Standard <code>special://home</code>. Änderungen nach Server-Neustart.</td></tr>
+</table>
+<div class="callout"><strong>Sicherheit:</strong> Anonymer Zugang und Autostart sind standardmäßig aus. Nur in vertrauenswürdigen Netzen verwenden und ein eigenes Passwort setzen. Der Benutzer hat Schreibzugriff, wenn der Ordner beschreibbar ist; <code>/sdcard</code> wird nur lesend freigegeben.</div>
+<h3>Beispiele für Clients</h3>
+<ul>
+<li><strong>Windows:</strong> FileZilla, WinSCP oder Windows-Explorer mit <code>ftp://IP:PORT</code>.</li>
+<li><strong>Android:</strong> FTP-Client wie MiXplorer, Solid Explorer oder FileZilla.</li>
+<li><strong>Linux/macOS:</strong> FileZilla, Cyberduck oder <code>ftp</code> im Terminal.</li>
+</ul>
+<p>Für Uploads in den Build-Ordner den FTP-Ordner passend wählen. Nach dem Upload im Wizard <strong>AKTUALISIEREN</strong> oder die lokale Build-Liste neu öffnen.</p>
+</section>
+
+<section class="section" id="settings">
+<h2>Einstellungen</h2>
+<table>
+<tr><th>Bereich</th><th>Funktion</th></tr>
+<tr><td>Speicherort</td><td>Zielordner für erstellte Builds. Leer bedeutet automatischer Download-Ordner.</td></tr>
+<tr><td>Build-Installation</td><td>Turbo-Installation und sichere Installation.</td></tr>
+<tr><td>Build-Erstellung</td><td>Turbo-Erstellung und sichere Erstellung.</td></tr>
+<tr><td>FTP-Server</td><td>Autostart, lokal, Port, Anmeldung, Freigabeordner.</td></tr>
+<tr><td>Hilfe &amp; Anleitung</td><td>HTML-Anleitung öffnen und Browser wählen.</td></tr>
+</table>
+<div class="callout"><strong>Kodi 19:</strong> Wenn der Hilfe- oder FTP-Reiter fehlt, <code>resources/settings19.xml</code> in <code>settings.xml</code> umbenennen und Kodi neu starten.</div>
+</section>
+
+<section class="section" id="help">
+<h2>Anleitung und Browser</h2>
+<p>Die HTML-Anleitung wird über einen kleinen lokalen Server im Wizard geöffnet. Der Server hört nur auf <code>127.0.0.1</code>, verwendet einen zufälligen Port und einen Schutz-Token. Er ist nicht im Netzwerk erreichbar und wird nach 30 Minuten oder beim Kodi-Beenden gestoppt.</p>
+<h3>Browser wählen</h3>
+<ul>
+<li><strong>Automatisch:</strong> Standardbrowser des Systems.</li>
+<li><strong>Chrome, Firefox, Edge, Safari, Samsung Internet:</strong> bevorzugter Browser.</li>
+<li><strong>Eigener Browserbefehl:</strong> Pfad oder Befehl, z. B. <code>/usr/bin/firefox</code> oder <code>flatpak run org.mozilla.firefox</code>.</li>
+</ul>
+<p>Android-Browser werden über die installierten Pakete angesprochen. Ist der gewählte Browser nicht vorhanden, versucht der Wizard den Standardbrowser. Auf Desktop-Systemen wird der erkannte Browserpfad oder <code>xdg-open</code> bzw. <code>open</code> verwendet.</p>
+<h3>Anleitung öffnen</h3>
+<p><strong>Einstellungen → HILFE &amp; ANLEITUNG → ANLEITUNG ÖFFNEN</strong>. Wenn der Dienst gerade startet, kurz warten und erneut öffnen. Die HTML-Datei liegt im Addon unter <code>resources/guide/buildbauer.html</code>.</p>
+</section>
+
+
+
+<section class="section" id="skingenerator">
+<h2>Skin Generator</h2>
+<p>Der <strong>Skin Generator</strong> vom Team <strong>IT('s) Possible</strong> ist ein kostenloses Browser-Werkzeug für eigene Kodi-Oberflächen. Du gestaltest Menüs mit Buttons, Listen, Schaltern, Widgets und Bildern, passt Farben und Hintergründe an und exportierst das Ergebnis als installierbare ZIP.</p>
+<div class="grid2">
+<div class="card"><h4>ADDON-MENÜ</h4><p>Baue ein eigenes <code>home.xml</code> für dein Addon, sieh dir Änderungen in der Live-Vorschau an und nutze Editor, Bild-Werkzeuge sowie fertige Vorlagen.</p></div>
+<div class="card"><h4>TITAN-MODUS</h4><p>Erstelle einen echten Kodi-Skin auf Estuary-Basis: mit eigenen Farben, Hintergrund, Logo, Hauptmenü, zusätzlichen Menüpunkten und Widgets. Die Elemente lassen sich frei verschieben.</p></div>
+</div>
+<p><a class="site-button" href="https://chrisophy.github.io/KSG" target="_blank" rel="noopener">SKIN GENERATOR ÖFFNEN</a></p>
+<div class="callout"><strong>Hinweis:</strong> Der Generator läuft im Browser und ist kein Bestandteil des Wizards. Projekte werden dort automatisch im Browser gespeichert; die fertige ZIP anschließend wie gewohnt in Kodi installieren.</div>
+</section>
+
+<section class="section" id="paths">
+<h2>Plattformpfade und kodi.log</h2>
+<p><code>special://home</code> ist Kodis Datenordner. <code>special://profile</code> ist normalerweise <code>special://home/userdata</code>. Die folgenden Pfade gelten für die normale Installation; portable, Store-, Flatpak- oder Jailbreak-Varianten können abweichen.</p>
+<div class="table-wrap"><table>
+<tr><th>System</th><th><code>special://home</code></th><th><code>kodi.log</code></th></tr>
+<tr><td>Windows</td><td><code>%APPDATA%\Kodi</code><br>z. B. <code>C:\Users\NAME\AppData\Roaming\Kodi</code></td><td><code>%APPDATA%\Kodi\kodi.log</code></td></tr>
+<tr><td>Windows portable</td><td><code>&lt;Kodi-Ordner&gt;\portable_data</code></td><td><code>&lt;Kodi-Ordner&gt;\portable_data\kodi.log</code></td></tr>
+<tr><td>Windows Store</td><td><code>%LOCALAPPDATA%\Packages\XBMCFoundation.Kodi_4n2hpmxwrvr6p\LocalCache\Roaming\Kodi</code></td><td>Im selben Ordner: <code>kodi.log</code></td></tr>
+<tr><td>Android</td><td><code>/storage/emulated/0/Android/data/org.xbmc.kodi/files/.kodi</code><br>oft auch <code>/sdcard/Android/data/...</code></td><td><code>.../.kodi/temp/kodi.log</code></td></tr>
+<tr><td>Linux</td><td><code>~/.kodi</code></td><td><code>~/.kodi/temp/kodi.log</code></td></tr>
+<tr><td>Linux Flatpak</td><td><code>~/.var/app/tv.kodi.Kodi/data</code></td><td><code>~/.var/app/tv.kodi.Kodi/data/temp/kodi.log</code></td></tr>
+<tr><td>LibreELEC / CoreELEC</td><td><code>/storage/.kodi</code></td><td><code>/storage/.kodi/temp/kodi.log</code></td></tr>
+<tr><td>macOS</td><td><code>~/Library/Application Support/Kodi</code></td><td><code>~/Library/Logs/kodi.log</code></td></tr>
+<tr><td>iOS / tvOS</td><td><code>/private/var/mobile/Library/Preferences/Kodi</code></td><td><code>/private/var/mobile/Library/Preferences/kodi.log</code></td></tr>
+</table></div>
+<div class="callout"><strong>Android:</strong> Der Ordner <code>Android/data</code> ist auf neueren Android-Versionen nur eingeschränkt sichtbar. Nutze den FTP-Server des Wizards, einen Dateimanager mit Zugriff oder ADB. <strong>iOS:</strong> Ohne Jailbreak ist der Ordner oft nicht direkt erreichbar; nutze eine Kodi-Sicherung oder ein Backup des Geräts.</div>
+<h3>Was liegt wo?</h3>
+<ul>
+<li><code>addons/</code>: installierte Addons, Skin und Repositories.</li>
+<li><code>userdata/</code>: Einstellungen, Favoriten, Quellen, Keymaps und Datenbanken.</li>
+<li><code>userdata/addon_data/</code>: Konten, Tokens und Einstellungen einzelner Addons.</li>
+<li><code>temp/</code>: temporäre Dateien und <code>kodi.log</code>; nicht in den Build packen.</li>
+<li><code>itspossible_backups/</code>: Sicherungen des Wizards unter <code>userdata/</code>.</li>
+</ul>
+<p>Diese Pfade werden bei FTP, Sicherung, Wiederherstellung und dem Kodi-19-Settings-Tausch verwendet. Wenn ein Pfad nicht existiert, zuerst prüfen, ob Kodi portable, als Flatpak oder über den Microsoft Store läuft.</p>
+</section>
+
+
+<section class="section" id="update">
+<h2>Build aktualisieren</h2>
+<ol class="steps">
+<li><strong>Version erhöhen:</strong> Im Build-Fenster eine neue Version eintragen, z. B. <code>1.1.0</code>. Nicht dieselbe Version mit anderem Inhalt veröffentlichen.</li>
+<li><strong>Neue ZIP erstellen:</strong> Build erneut packen. Die alte ZIP für einen Rollback aufbewahren.</li>
+<li><strong>ZIP ersetzen oder neu hochladen:</strong> Bei gleichem Dateinamen die Datei atomar ersetzen. Besser ist ein neuer Dateiname mit Versionsnummer, damit Caches und Nutzer nicht die alte Datei bekommen.</li>
+<li><strong>Build-Liste anpassen:</strong> <code>version</code>, <code>url</code> und bei Bedarf <code>kodi</code>, Icon, Fanart und Beschreibung aktualisieren.</li>
+<li><strong>Quelle aktualisieren:</strong> Im Wizard unter <strong>BUILD QUELLEN</strong> die Liste neu laden. Browser- und Wizard-Caches beachten.</li>
+<li><strong>Neu testen:</strong> Auf einem sauberen Test-Kodi installieren und prüfen, ob Addons, Skin und Einstellungen übernommen wurden.</li>
+</ol>
+<div class="callout red"><strong>Selbst gepackte ZIPs:</strong> <code>addons/</code> und <code>userdata/</code> müssen direkt im ZIP-Ordner liegen, nicht in einem zusätzlichen Unterordner wie <code>MeinBuild/addons/</code>. Der Wizard erkennt einen einzelnen Oberordner, aber andere Tools und manche Build-Listen tun das nicht. Im Zweifel die ZIP-Struktur mit dem Validator und einem Test-Kodi prüfen.</div>
+<h3>Rollback</h3>
+<p>Alte ZIP und alte Liste behalten. Bei einem fehlerhaften Update die vorherige ZIP wieder hochladen, die Liste auf die alte Version zurücksetzen und die Quelle neu laden. Nutzer, die bereits aktualisiert haben, müssen die ältere Version erneut installieren oder ihre Sicherung zurückspielen.</p>
+</section>
+
+
+<section class="section" id="compatibility">
+<h2>Kompatibilität</h2>
+<div class="table-wrap"><table>
+<tr><th>Kodi</th><th>Status</th><th>Einstellungen</th><th>Hinweis</th></tr>
+<tr><td>19 Matrix</td><td>unterstützt</td><td><code>settings19.xml</code> nach <code>settings.xml</code> umbenennen</td><td>Python-3-Ära; ältere Addons können fehlen.</td></tr>
+<tr><td>20 Nexus</td><td>unterstützt</td><td>normale <code>settings.xml</code></td><td>Für viele bestehende Builds der kleinste gemeinsame Nenner.</td></tr>
+<tr><td>21 Omega</td><td>unterstützt</td><td>normale <code>settings.xml</code></td><td>Kodi 21.3 war Ende 2025 die aktuelle stabile Linie.</td></tr>
+<tr><td>22 Piers</td><td>vorgesehen / Vorabversion</td><td>normale <code>settings.xml</code></td><td>2026 Beta/RC. Builds und Addons vor der Veröffentlichung gründlich testen.</td></tr>
+</table></div>
+<h3>Plattformen</h3>
+<div class="table-wrap"><table>
+<tr><th>Plattform</th><th>Wizard</th><th>Besonderheit</th></tr>
+<tr><td>Windows</td><td>unterstützt</td><td>Portable- und Store-Pfade beachten; Desktop-Browserauswahl verfügbar.</td></tr>
+<tr><td>Android</td><td>unterstützt</td><td>Browser über Paketnamen; <code>Android/data</code> kann gesperrt sein; FTP oder ADB nutzen.</td></tr>
+<tr><td>Linux</td><td>unterstützt</td><td>Normal <code>~/.kodi</code>, Flatpak unter <code>~/.var/app/tv.kodi.Kodi</code>.</td></tr>
+<tr><td>LibreELEC / CoreELEC</td><td>unterstützt</td><td>Feste Pfade unter <code>/storage/.kodi</code>; SSH und FTP sind typische Zugänge.</td></tr>
+<tr><td>macOS</td><td>unterstützt</td><td>Datenordner mit Leerzeichen im Pfad; Standardbrowser oder <code>open</code>.</td></tr>
+<tr><td>iOS / tvOS</td><td>eingeschränkt</td><td>Dateisystem oft nur über Backup/Jailbreak; Guide- und FTP-Nutzung vorher testen.</td></tr>
+</table></div>
+<h3>Wenn das Feld <code>kodi</code> nicht passt</h3>
+<p>Der Wizard vergleicht die Hauptversion, also <code>21</code> aus <code>21.3</code>, mit der installierten Kodi-Hauptversion. Bei einer Abweichung erscheint eine Warnung: Skin und Addons können unbrauchbar werden; die Installation ist nach Bestätigung trotzdem möglich. Im Turbo-Modus werden solche Rückfragen übersprungen. Fehlt das Feld <code>kodi</code>, findet keine Prüfung statt.</p>
+<div class="callout"><strong>Für Buildbauer:</strong> Trage die tatsächlich getestete Hauptversion ein. Ein Build für Kodi 21 sollte nicht als Kodi 22 deklariert werden, nur weil er „ungefähr“ passt. Für mehrere Versionen getrennte Builds oder getrennte Einträge verwenden.</div>
+</section>
+
+<section class="section" id="troubleshooting">
+<h2>Fehlerbehebung</h2>
+<details><summary><strong>Build-Liste bleibt leer</strong></summary><p>Adresse direkt auf TXT, JSON oder XML prüfen. Die Liste muss ohne Login erreichbar sein. <code>url</code> muss auf eine ZIP-Datei zeigen. Bei JSON <code>builds</code>, <code>items</code> oder eine direkte Liste verwenden. Unter <strong>BUILD QUELLEN</strong> prüfen, ob die Quelle aktiv ist.</p></details>
+<details><summary><strong>Build wird nicht installiert</strong></summary><p>ZIP auf gültige Struktur prüfen, Speicherplatz kontrollieren und das Kodi-Log unter <strong>WARTUNG → LOG ANZEIGEN</strong> ansehen. Bei Netzwerkfehlern die ZIP lokal testen. Prüfen, ob <code>addons/</code> und <code>userdata/</code> direkt im ZIP liegen.</p></details>
+<details><summary><strong>Schwarzer Bildschirm oder Skin fehlt nach der Installation</strong></summary><p>Meist passt der Build nicht zur Kodi-Version oder der Skin ist unvollständig. Kodi neu starten, mit einem anderen Skin starten und die Sicherung zurückspielen. Prüfen, ob das Feld <code>kodi</code> zur installierten Hauptversion passt und ob der Build auf einem sauberen Test-Kodi lief.</p></details>
+<details><summary><strong>Addons sind nach dem Build deaktiviert</strong></summary><p>Unter <em>Add-ons → Meine Add-ons</em> die betroffenen Addons aktivieren. Im Wizard <strong>WARTUNG → ADDONS AKTIVIEREN</strong> ausführen. Fehlende Abhängigkeiten oder ein Versionskonflikt werden im Log genannt; gegebenenfalls Addon und Repository aktualisieren.</p></details>
+<details><summary><strong>Kodi startet nicht mehr</strong></summary><p>Nicht sofort alles löschen. Zuerst die Sicherung zurückspielen. Unter Windows/Linux den Kodi-Datenordner umbenennen, Kodi neu starten und anschließend nur <code>userdata</code> aus der Sicherung zurückkopieren. Auf Android Kodi stoppen und den Datenordner über Dateimanager, FTP oder ADB sichern, bevor Änderungen vorgenommen werden. Die Pfade stehen unter <a href="#paths">Plattformpfade</a>.</p></details>
+<details><summary><strong>Download bricht ab oder ist zu groß</strong></summary><p>Direkte ZIP-Adresse verwenden, Speicherplatz prüfen und die Datei im privaten Browserfenster testen. Große Builds über GitHub Releases oder eigenen Webspace statt über Chat-Anhänge und Freigabeseiten hosten. Bei wiederholten Abbrüchen die ZIP einmal lokal herunterladen und anschließend als lokalen Build installieren.</p></details>
+<details><summary><strong>Kodi 19 zeigt keine Einstellungen</strong></summary><p><code>settings19.xml</code> in <code>settings.xml</code> umbenennen, vorhandene Datei sichern und Kodi neu starten.</p></details>
+<details><summary><strong>FTP startet nicht</strong></summary><p>Port belegen, anderen Port wählen oder <code>Nur lokal</code> testen. Der Wizard probiert automatisch Ausweichports. Bei Android den Ordner auf Schreibrechte prüfen; <code>/sdcard</code> ist nur lesend.</p></details>
+<details><summary><strong>FTP ist im Netzwerk nicht erreichbar</strong></summary><p><code>Nur lokal erreichbar</code> ausschalten, richtige IP verwenden und die Firewall auf dem Gerät prüfen. Bei Android/Windows muss der Port im lokalen Netz erlaubt sein.</p></details>
+<details><summary><strong>Anleitung öffnet keinen Browser</strong></summary><p>Unter <strong>Einstellungen → HILFE &amp; ANLEITUNG</strong> den Browser auf <strong>Automatisch</strong> stellen. Auf Android einen installierten Browser wählen. Bei eigenem Befehl den vollständigen Pfad eintragen. Der Guide-Dienst startet mit Kodi; nach einem Neustart kurz warten.</p></details>
+<details><summary><strong>Sicherung wiederherstellen</strong></summary><p><strong>WARTUNG → WIEDERHERSTELLEN</strong>, Sicherung wählen und Kodi neu starten. Sicherungen liegen unter <code>userdata/itspossible_backups/</code>. Wenn Kodi nicht mehr startet, den Datenordner extern sichern und die Sicherung manuell zurückspielen.</p></details>
+<details><summary><strong>Log prüfen</strong></summary><p><strong>WARTUNG → LOG ANZEIGEN</strong> zeigt die letzten 150.000 Zeichen. Nach Fehlern im Bereich <code>IT'S-POSSIBLE WIZARD</code> suchen. Die Datei liegt je nach System im <code>temp</code>-Ordner; die genauen Pfade stehen unter <a href="#paths">Plattformpfade</a>.</p></details>
+<details><summary><strong>Kodi-Version passt nicht</strong></summary><p>Der Wizard warnt bei einer anderen Hauptversion. Nach Bestätigung installiert er trotzdem; im Turbo-Modus ohne Rückfrage. Skin und Addons können unbrauchbar werden. Besser den passenden Build verwenden.</p></details>
+<h3>Häufige Fragen</h3>
+<div class="faq">
+<details><summary><strong>Muss die Build-ZIP im selben Ordner wie die Liste liegen?</strong></summary><p>Nein. Entscheidend ist die vollständige <code>url</code> in der Liste. Beide Dateien können auf verschiedenen Hosts liegen, solange sie ohne Login erreichbar sind.</p></details>
+<details><summary><strong>Kann ich mehrere Build-Listen gleichzeitig aktivieren?</strong></summary><p>Ja. Unter <strong>BUILD QUELLEN</strong> lassen sich mehrere Quellen auswählen. Die Builds werden zusammengeführt und nach dem gewählten Kriterium sortiert.</p></details>
+<details><summary><strong>Warum wird mein Build als Adult markiert?</strong></summary><p>Das Feld <code>adult</code> steuert die Sichtbarkeit. Adult-Builds erscheinen nur, wenn <code>show_adult</code> in <code>itspossible.json</code> auf <code>true</code> steht.</p></details>
+<details><summary><strong>Wo finde ich die Logdatei?</strong></summary><p>Unter Windows <code>%APPDATA%\Kodi\kodi.log</code>, unter Android im <code>.kodi/temp</code>-Ordner, unter Linux <code>~/.kodi/temp/kodi.log</code>, unter LibreELEC <code>/storage/.kodi/temp/kodi.log</code> und unter macOS <code>~/Library/Logs/kodi.log</code>. Die vollständige Tabelle steht unter <a href="#paths">Plattformpfade</a>.</p></details>
+<details><summary><strong>Darf ich Addondata weitergeben?</strong></summary><p>Nur wenn keine Konten, Tokens, Schlüssel oder persönlichen Daten enthalten sind und die Addon-Lizenz die Weitergabe erlaubt. Im Zweifel Addondata weglassen.</p></details>
+</div>
+</section>
+
+<section class="section" id="checklist">
+<h2>Checkliste für Buildbauer</h2>
+<div class="progress"><span id="progress-bar"></span></div>
+<p id="progress-text" aria-live="polite">0 von 12 erledigt</p>
+<ul class="checklist">
+<li><input type="checkbox" class="task" data-key="kodi-clean"><span>Test-Kodi mit gewünschtem Skin und Addons eingerichtet.</span></li>
+<li><input type="checkbox" class="task" data-key="addons-tested"><span>Alle Addons einmal gestartet und Einstellungen geprüft.</span></li>
+<li><input type="checkbox" class="task" data-key="storage"><span>Build-Speicherort ist beschreibbar und hat genug Platz.</span></li>
+<li><input type="checkbox" class="task" data-key="build-created"><span>Build-ZIP im Wizard erstellt.</span></li>
+<li><input type="checkbox" class="task" data-key="clean-install"><span>Build auf einem sauberen Kodi installiert und getestet.</span></li>
+<li><input type="checkbox" class="task" data-key="metadata"><span>Name, Version, Kodi-Version, Icon und Fanart festgelegt.</span></li>
+<li><input type="checkbox" class="task" data-key="list"><span>Build-Liste als TXT, JSON oder XML veröffentlicht.</span></li>
+<li><input type="checkbox" class="task" data-key="url"><span>ZIP-Adresse und Listen-Adresse sind ohne Login erreichbar.</span></li>
+<li><input type="checkbox" class="task" data-key="backup"><span>Sicherung der eigenen Kodi-Installation angelegt.</span></li>
+<li><input type="checkbox" class="task" data-key="ftp"><span>FTP-Zugang getestet, falls Uploads darüber laufen.</span></li>
+<li><input type="checkbox" class="task" data-key="tokens"><span>Passwörter, API-Schlüssel, Debrid-/Trakt-Tokens und persönliche Daten aus der Build-ZIP entfernt.</span></li>
+<li><input type="checkbox" class="task" data-key="rights"><span>Rechte für Skin, Addons und Inhalte geklärt; nur erlaubte Bestandteile weitergeben.</span></li>
+</ul>
+<p><button id="reset-checklist" type="button">CHECKLISTE ZURÜCKSETZEN</button></p>
+<div class="callout green">Die Häkchen werden nur lokal im Browser gespeichert. Sie werden nicht an den Wizard gesendet. Bei gesperrtem Speicher funktioniert die Checkliste trotzdem, nur ohne dauerhafte Speicherung.</div>
+</section>
+
+<button class="back-top" id="back-top" type="button" aria-label="Nach oben">NACH OBEN</button>
+<footer>IT'S-POSSIBLE EDITION · KODI 19–22 · BUILDBAUER-ANLEITUNG · 2026.11.10.38<br>Support &amp; Feedback: <a href="https://github.com/mr-evil1" target="_blank" rel="noopener">github.com/mr-evil1</a></footer>
+</main>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const sections = Array.from(document.querySelectorAll(".section"));
+const navLinks = Array.from(document.querySelectorAll("#nav-links a"));
+const search = $("search");
+const searchEmpty = $("search-empty");
+const guideNav = $("guide-nav");
+const navToggle = $("nav-toggle");
+const backTop = $("back-top");
+function setNav(open) {
+  guideNav.classList.toggle("open", open);
+  navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  navToggle.textContent = open ? "SCHLIESSEN" : "MENÜ";
+}
+navToggle.addEventListener("click", () => setNav(!guideNav.classList.contains("open")));
+if (window.matchMedia("(max-width:1000px)").matches) setNav(false);
+navLinks.forEach((link) => link.addEventListener("click", () => {
+  if (window.matchMedia("(max-width:1000px)").matches) setNav(false);
+}));
+search.addEventListener("input", () => {
+  const query = search.value.trim().toLowerCase();
+  let visible = 0;
+  sections.forEach((section) => {
+    const match = query.length === 0 || section.textContent.toLowerCase().includes(query);
+    section.classList.toggle("hidden", query.length > 0 && !match);
+    if (match) visible += 1;
+    if (query.length > 0) {
+      section.querySelectorAll("details").forEach((details) => {
+        if (details.textContent.toLowerCase().includes(query)) details.open = true;
+      });
+    }
+  });
+  navLinks.forEach((link) => {
+    const target = document.querySelector(link.getAttribute("href"));
+    link.classList.toggle("hidden", target ? target.classList.contains("hidden") : false);
+  });
+  searchEmpty.classList.toggle("hidden", query.length === 0 || visible > 0);
+});
+function fallbackCopy(value) {
+  const area = document.createElement("textarea");
+  area.value = value;
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand("copy");
+  area.remove();
+}
+async function copyValue(value, button, label) {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch (error) {
+    fallbackCopy(value);
+  }
+  const old = button.textContent;
+  button.textContent = label;
+  setTimeout(() => { button.textContent = old; }, 1400);
+}
+document.querySelectorAll(".copy").forEach((button, index) => {
+  button.setAttribute("aria-label", "Codeblock " + (index + 1) + " kopieren");
+  button.addEventListener("click", () => {
+    const code = button.parentElement.querySelector("code").innerText;
+    copyValue(code, button, "KOPIERT");
+  });
+});
+const printState = new Map();
+window.addEventListener("beforeprint", () => {
+  printState.clear();
+  document.querySelectorAll("details").forEach((details) => {
+    printState.set(details, details.open);
+    details.open = true;
+  });
+});
+window.addEventListener("afterprint", () => {
+  printState.forEach((open, details) => { details.open = open; });
+  printState.clear();
+});
+$("print-button").addEventListener("click", () => window.print());
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id));
+    });
+  }, {rootMargin: "-15% 0px -70% 0px", threshold: 0});
+  sections.forEach((section) => observer.observe(section));
+}
+backTop.addEventListener("click", () => window.scrollTo({top: 0, behavior: "smooth"}));
+window.addEventListener("scroll", () => backTop.classList.toggle("show", window.scrollY > 700), {passive: true});
+function xmlEscape(value) {
+  return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+const buildRows = $("build-rows");
+function makeBuildRow(values = {}) {
+  const row = document.createElement("div");
+  row.className = "build-row";
+  row.innerHTML = `<div class="row-head"><strong class="row-title">Build</strong><button class="remove-build" type="button">ENTFERNEN</button></div><div class="generator compact"><div><label>Name</label><input class="b-name" aria-label="Build-Name"></div><div><label>Version</label><input class="b-version" aria-label="Build-Version"></div><div><label>Kodi-Version</label><input class="b-kodi" aria-label="Kodi-Version" inputmode="decimal"></div><div class="wide"><label>ZIP-Adresse</label><input class="b-url" aria-label="ZIP-Adresse" inputmode="url"></div><div class="wide"><label>Beschreibung</label><input class="b-description" aria-label="Beschreibung"></div></div>`;
+  row.querySelector(".b-name").value = values.name || "Mein Build";
+  row.querySelector(".b-version").value = values.version || "1.0";
+  row.querySelector(".b-kodi").value = values.kodi || "22";
+  row.querySelector(".b-url").value = values.url || "https://example.com/builds/mein-build.zip";
+  row.querySelector(".b-description").value = values.description || "Mein Kodi-Build";
+  return row;
+}
+function renumberBuilds() {
+  const rows = buildRows.querySelectorAll(".build-row");
+  Array.from(rows).forEach((row, index) => {
+    row.querySelector(".row-title").textContent = "Build " + (index + 1);
+    row.querySelector(".remove-build").style.display = rows.length > 1 ? "" : "none";
+  });
+}
+function addBuild(values) {
+  buildRows.appendChild(makeBuildRow(values));
+  renumberBuilds();
+  updateGenerator();
+}
+buildRows.addEventListener("click", (event) => {
+  const button = event.target.closest(".remove-build");
+  if (!button || buildRows.querySelectorAll(".build-row").length <= 1) return;
+  button.closest(".build-row").remove();
+  renumberBuilds();
+  updateGenerator();
+});
+buildRows.addEventListener("input", updateGenerator);
+$("gen-add").addEventListener("click", () => addBuild({name: "Weiterer Build", version: "1.0", kodi: "22", url: "https://example.com/builds/weiterer-build.zip", description: "Weiterer Kodi-Build"}));
+function collectBuilds() {
+  return Array.from(buildRows.querySelectorAll(".build-row")).map((row) => ({
+    name: row.querySelector(".b-name").value.trim(),
+    version: row.querySelector(".b-version").value.trim(),
+    kodi: row.querySelector(".b-kodi").value.trim(),
+    url: row.querySelector(".b-url").value.trim(),
+    description: row.querySelector(".b-description").value.trim()
+  })).filter((build) => build.name || build.version || build.url);
+}
+function commonMeta() {
+  return {
+    icon: $("gen-icon").value.trim(),
+    fanart: $("gen-fanart").value.trim(),
+    adult: $("gen-adult").checked
+  };
+}
+function updateGenerator() {
+  const builds = collectBuilds();
+  const format = $("gen-format").value;
+  const meta = commonMeta();
+  const output = $("gen-output");
+  if (!builds.length) {
+    output.value = "";
+    return;
+  }
+  if (format === "txt") {
+    output.value = builds.map((build) => [build.name, build.version, build.url].join("|")).join("\n");
+  } else if (format === "attribute") {
+    output.value = builds.map((build) => {
+      const lines = ['name="' + build.name + '"', 'version="' + build.version + '"', 'url="' + build.url + '"', 'kodi="' + build.kodi + '"'];
+      if (meta.icon) lines.push('icon="' + meta.icon + '"');
+      if (meta.fanart) lines.push('fanart="' + meta.fanart + '"');
+      lines.push('adult="' + (meta.adult ? "Yes" : "No") + '"', 'description="' + build.description + '"');
+      return lines.join("\n");
+    }).join("\n\n");
+  } else if (format === "json") {
+    output.value = JSON.stringify({builds: builds.map((build) => ({name: build.name, version: build.version, kodi: build.kodi, url: build.url, icon: meta.icon || undefined, fanart: meta.fanart || undefined, description: build.description, adult: meta.adult}))}, null, 2);
+  } else {
+    const items = builds.map((build) => {
+      const attrs = [["name", build.name], ["version", build.version], ["kodi", build.kodi], ["url", build.url]];
+      if (meta.icon) attrs.push(["icon", meta.icon]);
+      if (meta.fanart) attrs.push(["fanart", meta.fanart]);
+      attrs.push(["adult", meta.adult ? "Yes" : "No"], ["description", build.description]);
+      return "  <build\n" + attrs.map((pair) => "    " + pair[0] + '="' + xmlEscape(pair[1]) + '"').join("\n") + " />";
+    }).join("\n");
+    output.value = '<?xml version="1.0" encoding="UTF-8"?>\n<builds>\n' + items + '\n</builds>';
+  }
+}
+["gen-format", "gen-icon", "gen-fanart", "gen-adult"].forEach((id) => {
+  $(id).addEventListener("input", updateGenerator);
+  $(id).addEventListener("change", updateGenerator);
+});
+$("gen-copy").addEventListener("click", () => copyValue($("gen-output").value, $("gen-copy"), "KOPIERT"));
+const sourceRows = $("source-rows");
+function makeSourceRow(values = {}) {
+  const row = document.createElement("div");
+  row.className = "source-row";
+  row.innerHTML = `<div class="row-head"><strong class="row-title">Quelle</strong><button class="remove-source" type="button">ENTFERNEN</button></div><div class="generator compact"><div><label>ID</label><input class="s-id" aria-label="Quellen-ID"></div><div><label>Name</label><input class="s-name" aria-label="Quellenname"></div><div class="wide"><label>Listen-Adresse</label><input class="s-url" aria-label="Listenadresse" inputmode="url"></div></div>`;
+  row.querySelector(".s-id").value = values.id || "meine-builds";
+  row.querySelector(".s-name").value = values.name || "Meine Builds";
+  row.querySelector(".s-url").value = values.url || "https://example.com/builds.json";
+  return row;
+}
+function renumberSources() {
+  const rows = sourceRows.querySelectorAll(".source-row");
+  Array.from(rows).forEach((row, index) => {
+    row.querySelector(".row-title").textContent = "Quelle " + (index + 1);
+    row.querySelector(".remove-source").style.display = rows.length > 1 ? "" : "none";
+  });
+}
+function addSource(values) {
+  sourceRows.appendChild(makeSourceRow(values));
+  renumberSources();
+  updateSources();
+}
+sourceRows.addEventListener("click", (event) => {
+  const button = event.target.closest(".remove-source");
+  if (!button || sourceRows.querySelectorAll(".source-row").length <= 1) return;
+  button.closest(".source-row").remove();
+  renumberSources();
+  updateSources();
+});
+sourceRows.addEventListener("input", updateSources);
+$("source-add").addEventListener("click", () => addSource({id: "weitere-quelle", name: "Weitere Quelle", url: "https://example.com/weitere-builds.json"}));
+function updateSources() {
+  const sources = Array.from(sourceRows.querySelectorAll(".source-row")).map((row) => ({
+    id: row.querySelector(".s-id").value.trim(),
+    name: row.querySelector(".s-name").value.trim(),
+    url: row.querySelector(".s-url").value.trim()
+  })).filter((source) => source.id || source.name || source.url);
+  if (!sources.length) {
+    $("source-output").value = "";
+    return;
+  }
+  $("source-output").value = JSON.stringify({build_sources: sources, active_build_sources: sources.map((source) => source.id)}, null, 2);
+}
+$("source-copy").addEventListener("click", () => copyValue($("source-output").value, $("source-copy"), "KOPIERT"));
+function urlProblems(value, label, results) {
+  const url = String(value || "").trim();
+  if (!url) {
+    results.push(["error", label + ": url fehlt."]);
+    return;
+  }
+  if (/\s/.test(url)) results.push(["warn", label + ": Die Adresse enthält ein Leerzeichen. Als %20 schreiben."]);
+  if (/^http:\/\//i.test(url)) results.push(["warn", label + ": http statt https. Viele Geräte blockieren unverschlüsselte Downloads."]);
+  if (/dropbox\.com/i.test(url) && !/[?&]dl=1(?:&|$)/i.test(url)) results.push(["warn", label + ": Dropbox-Link wirkt nicht direkt. ?dl=1 verwenden."]);
+  if (/drive\.google\.com/i.test(url)) results.push(["warn", label + ": Google-Drive-Links liefern oft eine Bestätigungsseite statt der Datei."]);
+  if (!/^https?:\/\//i.test(url)) {
+    results.push(["warn", label + ": Relative oder unbekannte Adresse. Sie funktioniert nur mit bekannter Listenadresse."]);
+    return;
+  }
+  try {
+    const parsed = new URL(url);
+    if (!parsed.pathname.toLowerCase().endsWith(".zip")) results.push(["warn", label + ": Die Adresse endet nicht auf .zip. Zeigt sie wirklich auf die Build-ZIP?"]);
+  } catch (error) {
+    results.push(["error", label + ": Die Adresse ist keine gültige URL."]);
+  }
+}
+function parseJsonList(raw, results) {
+  let data;
+  try { data = JSON.parse(raw); } catch (error) { results.push(["error", "JSON-Syntax: " + error.message]); return []; }
+  let items = data;
+  if (data && !Array.isArray(data)) items = data.builds || data.items;
+  if (!Array.isArray(items)) { results.push(["error", "JSON enthält weder builds noch items als Liste."]); return []; }
+  return items.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) { results.push(["error", "Build " + (index + 1) + " ist kein Objekt."]); return null; }
+    const url = item.url || item.zip || "";
+    if (!item.name) results.push(["warn", "Build " + (index + 1) + ": name fehlt."]);
+    if (!item.version) results.push(["warn", "Build " + (index + 1) + ": version fehlt."]);
+    urlProblems(url, "Build " + (index + 1), results);
+    return {name: item.name || "", version: item.version || "", url: url};
+  }).filter(Boolean);
+}
+function parseXmlList(raw, results) {
+  const doc = new DOMParser().parseFromString(raw, "application/xml");
+  if (doc.querySelector("parsererror")) { results.push(["error", "XML-Syntax ist ungültig."]); return []; }
+  const nodes = Array.from(doc.querySelectorAll("build, item"));
+  if (!nodes.length) { results.push(["error", "XML enthält keine build- oder item-Elemente."]); return []; }
+  return nodes.map((node, index) => {
+    const field = (name) => node.getAttribute(name) || (node.querySelector(name) ? node.querySelector(name).textContent.trim() : "");
+    const url = field("url") || field("zip");
+    if (!field("name")) results.push(["warn", "Build " + (index + 1) + ": name fehlt."]);
+    if (!field("version")) results.push(["warn", "Build " + (index + 1) + ": version fehlt."]);
+    urlProblems(url, "Build " + (index + 1), results);
+    return {name: field("name"), version: field("version"), url: url};
+  });
+}
+function parseTxtList(raw, results) {
+  const content = raw.replace(/^\uFEFF/, "").trim();
+  if (!content) { results.push(["error", "Die Eingabe ist leer."]); return []; }
+  if (/^\s*name\s*=/im.test(content)) {
+    const blocks = content.split(/(?=^\s*name\s*=\s*")/im).filter((block) => block.trim());
+    return blocks.map((block, index) => {
+      const fields = {};
+      block.replace(/^\s*([A-Za-z_]+)\s*=\s*"([^"]*)"\s*$/gm, (match, key, value) => { fields[key.toLowerCase()] = value; return match; });
+      const url = fields.url || fields.zip || "";
+      if (!fields.name) results.push(["warn", "Block " + (index + 1) + ": name fehlt."]);
+      if (!fields.version) results.push(["warn", "Block " + (index + 1) + ": version fehlt."]);
+      urlProblems(url, "Block " + (index + 1), results);
+      return {name: fields.name || "", version: fields.version || "", url: url};
+    });
+  }
+  return content.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line, index) => {
+    const parts = line.split(/[|;]/).map((part) => part.trim());
+    let item;
+    if (parts.length >= 3) item = {name: parts[0], version: parts[1], url: parts[2]};
+    else if (parts.length === 2) item = {name: parts[0], version: "", url: parts[1]};
+    else if (parts.length === 1 && parts[0].includes("://")) item = {name: "", version: "", url: parts[0]};
+    else { results.push(["error", "Zeile " + (index + 1) + ": Name, Version und URL konnten nicht gelesen werden."]); return null; }
+    if (!item.name) results.push(["warn", "Zeile " + (index + 1) + ": name fehlt."]);
+    if (!item.version) results.push(["warn", "Zeile " + (index + 1) + ": version fehlt."]);
+    urlProblems(item.url, "Zeile " + (index + 1), results);
+    return item;
+  }).filter(Boolean);
+}
+function renderValidation(results, count) {
+  const output = $("validator-output");
+  output.textContent = "";
+  const errors = results.filter((item) => item[0] === "error").length;
+  const warnings = results.filter((item) => item[0] === "warn").length;
+  const summary = document.createElement("div");
+  summary.className = "result " + (errors ? "error" : warnings ? "warn" : "ok");
+  summary.textContent = errors ? errors + " Fehler, " + warnings + " Warnungen. Bitte korrigieren." : warnings ? count + " Build(s) gelesen, " + warnings + " Warnung(en)." : count + " Build(s) gelesen. Keine Probleme gefunden.";
+  output.appendChild(summary);
+  if (results.length) {
+    const list = document.createElement("ul");
+    results.forEach((item) => {
+      const entry = document.createElement("li");
+      entry.textContent = item[1];
+      list.appendChild(entry);
+    });
+    summary.appendChild(list);
+  }
+}
+$("validate-button").addEventListener("click", () => {
+  const raw = $("validator-input").value.trim();
+  let format = $("validator-format").value;
+  if (format === "auto") {
+    if (/^[\[{]/.test(raw)) format = "json";
+    else if (/^</.test(raw)) format = "xml";
+    else format = "txt";
+  }
+  const results = [];
+  let items = [];
+  if (format === "json") items = parseJsonList(raw, results);
+  else if (format === "xml") items = parseXmlList(raw, results);
+  else items = parseTxtList(raw, results);
+  if (!items.length) results.push(["error", "Keine gültigen Builds gefunden."]);
+  renderValidation(results, items.length);
+});
+const tasks = Array.from(document.querySelectorAll(".task"));
+const storageKey = "itspossible-buildbauer-checklist";
+function updateProgress() {
+  const done = tasks.filter((task) => task.checked).length;
+  $("progress-text").textContent = done + " von " + tasks.length + " erledigt";
+  $("progress-bar").style.width = (done / tasks.length * 100) + "%";
+}
+function readChecklist() {
+  try { return JSON.parse(localStorage.getItem(storageKey) || "{}") || {}; } catch (error) { return {}; }
+}
+function writeChecklist() {
+  const saved = {};
+  tasks.forEach((task) => { saved[task.dataset.key] = task.checked; });
+  try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (error) {}
+}
+const savedTasks = readChecklist();
+tasks.forEach((task) => { task.checked = Boolean(savedTasks[task.dataset.key]); });
+tasks.forEach((task) => task.addEventListener("change", () => { writeChecklist(); updateProgress(); }));
+$("reset-checklist").addEventListener("click", () => {
+  tasks.forEach((task) => { task.checked = false; });
+  try { localStorage.removeItem(storageKey); } catch (error) {}
+  updateProgress();
+});
+addBuild({name: "Mein Build", version: "1.0", kodi: "22", url: "https://example.com/builds/mein-build.zip", description: "Mein Kodi-22-Build"});
+addSource({id: "meine-builds", name: "Meine Builds", url: "https://example.com/builds.json"});
+updateGenerator();
+updateSources();
+updateProgress();
+</script>
+</body>
+</html>
