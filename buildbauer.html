@@ -127,7 +127,7 @@ footer a{color:#e69a9a}
 <div class="header-inner">
 <div class="brand">
 <h1>IT'S-POSSIBLE WIZARD</h1>
-<p>Buildbauer-Anleitung · Kodi 19–22 · Version 2026.11.10.38</p>
+<p>Buildbauer-Anleitung · Kodi 19–22 · Version 2026.11.11</p>
 </div>
 <div class="header-actions">
 <button id="print-button" type="button">DRUCKEN / PDF</button>
@@ -155,7 +155,9 @@ footer a{color:#e69a9a}
 <a href="#lists">Build-Listen</a>
 <a href="#config">itspossible.json</a>
 <a href="#manage">Verwalten</a>
+<a href="#appearance">Darstellung</a>
 <a href="#maintenance">Wartung</a>
+<a href="#backup">Sicherung</a>
 <a href="#ftp">FTP-Server</a>
 <a href="#settings">Einstellungen</a>
 <a href="#help">Anleitung &amp; Browser</a>
@@ -226,7 +228,7 @@ footer a{color:#e69a9a}
 <h2>Installation</h2>
 <h3>Kodi 22 und Kodi 21</h3>
 <ol class="steps">
-<li>Die Datei <code>plugin.program.itspossiblewizard-39.zip</code> herunterladen.</li>
+<li>Die Datei <code>plugin.program.itspossiblewizard-42.zip</code> herunterladen.</li>
 <li>In Kodi <em>Add-ons → Add-on-Browser → Aus Zip-Datei installieren</em> öffnen.</li>
 <li>Die ZIP auswählen und die Warnung bestätigen.</li>
 <li>Unter <em>Programme → It's-Possible Wizard</em> starten.</li>
@@ -569,8 +571,105 @@ Zweiter Build|2.0|https://example.com/builds/zweiter-build.zip</textarea>
 <li>Bei Addons ist die ZIP-Adresse optional; ohne ZIP wird die Addon-ID über eine eingerichtete Repository installiert.</li>
 <li>Bei Build-Quellen ist die Listenadresse Pflicht.</li>
 <li><strong>LÖSCHEN</strong> entfernt den markierten Eintrag nach Bestätigung.</li>
+<li><strong>ANPASSEN</strong> öffnet die Darstellungsverwaltung für Titel, Farben und Positionen.</li>
 </ul>
 <p>Doppelte IDs werden abgelehnt. Änderungen werden sofort in <code>itspossible.json</code> gespeichert; der Addon-Ordner muss beschreibbar sein.</p>
+</section>
+
+<section class="section" id="appearance">
+<h2>Darstellung anpassen</h2>
+<p>Über <strong>VERWALTEN → ANPASSEN</strong> öffnet sich ein eigenes Wizard-Fenster. Dort werden der gemeinsame Titel, seine Position und Schrift sowie die Farben der Wizard-Oberfläche geändert. Die Einstellungen gelten für alle Wizard-Fenster, nicht für den übrigen Kodi-Skin oder fremde Addons.</p>
+<h3>So öffnest und speicherst du die Anpassung</h3>
+<ol class="steps">
+<li><strong>HAUPTFENSTER → VERWALTEN</strong> öffnen.</li>
+<li>In der unteren Buttonleiste <strong>ANPASSEN</strong> wählen. Der neue Button steht zwischen <strong>BEREICH WECHSELN</strong> und <strong>ZURÜCK</strong>.</li>
+<li>Im linken Bereich die gewünschte Zeile mit OK anklicken. Bei Textfeldern erscheint die Bildschirmtastatur, bei Zahlenfeldern die Zahleneingabe.</li>
+<li>Die Vorschau rechts zeigt den aktuellen Titel und den Powered-by-Text. Die vollständige Farbwirkung auf alle Fenster erscheint nach dem Speichern und erneuten Öffnen.</li>
+<li><strong>SPEICHERN</strong> wählen. Die Werte werden unter <code>appearance</code> in <code>resources/itspossible.json</code> geschrieben; alle übrigen Einstellungen bleiben erhalten.</li>
+<li>Den Wizard schließen und neu öffnen. Wenn Farben oder Schriftgrößen in bereits geöffneten Fenstern nicht aktualisiert werden, zusätzlich einen Skin-Reload oder Kodi-Neustart durchführen.</li>
+</ol>
+<div class="callout"><strong>Wichtig:</strong> <strong>ZURÜCK</strong> schließt das Fenster ohne zu speichern. Es gibt keinen eigenen „Zurücksetzen“-Button; zum Zurücksetzen die Standardwerte eintragen oder den Block <code>appearance</code> aus <code>itspossible.json</code> entfernen. Fehlende Werte verwenden automatisch die Standardwerte.</div>
+<h3>Was der Titel ändert</h3>
+<ul>
+<li>Der Titel ist für die Hauptseite und alle Unterfenster gemeinsam. Die bisherigen Überschriften wie <code>IT'S-POSSIBLE VERWALTUNG</code> werden ausgeblendet.</li>
+<li>Die jeweilige Bereichsbezeichnung bleibt in der Unterzeile unter dem Titel erhalten, zum Beispiel „Einträge hinzufügen oder löschen“.</li>
+<li>Inhalte, Listen, Buttons und Untertitel werden durch die Titeländerung nicht verschoben oder verändert.</li>
+<li>Standard: Text <code>IT'S-POSSIBLE WIZARD</code>, Schrift <code>font52</code>, Position <code>x=520</code> und <code>y=58</code>, Breite <code>1080</code>, Höhe <code>100</code>, Ausrichtung <code>center</code>.</li>
+<li>Auf der Hauptseite ersetzt die Powered-by-Zeile den bisherigen Footer unten links. In den Unterfenstern bleibt der vorhandene Footer erhalten.</li>
+<li>Die Powered-by-Zeile ist fest: <code>powered by&nbsp;&nbsp;IT('s) POSSIBLE WIZARD</code>. Sie enthält zwei Leerzeichen nach <code>by</code>, ist nicht über das Anpassen-Fenster änderbar und wird auch durch einen alten JSON-Wert nicht überschrieben.</li>
+</ul>
+<h3>Die Schaltflächen im ANPASSEN-Fenster</h3>
+<table>
+<tr><th>Schaltfläche</th><th>Genaue Wirkung</th></tr>
+<tr><td>TITEL ÄNDERN</td><td>Öffnet die Texteingabe für den gemeinsamen Titel. Leere Eingaben werden ignoriert; der bisherige Titel bleibt dann stehen.</td></tr>
+<tr><td>SCHRIFTGRÖSSE</td><td>Schaltet der Reihe nach durch <code>font45</code>, <code>font52</code>, <code>font60</code>, <code>font32</code> und <code>font22</code>. Es sind nur vorhandene Kodi-Schriften möglich, keine freie Punktgröße. Bei sehr großer Schrift die Titelhöhe manuell erhöhen, falls der Text abgeschnitten wird.</td></tr>
+<tr><td>TITELFARBE</td><td>Schaltet durch die Farbpalette und ändert nur die Farbe des gemeinsamen Titels. Die Akzentfarbe der Buttons bleibt davon unberührt.</td></tr>
+<tr><td>AUSRICHTUNG</td><td>Wechselt zwischen <strong>LINKS</strong>, <strong>MITTE</strong> und <strong>RECHTS</strong>. Die Ausrichtung bezieht sich auf die eingestellte Titelbreite, nicht auf den gesamten Bildschirm.</td></tr>
+<tr><td>POSITION X</td><td>Zahleneingabe von 0 bis 1920. Bestimmt den linken Rand des Titelbereichs im 1920×1080-Raster.</td></tr>
+<tr><td>POSITION Y</td><td>Zahleneingabe von 0 bis 1080. Bestimmt den oberen Rand des Titelbereichs.</td></tr>
+<tr><td>TITELBREITE</td><td>Zahleneingabe von 120 bis 1920. Begrenzt den Bereich, in dem der Titel ausgerichtet wird. Bei zu kleiner Breite wird der Text abgeschnitten.</td></tr>
+<tr><td>HINTERGRUNDFARBE</td><td>Färbt alle Vorkommen des Hintergrund-PNGs in den Wizard-Fenstern. Die Farbpalette wird mit jedem Klick weitergeschaltet.</td></tr>
+<tr><td>PANELFARBE</td><td>Färbt alle Vorkommen der beiden Panel-PNGs, also die großen Flächen hinter Listen, Texten und Vorschauen.</td></tr>
+<tr><td>AKZENTFARBE</td><td>Färbt Buttons, Fokusflächen, Listenauswahl, Fortschrittsbalken, Slider und Akzenttexte. Beim Ändern wird <code>accent_soft</code> auf denselben Wert gesetzt; für einen abweichenden hellen Ton <code>accent_soft</code> manuell in der JSON-Datei ändern.</td></tr>
+<tr><td>TEXTFARBE</td><td>Färbt normale Beschriftungen, Listen und Fließtexte. Die gedämpfte Farbe für Untertitel und Hinweise bleibt separat als <code>muted</code> erhalten und wird nur manuell geändert.</td></tr>
+<tr><td>SPEICHERN</td><td>Prüft die Werte und schreibt sie in <code>resources/itspossible.json</code>. Danach erscheint ein Hinweis zum erneuten Öffnen des Wizards.</td></tr>
+<tr><td>ZURÜCK</td><td>Schließt das Anpassen-Fenster ohne zu speichern. Bereits geänderte, aber nicht gespeicherte Werte gehen verloren.</td></tr>
+<tr><td>EINSTELLUNGEN</td><td>Öffnet die normalen Kodi-Addon-Einstellungen. Gehört nicht zur Darstellung und ändert keine Appearance-Werte.</td></tr>
+</table>
+<h3>Farbpalette und Farbwirkung</h3>
+<p>Jede Farbzeile schaltet mit jedem Klick durch dieselbe Palette: <strong>ROT, ORANGE, GELB, GRÜN, TÜRKIS, BLAU, VIOLETT, PINK, WEISS, GRAU, SCHWARZ</strong>. Für exakte Farben oder Zwischentöne die JSON-Werte verwenden.</p>
+<table>
+<tr><th>JSON-Schlüssel</th><th>Standard</th><th>Wo er wirkt</th><th>Im Fenster änderbar</th></tr>
+<tr><td><code>title_color</code></td><td><code>FFFF2B2B</code></td><td>Nur der gemeinsame Titel.</td><td>ja, TITELFARBE</td></tr>
+<tr><td><code>accent</code></td><td><code>FFFF0000</code></td><td>Buttons, Fokus, Listenauswahl, Fortschritt, Slider und Akzenttexte.</td><td>ja, AKZENTFARBE</td></tr>
+<tr><td><code>accent_soft</code></td><td><code>FFFF5555</code></td><td>Helle Akzenttexte und sekundäre Fokusdetails.</td><td>nein, wird mit AKZENTFARBE gleichgesetzt; manuell möglich</td></tr>
+<tr><td><code>text</code></td><td><code>FFE0E0E0</code></td><td>Normale Beschriftungen, Listen und Fließtexte.</td><td>ja, TEXTFARBE</td></tr>
+<tr><td><code>muted</code></td><td><code>FF9A9A9A</code></td><td>Untertitel, Hinweise, alte Footer-Zeilen.</td><td>nein, nur manuell</td></tr>
+<tr><td><code>background</code></td><td><code>FFFF0000</code></td><td>Hintergrund-PNG aller Wizard-Fenster.</td><td>ja, HINTERGRUNDFARBE</td></tr>
+<tr><td><code>panel</code></td><td><code>FFFF0000</code></td><td>Panel-PNGs hinter Listen, Texten und Vorschauen.</td><td>ja, PANELFARBE</td></tr>
+<tr><td><code>powered_color</code></td><td><code>FF7A7A7A</code></td><td>Nur die Powered-by-Zeile auf der Hauptseite.</td><td>nein, nur manuell</td></tr>
+</table>
+<h3>Was mit den vorhandenen PNGs passiert</h3>
+<p>Die Wizard-eigenen PNGs wurden für die Einfärbung in Graustufen-Masken umgewandelt. Dadurch kann dieselbe Datei für jede gewählte Farbe verwendet werden. Form, Transparenz und Helligkeitsverlauf bleiben erhalten; Kodi färbt die Graustufen beim Anzeigen über <code>colordiffuse</code> ein.</p>
+<ul>
+<li>Betroffen sind Hintergrund, Panels, große und kleine Buttons, Fokusflächen, Listenauswahl, Fortschrittsbalken und Slider.</li>
+<li>Nicht betroffen sind <code>icon.png</code> und <code>fanart.jpg</code> des Addons sowie Grafiken anderer Addons oder des Kodi-Skins.</li>
+<li>Die Farben werden nicht in die PNG-Dateien eingebrannt. Eine Änderung wirkt daher erst nach dem Speichern und erneuten Öffnen beziehungsweise nach einem Skin-Reload.</li>
+<li>Sehr dunkle Farben bleiben auf dunklen Panels dunkel. Für kräftige Panels eine helle Farbe wie WEISS, GELB oder TÜRKIS wählen.</li>
+</ul>
+<h3>Speichern, Standardwerte und manuelle JSON-Werte</h3>
+<p><strong>SPEICHERN</strong> ergänzt oder ersetzt nur den Block <code>appearance</code>. Quellen, Addons, Build-Quellen, Autostart und alle anderen Einstellungen bleiben unverändert. Die Datei liegt unter <code>resources/itspossible.json</code> im Addon-Ordner.</p>
+<p>Fehlende Schlüssel verwenden die Standardwerte. Ungültige Farben, unbekannte Schriften oder ungültige Ausrichtungen werden durch die Standardwerte ersetzt. Zahlen werden auf folgende Bereiche begrenzt: <code>title_x</code> 0–1920, <code>title_y</code> 0–1080, <code>title_width</code> 120–1920, <code>title_height</code> 30–240, <code>powered_x</code> 0–1920 und <code>powered_y</code> 0–1080.</p>
+<pre><code>"appearance": {
+  "title": "IT'S-POSSIBLE WIZARD",
+  "title_font": "font52",
+  "title_color": "FFFF2B2B",
+  "title_x": 520,
+  "title_y": 58,
+  "title_width": 1080,
+  "title_height": 100,
+  "title_align": "center",
+  "powered_font": "font12",
+  "powered_color": "FF7A7A7A",
+  "powered_x": 120,
+  "powered_y": 928,
+  "accent": "FFFF0000",
+  "accent_soft": "FFFF5555",
+  "text": "FFE0E0E0",
+  "muted": "FF9A9A9A",
+  "background": "FFFF0000",
+  "panel": "FFFF0000"
+}</code></pre>
+<p>Erlaubte Werte für <code>title_font</code>: <code>font45</code>, <code>font52</code>, <code>font60</code>, <code>font32</code>, <code>font22</code>. Erlaubte Werte für <code>title_align</code>: <code>left</code>, <code>center</code>, <code>right</code>. <code>powered_font</code> verwendet dieselben Schriftnamen; Standard ist <code>font12</code>. <code>title_height</code> ist nur manuell einstellbar und hilft, sehr große Schriften ohne Abschneiden unterzubringen. <code>powered_x</code>, <code>powered_y</code>, <code>powered_font</code> und <code>powered_color</code> werden nicht im Anpassen-Fenster angeboten. Der Text der Powered-by-Zeile ist fest und nicht änderbar; ein alter Schlüssel <code>powered_text</code> wird ignoriert.</p>
+<h3>Grenzen und typische Korrekturen</h3>
+<ul>
+<li><strong>Titel abgeschnitten:</strong> <code>title_width</code> erhöhen, kleinere Schrift wählen oder <code>title_x</code> nach links setzen.</li>
+<li><strong>Titel überlappt Buttons:</strong> <code>title_y</code> verkleinern oder <code>title_x</code>/<code>title_width</code> anpassen. Der Titel liegt auf allen Fenstern an derselben Stelle.</li>
+<li><strong>Farbe wirkt zu dunkel:</strong> Für Panels und Hintergrund eine hellere Farbe wählen; die PNGs enthalten dunkle Flächen, die auch nach dem Einfärben dunkel bleiben.</li>
+<li><strong>Schrift fehlt:</strong> Nur die fünf genannten Kodi-Schriften werden angeboten. Fehlt eine Schrift im aktiven Skin, verwendet Kodi eine Ersatzschrift; dann eine der vorhandenen Größen wählen.</li>
+<li><strong>Änderung nicht sichtbar:</strong> Wizard schließen und neu öffnen. Bei laufenden Fenstern zusätzlich Skin-Reload oder Kodi-Neustart.</li>
+</ul>
+<div class="callout"><strong>Hinweis:</strong> Die Anpassung ist kein vollständiger Skin-Editor. Sie ändert ausschließlich die Fenster dieses Wizards. Ein eigener Kodi-Skin, andere Addons und Systemdialoge bleiben unverändert.</div>
 </section>
 
 <section class="section" id="maintenance">
@@ -592,6 +691,16 @@ Zweiter Build|2.0|https://example.com/builds/zweiter-build.zip</textarea>
 <tr><td>ERWEITERTE EINSTELLUNGEN</td><td>Status der <code>advancedsettings.xml</code>, Sicherung, Bereinigung alter Tags und Cache-Verwaltung. Cache-Werte nur unter Kodi 19/20; ab Kodi 21 folgt der Hinweis auf die Kodi-Einstellungen.</td></tr>
 <tr><td>ZURÜCK</td><td>Schließt das Wartungsfenster.</td></tr>
 </table>
+<h3 id="backup">Sicherung erstellen</h3>
+<ol class="steps">
+<li><strong>WARTUNG → SICHERUNG AUSWÄHLEN</strong> öffnen.</li>
+<li>In der Liste die gewünschten Kategorien anklicken. Ein Klick setzt oder entfernt das Kästchen. <strong>ALLE AUSWÄHLEN</strong> markiert alles; ein zweiter Klick hebt die Auswahl wieder auf.</li>
+<li>Mit <strong>SICHERUNG ERSTELLEN</strong> starten. Der Fortschritt und die aktuelle Datei werden im Fenster angezeigt.</li>
+<li>Nach dem Abschluss liegt die ZIP unter <code>userdata/itspossible_backups/</code>, zum Beispiel <code>itspossible-einstellungen-20261111-143000.zip</code>.</li>
+<li>Zum Wiederherstellen <strong>WARTUNG → WIEDERHERSTELLEN</strong> wählen, die ZIP markieren und Kodi anschließend neu starten.</li>
+</ol>
+<p>Standardmäßig sind <strong>GUI-EINSTELLUNGEN</strong> und <strong>ADDON-DATEN</strong> markiert. Weitere Kategorien sind Skin-Einstellungen, Favoriten, Dateiquellen, erweiterte Einstellungen, Keymaps, Playlists, Profile und Datenbanken. Datenbanken können sehr groß werden; Kodi vorher am besten beenden.</p>
+<div class="callout"><strong>Wichtig:</strong> Die Sicherung enthält Einstellungen und Addondaten, aber keine installierten Addons oder Build-ZIPs. Für einen vollständigen Umzug zusätzlich die Build-ZIP und die Build-Liste aufbewahren. Vor einem Build-Update immer zuerst eine Sicherung erstellen.</div>
 <h3>Hintergrundaufgaben</h3>
 <p><strong>HINTERGRUND-AUFGABEN AUSWÄHLEN</strong> öffnet den Auswahlmodus. Ein Klick auf Cache, Pakete, Thumbnails, Datenbank oder Texturen setzt bzw. entfernt das Kästchen. Die Auswahl wird gespeichert und beim Kodi-Start vom Dienst ausgeführt, unabhängig vom Wizard-Autostart. Die Aktionen werden im Kodi-Log protokolliert.</p>
 <h3>Autostart</h3>
@@ -792,7 +901,7 @@ Zweiter Build|2.0|https://example.com/builds/zweiter-build.zip</textarea>
 </section>
 
 <button class="back-top" id="back-top" type="button" aria-label="Nach oben">NACH OBEN</button>
-<footer>IT'S-POSSIBLE EDITION · KODI 19–22 · BUILDBAUER-ANLEITUNG · 2026.11.10.38<br>Support &amp; Feedback: <a href="https://github.com/mr-evil1" target="_blank" rel="noopener">github.com/mr-evil1</a></footer>
+<footer>IT'S-POSSIBLE EDITION · KODI 19–22 · BUILDBAUER-ANLEITUNG · 2026.11.11<br>Support &amp; Feedback: <a href="https://github.com/mr-evil1" target="_blank" rel="noopener">github.com/mr-evil1</a></footer>
 </main>
 </div>
 <script>
