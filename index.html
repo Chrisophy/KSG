@@ -3315,6 +3315,14 @@ class MenuBase(object):
         elif kind == 'cmd':
             self.run_cmd(act.get('c', ''), act.get('close'))
 
+    def open_settings(self):
+        # Eigene Funktion open_settings(window) in custom.py kann die Einstellungen selbst oeffnen und danach z.B. die Seite wechseln
+        mod = hooks()
+        if mod and callable(getattr(mod, 'open_settings', None)):
+            self.handle_return(call_hook('open_settings', False, self))
+        else:
+            xbmc.executebuiltin('Addon.OpenSettings(%s)' % ADDON_ID)
+
     def run_cmd(self, cmd, close=None):
         if not cmd:
             return
@@ -3332,9 +3340,11 @@ class MenuBase(object):
             self.finish((ret, None))
         elif ret.startswith('page:'):
             self.finish(('page', ret[5:]))
+        elif ret.startswith('swap:'):
+            self.finish(('swap', ret[5:]))
         elif ret.startswith('browse:'):
-            url, _sep, label = ret[7:].partition('@@')
-            self.do({'k': 'browse', 'v': url, 'p': CONFIG.get('browse') or '', 'l': label})
+            parts = ret[7:].split('@@')
+            self.do({'k': 'browse', 'v': parts[0], 'p': (parts[2] if len(parts) > 2 and parts[2] else CONFIG.get('browse')) or '', 'l': parts[1] if len(parts) > 1 else ''})
         elif ret.startswith('py:') and hooks():
             self.handle_return(call_hook(ret[3:].strip(), True, self))
         else:
@@ -3480,7 +3490,7 @@ class MenuBase(object):
             entries.append(fav_entry('%s - %s' % (ADDON_NAME, name) if self.page_id != ROOT else ADDON_NAME, '', fav_page(self.page_id), 'Dieses Menü'))
         entries.append(('Kodi-Favoriten öffnen', lambda: self.run_cmd(favourites_cmd())))
         if os.path.exists(os.path.join(REAL_PATH, 'resources', 'settings.xml')):
-            entries.append(('Einstellungen dieses Addons', lambda: xbmc.executebuiltin('Addon.OpenSettings(%s)' % ADDON_ID)))
+            entries.append(('Einstellungen dieses Addons', lambda: self.open_settings()))
         extra = call_hook('kontextmenue', False, self, info) if hooks() else None
         if isinstance(extra, (list, tuple)):
             for ent in extra:
@@ -3541,6 +3551,9 @@ def run(stack, base):
             del stack[1:]
         elif kind == 'exit':
             return None, True
+        elif kind == 'swap':
+            if result[1] in PAGES:
+                stack[:] = [result[1]]
         elif kind == 'page':
             target = result[1]
             if target not in PAGES:
@@ -3564,6 +3577,10 @@ def run(stack, base):
 
 def start_stack():
     stack = [ROOT]
+    if hooks():
+        alt = call_hook('start_page', False)      # optional: eigene Startseite (z.B. nach Einstellung)
+        if isinstance(alt, str) and alt in PAGES:
+            stack = [alt]
     target = None
     if OPTS.get('deeplinks') and len(sys.argv) > 2 and sys.argv[2]:
         params = dict(parse_qsl(fix_url(sys.argv[2].lstrip('?'))))
@@ -3578,7 +3595,7 @@ def start_stack():
             PENDING[target] = (fix_url(params.get('path')), params.get('title', ''))
     if not target and OPTS.get('remember'):
         target = STATE.get('last')
-    if target in PAGES and target != ROOT:
+    if target in PAGES and target != stack[0]:
         stack.append(target)
     return stack
 
@@ -3668,6 +3685,7 @@ So nutzt du sie:
       'home'      -> zur Startseite des Addons
       'exit'      -> Addon schliessen
       'page:ID'   -> zu einer Seite springen (ID steht im Modding-Inspektor)
+      'swap:SEITE'  -> aktuelle Seite durch SEITE ersetzen (statt oben drauf)
       'browse:PFAD' -> Ordner im eigenen Browser zeigen, z.B. 'browse:plugin://plugin.video.xyz/'
                        (optional mit Titel: 'browse:plugin://plugin.video.xyz/@@Mein Titel')
       'py:NAME'   -> eine andere Funktion aus dieser Datei aufrufen (auch aus dem Kontextmenue)
@@ -3681,6 +3699,8 @@ Kontextmenue erweitern (lange druecken / Taste C):
 
 Automatisch aufgerufen (wenn vorhanden):
   on_start()                -> beim Start des Addons
+  start_page()              -> (optional) Seiten-ID, mit der das Addon startet, statt der ersten Seite
+  open_settings(window)     -> (optional) eigene Einstellungen oeffnen (Kontextmenue "Einstellungen dieses Addons"); Rueckgabe wie bei Aktionen
   on_page(window, page_id)  -> jedes Mal, wenn eine Seite geoeffnet wird
   on_exit()                 -> beim Schliessen des Addons
 """
@@ -4351,7 +4371,7 @@ if __name__ == '__main__':
         if (e.type === 'list' && e.lsrc !== 'dir') (e.items || []).forEach(it => { if (S.imgs[it.img]) used.add(it.img); });
       }));
       used.forEach(k => { F[MEDIA + picName(k)] = { b64: b64(S.imgs[k].d) }; });
-      S.pages.forEach((p, i) => { F['resources/skins/Default/1080i/' + (i === 0 ? 'home.xml' : `page_${i}.xml`)] = winXml(p); });
+      S.pages.forEach((p, i) => { const fc0 = S.theme.focus; if (p.fcol) S.theme.focus = p.fcol; try { F['resources/skins/Default/1080i/' + (i === 0 ? 'home.xml' : `page_${i}.xml`)] = winXml(p); } finally { S.theme.focus = fc0; } });
       Object.keys(TX).forEach(n => { F[MEDIA + n] = { b64: mkTex(TX[n]) }; });
       
       const actions = {}, lists = {}, switches = {};
