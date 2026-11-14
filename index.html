@@ -5471,6 +5471,21 @@ if __name__ == '__main__':
       });
       // Von Hand bearbeitete Dateien aus dem Editor überschreiben die erzeugten Texte
       if (!raw) Object.keys(S.overrides || {}).forEach(p => { if (typeof F[p] === 'string') F[p] = S.overrides[p]; });
+      if (!raw && typeof F['resources/lib/custom.py'] === 'string') F['resources/lib/custom.py'] = F['resources/lib/custom.py'].replace(/^STYLES = (\[.*\])/m, (m0, j) => {
+        try {
+          const A = JSON.parse(j);
+          A.forEach(st => {
+            const hp = S.pages.find(q => q.id === st.home), op = S.pages.find(q => q.id === st.browse);
+            if (hp) {
+              const g = hp.els.find(e => e.type === 'widget'), pl = hp.els.filter(e => e.act && e.act.t === 'py' && e.act.v === 'desk_add').pop();
+              if (g) st.list = fid(hp, g);
+              if (pl) st.plus = fid(hp, pl);
+            }
+            if (op) { const l = op.els.find(e => e.type === 'widget'); if (l) st.blist = fid(op, l); }
+          });
+          return 'STYLES = ' + JSON.stringify(A);
+        } catch (er) { return m0; }
+      });
       if (!raw && M.cleanPy) Object.keys(F).forEach(p => { if (/\.py$/.test(p) && typeof F[p] === 'string') F[p] = cleanPy(F[p]); });
       return F;
     }
@@ -5632,7 +5647,7 @@ if __name__ == '__main__':
     // Baut aus ein paar Angaben ein komplettes Desktop-Addon (Symbole, Taskleiste, Startmenü, 4 Designs).
     // Danach ist alles ganz normal im Designer änderbar.
     const DESK_BUILD = (CUSTOM, o) => {
-  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.6', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
+  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.7', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
   // ================= Zeichen-Helfer =================
   const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const glow = (x, cx, cy, r, rgb, a) => {
