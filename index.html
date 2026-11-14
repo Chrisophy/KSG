@@ -3712,7 +3712,7 @@ def on_page(window, page_id):
       if (!e || typeof e !== 'object' || !/^[A-Za-z0-9_.\-]+$/.test(String(e.id || ''))) return null;
       const ok = k => EXT_KINDS.some(x => x[0] === k);
       return {
-        id: String(e.id), name: String(e.name || e.id).slice(0, 80), ver: String(e.ver || '0').slice(0, 30), zip: extZipPath(e.id), size: Math.max(0, +e.size || 0),
+        id: String(e.id), name: (String(e.name || '').replace(/\[\/?(?:COLOR|B|I|UPPERCASE|LOWERCASE|CAPITALIZE|LIGHT|CR)[^\]]*\]/gi, '').replace(/\s+/g, ' ').trim() || String(e.id)).slice(0, 80), ver: String(e.ver || '0').slice(0, 30), zip: extZipPath(e.id), size: Math.max(0, +e.size || 0),
         prov: ['video', 'audio', 'image', 'executable'].includes(e.prov) ? e.prov : 'video', kind: ['plugin', 'script', 'other'].includes(e.kind) ? e.kind : 'plugin',
         key: /^\w{1,20}$/.test(String(e.key || '')) ? String(e.key) : 'mode',
         deps: (Array.isArray(e.deps) ? e.deps : []).map(String).filter(d => /^[A-Za-z0-9_.\-]+$/.test(d)).slice(0, 30),
@@ -3737,21 +3737,55 @@ def on_page(window, page_id):
       const typical = ['mode', 'action', 'route', 'function', 'func', 'cmd', 'command', 'page', 'do'], cnt = {};
       let m; const kr = /['"](\w{2,12})['"]/g;
       while ((m = kr.exec(txt))) if (typical.includes(m[1])) cnt[m[1]] = (cnt[m[1]] || 0) + 1;
+      // Zugriffe vor dem Vergleich:  mode[0] == 'x'  ·  params['mode'] == 'x'  ·  args.get('mode')[0] == 'x'
+      const SUBS = '(?:\\[\\s*(?:\\d+|[\'"]\\w+[\'"])\\s*\\]|\\.get\\([^()\\n]{0,40}\\))*';
+      // Der Parameter, den der Verteiler vergleicht, zählt viel mehr als bloßes Vorkommen (sonst gewinnt z. B. 'cmd' gegen 'mode')
+      typical.forEach(k => { const rd0 = new RegExp('(?:\\b' + k + '\\b|\\.get\\(\\s*[\'"]' + k + '[\'"][^()\\n]{0,30}\\))' + SUBS + '\\s*(?:==|\\bin\\b)\\s*[\\(\\[]?\\s*[\'"]', 'g'); let n = 0; while (rd0.exec(txt)) n++; if (n) cnt[k] = (cnt[k] || 0) + n * 8; });
       const key = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0] || 'mode';
       const vals = {}, free = {}, need = {}, branch = {};
       const ok = v => v && v.length <= 32 && !/^\d+$/.test(v) && !/^(None|True|False)$/.test(v);
       const add = v => { if (ok(v)) vals[v] = (vals[v] || 0) + 1; };
       const vote = (o, v) => { if (ok(v)) o[v] = (o[v] || 0) + 1; };
       const otherParam = seg => { const r = /\b(?:params|args|query|qs|parameters|p|kwargs|arguments)\s*(?:\.get\(|\[)\s*['"](\w+)['"]/g; let x; while ((x = r.exec(seg))) if (x[1] !== key) return true; return false; };
-      // 1) Verteiler: mode == 'x' – liest der Zweig weitere Parameter, braucht der Pfad Angaben
+      // 1) Verteiler: mode == 'x' (auch mode[0] == 'x' oder params.get('mode') == 'x'). Der Zweig – samt den Funktionen, die er aufruft – entscheidet:
+      //    liest er weitere Parameter, braucht der Pfad Angaben · zeichnet er eine Liste (endOfDirectory), ist es ein Ordner, sonst eine Aktion
+      const kinds = {}, ffl = {}, home = new Set();
+      const lineInd = (t, i) => { const s0 = t.lastIndexOf('\n', i - 1) + 1; return /^[ \t]*/.exec(t.slice(s0, s0 + 200))[0].replace(/\t/g, '    ').length; };
+      const blockAfter = (t, i, lim) => {
+        const ind = lineInd(t, i), nl = t.indexOf('\n', i); if (nl < 0) return t.slice(i, i + lim);
+        let end = nl, pos = nl + 1;
+        while (pos < t.length && pos - i < lim) {
+          let e = t.indexOf('\n', pos); if (e < 0) e = t.length;
+          const ln = t.slice(pos, e);
+          if (ln.trim() && !/^\s*#/.test(ln) && /^[ \t]*/.exec(ln)[0].replace(/\t/g, '    ').length <= ind) break;
+          end = e; pos = e + 1;
+        }
+        return t.slice(i, end);
+      };
+      const KW = new Set(['if', 'elif', 'while', 'for', 'return', 'print', 'str', 'int', 'len', 'list', 'dict', 'set', 'tuple', 'range', 'open', 'isinstance', 'getattr', 'hasattr', 'super', 'float', 'bool', 'sorted', 'enumerate', 'zip', 'map', 'filter', 'any', 'all', 'min', 'max', 'type', 'except', 'with', 'not', 'and', 'or', 'in', 'is', 'def', 'lambda']);
+      const callsIn = seg => { const out = [], r = /([A-Za-z_]\w*)\s*\(/g; let q; while ((q = r.exec(seg))) if (!KW.has(q[1]) && !out.includes(q[1])) out.push(q[1]); return out; };   // auch modul.funktion(): ist sie im Code definiert, wird sie mit ausgewertet
+      const defBody = fn => { const dm = new RegExp('^[ \\t]*def[ \\t]+' + fn + '\\s*\\(', 'm').exec(txt); return dm ? blockAfter(txt, dm.index, 6000) : null; };
+      const analyze = (seg, depth, got) => {
+        const r = { need: otherParam(seg), dir: /\b(?:endOfDirectory|addDirectoryItems?|add_directory_item)\b/.test(seg), play: /\bsetResolvedUrl\b/.test(seg), known: /\b(?:executebuiltin|notification|Dialog\s*\(\s*\)|Player\s*\(\s*\))/.test(seg), fns: [] };
+        if (depth > 0) callsIn(seg).forEach(fn => {
+          if (got.has(fn)) return; const b = defBody(fn); if (b == null) return;
+          got.add(fn); r.fns.push(fn); r.known = true;
+          const sub = analyze(b, depth - 1, got); r.need = r.need || sub.need; r.dir = r.dir || sub.dir; r.play = r.play || sub.play; sub.fns.forEach(f => r.fns.push(f));
+        });
+        return r;
+      };
+      // Der Startzweig (kein Modus angegeben) – Einträge, die nur dieselbe Startseite öffnen, braucht es nicht noch einmal
+      const rdef = new RegExp('(?:\\b\\w*(?:' + key + '|mode|action)\\w*(?:\\s+is\\s+None|\\s*==\\s*None|\\s*==\\s*[\'"][\'"])|\\bnot\\s+\\w*(?:' + key + '|mode|action)\\w*\\s*:)', 'g');
+      const homeFns = new Set();
+      while ((m = rdef.exec(txt))) { const b = blockAfter(txt, m.index + m[0].length, 2500); callsIn(b).forEach(f => homeFns.add(f)); analyze(b, 2, new Set()).fns.forEach(f => homeFns.add(f)); }
       const names = '(?:\\b\\w*' + key + '\\w*|\\bmode|\\baction|\\broute)';
-      const re1 = new RegExp(names + '\\s*(?:==|in|is)\\s*[\\(\\[]?\\s*((?:[\'"][\\w\\-]+[\'"]\\s*,?\\s*)+)', 'g');
+      const re1 = new RegExp(names + SUBS + '\\s*(?:==|\\bin\\b|\\bis\\b)\\s*[\\(\\[]?\\s*((?:[\'"][\\w\\-]+[\'"]\\s*,?\\s*)+)', 'g');
       while ((m = re1.exec(txt))) {
         const vs = (m[1].match(/['"]([\w\-]+)['"]/g) || []).map(s => s.slice(1, -1));
-        let seg = txt.slice(m.index + m[0].length, m.index + m[0].length + 600); const nl = seg.indexOf('\n');
-        if (nl >= 0) { const cut = seg.slice(nl).search(/\n\s*(?:elif\b|else\b|if\b|def\b|@)/); if (cut > 0) seg = seg.slice(0, nl + cut); }
-        const nd = otherParam(seg);
-        vs.forEach(v => { add(v); if (ok(v)) branch[v] = branch[v] === 'need' || nd ? 'need' : 'free'; });
+        const seg = blockAfter(txt, m.index + m[0].length, 4000), a = analyze(seg, 3, new Set());
+        const dc = callsIn(seg), isHome = dc.length > 0 && dc.every(f => homeFns.has(f));
+        const kind = a.play ? 'play' : a.dir ? 'dir' : (a.fns.length || a.known) ? 'run' : '';
+        vs.forEach(v => { add(v); if (!ok(v)) return; branch[v] = branch[v] === 'need' || a.need ? 'need' : 'free'; if (!kinds[v] && kind) kinds[v] = kind; if (isHome) home.add(v); });
       }
       // 2) Adressen im Code: {'mode': 'x'} allein = frei, mit weiteren Schlüsseln = braucht Angaben
       const re2 = /\{[^{}]{0,400}\}/g;
@@ -3906,8 +3940,25 @@ def on_page(window, page_id):
         };
         walkJ(j, 0);
       });
+      // 6) Beschriftung und Art je Menüpunkt aus dem Code: build_url({... 'mode': 'x' ...}) und gleich danach ListItem('Beschriftung')
+      const lbl = {}, order = [], BB = /\[\/?(?:COLOR|B|I|UPPERCASE|LOWERCASE|CAPITALIZE|LIGHT|CR)[^\]]*\]/gi, ru = new RegExp(urlCall, 'g');
+      while ((m = ru.exec(txt))) {
+        const items = parseDict(m[1]), mi = items.find(x => x[0] === key), v = mi ? lit(mi[1]) : null; if (v == null || lbl[v]) continue;
+        let win = txt.slice(ru.lastIndex, ru.lastIndex + 500); const cut = win.search(/\bdef[ \t]+\w+\s*\(|\b(?:build_url|urlencode|make_url|get_url|url_for|geturl|buildurl|build_plugin_url|plugin_url)\s*\(/); if (cut > 0) win = win.slice(0, cut);
+        const lm = /ListItem\(\s*(?:label\s*=\s*)?(f?)(['"])((?:(?!\2)[^\n\\])*)\2/.exec(win);
+        if (!(v in lbl)) order.push(v);
+        lbl[v] = lm && !(lm[1] && /[{}]/.test(lm[3])) ? lm[3].replace(BB, '').replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+        if (/addDirectoryItem\([^)]*isFolder\s*=\s*False/.test(win)) ffl[v] = true;
+      }
+      // Alle Pfade, die ohne weitere Angaben funktionieren, werden fertige Einträge – mit der Beschriftung des Addons und der richtigen Art (Ordner oder Aktion)
+      const fv = Object.keys(vals).filter(v => isFree(v) && !home.has(v));
+      order.filter(v => fv.includes(v)).concat(fv.filter(v => !order.includes(v))).forEach(v => {
+        if (resolved.has(v) || ents.length >= 50) return;
+        const u = 'plugin://\u0001/?' + encQ(key) + '=' + encQ(v); if (seen.has(u)) return; seen.add(u); resolved.add(v);
+        ents.push({ l: lbl[v] || extNice(v), u, k: kinds[v] || (ffl[v] ? 'run' : 'dir') });
+      });
       const all2 = Object.keys(vals).sort((a, b) => vals[b] - vals[a] || a.localeCompare(b)).slice(0, 30);
-      return { key, vals: all2.filter(isFree), more: all2.filter(v => !isFree(v) && !resolved.has(v)), ents, n: py.length };
+      return { key, vals: [], more: all2.filter(v => !isFree(v) && !resolved.has(v) && !home.has(v)), ents, n: py.length };
     }
     // Welche Python-Module importiert der Code? (oberste Ebene, ohne relative Importe)
     function pyImports(txt) {
@@ -3992,7 +4043,7 @@ def on_page(window, page_id):
       const e = [{ l: 'Startseite', u: 'plugin://' + ex.id + '/', k: 'dir' }];
       const eu = new Set((ents || []).map(x => String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/')));
       (vals || []).forEach(v => { const u = 'plugin://' + ex.id + '/?' + ex.key + '=' + v; if (!eu.has(u)) e.push({ l: extNice(v), u, k: 'dir' }); });
-      (ents || []).forEach(x => e.push({ l: x.l, u: String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/'), k: 'dir' }));
+      (ents || []).forEach(x => e.push({ l: x.l, u: String(x.u).replace('plugin://\u0001/', 'plugin://' + ex.id + '/'), k: x.k || 'dir' }));
       return e;
     }
     // Die Seite, auf der Ordner im eigenen Skin angezeigt werden: erste Seite mit einer Liste „Automatisch aus Kodi“ und Ordner-Navigation
@@ -4066,7 +4117,7 @@ def on_page(window, page_id):
     }
     function extIcon(l) {
       const s = String(l).toLowerCase();
-      const m = [[/such|find|search/, '🔍'], [/einstell|setting|konfig|option/, '⚙'], [/film|movie|kino/, '🎬'], [/serie|show|episod|folge/, '📺'], [/live|tv|sender|kanal|channel/, '📡'], [/musik|music|audio|song|radio/, '🎵'], [/favorit|merk|liste|watchlist/, '⭐'], [/genre|kategor|categor/, '🏷'], [/neu|new|latest|aktuell|recent/, '🆕'], [/beliebt|popular|top|trend/, '🔥'], [/start|home|haupt/, '🏠'], [/doku/, '🎞'], [/kind|kid/, '🧸'], [/sport/, '⚽'], [/news|nachricht/, '📰']].find(x => x[0].test(s));
+      const m = [[/epg|programm|guide/, '🗓'], [/cache|leeren|clear|bereinig/, '🧹'], [/vod|video/, '🎬'], [/such|find|search/, '🔍'], [/einstell|setting|konfig|option/, '⚙'], [/film|movie|kino/, '🎬'], [/serie|show|episod|folge/, '📺'], [/live|tv|sender|kanal|channel/, '📡'], [/musik|music|audio|song|radio/, '🎵'], [/favorit|merk|liste|watchlist/, '⭐'], [/genre|kategor|categor/, '🏷'], [/neu|new|latest|aktuell|recent/, '🆕'], [/beliebt|popular|top|trend/, '🔥'], [/start|home|haupt/, '🏠'], [/doku/, '🎞'], [/kind|kid/, '🧸'], [/sport/, '⚽'], [/news|nachricht/, '📰']].find(x => x[0].test(s));
       return m ? m[1] : '📂';
     }
     // Seiten im gewählten Stil bauen
@@ -4112,7 +4163,7 @@ def on_page(window, page_id):
         en.forEach((e, i) => els.push(btn(e.l, extIcon(e.l), 215 + (i % cols) * (w + gap), 190 + Math.floor(i / cols) * (h + gap), 'none', '', { w, h, act: A(e), rad: 18, color: '#5c2a50', wrap: true })));
       }
       const first = def ? { id: def } : els.find(e => e.type === 'button' && e.act && e.act.t !== 'none' && e.act.t !== 'back');
-      return { id: 'ext_' + ex.id.replace(/[^a-z0-9]+/gi, '_').slice(0, 20) + '_' + style + '_' + uid(), name: ex.name + ' (' + (EXT_STYLES.find(s => s[0] === style) || ['', style])[1].replace(/^\S+\s/, '') + ')', bg, bgImg: null, dlg: false, dim: 60, onload: '', onunload: '', xml: '', def: first ? first.id : '', els };
+      return { id: 'ext_' + ex.id.replace(/[^a-z0-9]+/gi, '_').slice(0, 20) + '_' + style + '_' + uid(), name: ex.name + ' (' + (EXT_STYLES.find(s => s[0] === style) || ['', style])[1].replace(/^\S+\s/, '').replace(/\s*\(.*\)\s*$/, '') + ')', bg, bgImg: null, dlg: false, dim: 60, onload: '', onunload: '', xml: '', def: first ? first.id : '', els };
     }
     function extBuild(i) {
       const ex = S.ext[i]; if (!ex) return;
