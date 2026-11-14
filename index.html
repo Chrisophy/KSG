@@ -5478,7 +5478,7 @@ if __name__ == '__main__':
     // Baut aus ein paar Angaben ein komplettes Desktop-Addon (Symbole, Taskleiste, Startmenü, 4 Designs).
     // Danach ist alles ganz normal im Designer änderbar.
     const DESK_BUILD = (CUSTOM, o) => {
-  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.3', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true }, o || {});
+  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.4', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
   // ================= Zeichen-Helfer =================
   const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const glow = (x, cx, cy, r, rgb, a) => {
@@ -5756,9 +5756,12 @@ if __name__ == '__main__':
   const keys = Object.keys(SCI);
   // Beschriftungs-Platte unter den Symbolen je Stil (Farbe, Deckkraft in %) - Textfarbe immer weiss
   const PLATE = { ubuntu: ['#3a0f31', 72], windows: ['#08204f', 66], bunt: ['#4b1a8f', 60], dunkel: ['#0c1332', 74] };
+  // Spalten: jede Kachel belegt 180 px (150 + 30 Abstand); sichtbare Breite wird mittig auf 1920 gesetzt
+  const COLS = Math.max(4, Math.min(10, parseInt(o.cols, 10) || 9));
+  const GW = COLS * 180 + 6, GX = Math.round((1920 - (COLS * 180 - 30)) / 2);
   const gridOf = (style) => {
     const items = Array.from({ length: MAXT }, (_, i) => ({ l: '', l2: '', img: i < keys.length ? SCI[keys[i]] : '', src: i < keys.length ? '' : 'DefaultAddon.png', act: py('desk_click') }));
-    return mk('list', { label: '', x: 165, y: 20, w: 1590, h: 890, ltype: 'panel', iw: 150, ih: 200, gap: 30, lsrc: 'static', color: o.plate || PLATE[style][0], op: o.plate ? o.plateOp : PLATE[style][1], rad: 30, tc: '#ffffff', font: 'font13', items });
+    return mk('list', { label: '', x: GX, y: 20, w: GW, h: 890, ltype: 'panel', iw: 150, ih: 200, gap: 30, lsrc: 'static', color: o.plate || PLATE[style][0], op: o.plate ? o.plateOp : PLATE[style][1], rad: 30, tc: '#ffffff', font: 'font13', items });
   };
   const hintOf = () => mk('tbox', { label: '$INFO[Window.Property(desk.hint)]', x: 400, y: 330, w: 1120, h: 260, font: 'font27', color: '#ead7e4', al: 'center' });
 
@@ -5801,7 +5804,7 @@ if __name__ == '__main__':
       { k: 'dunkel', l: 'Dunkel', d: 'Nachtblau, ruhig', bg: 'linear-gradient(180deg,#2c4b79,#070b18)', ac: '#5470ff' }
     ];
     let TPLO = null;
-    const tplDefs = () => ({ name: 'Kodi Desktop', author: (S.meta.author && S.meta.author !== 'Ich' && S.meta.author !== 'zusatzmetall') ? S.meta.author : '', ver: '1.0.0', style: 'ubuntu', styles: { ubuntu: true, windows: true, bunt: true, dunkel: true }, accentOn: false, accent: '#e95420', plateOn: false, plate: '#3a0f31', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, pro: false });
+    const tplDefs = () => ({ name: 'Kodi Desktop', author: (S.meta.author && S.meta.author !== 'Ich' && S.meta.author !== 'zusatzmetall') ? S.meta.author : '', ver: '1.0.0', style: 'ubuntu', styles: { ubuntu: true, windows: true, bunt: true, dunkel: true }, accentOn: false, accent: '#e95420', plateOn: false, plate: '#3a0f31', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9, pro: false });
     function showDeskTpl() {
       if (!TPLO) TPLO = tplDefs();
       modal('<div id="tpl-box"></div>', 'tpl'); $('modal-in').style.maxWidth = '46rem'; tplRender();
@@ -5818,6 +5821,7 @@ if __name__ == '__main__':
         <div class="grid grid-cols-2 gap-2">
           <label class="text-xs">Autor<input class="inp mt-1" value="${esc(T.author)}" oninput="tplSet('author',this.value)" placeholder="dein Name"></label>
           <label class="text-xs">Version<input class="inp mt-1" value="${esc(T.ver)}" oninput="tplSet('ver',this.value)"></label>
+          <label class="text-xs">Spalten auf dem Desktop (4–10)<input class="inp mt-1" type="number" min="4" max="10" value="${T.cols}" oninput="tplSet('cols',this.value)"></label>
           <label class="text-xs">Max. Symbole auf dem Desktop<input class="inp mt-1" type="number" min="12" max="240" value="${T.maxTiles}" oninput="tplSet('maxTiles',this.value)"></label>
           <label class="text-xs">Schrift (Kodi-Skin-Name)<input class="inp mt-1" list="dl-font" value="${esc(T.font)}" oninput="tplSet('font',this.value.trim())"></label>
         </div>
@@ -5851,7 +5855,7 @@ if __name__ == '__main__':
       const T = TPLO;
       if (!String(T.name).trim()) return toast('Bitte einen Namen eingeben.');
       if (!confirm('Das aktuelle Projekt wird durch die Vorlage ersetzt. Nicht gespeicherte Änderungen gehen verloren. Fortfahren?')) return;
-      const o = { name: T.name, author: T.author, ver: T.ver, style: T.style, styles: DESK_ST.filter(s => T.styles[s.k] || s.k === T.style).map(s => s.k), accent: T.accentOn ? T.accent : '', plate: T.plateOn ? T.plate : '', plateOp: T.plateOp, maxTiles: T.maxTiles, font: T.font || 'font13', shadow: T.shadow, autostart: T.autostart, autoDef: T.autoDef, lockBack: T.lockBack };
+      const o = { name: T.name, author: T.author, ver: T.ver, style: T.style, styles: DESK_ST.filter(s => T.styles[s.k] || s.k === T.style).map(s => s.k), accent: T.accentOn ? T.accent : '', plate: T.plateOn ? T.plate : '', plateOp: T.plateOp, maxTiles: T.maxTiles, font: T.font || 'font13', shadow: T.shadow, autostart: T.autostart, autoDef: T.autoDef, lockBack: T.lockBack, cols: T.cols };
       try {
         DESK_BUILD(document.getElementById('desk-custom-py').textContent, o);
       } catch (e) { console.error(e); return toast('Die Vorlage konnte nicht erstellt werden: ' + e.message); }
