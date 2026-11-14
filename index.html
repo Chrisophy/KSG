@@ -3226,7 +3226,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
     }
 
     let TX = {};
-    const hexA = (c, a) => Math.round(Math.max(0, Math.min(100, a)) * 2.55).toString(16).padStart(2, '0').toUpperCase() + c.slice(1).toUpperCase();
+    const hexA = (c, a) => { const r = Math.round(Math.max(0, Math.min(100, a)) * 2.55).toString(16).padStart(2, '0').toUpperCase() + c.slice(1).toUpperCase(); return r === '00000000' ? '00000001' : r; };
 
     // Texturen für Rundungen / Rahmen / Schalter / Regler (werden beim Export als PNG erzeugt)
     function tex(r, bw) {
