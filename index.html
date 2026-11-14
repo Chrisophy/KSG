@@ -3320,6 +3320,8 @@ class MenuBase(object):
             self.finish(('page', ret[5:]))
         elif ret.startswith('browse:'):
             self.do({'k': 'browse', 'v': ret[7:], 'p': CONFIG.get('browse') or '', 'l': ''})
+        elif ret.startswith('py:') and hooks():
+            self.handle_return(call_hook(ret[3:].strip(), True, self))
         else:
             self.run_cmd(ret)
 
@@ -3652,6 +3654,7 @@ So nutzt du sie:
       'exit'      -> Addon schliessen
       'page:ID'   -> zu einer Seite springen (ID steht im Modding-Inspektor)
       'browse:PFAD' -> Ordner im eigenen Browser zeigen, z.B. 'browse:plugin://plugin.video.xyz/'
+      'py:NAME'   -> eine andere Funktion aus dieser Datei aufrufen (auch aus dem Kontextmenue)
       jeder andere Text wird als Kodi-Befehl ausgefuehrt,
       z.B. 'ActivateWindow(home)' oder 'PlayMedia(https://...)'
 
