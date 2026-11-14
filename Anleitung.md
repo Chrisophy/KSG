@@ -1,15 +1,10 @@
 # 📖 Handbuch – Kodi Addon & Skin Generator v9.1 Pro by IT('s) Possible
 
-Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail – mit dem **⚡ Titan-Modus** baust du sogar einen echten Kodi-Skin für ganz Kodi (Teil G) – und mit **📦 Fremd-Addon** packst du ein vorhandenes Addon (ZIP) in dein Menü und zeigst es im eigenen Skin, mit eigenem Kontextmenü und Favoriten (Teil H).
+Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestalteten Vollbild-Menü** – ganz ohne Programmierkenntnisse. Du ziehst Buttons, Bilder und Widgets auf eine Bühne, legst fest, was beim Klick passiert, und bekommst am Ende eine ZIP-Datei, die du in Kodi installierst. Wer mehr will, findet in der 🛠 Modding-Werkstatt Kontrolle bis ins letzte Detail – mit dem **⚡ Titan-Modus** baust du sogar einen echten Kodi-Skin für ganz Kodi (Teil G) – und mit **📦 Fremd-Addon** packst du ein vorhandenes Addon (ZIP) in dein Menü und zeigst es im eigenen Skin, mit eigenem Kontextmenü und Favoriten (Teil H). Ganz ohne Gestalten startest du mit der **✨ Desktop-Vorlage**: Ein Assistent baut dir in drei Klicks einen kompletten **Kodi Desktop** mit vier Stilen (Teil I).
 
 > 💚 Das Werkzeug ist **gratis für die Kodi-Community** – für Anfänger und Profis. Es ist kostenlos, aber nicht Open Source: Verkauf, Weiterverkauf und Weiterverbreitung sind verboten (siehe [LICENSE](LICENSE)). **Die Addons, die du damit baust, gehören dir.**
 
-👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-
-📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
-
-🪧 **Verschiedene Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
-
+**Online starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
 
 ---
 
@@ -99,9 +94,17 @@ Mit dem Generator baust du ein **echtes Kodi-Video-Addon mit einem selbst gestal
 57. [Kontextmenü und Favoriten 🖱](#k57)
 58. [Eigene Einträge in custom.py](#k58)
 
-**Teil I – Lizenz**
+**Teil I – Vorlage „Kodi Desktop“**
 
-59. [Lizenz und wie es weitergeht](#k59)
+59. [Was ist der Kodi Desktop?](#k59)
+60. [Mit dem Assistenten erstellen](#k60)
+61. [Der Desktop in Kodi](#k61)
+62. [Im Designer weiter anpassen](#k62)
+63. [Für Profis: Hooks, Dateien und Grenzen](#k63)
+
+**Teil J – Lizenz**
+
+64. [Lizenz und wie es weitergeht](#k64)
 
 ---
 
@@ -140,8 +143,8 @@ Der Generator erzeugt ein ganz normales **Kodi-Video-Addon** (`plugin.video.…`
 
 | Bereich | Inhalt |
 |---|---|
-| **Kopfzeile oben** | 🗑 Neu · ❓ So geht's · 📂 Vorlagen · 🧩 Widgets · 📦 Fremd-Addon · ⚡ Titan · ↩ Rückgängig · ↪ Wiederholen · ▶ Testen · ✔ Prüfen · 💻 Editor · 🛠 Modding · ⬇ ZIP exportieren · 🚪 Beenden |
-| **Links** | Live-Ansicht-Schalter und die Bereiche 1 · Projekt, 2 · Hinzufügen, 3 · Design, 4 · Werkzeuge, 5 · Addon-Bilder & Dateien (dort auch 🧩 Fremd-Addon einbinden), 6 · Modding für Profis, 7 · ⚡ Titan-Modus, Projekt sichern |
+| **Kopfzeile oben** | 🗑 Neu · ❓ So geht's · 📂 Vorlagen · ✨ Desktop-Vorlage · 🧩 Widgets · 📦 Fremd-Addon · ⚡ Titan · ↩ Rückgängig · ↪ Wiederholen · ▶ Testen · ✔ Prüfen · 💻 Editor · 🛠 Modding · ⬇ ZIP exportieren · 🚪 Beenden |
+| **Links** | Live-Ansicht-Schalter und die Bereiche 1 · Projekt, 2 · Hinzufügen, 3 · Design, 4 · Werkzeuge, 5 · Addon-Bilder & Dateien (dort auch 🧩 Fremd-Addon einbinden), 6 · Modding für Profis, ✨ Vorlagen (🖥 Kodi Desktop erstellen), 7 · ⚡ Titan-Modus, Projekt sichern |
 | **Mitte** | Seiten-Leiste und die **Bühne** (1920×1080, so groß wie ein Full-HD-Fernseher) |
 | **Rechts** | **Eigenschaften** des markierten Elements |
 
@@ -190,6 +193,8 @@ Unter **⚙ Erweiterte Addon-Angaben** findest du außerdem:
 | 🎵 Musik-Player | Cover, Play, Weiter, Stopp, Fortschritt |
 | 🛠 Profi-Menü | Liste, Bibliotheks-Listen, Schalter, Regler, Videofenster |
 | 📄 Leer | Nur ein Button |
+
+💡 Die **Desktop-Vorlage** hat einen eigenen Assistenten: Kopfzeile **✨ Desktop-Vorlage** (siehe [Teil I](#k59)). Sie steht bewusst nicht in dieser Liste, weil sie Name, Stil und Farbe abfragt.
 
 ### Das Beispiel „Mein Kino-Hub“
 
@@ -678,7 +683,7 @@ Alles ist optional und wirkt sofort. Während die Werkstatt offen ist, zeigt dir
 |---|---|
 | 🏠 Beenden führt zur Kodi-Startseite | Wer das Addon verlässt, landet auf der Kodi-Startseite statt in Kodis Video-Ansicht. *(Standard: an)* |
 | ↩ Nach Kodi-Fenstern zurück ins Menü | Nach Kodi-Fenstern, anderen Addons und Videos öffnet sich dein Menü wieder. *(Standard: an)* |
-| ⬅ Zurück auf der Startseite | **Schließt das Addon** (Standard) · **Erst beim zweiten Zurück schließen** – beim ersten Mal erscheint „Zum Verlassen noch einmal Zurück drücken“ · **Schließt das Addon nie** – verlassen nur über einen Button mit „Addon komplett schließen“. Auf Unterseiten geht Zurück immer eine Seite zurück. Auch direkt in den Einstellungen über Bereich 6 zu finden. |
+| ⬅ Zurück auf der Startseite | **Schließt das Addon** (Standard) · **Erst beim zweiten Zurück schließen** – beim ersten Mal erscheint „Zum Verlassen noch einmal Zurück drücken“ · **Schließt das Addon nie** – verlassen nur über einen Button mit „Addon komplett schließen“. Auf Unterseiten geht Zurück immer eine Seite zurück. Als „Startseite“ zählt dabei jede Seite, auf der das Addon beginnt – auch eine, die ein Hook mit `start_page()` oder ein Seitentausch mit `swap:` setzt ([Kapitel 37](#k37)). Auch direkt in den Einstellungen über Bereich 6 zu finden. |
 | ❓ Beim Verlassen nachfragen | „Addon wirklich verlassen?“ auf der Startseite. |
 | 🧠 Letzte Seite merken | Das Addon öffnet sich dort, wo man es verlassen hat. |
 | 🔗 Direkt-Links erlauben | Jede Seite lässt sich direkt öffnen (siehe [Kapitel 38](#k38)). *(Standard: an)* |
@@ -878,11 +883,18 @@ def meine_funktion(window):
 | `'home'` | zur Startseite des Addons |
 | `'exit'` | Addon schließen |
 | `'page:ID'` | zu einer Seite springen (Seiten-ID siehe Seiten-Tuning oder Inspektor) |
-| `'browse:PFAD'` | einen Kodi-Pfad im Live-Browser zeigen, z.B. `'browse:plugin://plugin.video.xyz/'` |
+| `'swap:ID'` | die aktuelle Seite **ersetzen** (statt eine neue oben aufzulegen) und sie zur Startseite machen – z.B. nach einem Stilwechsel |
+| `'browse:PFAD'` | einen Kodi-Pfad im Live-Browser zeigen, z.B. `'browse:plugin://plugin.video.xyz/'`. Erweiterte Form: `'browse:PFAD@@Titel@@SEITE'` (Titel der Ansicht und ID der Browser-Seite, die ihn zeigen soll) |
+| `'py:NAME'` | eine andere Funktion aus `custom.py` aufrufen (auch aus dem Kontextmenü) |
 | jeder andere Text | wird als Kodi-Befehl ausgeführt, z.B. `'PlayMedia("…")'` |
 | `None` | nichts weiter |
 
-**Automatisch aufgerufen**, wenn vorhanden: `on_start()`, `on_page(window, page_id)` bei jeder geöffneten Seite und `on_exit()`.
+**Automatisch aufgerufen**, wenn vorhanden: `on_start()`, `on_page(window, page_id)` bei jeder geöffneten Seite und `on_exit()`. Zusätzlich gibt es zwei optionale Funktionen:
+
+| Funktion | Wirkung |
+|---|---|
+| `start_page()` | Gibt die ID einer Seite zurück, mit der das Addon **statt der ersten Seite** startet – z.B. der Stil, den der Nutzer in den Einstellungen gewählt hat. Die Seite zählt als Startseite für „⬅ Zurück auf der Startseite“. |
+| `open_settings(window)` | Wird statt der normalen Addon-Einstellungen aufgerufen, wenn der Nutzer im Kontextmenü „Einstellungen dieses Addons“ wählt. Mit `return 'swap:ID'` kannst du danach eine geänderte Einstellung (z.B. ein anderes Design) sofort übernehmen. Fehlt die Funktion, öffnet Kodi die Einstellungen ganz normal. |
 
 **Kontextmenü erweitern:** `kontextmenue(window, info)` gibt eine Liste von `(Beschriftung, Rückgabe)` zurück – die Rückgabe gilt wie in der Tabelle oben (siehe [Kapitel 57](#k57)).
 
@@ -1097,6 +1109,12 @@ Version erhöhen (＋), neu exportieren und erneut aus der ZIP installieren. Hil
 
 **Zurück wirft mich aus dem Addon.**
 Auf der Startseite schließt Zurück das Addon – so ist es voreingestellt. Unter **⬅ Zurück auf der Startseite** (Einstellungen über Bereich 6 oder 🛠 Modding → Schalter) wählst du „Erst beim zweiten Zurück schließen“ oder „Schließt das Addon nie“. Bei „nie“ brauchst du einen Button mit **Addon komplett schließen** – fehlt er, exportiert der Generator zur Sicherheit „Erst beim zweiten Zurück schließen“, damit niemand festsitzt.
+
+**Auf der Startseite fliege ich kurz in Kodi und lande dann wieder im Menü.**
+Die Startseite, auf der du bist, wurde nicht als Startseite erkannt – das kam vor, wenn ein Hook (`start_page()`) oder ein Stilwechsel eine andere Seite als die erste zum Start machte. Mit der aktuellen Fassung zählt jede Startseite. Neu exportieren und neu installieren; dann greift „⬅ Zurück auf der Startseite“ überall. Soll Zurück gar nicht schließen, stelle **Schließt das Addon nie** ein und sorge für einen Ausgang (Button „Addon komplett schließen“ oder – wie beim Desktop – ein eigener Beenden-Hook, siehe [Kapitel 63](#k63)).
+
+**Der Favoriten-Button schließt Kodi (Kodi 20/21).**
+Das alte Fenster `favourites` ist in Kodi 20 und neuer ein Dialog und beendet Kodi. Der Befehl heißt dort `ActivateWindow(favouritesbrowser)`; die 📚 Befehlsliste und die Vorlage nutzen ihn jetzt. Hast du den alten Befehl in einem eigenen Button, ersetze ihn.
 
 **Nach dem Beenden lande ich in Kodis Video-Ansicht.**
 Modding-Werkstatt → 🎛 Schalter → **🏠 Beenden führt zur Kodi-Startseite** einschalten und neu exportieren.
@@ -1564,6 +1582,8 @@ Der Live-Browser zeigt den Inhalt eines Addons **in deinem eigenen Menü** – K
 
 **Aufbau:** Die Browser-Seite enthält eine Liste „Automatisch aus Kodi“. Das Addon fragt dafür Kodis `Files.GetDirectory` ab und füllt die Liste mit Titel, Bild und Beschreibung. Ob ein Eintrag ein **Ordner** oder ein **Video** ist, liest es aus der Antwort. Fehlt diese Angabe (ältere Kodi-Version), behandelt das Addon den Eintrag als abspielbar. Für eigene XML-Zeilen setzt der Browser die Fenster-Eigenschaften `kfe.title` (aktueller Ordner) und `kfe.depth` (Tiefe) sowie je Eintrag `kfe.plot` (Beschreibung).
 
+**Saubere Beschriftungen:** Viele Addons schreiben Farbcodes (`[COLOR …]`), Fettdruck (`[B]`) oder Emojis und Flaggen in ihre Namen. Kodi-Schriften zeigen Emojis oft als Kästchen. Der Live-Browser entfernt diese Zeichen aus den Beschriftungen der Listen; der eigentliche Pfad bleibt unverändert.
+
 **Jeder Button kann Ordner öffnen:** Wähle die Aktion **Ordner im eigenen Browser öffnen (bleibt im Skin)** und trage einen Kodi-Pfad ein, z.B. `plugin://plugin.video.xyz/`.
 
 💡 Wer Kodis Originalansicht braucht, nutzt im Kontextmenü **In Kodis Ansicht öffnen**.
@@ -1604,7 +1624,7 @@ Kodi blendet sein eigenes Kontextmenü in Addon-Fenstern aus. Darum bringt das f
 | **Video** | Abspielen · Zur Wiedergabeliste hinzufügen · Als Favorit speichern |
 | **Artikel** | Ausführen (Kodi kann Artikel nicht als Favorit speichern) |
 | **Button** | Ausführen · bei Seiten und Ordnern zusätzlich Als Favorit speichern |
-| **Immer** | Dieses Menü als Favorit speichern · Kodi-Favoriten öffnen · Einstellungen dieses Addons (falls vorhanden) |
+| **Immer** | Dieses Menü als Favorit speichern · Kodi-Favoriten öffnen · Einstellungen dieses Addons (falls vorhanden; mit Hook `open_settings` kann das Addon danach eine Änderung sofort übernehmen) |
 | **Schon gespeicherter Favorit** | „aus Favoriten entfernen“ statt „speichern“ |
 
 **Favoriten:** Ein gespeicherter **Ordner** öffnet sich später direkt in **deinem** Skin an genau dieser Stelle. Ein gespeicherter **Menüpunkt** springt auf die Seite (siehe [Kapitel 38](#k38)). Die Favoriten findest du in Kodi unter **Favoriten**. Voraussetzung für Ordner-Favoriten: Die Browser-Seite muss im Addon vorhanden sein.
@@ -1658,11 +1678,196 @@ Die zurückgegebenen Einträge erscheinen im Kontextmenü, die Rückgabe wirkt w
 
 ---
 
-# Teil I – Lizenz
+# Teil I – Vorlage „Kodi Desktop“
 
 <a id="k59"></a>
 
-## 59. Lizenz und wie es weitergeht
+## 59. Was ist der Kodi Desktop?
+
+Der **Kodi Desktop** ist eine fertige Vorlage: ein Vollbild-Desktop wie am PC, als ganz normales Kodi-Addon. Statt ein Menü Element für Element zu bauen, wählst du im **✨ Vorlagen-Assistenten** nur Name, Stil und Farbe – den Rest erzeugt der Generator.
+
+> 🧪 Die Vorlage ist neu und wurde auf Android-Handy und Fernseher ausprobiert. Wie alle Addons aus dem Generator sollte sie auf jedem Gerät einmal getestet werden. Fehler bitte mit Kodi-Version und Gerät melden.
+
+**Was der Nutzer in Kodi bekommt**
+
+| Baustein | Beschreibung |
+|---|---|
+| **Kachel-Raster** | Der Desktop ist am Anfang **leer**. Jeder legt selbst fest, was darauf erscheint: Addons und Scripte (mit ihrem Original-Icon), **Kodi-Verknüpfungen** (Favoriten, Dateien, Videos, Musik, Bilder, Live TV, Addon-Browser, Einstellungen), **einzelne Menüs aus Addons** und Leerfelder. |
+| **Taskleiste** | Start-Knopf, **＋** (Addon oder Skript hinzufügen), **✎** (Anordnen), Statusfeld, **★** Favoriten, **⚙** Kodi-Einstellungen, **⏻** Beenden sowie Uhr und Datum. |
+| **Startmenü** | Alles auf einen Blick: hinzufügen, anordnen, Design wechseln, Einstellungen, leeren, schließen ([Kapitel 61](#k61)). |
+| **Vier Stile** | **Ubuntu** (Aubergine, orange), **Windows** (Blau, Startleiste), **Bunt** (Blau bis Pink, schwebende Leiste) und **Dunkel** (Nachtblau). Jeder Stil bringt zwei Seiten mit: den Desktop und eine **Ordner-Ansicht** im selben Design. |
+| **Menüs im Desktop-Look** | Ein Menü aus einem Addon (z.B. „Live TV“) öffnet in der Ordner-Ansicht des gewählten Stils statt in Kodis Standardansicht. |
+
+Die Auswahl des Nutzers liegt in `special://profile/addon_data/<addon-id>/desktop.json`. Sie bleibt bei Updates des Addons erhalten.
+
+💡 Der Generator ist nur der **Baukasten**: Was auf dem Desktop liegt, entscheidet jeder Nutzer später selbst in Kodi. Du musst keine Addons vorgeben.
+
+<a id="k60"></a>
+
+## 60. Mit dem Assistenten erstellen
+
+Öffne **✨ Desktop-Vorlage** in der Kopfzeile (oder in den Einstellungen unter **✨ Vorlagen → 🖥 Kodi Desktop erstellen**).
+
+### Einsteiger: drei Schritte
+
+1. **Name:** Wie soll das Addon in Kodi heißen? Darunter siehst du die Kodi-Kennung, z.B. `plugin.video.kodidesktop`.
+2. **Stil wählen:** Tippe eine der vier Karten an. Der gewählte Stil ist der **Startstil**. Der Nutzer kann ihn in Kodi später wechseln ([Kapitel 61](#k61)).
+3. **Akzentfarbe:** Das ist die Farbe der ausgewählten Kachel. Mit dem Haken **passend zum Stil** (Standard) nimmt jeder Stil seine eigene Farbe. Ziehst du die Farbe auf einen eigenen Wert, gilt dieser für alle Stile.
+
+Dann **✨ Desktop erstellen**. Der Generator fragt vorher, ob das aktuelle Projekt ersetzt werden darf – sichere es bei Bedarf vorher mit **💾 Speichern**. Danach ist das fertige Projekt geladen. **▶ Testen** zeigt die Seiten, **⬇ ZIP exportieren** erzeugt das Addon, die Installation läuft wie in [Kapitel 16](#k16).
+
+### Profi-Optionen
+
+Mit **⚙ Profi-Optionen** klappst du weitere Einstellungen auf:
+
+| Option | Bedeutung |
+|---|---|
+| **Autor, Version** | Erscheinen in Kodis Addon-Info. Für Updates die Version erhöhen. |
+| **Spalten auf dem Desktop (4–10)** | Wie viele Kacheln nebeneinander stehen. Standard **9**. Jede Kachel braucht 180 Pixel Breite (150 Bild + 30 Abstand); das Raster wird mittig auf 1920 Pixel gesetzt. Bei 10 Spalten bleiben nur etwa 75 Pixel Rand pro Seite. |
+| **Max. Symbole auf dem Desktop** | Obergrenze für Kacheln, 12 bis 240, Standard 120. |
+| **Schrift** | Kodi-Schriftname aus dem aktiven Skin, Standard `font13`. |
+| **Stile im Addon** | Welche der vier Stile im Addon stecken. Weniger Stile ergeben ein kleineres ZIP. Der Startstil ist immer dabei. Er steht an erster Stelle und ist die Voreinstellung der Auswahl in Kodi. |
+| **Eigene Farbe für die Beschriftung unter den Symbolen** | Farbe und Deckkraft der **Platte** unter jeder Kachel. Ohne Haken hat jeder Stil seine eigene Farbe (Ubuntu Aubergine, Windows Dunkelblau, Bunt Violett, Dunkel Nachtblau). Die Schrift ist immer weiß. |
+| **Schrift mit Schatten** | Standard aus – scharfe Schrift liest sich auf der farbigen Platte besser. |
+| **Zurück-Taste auf dem Desktop sperren** | Standard **an**: Zurück schließt den Desktop nicht, es erscheint nur ein Hinweis. Beenden geht über das ⏻-Symbol oder das Startmenü ([Kapitel 63](#k63)). Ohne Haken schließt Zurück den Desktop wie bei jedem Addon. |
+| **Option „Beim Kodi-Start öffnen“** | Baut die Autostart-Option ein ([Kapitel 26](#k26)). Mit **schon vorausgewählt** ist sie nach der Installation an. |
+
+💡 Der Assistent legt nur den Anfang fest. Alles, was er erzeugt, kannst du danach im Designer ändern ([Kapitel 62](#k62)).
+
+<a id="k61"></a>
+
+## 61. Der Desktop in Kodi
+
+### Bedienung
+
+| Aktion | Wirkung |
+|---|---|
+| **Kachel antippen / OK** | Startet das Addon oder Script. Danach kommt man zurück zum Desktop. Menü-Kacheln öffnen die Ordner-Ansicht. |
+| **Langes Drücken, Rechtsklick, Taste C** | Kontextmenü der Kachel (siehe unten). |
+| **Start-Knopf** | Startmenü (siehe unten). |
+| **＋** | Addons und Scripte auswählen und auf den Desktop legen. |
+| **✎** | **Anordnen** an/aus: erst die Kachel antippen, dann den Zielplatz. |
+| **★ / ⚙** | Kodi-Favoriten bzw. Kodi-Einstellungen. |
+| **⏻** | Auswahl „Desktop schließen“ oder „Kodi beenden / Herunterfahren …“. |
+| **Zurück-Taste / Esc** | Auf dem Desktop **gesperrt** (nur ein Hinweis, falls die Sperre an ist). In der Ordner-Ansicht geht es eine Ebene hoch. |
+
+### Das Startmenü
+
+| Eintrag | Wirkung |
+|---|---|
+| Addon oder Skript hinzufügen | Liste der installierten Addons, jeweils mit Original-Icon |
+| Menü aus einem Addon hinzufügen | Siehe „Menüs als Kacheln“ unten |
+| Kodi-Verknüpfung hinzufügen | Favoriten, Dateien, Videos, Musik, Bilder, Live TV, Addon-Browser, Einstellungen |
+| Symbole anordnen (an/aus) | wie ✎ |
+| Design wechseln | Wählt einen der Stile; gilt **sofort** |
+| Desktop-Einstellungen | Öffnet die Addon-Einstellungen; ein geändertes Design wird nach dem Schließen sofort übernommen |
+| Desktop leeren | Entfernt alle Kacheln (mit Rückfrage; die Addons bleiben installiert) |
+| Desktop schließen | Beendet den Desktop |
+
+### Das Kontextmenü einer Kachel
+
+Kachel verschieben … · Eine Stelle nach vorn / nach hinten · Leerfeld davor / danach einfügen (bzw. Leerfeld entfernen) · Kachel umbenennen (bei Menü-Kacheln) · **Ansicht: Kodi-Standard verwenden / im Desktop-Look zeigen** · Einstellungen des Addons · Vom Desktop entfernen. Dazu kommen die Einträge zum Hinzufügen und zum Wechseln des Designs.
+
+### Menüs als Kacheln
+
+Nicht nur ein ganzes Addon, auch **ein einzelnes Menü** lässt sich ablegen, z.B. „Live TV“ eines IPTV-Addons:
+
+1. Startmenü → **Menü aus einem Addon hinzufügen**.
+2. Addon wählen und Ebene für Ebene durch seine Menüs blättern.
+3. Auf der gewünschten Ebene **„+ DIESE EBENE auf den Desktop legen“** wählen.
+
+Die Kachel öffnet das Menü danach in der **Ordner-Ansicht** im Stil des Desktops, mit Zurück eine Ebene hoch. Videos starten direkt; langes Drücken öffnet das Kontextmenü mit Favoriten ([Kapitel 57](#k57)).
+
+⚠️ **Grenzen der Desktop-Ansicht:** Kodis eigene Funktionen wie Sortieren, Filtern oder das vollständige Kontextmenü fehlen dort. Wer sie braucht, schaltet die Kachel im Kontextmenü auf **Ansicht: Kodi-Standard verwenden** um. Kodi selbst kann nicht jedes Addon im fremden Design zeigen – darum gibt es beide Ansichten.
+
+### Design wechseln
+
+Zwei Wege: **Startmenü → Design wechseln** oder **Addon-Einstellungen → Design** (Ubuntu, Windows, Bunt, Dunkel). Beide wirken sofort, ohne Neustart des Addons. Die Auswahl wird gemerkt.
+
+<a id="k62"></a>
+
+## 62. Im Designer weiter anpassen
+
+Nach dem Erstellen ist das Ergebnis ein **ganz normales Projekt**. Du kannst alles wie in den Teilen A bis C ändern: Texte, Farben, Hintergründe, Position von Taskleiste und Symbolen, Form & Stil, Schriften, Animationen.
+
+**Was erzeugt wird**
+
+| Seiten | Inhalt |
+|---|---|
+| `home`, `home_win`, `home_bunt`, `home_dunkel` | Desktop je Stil: Hintergrund, **Kachel-Raster** (Liste mit der Kodi-ID 100), Taskleiste |
+| `ordner`, `ordner_win`, `ordner_bunt`, `ordner_dunkel` | Ordner-Ansicht je Stil: Liste mit **„Automatisch aus Kodi“** ([Kapitel 19](#k19)) und Taskleiste |
+
+Mit der Auswahl „Stile im Addon“ im Assistenten gibt es entsprechend weniger Seiten. Der Startstil steht an erster Stelle.
+
+**Beschriftung unter den Symbolen ändern:** Wähle im Kachel-Raster **Farbe** (Platte), **Deckkraft** (unter Form & Stil) und **Textfarbe** (Schrift). Wer den Schatten möchte, schaltet **🌑 Textschatten** in der Modding-Werkstatt ein ([Kapitel 26](#k26)).
+
+**Spalten ändern:** Ändere die **Breite** des Kachel-Rasters. Kodi legt die Spalten selbst nach Breite an; bei 180 Pixel je Kachel sind 1626 Pixel Breite genau 9 Spalten (Spalten × 180 + 6). Einfacher geht es, den Assistenten mit einer anderen Spaltenzahl neu zu starten – das ersetzt aber das Projekt.
+
+**Akzentfarbe ändern:** Die Farbe der ausgewählten Kachel steckt in jeder Seite als eigenes Feld `fcol` (sichtbar in der 🧬 Projekt-JSON, [Kapitel 33](#k33)). Sie hat Vorrang vor der Design-Farbe **Fokus** (3 · Design); nur Seiten ohne `fcol` – im Ubuntu-Stil – folgen der Design-Farbe. Am einfachsten startest du den Assistenten mit einer anderen Akzentfarbe neu; alternativ änderst du `fcol` je Seite in der Projekt-JSON und übernimmst mit **💾 Übernehmen**.
+
+⚠️ **IDs nicht durcheinanderbringen.** Die Desktop-Logik in `custom.py` kennt das Kachel-Raster (ID 100) und die Elemente der Taskleiste. Verschiebe sie gern, aber ändere beim **⬆ nach vorn / ⬇ nach hinten** nichts an der Reihenfolge der Elemente einer Seite – sonst ändern sich die IDs ([Kapitel 35](#k35)). Prüfe danach im 🔍 Inspektor.
+
+💡 Eigene Elemente (Logo, Textzeile, Bilder) kannst du frei dazusetzen. Änderungen an Texten und Farben sind gefahrlos.
+
+<a id="k63"></a>
+
+## 63. Für Profis: Hooks, Dateien und Grenzen
+
+### Dateien der Vorlage
+
+| Datei | Zweck |
+|---|---|
+| `resources/lib/custom.py` | Die gesamte Desktop-Logik (Python-Hooks, [Kapitel 37](#k37)). Die Vorlage bringt sie fertig mit. Änderst du sie im 💻 Editor, bleibt deine Fassung beim Export erhalten. |
+| `resources/settings.xml` | Auswahl **Design** (`desk_style`, mit den Stilen aus dem Assistenten, Startstil zuerst) und, falls gewählt, die Autostart-Option. |
+| `desktop.json` | Auswahl des Nutzers, im Kodi-Profil unter `addon_data/<addon-id>/`. Der Generator legt sie nicht an. |
+
+### Hooks, die die Vorlage nutzt
+
+| Hook | Aufgabe |
+|---|---|
+| `on_page(window, page_id)` | Füllt Kachel-Raster und Ordner-Ansicht; zeigt den Hinweis bei leerem Desktop oder leerem Ordner. |
+| `start_page()` | Startet mit dem Stil, der in den Einstellungen gewählt ist. |
+| `open_settings(window)` | Öffnet die Einstellungen aus dem Kontextmenü und gibt bei geändertem Design `swap:<Startseite>` zurück. |
+| `kontextmenue(window, info)` | Erzeugt das Kontextmenü der Kachel. |
+| `desk_click`, `desk_menu`, `desk_power` … | Aktionen der Kacheln und der Taskleiste (Aktion **Python-Funktion**). |
+
+Der Stilwechsel nutzt die Rückgabe **`swap:ID`**: Die aktuelle Seite wird durch die Startseite des neuen Stils **ersetzt** (nicht oben aufgelegt) und als Startseite gemerkt. Menü-Kacheln nutzen **`browse:PFAD@@Titel@@SEITE`**, damit der Titel angezeigt und die Ordner-Ansicht des richtigen Stils benutzt wird.
+
+### Zurück sperren und trotzdem beenden
+
+Die Vorlage setzt **⬅ Zurück auf der Startseite** auf „Schließt das Addon nie“. Weil die Ausgänge (⏻ und Startmenü) per Python-Hook mit `'exit'` schließen und nicht über einen Button mit der Aktion „Addon komplett schließen“, bekommt das Projekt das Kennzeichen `"exitOwn": true` im Bereich `mod` (zu sehen in der 🧬 Projekt-JSON, [Kapitel 33](#k33)). Es sagt dem Generator: „Es gibt einen eigenen Ausgang, bitte nicht auf ‚zweimal Zurück‘ zurückfallen.“ Ohne dieses Kennzeichen exportiert der Generator bei „nie“ und fehlendem Ausgang-Button zur Sicherheit „Erst beim zweiten Zurück schließen“.
+
+Wer eigene Projekte so baut, setzt `exitOwn` auf `true`, **nachdem** er sichergestellt hat, dass es einen Ausgang gibt.
+
+### Grenzen und Hinweise
+
+| Thema | Hinweis |
+|---|---|
+| **Nicht jedes Addon passt** | Die Ordner-Ansicht liest Verzeichnisse über Kodis `Files.GetDirectory` ([Kapitel 55](#k55)). Addons, die eigene Dialoge oder Fenster zeigen, öffnen diese weiterhin in Kodis Oberfläche. |
+| **Beschriftungen** | Farbcodes, Fettdruck, Emojis und Flaggen werden aus Namen entfernt; sonst erscheinen in Kodi-Schriften Kästchen. |
+| **Favoriten** | Der ★-Knopf öffnet `ActivateWindow(favouritesbrowser)`. Das alte Fenster `favourites` beendet Kodi 20 und neuer. Ältere gespeicherte Kacheln werden automatisch auf den neuen Befehl umgestellt. |
+| **Fernbedienung** | Das Kachel-Raster und die Taskleiste sind für Pfeiltasten angelegt; der Generator verbindet die Wege nach Lage der Elemente. Beim Umbauen der Taskleiste die Wege einmal in Kodi prüfen. |
+| **Nicht in echtem Kodi getestet** | Die Vorschau im Generator zeigt die Seiten **angenähert**. Prüfe das fertige Addon einmal auf deinem Gerät, besonders nach eigenen Änderungen. |
+
+**Fehlerbehebung**
+
+| Problem | Lösung |
+|---|---|
+| Nach einer Einstellung bleibt das alte Design stehen | Neu exportieren und installieren: Die aktuelle Fassung übernimmt das Design sofort nach dem Schließen der Einstellungen. |
+| Rechts bleibt Platz frei | Das Raster ist zu schmal für eine weitere Spalte. Breite = Spalten × 180 + 6 (z.B. 1626 für 9 Spalten). |
+| Beschriftungen unleserlich | Platte (Farbe, Deckkraft) und Textfarbe im Kachel-Raster prüfen; **Schrift mit Schatten** ausschalten. |
+| Der Favoriten-Knopf schließt Kodi | Neu exportieren: die aktuelle Vorlage nutzt `favouritesbrowser`. |
+| Zurück wirft aus dem Desktop | Neu exportieren; mit der aktuellen Fassung zählt jede Startseite ([Kapitel 43](#k43)). |
+
+---
+
+---
+
+# Teil J – Lizenz
+
+<a id="k64"></a>
+
+## 64. Lizenz und wie es weitergeht
 
 Estuary stammt von **phil65 und Team Kodi**: der Code steht unter der **GPL-2.0**, die Grafiken unter **CC BY-SA 4.0**. Ein daraus gebauter Skin steht deshalb automatisch unter denselben freien Lizenzen. Die Lizenztexte (`LICENSE.txt`) und ein Hinweis auf die Grundlage (`TITAN.txt`) liegen in jeder Skin-ZIP. Du darfst deinen Skin weitergeben – er muss dann aber frei bleiben und Estuary nennen.
 
@@ -1676,7 +1881,7 @@ Der **Generator selbst** bleibt unter der IT('s) Possible Freeware-Lizenz gesch�
 
 ```text
 Kodi Addon & Skin Generator v9.1 Pro – Copyright (c) 2026 Team IT('s) Possible
-Handbuch · Stand 2026.10.25. Alle Rechte vorbehalten.
+Handbuch · Stand 2026.11.14. Alle Rechte vorbehalten.
 
 Kostenlos für die Kodi-Community, aber nicht Open Source. Ohne schriftliche Erlaubnis
 verboten: Verkaufen, Vermieten oder Anbieten gegen Bezahlung, Einbau von Werbung,

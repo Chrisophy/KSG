@@ -3,19 +3,33 @@
 **Baue dein eigenes Kodi-Video-Addon mit individuellem Vollbild-Menü, einen kompletten Kodi-Skin oder ein Menü um ein vorhandenes Addon – ohne eine Zeile Code zu schreiben.**
 
 👉 **Direkt im Browser starten:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/)
-
 📖 **Ausführliches Handbuch:** [Anleitung.md](Anleitung.md)
 
-🪧 **Verschiedene Demos:** [Beispiele](https://github.com/Chrisophy/KSG/tree/main/Demos)
-
-
-> 🧪 **Kontextmenü, Live-Browser und Fremd-Addon sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
+> 🧪 **Kontextmenü, Live-Browser, Fremd-Addon und die neue Desktop-Vorlage sind brandneu** und noch im Praxistest auf echten Geräten. Fehler bitte mit Kodi-Version, Gerät und Schritten melden.
 
 > 🇩🇪 Oberfläche und Handbuch auf Deutsch · 📱 Maus, Tastatur und Touch (PC, Tablet, Handy) · 🔒 Läuft komplett in deinem Browser – nichts wird hochgeladen · 💚 Gratis für die Kodi-Community
 
 ---
 
-## 🆕 Neu im Update vom 23.10.2026
+## 🆕 Neu im Update vom 14.11.2026
+
+| | Neuheit | Was sie bringt |
+|---|---|---|
+| ✨ | **Vorlagen-Assistent „Desktop-Vorlage“** | Ein Klick auf **✨ Desktop-Vorlage** (Kopfzeile) bzw. **🖥 Kodi Desktop erstellen** (Einstellungen), dann Name, Stil und Akzentfarbe wählen – fertig ist ein komplettes Desktop-Addon. Danach lässt sich alles wie gewohnt im Designer ändern. Für Profis gibt es aufklappbare **Profi-Optionen**. |
+| 🖥 | **Kodi Desktop** | Ein Desktop wie am PC: Der Nutzer legt in Kodi selbst **Addons, Scripte, Kodi-Verknüpfungen und einzelne Menüs aus Addons** (z.B. „Live TV“ aus einem IPTV-Addon) als Kacheln ab, ordnet sie per Touch oder Fernbedienung an und bedient alles über Taskleiste und Startmenü. Der Desktop ist am Anfang leer. |
+| 🎨 | **Vier Stile zum Umschalten** | **Ubuntu**, **Windows**, **Bunt** und **Dunkel** – jeweils mit eigener Taskleiste, eigenem Hintergrund und eigener Ordner-Ansicht. Der Stil lässt sich in Kodi in den Addon-Einstellungen oder im Startmenü wechseln und gilt **sofort**. |
+| 📂 | **Menüs im Desktop-Look** | Einzelne Menüs eines Addons erscheinen als Kachel und öffnen im **selben Design** statt in Kodis Standardansicht. Wer die Originalansicht braucht, schaltet das pro Kachel um. |
+| 🔤 | **Lesbare Beschriftungen** | Kachel-Beschriftungen stehen auf einer **farbigen Platte** (Farbe und Deckkraft einstellbar) mit scharfer Schrift ohne Schatten. Farbcodes, Emojis und Flaggen aus Addon-Namen werden entfernt, damit keine Kästchen erscheinen. |
+| ▦ | **Spalten wählbar (4–10)** | Das Kachel-Raster nutzt die Breite aus: Standard sind **9 Spalten**, mittig auf dem Bildschirm. |
+| 🔒 | **Zurück-Taste sperren** | „⬅ Zurück auf der Startseite“ gilt jetzt auf **jeder** Startseite, auch wenn ein Hook oder ein Stilwechsel eine andere Seite als Start setzt. Kein kurzes Aufblitzen von Kodi mehr. Beenden geht dann nur über das Power-Symbol. |
+| 🐍 | **Neue Python-Hook-Möglichkeiten** | Rückgabe `swap:SEITE` (Seite ersetzen), `browse:PFAD@@Titel@@SEITE`, `py:NAME` sowie die optionalen Funktionen `start_page()` (eigene Startseite) und `open_settings(window)` (eigene Einstellungs-Aktion). |
+| 🛠 | **Korrektur Favoriten-Befehl** | Der Befehl „Favoriten“ in der 📚 Befehlsliste nutzt jetzt `favouritesbrowser`. In Kodi 20/21 schloss das alte Fenster `favourites` Kodi. |
+
+Alles dazu steht im Handbuch: **[Anleitung.md](Anleitung.md), Teil I (Kapitel 59–63)**.
+
+---
+
+## Frühere Neuerungen – Update vom 23.10.2026
 
 | | Neuheit | Was sie bringt |
 |---|---|---|
@@ -44,6 +58,7 @@
 
 **Gestalten**
 
+- ✨ **Vorlagen-Assistent:** In drei Klicks zum fertigen **Kodi Desktop** mit vier Stilen (Ubuntu, Windows, Bunt, Dunkel).
 - 🎨 **Visueller Menü-Editor** auf einer 1920×1080-Bühne: Buttons, Texte, Flächen, Poster, eigene Bilder, Fortschrittsbalken, Cover – ziehen, Größe ändern, fertig.
 - 🧩 **Widgets & Info-Widgets** (siehe oben), **Listen**, **Kachel-Raster**, **Karussell**, echte **Ein/Aus-Schalter**, **Regler** für Lautstärke und Spulen, **Textbox**, **Laufschrift**, **Videofenster**, **Visualisierung**, **RSS-Ticker**.
 - 🖼 **Alles ist anklickbar:** Jedes Element kann eine Aktion bekommen – auch Bilder, Texte und Flächen.
@@ -84,7 +99,7 @@
 
 ## 🚀 Schnellstart
 
-Du kannst ein Addon-Menü bauen (Schritte unten), einen **⚡ Titan-Skin** (Kopfzeile ⚡ Titan) oder ein Menü um ein **📦 Fremd-Addon** (Kopfzeile 📦 Fremd-Addon).
+Du kannst ein Addon-Menü bauen (Schritte unten), einen **⚡ Titan-Skin** (Kopfzeile ⚡ Titan), ein Menü um ein **📦 Fremd-Addon** (Kopfzeile 📦 Fremd-Addon) oder einen **🖥 Kodi Desktop** per Assistent (Kopfzeile ✨ Desktop-Vorlage).
 
 1. **Öffnen:** [chrisophy.github.io/KSG](https://chrisophy.github.io/KSG/) aufrufen (oder die `index.html` herunterladen und im Browser öffnen).
 2. **Starten:** Unter **📂 Vorlagen** das **✨ Beispiel „Mein Kino-Hub“** laden – oder mit einer leeren Seite beginnen.
@@ -96,6 +111,7 @@ Du kannst ein Addon-Menü bauen (Schritte unten), einen **⚡ Titan-Skin** (Kopf
 
 **Skin bauen:** Kopfzeile ⚡ Titan → Estuary laden → Farben, Hauptmenü, Layout einstellen → Export als `skin.<name>.zip`.
 **Fremd-Addon einbinden:** Kopfzeile 📦 Fremd-Addon → ZIP wählen → Stil wählen (empfohlen: Live-Browser) → exportieren.
+**Desktop in drei Klicks:** Kopfzeile ✨ Desktop-Vorlage → Name, Stil und Akzentfarbe wählen → **✨ Desktop erstellen** → **⬇ ZIP exportieren**. Profi-Optionen (Spalten, Platte, Schrift, Stile, Autostart) stehen aufklappbar im Assistenten.
 
 Alles Weitere – Schritt für Schritt, mit Rezepten und Fehlerhilfe – steht in der **[Anleitung.md](Anleitung.md)**.
 
@@ -145,7 +161,7 @@ plugin.video.<projektname>/
 
 ```text
 Kodi Addon & Skin Generator v9.1 Pro – Copyright (c) 2026 Team IT('s) Possible
-Stand 2026.10.23. Alle Rechte vorbehalten.
+Stand 2026.11.14. Alle Rechte vorbehalten.
 ```
 
 | ✅ Erlaubt | 🚫 Verboten ohne schriftliche Erlaubnis |
