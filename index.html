@@ -1373,6 +1373,7 @@ def desk_ctx_remove(window):
       ['top_movies', '⭐', 'Am besten bewertet', xsp('videodb://movies/titles/', { order: { direction: 'descending', ignorefolders: 0, method: 'rating' }, type: 'movies' }), 'video', 'poster', '🎬 Filme', 'Deine Filme nach Bewertung sortiert.'],
       ['recent_eps', '📺', 'Neue Folgen', 'videodb://recentlyaddedepisodes/', 'video', 'land', '📺 Serien', 'Die neuesten Serien-Folgen deiner Bibliothek.'],
       ['prog_shows', '⏯', 'Serien weiterschauen', 'videodb://inprogresstvshows/', 'video', 'poster', '📺 Serien', 'Serien, die du gerade schaust.'],
+      ['continue', '⏯', 'Weiterschauen (aus Addons)', 'kfe://continue', 'video', 'land', '📺 Serien', 'Merkt sich Videos aus Addons (z.B. GEZ Kino), die du angefangen hast, und setzt sie dort fort, wo du aufgehört hast. Die Bibliotheks-Bausteine „weiterschauen“ sehen solche Videos nicht.'],
       ['rand_shows', '🎲', 'Zufällige Serien', xsp('videodb://tvshows/titles/', { order: { direction: 'ascending', ignorefolders: 0, method: 'random' }, type: 'tvshows' }), 'video', 'poster', '📺 Serien', 'Lass dich überraschen.'],
       ['recent_albums', '💿', 'Neue Alben', 'musicdb://recentlyaddedalbums/', 'music', 'square', '🎵 Musik', 'Zuletzt hinzugefügte Alben.'],
       ['played_albums', '🎵', 'Zuletzt gehört', 'musicdb://recentlyplayedalbums/', 'music', 'square', '🎵 Musik', 'Alben, die zuletzt liefen.'],
@@ -3738,6 +3739,75 @@ def save_state():
         log('Zustand nicht gespeichert: %s' % exc, xbmc.LOGWARNING)
 
 
+CONT_PATH = os.path.join(PROFILE, 'continue.json')
+CONT_KEY = 'kfe://continue'
+CONT = {'cur': None, 'pos': 0.0, 'tot': 0.0}
+
+
+def cont_load():
+    try:
+        with open(CONT_PATH, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def cont_save(items):
+    try:
+        if not os.path.isdir(PROFILE):
+            os.makedirs(PROFILE)
+        with open(CONT_PATH, 'w', encoding='utf-8') as f:
+            json.dump(items, f)
+    except Exception as exc:
+        log('Weiterschauen nicht gespeichert: %s' % exc, xbmc.LOGWARNING)
+
+
+def cont_begin(path, label, thumb, plot):
+    if path.lower().startswith(('videodb://', 'musicdb://')):
+        return
+    CONT['cur'] = {'p': path, 'l': label, 't': thumb, 'o': plot}
+    CONT['pos'] = 0.0
+    CONT['tot'] = 0.0
+
+
+def cont_track(player):
+    if not CONT['cur']:
+        return
+    try:
+        if player.isPlayingVideo():
+            total = player.getTotalTime()
+            if total > 0:
+                CONT['pos'] = player.getTime()
+                CONT['tot'] = total
+    except Exception:
+        pass
+
+
+def cont_commit():
+    cur, pos, total = CONT['cur'], CONT['pos'], CONT['tot']
+    CONT['cur'] = None
+    if not cur or total <= 0:
+        return
+    items = [i for i in cont_load() if i.get('p') != cur['p']]
+    if pos >= 60 and pos / total < 0.95:
+        entry = dict(cur)
+        entry['pos'] = int(pos)
+        entry['tot'] = int(total)
+        items.insert(0, entry)
+    cont_save(items[:20])
+
+
+def cont_result():
+    files = []
+    for i in cont_load():
+        thumb = i.get('t') or ''
+        files.append({'label': i.get('l') or '', 'file': i.get('p') or '', 'filetype': 'file', 'plot': i.get('o') or '',
+                      'thumbnail': thumb, 'art': {'poster': thumb, 'thumb': thumb, 'landscape': thumb, 'fanart': thumb},
+                      'resume': {'position': i.get('pos') or 0, 'total': i.get('tot') or 0}})
+    return {'files': files}
+
+
 def rpc(method, params, quiet=False):
     req = {'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}
     level = xbmc.LOGDEBUG if quiet else xbmc.LOGWARNING
@@ -3900,22 +3970,32 @@ def go_home(wait=True):
 
 
 def wait_return(base):
+    try:
+        return wait_return_inner(base)
+    finally:
+        cont_commit()
+
+
+def wait_return_inner(base):
     """Wartet, bis man aus einem Kodi-Fenster oder Video wieder zurück ist.
 
     True = Menü wieder öffnen, False = Addon beenden (Kodi schließt
     oder das Addon wurde inzwischen neu gestartet).
     """
     monitor = xbmc.Monitor()
+    player = xbmc.Player()
     away = False
     for _ in range(80):  # bis zu 4 Sekunden auf das neue Fenster / Video warten
         if monitor.waitForAbort(0.05) or not still_ours():
             return False
+        cont_track(player)
         if xbmcgui.getCurrentWindowId() != base or modal_open():
             away = True
             break
     while away:
         if monitor.waitForAbort(0.25) or not still_ours():
             return False
+        cont_track(player)
         if xbmcgui.getCurrentWindowId() == base and not modal_open():
             if monitor.waitForAbort(0.4) or not still_ours():
                 return False
@@ -4169,7 +4249,9 @@ class MenuBase(object):
                 limit = max(limit, 500)
             params = {'directory': fix_url(cur[0] if cur else data.get('dir', '')), 'media': media}
             res = None
-            if nav:
+            if params['directory'] == CONT_KEY:
+                res = cont_result()
+            elif nav:
                 # Mit customproperties erfahren wir, ob ein Eintrag abspielbar ist (ab Kodi 20)
                 res = rpc('Files.GetDirectory', dict(params, properties=NAV_PROPS + ['customproperties']), True)
                 if res is None:
@@ -4270,6 +4352,19 @@ class MenuBase(object):
         else:
             xbmc.executebuiltin('PlayMedia("%s")' % path)
 
+    def play_row(self, cid, pos, path, label):
+        thumb, plot = '', ''
+        try:
+            li = self.getControl(int(cid)).getListItem(pos)
+            thumb = li.getArt('thumb')
+            plot = li.getProperty('kfe.plot')
+        except Exception:
+            pass
+        cont_begin(path, label, thumb, plot)
+        if any(i.get('p') == path for i in cont_load()):
+            return 'PlayMedia("%s",resume)' % path
+        return 'PlayMedia("%s")' % path
+
     def nav_up(self):
         navs = getattr(self, 'navs', {})
         try:
@@ -4323,7 +4418,7 @@ class MenuBase(object):
                 elif ftype == 'directory':
                     self.finish(('cmd', 'ActivateWindow(%s,"%s",return)' % (DIR_WINDOWS.get(media, 'Videos'), path)))
                 else:
-                    self.finish(('cmd', 'PlayMedia("%s")' % path))
+                    self.finish(('cmd', self.play_row(cid, pos, path, label)))
             return
         act = ACTIONS.get(self.page_id, {}).get(cid)
         if act and act.get('k') == 'list':
