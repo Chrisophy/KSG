@@ -686,12 +686,48 @@ def desk_home(window):
 
 
 # ---------------------------------------------------------------- Anzeige
+_FOUND = {}
+
+
+def _is_list(ctl):
+    return all(hasattr(ctl, a) for a in ('reset', 'addItem', 'selectItem', 'getSelectedPosition'))
+
+
+def find_list(window, preferred, key='grid'):
+    """Nummer der Liste auf dieser Seite. Bevorzugt die vom Generator vorgesehene Nummer; wurden im Designer
+    Elemente verschoben oder eingefuegt (die Nummern aendern sich dann), wird die Liste der Seite gesucht."""
+    ck = (key, window.getProperty('desk.page') or '')
+    for cand in (_FOUND.get(ck), preferred):
+        if cand is None:
+            continue
+        try:
+            if _is_list(window.getControl(cand)):
+                _FOUND[ck] = cand
+                return cand
+        except Exception:
+            pass
+    for cand in range(100, 400):
+        try:
+            if _is_list(window.getControl(cand)):
+                _FOUND[ck] = cand
+                log('Liste auf Seite %s hat die Nummer %d (erwartet %d)' % (ck[1], cand, preferred))
+                return cand
+        except Exception:
+            continue
+    return None
+
+
 def fill(window, select=None):
     """Zeichnet alle Kacheln neu."""
     items = load()
     edit = window.getProperty('desk.edit') == '1'
     pick = _int(window.getProperty('desk.pick'))
-    ctl = window.getControl(LIST_ID)
+    gid = find_list(window, LIST_ID)
+    if gid is None:
+        log('Kachel-Raster nicht gefunden (keine Liste auf dieser Seite)', xbmc.LOGERROR)
+        notify('Kachel-Raster nicht gefunden - Seite im Generator pruefen', xbmcgui.NOTIFICATION_ERROR)
+        return
+    ctl = window.getControl(gid)
     ctl.reset()
     for i, e in enumerate(items):
         ctl.addItem(tile_item(e, edit, edit and i == pick))
@@ -719,7 +755,7 @@ def fill(window, select=None):
         return
     if select is not None:
         try:
-            window.setFocusId(LIST_ID)
+            window.setFocusId(gid)
             ctl.selectItem(max(0, min(select, ctl.size() - 1)))
         except Exception:
             pass
@@ -736,7 +772,8 @@ def on_page(window, page_id):
     window.setProperty('desk.page', page_id)
     if page_id == st['browse']:
         try:
-            empty = window.getControl(st['blist']).size() == 0
+            bl = find_list(window, st['blist'], 'blist')
+            empty = window.getControl(bl).size() == 0
         except Exception:
             return
         if empty:
@@ -745,7 +782,9 @@ def on_page(window, page_id):
         else:
             window.setProperty('desk.hint', '')
         return
-    window.setProperty('desk.plus', str(st['plus']))
+    gid = find_list(window, st['list'])
+    shift = (gid - st['list']) if gid is not None else 0      # Nummern verschoben? Dann auch das Plus
+    window.setProperty('desk.plus', str(st['plus'] + shift))
     window.setProperty('desk.edit', '')
     window.setProperty('desk.pick', '')
     fill(window)
@@ -757,10 +796,10 @@ def focus_pos(window):
         cid = window.getFocusId()
     except Exception:
         return None, -1
-    if cid != LIST_ID:
+    if cid != find_list(window, LIST_ID):
         return None, -1
     try:
-        return cid, window.getControl(LIST_ID).getSelectedPosition()
+        return cid, window.getControl(cid).getSelectedPosition()
     except Exception:
         return cid, -1
 
@@ -3498,6 +3537,120 @@ def ensure_bundles():
     return True
 `;
 
+    const CLEAN_UML = {
+      'Adressen': 'Adressen', 'Fuehre': 'Führe', 'Kaestchen': 'Kästchen', 'Kontextmenue': 'Kontextmenü',
+      'Menue': 'Menü', 'Menues': 'Menüs', 'menue': 'menü', 'menues': 'menüs', 'Oeffne': 'Öffne', 'oeffne': 'öffne',
+      'oeffnen': 'öffnen', 'oeffnet': 'öffnet', 'geoeffnet': 'geöffnet', 'Eintraege': 'Einträge', 'Eintrag': 'Eintrag',
+      'Rueckgabe': 'Rückgabe', 'Startmenue': 'Startmenü', 'Verknuepfung': 'Verknüpfung', 'Verknuepfungen': 'Verknüpfungen',
+      'Zurueck': 'Zurück', 'zurueck': 'zurück', 'aendern': 'ändern', 'Aendern': 'Ändern', 'geaendert': 'geändert',
+      'geaendertes': 'geändertes', 'Aenderung': 'Änderung', 'Aenderungen': 'Änderungen', 'auswaehlen': 'auswählen',
+      'waehlen': 'wählen', 'Waehle': 'Wähle', 'waehle': 'wähle', 'gewaehlt': 'gewählt', 'gewaehlten': 'gewählten',
+      'druecken': 'drücken', 'Druecke': 'Drücke', 'druecke': 'drücke', 'einfuegen': 'einfügen', 'eingefuegt': 'eingefügt',
+      'hinzufuegen': 'hinzufügen', 'hinzugefuegt': 'hinzugefügt', 'Hinzufuegen': 'Hinzufügen', 'fuer': 'für', 'Fuer': 'Für',
+      'heisst': 'heißt', 'pruefen': 'prüfen', 'Pruefe': 'Prüfe', 'pruefe': 'prüfe', 'rueckt': 'rückt',
+      'schliessen': 'schließen', 'Schliessen': 'Schließen', 'spaeter': 'später', 'stuerzt': 'stürzt',
+      'uebernehmen': 'übernehmen', 'uebernommen': 'übernommen', 'wuerden': 'würden', 'aelter': 'älter',
+      'Aeltere': 'Ältere', 'aeltere': 'ältere', 'Vergleichsschluessel': 'Vergleichsschlüssel', 'ueber': 'über',
+      'Ueber': 'Über', 'koennen': 'können', 'Koennen': 'Können', 'moechte': 'möchte', 'muessen': 'müssen',
+      'muss': 'muss', 'natuerlich': 'natürlich', 'loeschen': 'löschen', 'Loeschen': 'Löschen', 'geloescht': 'gelöscht',
+      'Groesse': 'Größe', 'groesser': 'größer', 'gross': 'groß', 'Strasse': 'Straße', 'Schluessel': 'Schlüssel'
+    };
+
+    function cleanPy(src, opts) {
+      opts = opts || {};
+      const stripC = opts.comments !== false, umlaut = opts.umlauts !== false;
+      const n = src.length;
+      const strs = [];
+      const coms = [];
+      let i = 0, depth = 0, stmt = true, cont = false;
+      while (i < n) {
+        const c = src[i];
+        if (c === '\n') { if (depth === 0 && !cont) stmt = true; cont = false; i++; continue; }
+        if (c === ' ' || c === '\t' || c === '\r' || c === '\f') { i++; continue; }
+        if (c === '\\' && (src[i + 1] === '\n' || (src[i + 1] === '\r' && src[i + 2] === '\n'))) { cont = true; i++; continue; }
+        if (c === '#') { let j = i; while (j < n && src[j] !== '\n') j++; coms.push([i, j]); i = j; continue; }
+        let k = i;
+        while (k < n && /[rRbBuUfF]/.test(src[k]) && k - i < 2) k++;
+        if (k < n && (src[k] === '"' || src[k] === "'") && (k === i || /[rRbBuUfF]/.test(src[i]))) {
+          const q = src[k];
+          const triple = src[k + 1] === q && src[k + 2] === q;
+          let j = k + (triple ? 3 : 1);
+          while (j < n) {
+            if (src[j] === '\\') { j += 2; continue; }
+            if (triple) { if (src[j] === q && src[j + 1] === q && src[j + 2] === q) { j += 3; break; } }
+            else { if (src[j] === q) { j++; break; } if (src[j] === '\n') break; }
+            j++;
+          }
+          let e = j;
+          while (e < n && (src[e] === ' ' || src[e] === '\t' || src[e] === '\r')) e++;
+          const alone = depth === 0 && stmt && (e >= n || src[e] === '\n' || src[e] === '#');
+          strs.push({ s: i, e: j, qs: k, doc: alone });
+          stmt = false; i = j; continue;
+        }
+        if (c === '(' || c === '[' || c === '{') depth++;
+        else if (c === ')' || c === ']' || c === '}') depth = Math.max(0, depth - 1);
+        stmt = false;
+        if (/[A-Za-z0-9_]/.test(c)) { while (i < n && /[A-Za-z0-9_]/.test(src[i])) i++; continue; }
+        i++;
+      }
+
+      const uml = t => t.replace(/[A-Za-zÄÖÜäöüß]+/g, (w, off) => {
+        let pre = '';
+        if (off > 0 && t[off - 1] === '\\' && /[nrtabfv]/.test(w[0]) && !(off > 1 && t[off - 2] === '\\')) { pre = w[0]; w = w.slice(1); }
+        return pre + (Object.prototype.hasOwnProperty.call(CLEAN_UML, w) ? CLEAN_UML[w] : w);
+      });
+
+      const edits = [];
+      strs.forEach(t => {
+        if (stripC && t.doc) { edits.push({ s: t.s, e: t.e, doc: true }); return; }
+        if (umlaut && !/[bBrRfF]/.test(src.slice(t.s, t.qs))) {
+          const raw = src.slice(t.s, t.e), nt = uml(raw);
+          if (nt !== raw) edits.push({ s: t.s, e: t.e, rep: nt });
+        }
+      });
+      if (stripC) coms.forEach(cm => edits.push({ s: cm[0], e: cm[1], com: true }));
+      edits.sort((a, b) => a.s - b.s);
+
+      let out = '', pos = 0;
+      const docMarks = [];
+      edits.forEach(ed => {
+        out += src.slice(pos, ed.s);
+        if (ed.doc) out += '\u0001DOC\u0001';
+        else if (ed.com) out += '\u0002';
+        else out += ed.rep;
+        pos = ed.e;
+      });
+      out += src.slice(pos);
+
+      let lines = out.split('\n');
+      const res = [];
+      for (let li = 0; li < lines.length; li++) {
+        let ln = lines[li];
+        if (ln.indexOf('\u0002') >= 0) {
+          const t = ln.replace('\u0002', '').replace(/[ \t\r]+$/, '');
+          if (t.trim() === '' ) continue;
+          ln = t + (lines[li].endsWith('\r') ? '\r' : '');
+        }
+        res.push(ln);
+      }
+      const fin = [];
+      for (let li = 0; li < res.length; li++) {
+        const ln = res[li];
+        if (ln.indexOf('\u0001DOC\u0001') < 0) { fin.push(ln); continue; }
+        const m = ln.match(/^([ \t]*)/), ind = m[1].length;
+        let prev = fin.length - 1;
+        while (prev >= 0 && fin[prev].trim() === '') prev--;
+        let nx = li + 1;
+        while (nx < res.length && (res[nx].trim() === '' || res[nx].indexOf('\u0001DOC\u0001') >= 0)) nx++;
+        const needPass = prev >= 0 && fin[prev].replace(/\r$/, '').trimEnd().endsWith(':') &&
+          (nx >= res.length || res[nx].match(/^([ \t]*)/)[1].length < ind);
+        if (needPass) fin.push(m[1] + 'pass');
+      }
+      const body = fin.join('\n');
+      return body.replace(/^\n+/, '').replace(/\s+$/, '') + '\n';
+    }
+
+
     const ADDON_PY = `# -*- coding: utf-8 -*-
 # Erzeugt mit dem Kodi Addon & Skin Generator
 # Die Seiten, Aktionen, Listen und Schalter stehen in pages.json.
@@ -5318,6 +5471,7 @@ if __name__ == '__main__':
       });
       // Von Hand bearbeitete Dateien aus dem Editor überschreiben die erzeugten Texte
       if (!raw) Object.keys(S.overrides || {}).forEach(p => { if (typeof F[p] === 'string') F[p] = S.overrides[p]; });
+      if (!raw && M.cleanPy) Object.keys(F).forEach(p => { if (/\.py$/.test(p) && typeof F[p] === 'string') F[p] = cleanPy(F[p]); });
       return F;
     }
 
@@ -5478,7 +5632,7 @@ if __name__ == '__main__':
     // Baut aus ein paar Angaben ein komplettes Desktop-Addon (Symbole, Taskleiste, Startmenü, 4 Designs).
     // Danach ist alles ganz normal im Designer änderbar.
     const DESK_BUILD = (CUSTOM, o) => {
-  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.4', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
+  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.6', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
   // ================= Zeichen-Helfer =================
   const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const glow = (x, cx, cy, r, rgb, a) => {
@@ -5627,7 +5781,7 @@ if __name__ == '__main__':
   S.theme = { primary: '#5a2450', focus: o.accent || '#e95420', bg: '#2c001e', rad: 30, anim: 'fade' };
   S.mod.shadow = !!o.shadow; S.mod.fzoom = false; S.mod.ftc = '#ffffff'; S.mod.font = o.font || 'font13';
   S.mod.hooks = true; S.mod.autostart = !!o.autostart; S.mod.autoDef = !!o.autoDef;
-  S.mod.backMode = o.lockBack === false ? 'exit' : 'stay'; S.mod.exitOwn = o.lockBack !== false; S.mod.autoDelay = 5; S.mod.retMenu = true; S.mod.ctx = true; S.mod.deeplinks = true;
+  S.mod.backMode = o.lockBack === false ? 'exit' : 'stay'; S.mod.exitOwn = o.lockBack !== false; S.mod.cleanPy = o.cleanPy !== false; S.mod.autoDelay = 5; S.mod.retMenu = true; S.mod.ctx = true; S.mod.deeplinks = true;
   S.bgImg = makeBg();
   S.assets.icon = addonIcon(); S.assets.fanart = S.bgImg;
 
@@ -6079,6 +6233,7 @@ if __name__ == '__main__':
           ${tgM('mod', 'bgmOn', '🎵 Hintergrundmusik', 'Spielt beim Öffnen des Addons Musik oder einen Radio-Stream.', M.bgmOn ? bgm : '', true)}
           <div class="sec">🐍 Für Profis</div>
           ${tgM('mod', 'hooks', '🐍 Python-Hooks (custom.py)', 'Eigene Python-Funktionen als Aktion, plus on_start / on_page / on_exit. resources/lib/custom.py wird mit Beispielen erzeugt.', M.hooks ? '<button class="btn mt-2" onclick="showCode(\'resources/lib/custom.py\')">💻 custom.py im Editor öffnen</button>' : '', true)}
+          ${tgM('mod', 'cleanPy', '🧹 Python ohne Kommentare, echte Umlaute', 'Entfernt in addon.py, service.py und custom.py alle Kommentare (#) und Docstrings (""") und schreibt Texte mit ä, ö, ü, ß statt ae, oe, ue, ss. Der 💻 Editor zeigt weiter die Originale.')}
           ${tgM('mod', 'debug', '🐞 Ausführliches Kodi-Log', 'Schreibt jeden Seitenwechsel und Schalter ins Kodi-Log (sonst nur im Debug-Modus sichtbar).')}
           <div class="card mt-3"><b class="text-xs">💡 Profi-Tipp</b><p class="hint mt-1">Ein 🔘 Schalter im Modus „Eigener Merker“ setzt eine Kodi-Eigenschaft. Im „🧠 Bedingungen“-Tab baust du daraus mit einem Klick Sichtbarkeits-Regeln – so blendest du ganze Bereiche per Schalter ein und aus.</p></div>
         </div>

@@ -1805,7 +1805,9 @@ Mit der Auswahl „Stile im Addon“ im Assistenten gibt es entsprechend weniger
 
 **Akzentfarbe ändern:** Die Farbe der ausgewählten Kachel steckt in jeder Seite als eigenes Feld `fcol` (sichtbar in der 🧬 Projekt-JSON, [Kapitel 33](#k33)). Sie hat Vorrang vor der Design-Farbe **Fokus** (3 · Design); nur Seiten ohne `fcol` – im Ubuntu-Stil – folgen der Design-Farbe. Am einfachsten startest du den Assistenten mit einer anderen Akzentfarbe neu; alternativ änderst du `fcol` je Seite in der Projekt-JSON und übernimmst mit **💾 Übernehmen**.
 
-⚠️ **IDs nicht durcheinanderbringen.** Die Desktop-Logik in `custom.py` kennt das Kachel-Raster (ID 100) und die Elemente der Taskleiste. Verschiebe sie gern, aber ändere beim **⬆ nach vorn / ⬇ nach hinten** nichts an der Reihenfolge der Elemente einer Seite – sonst ändern sich die IDs ([Kapitel 35](#k35)). Prüfe danach im 🔍 Inspektor.
+🧹 **Sauberer Python-Code.** Unter „Für Profis“ gibt es den Schalter **Python ohne Kommentare, echte Umlaute**. Er entfernt in `addon.py`, `service.py` und `custom.py` alle Kommentare (`#`) und Docstrings (`"""`) und schreibt Texte mit ä, ö, ü, ß statt ae, oe, ue, ss. Die Desktop-Vorlage schaltet ihn ein, bei anderen Projekten ist er aus. Der 💻 Editor zeigt weiter die Originale; die Bereinigung greift erst beim Export.
+
+⚠️ **IDs im Blick behalten.** Seit Version 1.4.5 sucht der Desktop das Kachel-Raster beim Start selbst (Nummer 100–399) und findet es auch, wenn sich die Nummern verschoben haben, z. B. nach ⬆ nach vorn / ⬇ nach hinten ([Kapitel 35](#k35)). Die Taskleiste und die Plus-Kachel folgen der Verschiebung des Rasters. Trotzdem gilt: Verschiebe Elemente nur, wenn nötig, und prüfe danach im 🔍 Inspektor. Fehlt das Raster ganz (z. B. gelöscht), zeigt Kodi den Hinweis „Kachel-Raster nicht gefunden“ statt abzustürzen.
 
 💡 Eigene Elemente (Logo, Textzeile, Bilder) kannst du frei dazusetzen. Änderungen an Texten und Farben sind gefahrlos.
 
@@ -1853,6 +1855,7 @@ Wer eigene Projekte so baut, setzt `exitOwn` auf `true`, **nachdem** er sicherge
 
 | Problem | Lösung |
 |---|---|
+| Log: `ControlImage has no attribute 'reset'` | Alte Version (vor 1.4.5) hat das Raster unter fester Nummer 100 erwartet. Neue Version einspielen – sie findet das Raster selbst. |
 | Nach einer Einstellung bleibt das alte Design stehen | Neu exportieren und installieren: Die aktuelle Fassung übernimmt das Design sofort nach dem Schließen der Einstellungen. |
 | Rechts bleibt Platz frei | Das Raster ist zu schmal für eine weitere Spalte. Breite = Spalten × 180 + 6 (z.B. 1626 für 9 Spalten). |
 | Beschriftungen unleserlich | Platte (Farbe, Deckkraft) und Textfarbe im Kachel-Raster prüfen; **Schrift mit Schatten** ausschalten. |
