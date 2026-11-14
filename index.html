@@ -2080,7 +2080,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
 
     // ---- Widget: Geometrie (gleich für Vorschau und Kodi-XML) ----
     function wGeo(e) {
-      const HH = String(e.wtitle || '').trim() ? 60 : 0, IH = e.winfo ? 150 : 0, SP = 14;
+      const HH = String(e.wtitle || '').trim() ? 60 : 0, IH = e.winfo ? Math.max(100, Math.min(600, Math.round(+e.winfh || 150))) : 0, SP = 14;
       const rowTop = HH ? HH + SP : 0, rowH = Math.max(60, e.h - rowTop - (IH ? IH + SP : 0));
       const list = e.wstyle === 'list', gap = Math.max(0, +e.gap || 0);
       const lbh = list ? 0 : Math.min(54, Math.max(34, Math.round(rowH * .14)));
@@ -2370,6 +2370,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
       h += field('Darstellung', `<select class="inp" onchange="setP('wstyle',this.value);renderProps()">${WSTYLES.map(s => `<option value="${s[0]}" ${s[0] === e.wstyle ? 'selected' : ''}>${s[1]}</option>`).join('')}</select>`);
       h += `<div class="grid grid-cols-3 gap-1.5 mt-2">${numF('Max. Einträge', 'dmax', e.dmax)}${numF('Abstand', 'gap', e.gap)}${e.wstyle === 'list' ? numF('Zeilenhöhe', 'wih', e.wih) : ''}</div>`;
       h += chk('winfo', 'Infos zum gewählten Titel zeigen (Jahr, Bewertung, Inhalt)', e.winfo);
+      if (e.winfo) h += `<div class="grid grid-cols-2 gap-1.5 mt-2">${numF('Höhe der Infos (Inhalt wird länger)', 'winfh', e.winfh || 150)}</div><p class="hint">Der Platz für die Infos geht von der Widget-Höhe ab. Mehr Infos-Höhe = mehr Zeilen Inhalt, dafür werden die Poster kleiner. Ist der Text trotzdem länger, läuft er automatisch durch.</p>`;
       if (e.wstyle !== 'list') h += chk('wwrap', 'Endlos blättern (Karussell)', e.wwrap);
       h += '<p class="hint mt-2">Tipp: Mit der weißen Ecke unten rechts machst du das Widget höher – dann werden auch die Bilder größer.</p>';
       return h + '</div>';
@@ -3368,7 +3369,7 @@ Profi|🔁|Container neu laden|Container.Refresh|Lädt die aktuelle Liste neu`.s
         const y = g.infoTop;
         inner += `\n  <control type="label"><left>0</left><top>${y}</top><width>${W}</width><height>50</height><font>font14</font><textcolor>${tcol}</textcolor>${sh}<aligny>center</aligny><label>$INFO[Container(${cid}).ListItem.Label]</label></control>` +
           `\n  <control type="label"><left>0</left><top>${y + 50}</top><width>${W}</width><height>40</height><font>font12</font><textcolor>${dim}</textcolor>${sh}<aligny>center</aligny><label>$INFO[Container(${cid}).ListItem.Property(kfe.meta)]</label></control>` +
-          `\n  <control type="textbox"><left>0</left><top>${y + 92}</top><width>${W}</width><height>${Math.max(20, g.IH - 92)}</height><font>font12</font><textcolor>${hexA(e.tc || '#ffffff', 60)}</textcolor>${sh}<label>$INFO[Container(${cid}).ListItem.Property(kfe.plot)]</label></control>`;
+          `\n  <control type="textbox"><left>0</left><top>${y + 92}</top><width>${W}</width><height>${Math.max(20, g.IH - 92)}</height><font>font12</font><textcolor>${hexA(e.tc || '#ffffff', 60)}</textcolor>${sh}<autoscroll delay="4000" time="2500" repeat="8000">true</autoscroll><label>$INFO[Container(${cid}).ListItem.Property(kfe.plot)]</label></control>`;
       }
       return ` <control type="group">${pos}${inner}\n </control>`;
     }
