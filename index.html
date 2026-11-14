@@ -134,6 +134,7 @@
     </div>
     <div id="hdr-btns" class="flex flex-wrap gap-2">
       <button class="btn" onclick="newProject()">🗑 Neu</button>
+      <button class="btn" onclick="showDeskTpl()" title="Fertigen Kodi Desktop in drei Klicks erstellen">✨ Desktop-Vorlage</button>
       <button class="btn" onclick="showHelp()">❓ So geht's</button>
       <button class="btn" onclick="showTpl()">📂 Vorlagen</button>
       <button class="btn" onclick="showWidgets()">🧩 Widgets</button>
@@ -342,6 +343,10 @@
         <button class="btn" onclick="addEl('viz',{vis:'Player.HasAudio'})">🌈 Visualisierung</button>
       </div>
 
+      <h3 class="text-xs font-bold text-sky-400 uppercase mt-6">✨ Vorlagen</h3>
+      <button class="btn w-full mt-2" onclick="showDeskTpl()">🖥 Kodi Desktop erstellen</button>
+      <p class="hint mt-1">Fertiger Desktop mit Symbolen, Taskleiste, Startmenü und 4 Stilen – in drei Klicks.</p>
+
       <h3 class="text-xs font-bold uppercase mt-6 ti-grad">7 · ⚡ Titan-Modus</h3>
       <button class="btn titb w-full mt-2" onclick="showTitan()">⚡ Eigenen Kodi-Skin bauen</button>
       <p class="hint mt-1">Ein echter Kodi-Skin für ganz Kodi: Estuary mit deinen Farben, deinem Hintergrund, Logo, Hauptmenü, eigenen Menüpunkten (auch zu deinem Addon) und Widgets – und alle Elemente frei verschiebbar – auch das Hauptmenü als einzelne Buttons, waagerecht oder senkrecht, mit eigenen Bildern als Dekoration (📐 Layout).</p>
@@ -409,6 +414,885 @@
   <datalist id="dl-kset"></datalist>
   <datalist id="dl-dir"></datalist>
 
+  <script type="text/plain" id="desk-custom-py"># -*- coding: utf-8 -*-
+"""Desktop fuer alle - die Logik hinter den Kacheln.
+
+Der Desktop ist am Anfang LEER. Jeder legt selbst fest, welche Addons, Skripte
+und Kodi-Verknuepfungen darauf erscheinen. Die Auswahl steht in
+  special://profile/addon_data/<addon-id>/desktop.json
+
+Bedienung (Fernbedienung, Maus oder Touch):
+  * Kachel antippen          -> Addon / Skript starten (danach zurueck zum Desktop)
+  * Taskleiste: Plus         -> Addons und Skripte auswaehlen (mit Original-Icon)
+  * Taskleiste: Stift        -> Anordnen: Kachel antippen, dann Zielplatz antippen
+  * Lange druecken / Taste C -> Kontextmenue: verschieben, Leerfeld, entfernen ...
+"""
+import json
+import os
+
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcvfs
+
+ADDON = xbmcaddon.Addon()
+ADDON_ID = ADDON.getAddonInfo('id')
+ADDON_NAME = ADDON.getAddonInfo('name')
+
+# Werte, die der Generator beim Bauen einsetzt
+# Stile (Design): je Stil eine Desktop-Seite und eine Ordner-Seite mit eigenen Steuerelement-Nummern
+STYLES = __STYLES__
+LIST_ID = STYLES[0]['list']     # Kachel-Raster (auf allen Desktop-Seiten gleich)
+MAX_TILES = __MAX_TILES__
+ICONS = __ICONS__              # Schluessel -> Bilddatei fuer Kodi-Verknuepfungen
+
+MEDIA = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'skins', 'Default', 'media')
+
+# Kodi-Verknuepfungen: Schluessel, Name, Befehl
+SHORTCUTS = [
+    ('fav', 'Favoriten', 'ActivateWindow(favouritesbrowser)'),
+    ('files', 'Dateien', 'ActivateWindow(filemanager)'),
+    ('video', 'Videos', 'ActivateWindow(videos,root)'),
+    ('music', 'Musik', 'ActivateWindow(music,root)'),
+    ('pics', 'Bilder', 'ActivateWindow(pictures,root)'),
+    ('tv', 'Live TV', 'ActivateWindow(tvchannels)'),
+    ('addons', 'Addon-Browser', 'ActivateWindow(addonbrowser)'),
+    ('settings', 'Einstellungen', 'ActivateWindow(settings)'),
+]
+
+# Plugin-Typen: ID-Anfang -> Kodi-Fenster
+PLUGIN_WINDOWS = (
+    ('plugin.video.', 'Videos'),
+    ('plugin.audio.', 'Music'),
+    ('plugin.image.', 'Pictures'),
+    ('plugin.program.', 'Programs'),
+)
+SKIP_PREFIX = ('script.module.', 'script.service.', 'script.skin.', 'script.common.', 'script.kodi.')
+
+
+# ---------------------------------------------------------------- Hilfen
+def log(msg, level=None):
+    xbmc.log('[Desktop] %s' % msg, level if level is not None else xbmc.LOGINFO)
+
+
+def notify(msg, icon=None):
+    xbmcgui.Dialog().notification(ADDON_NAME, msg, icon or xbmcgui.NOTIFICATION_INFO, 3000)
+
+
+def _path(p):
+    try:
+        return xbmcvfs.translatePath(p)
+    except AttributeError:
+        return xbmc.translatePath(p)
+
+
+def cfg_file():
+    d = _path('special://profile/addon_data/%s/' % ADDON_ID)
+    return d, os.path.join(d, 'desktop.json')
+
+
+def rpc(method, params=None):
+    req = {'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params or {}}
+    try:
+        res = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
+    except Exception as exc:
+        log('JSON-RPC %s: %s' % (method, exc), xbmc.LOGWARNING)
+        return {}
+    return res.get('result') or {}
+
+
+def _clean(raw):
+    out = []
+    for e in raw if isinstance(raw, list) else []:
+        if not isinstance(e, dict):
+            continue
+        if e.get('gap'):
+            out.append({'gap': 1})
+        elif e.get('id'):
+            out.append({'id': str(e['id']), 'n': str(e.get('n') or ''), 'm': 'k' if e.get('m') == 'k' else 'd'})
+        elif e.get('link'):
+            out.append({'link': str(e['link']), 'n': str(e.get('n') or ''), 'a': str(e.get('a') or ''),
+                        'p': 1 if e.get('p') else 0, 'th': str(e.get('th') or ''),
+                        'm': 'k' if e.get('m') == 'k' else 'd'})
+        elif e.get('cmd'):
+            out.append({'cmd': str(e['cmd']), 'n': str(e.get('n') or ''), 'k': str(e.get('k') or '')})
+    return out[:MAX_TILES]
+
+
+def load():
+    _, f = cfg_file()
+    try:
+        with open(f, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except Exception:
+        return []
+    return _clean(data.get('items') if isinstance(data, dict) else data)
+
+
+def save(items):
+    items = _clean(items)
+    while items and items[-1].get('gap'):      # Leerfelder am Ende sind sinnlos
+        items.pop()
+    d, f = cfg_file()
+    try:
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        tmp = f + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as fh:
+            json.dump({'v': 1, 'items': items}, fh, ensure_ascii=False, indent=1)
+        if os.path.exists(f):
+            os.remove(f)
+        os.rename(tmp, f)
+    except Exception as exc:
+        log('Speichern fehlgeschlagen: %s' % exc, xbmc.LOGERROR)
+        notify('Desktop konnte nicht gespeichert werden', xbmcgui.NOTIFICATION_ERROR)
+    return items
+
+
+_INFO = {}
+
+
+def addon_info(aid):
+    """Name, Original-Icon und Typ eines installierten Addons (leer, wenn nicht vorhanden)."""
+    if aid not in _INFO:
+        res = rpc('Addons.GetAddonDetails', {'addonid': aid, 'properties': ['name', 'thumbnail', 'enabled']})
+        d = res.get('addon') or {}
+        _INFO[aid] = {'name': d.get('name') or '', 'thumb': d.get('thumbnail') or '', 'enabled': d.get('enabled', True),
+                      'type': d.get('type') or '', 'ok': bool(d)}
+    return _INFO[aid]
+
+
+def browsable(aid):
+    """Video-, Audio- und Bild-Addons lassen sich im Desktop-Look durchsuchen (Programm-Addons und Skripte nicht)."""
+    return str(aid).startswith(('plugin.video.', 'plugin.audio.', 'plugin.image.'))
+
+
+def open_cmd(aid):
+    """Kodi-Befehl, der ein Addon oder Skript startet."""
+    for prefix, win in PLUGIN_WINDOWS:
+        if aid.startswith(prefix):
+            if win == 'Programs':
+                return 'ActivateWindow(Programs,"plugin://%s/",return)' % aid
+            return 'ActivateWindow(%s,"plugin://%s/",return)' % (win, aid)
+    return 'RunAddon(%s)' % aid
+
+
+def plugin_window(aid):
+    for prefix, win in PLUGIN_WINDOWS:
+        if str(aid).startswith(prefix):
+            return win
+    return 'Videos'
+
+
+def link_cmd(e):
+    """Kodi-Befehl einer Menue-Kachel: Ordner im Addon oeffnen bzw. Eintrag abspielen."""
+    path = e.get('link') or ''
+    if e.get('p'):
+        return 'PlayMedia("%s")' % path
+    return 'ActivateWindow(%s,"%s",return)' % (plugin_window(e.get('a')), path)
+
+
+def icon_path(key):
+    name = ICONS.get(key) or ''
+    return os.path.join(MEDIA, name) if name else ''
+
+
+def tile_item(entry, edit, picked):
+    """Baut das ListItem fuer eine Kachel."""
+    if entry.get('gap'):
+        li = xbmcgui.ListItem('(leer)' if edit else '')
+        return li
+    if entry.get('link'):
+        label = _clean_label(entry.get('n')) or 'Menue'
+        thumb = entry.get('th') or addon_info(entry.get('a') or '')['thumb']
+    elif entry.get('cmd'):
+        label, thumb = entry.get('n') or 'Kodi', icon_path(entry.get('k'))
+    else:
+        info = addon_info(entry['id'])
+        label = _clean_label(info['name'] or entry.get('n') or entry['id']) or entry['id']
+        thumb = info['thumb']
+    if picked:
+        label = '>> ' + label
+    li = xbmcgui.ListItem(label)
+    if thumb:
+        li.setArt({'thumb': thumb, 'icon': thumb})
+    return li
+
+
+def _int(v, default=-1):
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return default
+
+
+# ---------------------------------------------------------------- Stile
+def style_by_label(label):
+    label = str(label or '').strip().lower()
+    for st in STYLES:
+        if st['label'].lower() == label or st['key'] == label:
+            return st
+    return STYLES[0]
+
+
+def current_style():
+    try:
+        return style_by_label(xbmcaddon.Addon(ADDON_ID).getSetting('desk_style'))
+    except Exception:
+        return STYLES[0]
+
+
+def style_of_page(page_id):
+    for st in STYLES:
+        if page_id in (st['home'], st['browse']):
+            return st
+    return None
+
+
+def start_page():
+    """Mit welcher Seite das Addon startet (je nach Design-Einstellung)."""
+    return current_style()['home']
+
+
+def browse_ret(window, url, title):
+    """Rueckgabe fuer einen Ordner im Desktop-Look - auf der Ordner-Seite des gerade gewaehlten Stils."""
+    st = style_of_page(window.getProperty('desk.page')) or current_style()
+    return 'browse:%s@@%s@@%s' % (url, title or '', st['browse'])
+
+
+def set_style(label):
+    try:
+        xbmcaddon.Addon(ADDON_ID).setSetting('desk_style', label)
+    except Exception as exc:
+        log('Design setzen: %s' % exc, xbmc.LOGWARNING)
+
+
+def desk_style_menu(window):
+    """Design wechseln (wirkt sofort)."""
+    cur = current_style()
+    labels = [('* ' if st is cur else '') + st['label'] for st in STYLES]
+    pick = xbmcgui.Dialog().select('Design waehlen', labels)
+    if pick < 0 or STYLES[pick] is cur:
+        return None
+    set_style(STYLES[pick]['label'])
+    return 'swap:' + STYLES[pick]['home']
+
+
+def desk_home(window):
+    """Haus-Symbol auf dem Desktop: zur ersten Kachel springen."""
+    items = load()
+    fill(window, 0 if items else None)
+    return None
+
+
+# ---------------------------------------------------------------- Anzeige
+def fill(window, select=None):
+    """Zeichnet alle Kacheln neu."""
+    items = load()
+    edit = window.getProperty('desk.edit') == '1'
+    pick = _int(window.getProperty('desk.pick'))
+    ctl = window.getControl(LIST_ID)
+    ctl.reset()
+    for i, e in enumerate(items):
+        ctl.addItem(tile_item(e, edit, edit and i == pick))
+    if edit and items:
+        end = xbmcgui.ListItem('-> Ende')
+        ctl.addItem(end)
+    real = len([e for e in items if not e.get('gap')])
+    if not items:
+        window.setProperty('desk.hint', 'Dein Desktop ist noch leer.\n\nTippe unten auf das Plus (+), um Addons, Skripte und einzelne\nAddon-Menues auf den Desktop zu legen.')
+    else:
+        window.setProperty('desk.hint', '')
+    if edit:
+        if pick >= 0 and pick < len(items):
+            nm = items[pick].get('n') or addon_info(items[pick].get('id', '')).get('name') or 'Leerfeld'
+            window.setProperty('desk.status', 'Wohin mit "%s"? Zielplatz waehlen' % nm)
+        else:
+            window.setProperty('desk.status', 'Anordnen: Symbol waehlen, dann Zielplatz')
+    else:
+        window.setProperty('desk.status', 'Desktop - %d Symbol%s' % (real, '' if real == 1 else 'e'))
+    if not items:
+        try:
+            window.setFocusId(_int(window.getProperty('desk.plus'), 0))
+        except Exception:
+            pass
+        return
+    if select is not None:
+        try:
+            window.setFocusId(LIST_ID)
+            ctl.selectItem(max(0, min(select, ctl.size() - 1)))
+        except Exception:
+            pass
+
+
+def on_start():
+    pass
+
+
+def on_page(window, page_id):
+    st = style_of_page(page_id)
+    if st is None:
+        return
+    window.setProperty('desk.page', page_id)
+    if page_id == st['browse']:
+        try:
+            empty = window.getControl(st['blist']).size() == 0
+        except Exception:
+            return
+        if empty:
+            window.setProperty('desk.hint', 'Hier wurde nichts geladen.\n\nDas Addon liefert gerade keine Eintraege (z.B. Portal nicht erreichbar)\noder der Ordner ist leer. Bitte spaeter noch einmal versuchen.')
+            xbmcgui.Dialog().notification(ADDON_NAME, 'Keine Eintraege - Addon nicht erreichbar?', xbmcgui.NOTIFICATION_WARNING, 5000)
+        else:
+            window.setProperty('desk.hint', '')
+        return
+    window.setProperty('desk.plus', str(st['plus']))
+    window.setProperty('desk.edit', '')
+    window.setProperty('desk.pick', '')
+    fill(window)
+
+
+def focus_pos(window):
+    """(Kontrolle, Position) der Kachel mit Fokus, sonst (None, -1)."""
+    try:
+        cid = window.getFocusId()
+    except Exception:
+        return None, -1
+    if cid != LIST_ID:
+        return None, -1
+    try:
+        return cid, window.getControl(LIST_ID).getSelectedPosition()
+    except Exception:
+        return cid, -1
+
+
+def fix_cmd(cmd):
+    """Aeltere gespeicherte Kacheln: "favourites" ist in Kodi 20+ der Dialog (stuerzt ab) - das Fenster heisst favouritesbrowser."""
+    c = str(cmd or '').replace(' ', '').lower()
+    if c == 'activatewindow(favourites)':
+        try:
+            major = int((xbmc.getInfoLabel('System.BuildVersion') or '0').split('.')[0].split()[0])
+        except Exception:
+            major = 21
+        if major >= 20:
+            return 'ActivateWindow(favouritesbrowser)'
+    return cmd
+
+
+# ---------------------------------------------------------------- Kachel-Klick
+def desk_click(window):
+    cid, pos = focus_pos(window)
+    items = load()
+    if pos < 0:
+        return None
+    if window.getProperty('desk.edit') == '1':
+        return edit_click(window, pos, items)
+    if pos >= len(items):
+        return None
+    e = items[pos]
+    if e.get('gap'):
+        return None
+    if e.get('link'):
+        if e.get('a') and not addon_info(e['a'])['ok']:
+            notify('"%s" ist nicht mehr installiert' % e['a'], xbmcgui.NOTIFICATION_WARNING)
+            return None
+        if not e.get('p') and e.get('m') != 'k':
+            return browse_ret(window, e['link'], e.get('n'))       # im Desktop-Look zeigen (eigene Seite)
+        return link_cmd(e)
+    if e.get('cmd'):
+        return fix_cmd(e['cmd'])
+    info = addon_info(e['id'])
+    if not info['ok']:
+        notify('"%s" ist nicht mehr installiert' % (e.get('n') or e['id']), xbmcgui.NOTIFICATION_WARNING)
+        return None
+    if not info['enabled']:
+        notify('"%s" ist deaktiviert' % info['name'], xbmcgui.NOTIFICATION_WARNING)
+        return None
+    if e.get('m') != 'k' and browsable(e['id']):
+        return browse_ret(window, 'plugin://%s/' % e['id'], info['name'] or e.get('n'))
+    return open_cmd(e['id'])
+
+
+def move_item(items, src, dst):
+    """Nimmt Kachel src heraus und setzt sie auf den Platz von dst (der Rest rueckt auf)."""
+    if src == dst or not (0 <= src < len(items)):
+        return items, src
+    it = items.pop(src)
+    dst = max(0, min(dst, len(items)))
+    items.insert(dst, it)
+    return items, dst
+
+
+def edit_click(window, pos, items):
+    pick = _int(window.getProperty('desk.pick'))
+    if pick < 0:
+        if pos < len(items):                    # aufnehmen (der "Ende"-Platz laesst sich nicht aufnehmen)
+            window.setProperty('desk.pick', str(pos))
+            fill(window, pos)
+        return None
+    window.setProperty('desk.pick', '')
+    if pos == pick:                              # nochmal dieselbe Kachel: abbrechen
+        fill(window, pos)
+        return None
+    items, new = move_item(items, pick, pos)
+    save(items)
+    fill(window, new)
+    return None
+
+
+def desk_edit(window):
+    """Stift in der Taskleiste: Anordnen-Modus ein/aus."""
+    items = load()
+    _, pos = focus_pos(window)
+    pos = max(0, pos)
+    if window.getProperty('desk.edit') == '1':
+        window.setProperty('desk.edit', '')
+        window.setProperty('desk.pick', '')
+        fill(window, pos if items else None)
+        return None
+    if not items:
+        notify('Noch nichts zum Anordnen - erst mit + Symbole hinzufuegen')
+        return None
+    window.setProperty('desk.edit', '1')
+    window.setProperty('desk.pick', '')
+    fill(window, pos)
+    return None
+
+
+# ---------------------------------------------------------------- Hinzufuegen
+def _list_addons():
+    """Alle aktivierten Addons als (id, Name, Icon). Mehrere Wege, falls einer bei dieser Kodi-Version nicht geht."""
+    out = []
+    # 1) JSON-RPC (nur gueltige Eigenschaften; "type" liefert Kodi ohnehin immer mit)
+    res = rpc('Addons.GetAddons', {'properties': ['name', 'thumbnail', 'enabled']})
+    for a in res.get('addons') or []:
+        if a.get('enabled', True) and a.get('addonid'):
+            out.append((a['addonid'], a.get('name') or a['addonid'], a.get('thumbnail') or '', str(a.get('type') or '')))
+    if out:
+        return out
+    # 2) Ohne Eigenschaften
+    res = rpc('Addons.GetAddons')
+    for a in res.get('addons') or []:
+        if a.get('addonid'):
+            out.append((a['addonid'], a.get('name') or a['addonid'], '', str(a.get('type') or '')))
+    if out:
+        return out
+    # 3) Ordner durchsuchen
+    for base in ('special://home/addons/', 'special://xbmc/addons/'):
+        try:
+            dirs, _ = xbmcvfs.listdir(base)
+        except Exception:
+            continue
+        for d in dirs:
+            icon = os.path.join(_path(base), d, 'icon.png')
+            out.append((d, d, icon if os.path.isfile(icon) else '', ''))
+    return out
+
+
+def installed_candidates(placed):
+    out, seen = [], set()
+    for aid, name, thumb, typ in _list_addons():
+        if aid in seen or aid == ADDON_ID or aid in placed or aid.startswith(SKIP_PREFIX):
+            continue
+        ok = aid.startswith(tuple(p for p, _ in PLUGIN_WINDOWS)) or aid.startswith('script.') or 'executable' in typ.lower()
+        if not ok:
+            continue
+        seen.add(aid)
+        out.append((name, aid, thumb))
+    out.sort(key=lambda t: t[0].lower())
+    return out
+
+
+def _multiselect(title, rows):
+    """rows: (Name, Zusatz, Icon). Gibt die gewaehlten Positionen zurueck."""
+    dlg = xbmcgui.Dialog()
+    lis = []
+    for name, sub, thumb in rows:
+        li = xbmcgui.ListItem(name, sub)
+        if thumb:
+            li.setArt({'thumb': thumb, 'icon': thumb})
+        lis.append(li)
+    try:
+        return dlg.multiselect(title, lis, useDetails=True) or []
+    except TypeError:
+        return dlg.multiselect(title, [r[0] for r in rows]) or []
+
+
+def desk_add(window):
+    items = load()
+    if len(items) >= MAX_TILES:
+        notify('Der Desktop ist voll (%d Symbole)' % MAX_TILES, xbmcgui.NOTIFICATION_WARNING)
+        return None
+    placed = set(e.get('id') for e in items if e.get('id'))
+    cands = installed_candidates(placed)
+    if not cands:
+        xbmcgui.Dialog().ok('Addon hinzufuegen', 'Es gibt keine weiteren Addons oder Skripte, die auf den Desktop passen.')
+        return None
+    chosen = _multiselect('Auf den Desktop legen', [(n, aid, t) for n, aid, t in cands])
+    if not chosen:
+        return None
+    for i in chosen:
+        if len(items) < MAX_TILES:
+            items.append({'id': cands[i][1], 'n': cands[i][0]})
+    items = save(items)
+    fill(window, len(items) - 1)
+    return None
+
+
+# ---------------------------------------------------------------- Menues aus Addons
+class _Busy(object):
+    """Kleiner Fortschrittsbalken im Hintergrund, solange das Addon seinen Ordner liefert."""
+    def __init__(self):
+        self.bg = None
+
+    def __enter__(self):
+        try:
+            self.bg = xbmcgui.DialogProgressBG()
+            self.bg.create('Menue wird geladen ...', ADDON_NAME)
+        except Exception:
+            self.bg = None
+        return self
+
+    def __exit__(self, *a):
+        try:
+            if self.bg:
+                self.bg.close()
+        except Exception:
+            pass
+        return False
+
+
+def _list_dir(path):
+    """Eintraege eines Addon-Ordners als Liste von Dicts (label, file, folder, thumb). None bei Fehler."""
+    with _Busy():
+        res = rpc('Files.GetDirectory', {'directory': path, 'media': 'files', 'properties': ['title', 'thumbnail', 'art']})
+    files = res.get('files')
+    if files is None:
+        return None
+    out = []
+    for f in files:
+        file_ = f.get('file') or ''
+        label = f.get('label') or f.get('title') or ''
+        if not file_ or not label:
+            continue
+        art = f.get('art') or {}
+        thumb = f.get('thumbnail') or art.get('thumb') or art.get('icon') or ''
+        if os.path.basename(thumb).lower().startswith('default'):
+            thumb = ''                                    # Kodis Platzhalter-Symbole sind keine gute Kachel
+        out.append({'label': label, 'file': file_, 'folder': f.get('filetype') == 'directory', 'thumb': thumb})
+    return out
+
+
+def _clean_label(text):
+    """Entfernt Kodi-Farb-/Formatierungs-Markierungen und Emojis/Flaggen (die als Kaestchen erscheinen wuerden)."""
+    import re
+    text = re.sub(r'\[/?(?:COLOR[^\]]*|B|I|UPPERCASE|LOWERCASE|CAPITALIZE|LIGHT|CR)\]', ' ', text or '')
+    text = re.sub('[\U00010000-\U0010FFFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D]', '', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+
+def _pin(items, aid, ent):
+    """Legt einen Addon-Ordner bzw. Eintrag als Kachel auf den Desktop (dieselbe Adresse nur einmal)."""
+    if len(items) >= MAX_TILES:
+        notify('Der Desktop ist voll (%d Symbole)' % MAX_TILES, xbmcgui.NOTIFICATION_WARNING)
+        return False
+    if any(e.get('link') == ent['file'] for e in items):
+        notify('Liegt schon auf dem Desktop')
+        return False
+    items.append({'link': ent['file'], 'n': _clean_label(ent['label']), 'a': aid, 'p': 0 if ent['folder'] else 1, 'th': ent.get('thumb') or '', 'm': 'd'})
+    return True
+
+
+def browse_addon(aid, name, window):
+    """Durchsucht ein Addon Ebene fuer Ebene; Ordner oder Eintraege lassen sich als Kachel anheften. Zurueck = eine Ebene hoch."""
+    stack = [('plugin://%s/' % aid, name)]
+    added = 0
+    while stack:
+        path, title = stack[-1]
+        entries = _list_dir(path)
+        if entries is None or not entries:
+            msg = 'Das Addon liefert hier nichts (nicht erreichbar oder leer).'
+            xbmcgui.Dialog().ok(name, msg)
+            stack.pop()
+            continue
+        up = 'Fertig' if len(stack) == 1 else '.. Eine Ebene zurueck'
+        rows = [(up, '', '')]
+        here = None
+        if len(stack) > 1:
+            here = len(rows)
+            rows.append(('+ DIESE EBENE auf den Desktop legen', _clean_label(title), ''))
+        base = len(rows)
+        for ent in entries:
+            rows.append((_clean_label(ent['label']), 'Ordner' if ent['folder'] else 'Abspielbar', ent['thumb']))
+        lis = []
+        for lab, sub, th in rows:
+            li = xbmcgui.ListItem(lab, sub)
+            if th:
+                li.setArt({'thumb': th, 'icon': th})
+            lis.append(li)
+        head = '%s  >  %s' % (name, _clean_label(title)) if len(stack) > 1 else name
+        try:
+            pick = xbmcgui.Dialog().select(head, lis, useDetails=True)
+        except TypeError:
+            pick = xbmcgui.Dialog().select(head, [r[0] for r in rows])
+        if pick < 0 or pick == 0:
+            stack.pop()
+            continue
+        if here is not None and pick == here:
+            items = load()
+            if _pin(items, aid, {'file': path, 'label': title, 'folder': True, 'thumb': ''}):
+                save(items)
+                added += 1
+                notify('Auf dem Desktop: %s' % _clean_label(title))
+            continue
+        ent = entries[pick - base]
+        if ent['folder']:
+            # Ordner: einen Schritt hinein; das Anheften geschieht oben ueber "Diese Ebene"
+            stack.append((ent['file'], ent['label']))
+        else:
+            if xbmcgui.Dialog().yesno(_clean_label(ent['label']), 'Diesen Eintrag als Kachel auf den Desktop legen?\n(Ein Klick spielt ihn direkt ab.)'):
+                items = load()
+                if _pin(items, aid, ent):
+                    save(items)
+                    added += 1
+                    notify('Auf dem Desktop: %s' % _clean_label(ent['label']))
+    return added
+
+
+def desk_add_menu(window):
+    """Startmenue: ein einzelnes Menue aus einem Addon (z.B. Live TV aus TV Hunter) als Kachel anlegen."""
+    if len(load()) >= MAX_TILES:
+        notify('Der Desktop ist voll (%d Symbole)' % MAX_TILES, xbmcgui.NOTIFICATION_WARNING)
+        return None
+    cands = []
+    for aid, name, thumb, typ in _list_addons():
+        if aid == ADDON_ID or not aid.startswith(tuple(p for p, _ in PLUGIN_WINDOWS)):
+            continue
+        cands.append((name, aid, thumb))
+    cands.sort(key=lambda t: t[0].lower())
+    if not cands:
+        xbmcgui.Dialog().ok('Menue hinzufuegen', 'Es wurde kein Addon mit Menues gefunden.')
+        return None
+    lis = []
+    for n, aid, t in cands:
+        li = xbmcgui.ListItem(n, aid)
+        if t:
+            li.setArt({'thumb': t, 'icon': t})
+        lis.append(li)
+    try:
+        pick = xbmcgui.Dialog().select('Aus welchem Addon?', lis, useDetails=True)
+    except TypeError:
+        pick = xbmcgui.Dialog().select('Aus welchem Addon?', [c[0] for c in cands])
+    if pick < 0:
+        return None
+    n = browse_addon(cands[pick][1], cands[pick][0], window)
+    items = load()
+    fill(window, len(items) - 1 if n else None)
+    return None
+
+
+
+def desk_add_shortcut(window):
+    items = load()
+    placed = set(e.get('k') for e in items if e.get('cmd'))
+    rest = [s for s in SHORTCUTS if s[0] not in placed]
+    if not rest:
+        notify('Alle Kodi-Verknuepfungen liegen schon auf dem Desktop')
+        return None
+    chosen = _multiselect('Kodi-Verknuepfung hinzufuegen', [(n, '', icon_path(k)) for k, n, c in rest])
+    if not chosen:
+        return None
+    for i in chosen:
+        if len(items) < MAX_TILES:
+            items.append({'cmd': rest[i][2], 'n': rest[i][1], 'k': rest[i][0]})
+    items = save(items)
+    fill(window, len(items) - 1)
+    return None
+
+
+# ---------------------------------------------------------------- Taskleiste
+def desk_settings(window):
+    """Desktop-Einstellungen oeffnen; geaendertes Design wird sofort uebernommen."""
+    before = current_style()
+    try:
+        xbmcaddon.Addon(ADDON_ID).openSettings()
+    except Exception:
+        return 'Addon.OpenSettings(%s)' % ADDON_ID
+    after = current_style()
+    if after is not before:
+        return 'swap:' + after['home']
+    return None
+
+
+def open_settings(window):
+    """Kontextmenue "Einstellungen dieses Addons": oeffnen und ein geaendertes Design sofort uebernehmen."""
+    return desk_settings(window)
+
+
+def desk_menu(window):
+    """Start-Knopf: das Startmenue."""
+    labels = ['Addon oder Skript hinzufuegen', 'Menue aus einem Addon hinzufuegen', 'Kodi-Verknuepfung hinzufuegen', 'Symbole anordnen (an/aus)',
+              'Design wechseln (%s)' % current_style()['label'], 'Desktop-Einstellungen', 'Desktop leeren', 'Desktop schliessen']
+    pick = xbmcgui.Dialog().select('Startmenue', labels)
+    if pick == 0:
+        return desk_add(window)
+    if pick == 1:
+        return desk_add_menu(window)
+    if pick == 2:
+        return desk_add_shortcut(window)
+    if pick == 3:
+        return desk_edit(window)
+    if pick == 4:
+        return desk_style_menu(window)
+    if pick == 5:
+        return desk_settings(window)
+    if pick == 6:
+        if load() and xbmcgui.Dialog().yesno('Desktop leeren', 'Alle Symbole vom Desktop entfernen?\nDie Addons bleiben installiert.'):
+            save([])
+            window.setProperty('desk.edit', '')
+            window.setProperty('desk.pick', '')
+            fill(window)
+        return None
+    if pick == 7:
+        return 'exit'
+    return None
+
+
+def desk_power(window):
+    pick = xbmcgui.Dialog().select('Beenden', ['Desktop schliessen', 'Kodi beenden / Herunterfahren ...'])
+    if pick == 0:
+        return 'exit'
+    if pick == 1:
+        return 'ActivateWindow(shutdownmenu)'
+    return None
+
+
+# ---------------------------------------------------------------- Kontextmenue (lange druecken)
+def kontextmenue(window, info):
+    out = []
+    cid, pos = focus_pos(window)
+    items = load()
+    if cid is not None and 0 <= pos < len(items):
+        e = items[pos]
+        out.append(('Kachel verschieben ...', 'py:desk_ctx_move'))
+        if pos > 0:
+            out.append(('Eine Stelle nach vorn', 'py:desk_ctx_left'))
+        if pos < len(items) - 1:
+            out.append(('Eine Stelle nach hinten', 'py:desk_ctx_right'))
+        if e.get('gap'):
+            out.append(('Leerfeld entfernen', 'py:desk_ctx_remove'))
+        else:
+            out.append(('Leerfeld davor einfuegen', 'py:desk_ctx_gap_before'))
+            out.append(('Leerfeld danach einfuegen', 'py:desk_ctx_gap_after'))
+            if e.get('link'):
+                out.append(('Kachel umbenennen', 'py:desk_ctx_rename'))
+            if (e.get('link') and not e.get('p')) or (e.get('id') and browsable(e['id'])):
+                out.append(('Ansicht: Kodi-Standard verwenden' if e.get('m') != 'k' else 'Ansicht: im Desktop-Look zeigen', 'py:desk_ctx_view'))
+            if e.get('id') or e.get('a'):
+                aid = e.get('id') or e.get('a')
+                out.append(('Einstellungen von %s' % (e.get('n') or aid), 'Addon.OpenSettings(%s)' % aid))
+            out.append(('Vom Desktop entfernen', 'py:desk_ctx_remove'))
+    out.append(('Addon oder Skript hinzufuegen', 'py:desk_add'))
+    out.append(('Menue aus einem Addon hinzufuegen', 'py:desk_add_menu'))
+    out.append(('Kodi-Verknuepfung hinzufuegen', 'py:desk_add_shortcut'))
+    out.append(('Symbole anordnen (an/aus)', 'py:desk_edit'))
+    out.append(('Design wechseln ...', 'py:desk_style_menu'))
+    return out
+
+
+def _ctx_items(window):
+    cid, pos = focus_pos(window)
+    items = load()
+    if cid is None or not (0 <= pos < len(items)):
+        return items, -1
+    return items, pos
+
+
+def desk_ctx_move(window):
+    items, pos = _ctx_items(window)
+    if pos < 0:
+        return None
+    window.setProperty('desk.edit', '1')
+    window.setProperty('desk.pick', str(pos))
+    fill(window, pos)
+    return None
+
+
+def _swap(window, delta):
+    items, pos = _ctx_items(window)
+    new = pos + delta
+    if pos < 0 or not (0 <= new < len(items)):
+        return None
+    items[pos], items[new] = items[new], items[pos]
+    save(items)
+    fill(window, new)
+    return None
+
+
+def desk_ctx_left(window):
+    return _swap(window, -1)
+
+
+def desk_ctx_right(window):
+    return _swap(window, 1)
+
+
+def desk_ctx_gap_before(window):
+    items, pos = _ctx_items(window)
+    if pos < 0 or len(items) >= MAX_TILES:
+        return None
+    items.insert(pos, {'gap': 1})
+    save(items)
+    fill(window, pos + 1)
+    return None
+
+
+def desk_ctx_gap_after(window):
+    items, pos = _ctx_items(window)
+    if pos < 0 or len(items) >= MAX_TILES:
+        return None
+    items.insert(pos + 1, {'gap': 1})
+    save(items)
+    fill(window, pos)
+    return None
+
+
+def desk_ctx_rename(window):
+    items, pos = _ctx_items(window)
+    if pos < 0 or not items[pos].get('link'):
+        return None
+    new = xbmcgui.Dialog().input('Name der Kachel', items[pos].get('n') or '')
+    if new and new.strip():
+        items[pos]['n'] = new.strip()
+        save(items)
+        fill(window, pos)
+    return None
+
+
+def desk_ctx_view(window):
+    """Menue-Kachel: im Desktop-Look oder in Kodis eigener Ansicht oeffnen."""
+    items, pos = _ctx_items(window)
+    if pos < 0 or not (items[pos].get('link') or items[pos].get('id')):
+        return None
+    items[pos]['m'] = 'd' if items[pos].get('m') == 'k' else 'k'
+    save(items)
+    notify('Diese Kachel oeffnet jetzt %s' % ('in Kodis Standardansicht' if items[pos]['m'] == 'k' else 'im Desktop-Look'))
+    return None
+
+
+def desk_ctx_remove(window):
+    items, pos = _ctx_items(window)
+    if pos < 0:
+        return None
+    it = items[pos]
+    if not it.get('gap'):
+        nm = it.get('n') or it.get('id') or ''
+        if not xbmcgui.Dialog().yesno('Entfernen', '"%s" vom Desktop entfernen?\nDas Addon selbst bleibt installiert.' % nm):
+            return None
+    items.pop(pos)
+    items = save(items)
+    fill(window, min(pos, len(items) - 1) if items else None)
+    return None
+</script>
   <script>
     /* Kodi Addon & Skin Generator v9.1 Pro – (c) 2026 Team IT('s) Possible. Alle Rechte vorbehalten.
        IT('s) Possible Freeware-Lizenz: Verkauf, Weiterverbreitung und veränderte Fassungen nur mit schriftlicher Erlaubnis. */
@@ -2649,6 +3533,11 @@ KEYS = CONFIG.get('keys', {})
 CLOSE_CMDS = tuple(c.lower() for c in CONFIG.get('close', []))
 NO_RETURN = tuple(c.lower() for c in CONFIG.get('noreturn', []))
 ROOT = CONFIG.get('start') or (CONFIG['pages'][0]['id'] if CONFIG.get('pages') else None)
+HOMES = set()    # weitere Startseiten (z.B. per Hook start_page oder swap:), auf denen Zurueck nicht schliessen soll
+
+
+def is_home(page_id):
+    return page_id == ROOT or page_id in HOMES
 HOME_ID = 10000
 HOME = xbmcgui.Window(HOME_ID)
 RUN_KEY = 'kfe.run.' + ADDON_ID
@@ -3297,7 +4186,7 @@ class MenuBase(object):
         elif kind in ('back', 'home', 'exit'):
             if kind == 'back' and self.nav_up():
                 return
-            if kind == 'back' and self.page_id == ROOT and not leave_ok():
+            if kind == 'back' and is_home(self.page_id) and not leave_ok():
                 return
             self.finish((kind, None))
         elif kind == 'browse':
@@ -3387,7 +4276,7 @@ class MenuBase(object):
         self.back_timer = None
         if self.nav_up():
             return
-        if self.page_id == ROOT and not leave_ok():
+        if is_home(self.page_id) and not leave_ok():
             return
         self.finish(None)
 
@@ -3487,7 +4376,7 @@ class MenuBase(object):
                     entries.append(fav_entry(label or 'Video', '', {'type': 'media', 'path': media_path}))
         if OPTS.get('deeplinks'):
             name = PAGES.get(self.page_id, {}).get('name', '')
-            entries.append(fav_entry('%s - %s' % (ADDON_NAME, name) if self.page_id != ROOT else ADDON_NAME, '', fav_page(self.page_id), 'Dieses Menü'))
+            entries.append(fav_entry('%s - %s' % (ADDON_NAME, name) if not is_home(self.page_id) else ADDON_NAME, '', fav_page(self.page_id), 'Dieses Menü'))
         entries.append(('Kodi-Favoriten öffnen', lambda: self.run_cmd(favourites_cmd())))
         if os.path.exists(os.path.join(REAL_PATH, 'resources', 'settings.xml')):
             entries.append(('Einstellungen dieses Addons', lambda: self.open_settings()))
@@ -3554,6 +4443,7 @@ def run(stack, base):
         elif kind == 'swap':
             if result[1] in PAGES:
                 stack[:] = [result[1]]
+                HOMES.add(result[1])
         elif kind == 'page':
             target = result[1]
             if target not in PAGES:
@@ -3595,6 +4485,7 @@ def start_stack():
             PENDING[target] = (fix_url(params.get('path')), params.get('title', ''))
     if not target and OPTS.get('remember'):
         target = STATE.get('last')
+    HOMES.add(stack[0])
     if target in PAGES and target != stack[0]:
         stack.append(target)
     return stack
@@ -4583,6 +5474,391 @@ if __name__ == '__main__':
       r.readAsText(f); inp.value = '';
     }
 
+    // ================= ✨ Vorlagen-Assistent: Kodi Desktop =================
+    // Baut aus ein paar Angaben ein komplettes Desktop-Addon (Symbole, Taskleiste, Startmenü, 4 Designs).
+    // Danach ist alles ganz normal im Designer änderbar.
+    const DESK_BUILD = (CUSTOM, o) => {
+  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.3', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true }, o || {});
+  // ================= Zeichen-Helfer =================
+  const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const glow = (x, cx, cy, r, rgb, a) => {
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(.55, `rgba(${rgb},${a * .35})`); g.addColorStop(1, `rgba(${rgb},0)`);
+    x.fillStyle = g; x.fillRect(0, 0, x.canvas.width, x.canvas.height);
+  };
+
+  // ---- Hintergrund: Aubergine mit orangem Leuchten oben rechts (wie dein Screenshot) ----
+  function makeBg() {
+    const c = cv(1920, 1080), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 0, 1080);
+    g.addColorStop(0, '#5d1f4a'); g.addColorStop(.5, '#430c35'); g.addColorStop(1, '#25001a');
+    x.fillStyle = g; x.fillRect(0, 0, 1920, 1080);
+    glow(x, 820, -120, 1050, '150,44,104', .55);
+    glow(x, 1760, -90, 980, '233,84,32', .95);
+    glow(x, 1980, 260, 560, '246,130,10', .38);
+    glow(x, -80, 1180, 900, '20,0,14', .75);
+    const b = x.createLinearGradient(0, 780, 0, 1080); b.addColorStop(0, 'rgba(20,0,14,0)'); b.addColorStop(1, 'rgba(20,0,14,.55)');
+    x.fillStyle = b; x.fillRect(0, 780, 1920, 300);
+    return c.toDataURL('image/jpeg', .9);
+  }
+
+  // ---- Symbole (weiß, auf 256 x 256) ----
+  const W = x => { x.strokeStyle = '#ffffff'; x.fillStyle = '#ffffff'; x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = 13; };
+  const line = (x, ...p) => { x.beginPath(); x.moveTo(p[0], p[1]); for (let i = 2; i < p.length; i += 2) x.lineTo(p[i], p[i + 1]); x.stroke(); };
+  const tri = (x, a, b, c2, d, e, f) => { x.beginPath(); x.moveTo(a, b); x.lineTo(c2, d); x.lineTo(e, f); x.closePath(); x.fill(); };
+  const G = {
+    tv(x) { W(x); rrPath(x, 50, 92, 156, 112, 24); x.stroke(); x.save(); x.globalAlpha = .2; rrPath(x, 50, 92, 156, 112, 24); x.fill(); x.restore(); line(x, 104, 88, 76, 50); line(x, 152, 88, 180, 50); line(x, 88, 222, 168, 222); },
+    film(x) {
+      W(x); rrPath(x, 50, 116, 156, 92, 16); x.stroke();
+      x.save(); x.translate(128, 98); x.rotate(-.1); rrPath(x, -78, -26, 156, 40, 10); x.stroke(); for (let i = 0; i < 4; i++) line(x, -58 + i * 38, -26, -38 + i * 38, 14); x.restore();
+      tri(x, 112, 140, 112, 186, 154, 163);
+    },
+    list(x) { W(x); line(x, 54, 94, 146, 94); line(x, 54, 138, 146, 138); line(x, 54, 182, 118, 182); tri(x, 160, 112, 160, 184, 214, 148); },
+    hunter(x) { W(x); x.beginPath(); x.arc(128, 128, 62, 0, Math.PI * 2); x.stroke(); x.beginPath(); x.arc(128, 128, 20, 0, Math.PI * 2); x.fill(); line(x, 128, 38, 128, 72); line(x, 128, 184, 128, 218); line(x, 38, 128, 72, 128); line(x, 184, 128, 218, 128); },
+    epg(x) {
+      W(x); rrPath(x, 50, 66, 156, 142, 22); x.stroke(); line(x, 50, 112, 206, 112); line(x, 92, 46, 92, 80); line(x, 164, 46, 164, 80);
+      [[78, 134], [116, 134], [154, 134], [78, 168], [116, 168]].forEach(p => { rrPath(x, p[0], p[1], 24, 24, 6); x.fill(); });
+    },
+    trash(x) {
+      W(x); line(x, 54, 86, 202, 86); x.beginPath(); x.moveTo(104, 86); x.lineTo(104, 64); x.lineTo(152, 64); x.lineTo(152, 86); x.stroke();
+      x.beginPath(); x.moveTo(70, 104); x.lineTo(82, 204); x.quadraticCurveTo(84, 214, 96, 214); x.lineTo(160, 214); x.quadraticCurveTo(172, 214, 174, 204); x.lineTo(186, 104); x.stroke();
+      line(x, 112, 128, 112, 190); line(x, 144, 128, 144, 190);
+    },
+    gear(x) {
+      W(x); x.lineWidth = 22; x.beginPath(); x.arc(128, 128, 46, 0, Math.PI * 2); x.stroke();
+      for (let i = 0; i < 8; i++) { x.save(); x.translate(128, 128); x.rotate(i * Math.PI / 4); rrPath(x, -13, -84, 26, 34, 7); x.fill(); x.restore(); }
+    },
+    home(x) { W(x); x.lineWidth = 15; line(x, 44, 130, 128, 54, 212, 130); x.beginPath(); x.moveTo(72, 112); x.lineTo(72, 200); x.lineTo(184, 200); x.lineTo(184, 112); x.stroke(); line(x, 112, 200, 112, 150, 144, 150, 144, 200); },
+    back(x) { W(x); x.lineWidth = 17; line(x, 160, 52, 84, 128, 160, 204); },
+    down(x) { W(x); x.lineWidth = 15; line(x, 128, 50, 128, 156); line(x, 84, 116, 128, 160, 172, 116); line(x, 62, 180, 62, 208, 194, 208, 194, 180); },
+    power(x) { W(x); x.lineWidth = 15; x.beginPath(); x.arc(128, 136, 66, -Math.PI / 2 + .62, 1.5 * Math.PI - .62); x.stroke(); line(x, 128, 48, 128, 130); },
+    ring(x) { W(x); x.lineWidth = 15; x.beginPath(); x.arc(128, 128, 46, 0, Math.PI * 2); x.stroke(); x.beginPath(); x.arc(128, 128, 12, 0, Math.PI * 2); x.fill(); }
+  };
+
+  // Kachel mit Verlauf und Glanz
+  function tileIcon(kind, c1, c2) {
+    const c = cv(256, 256), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, c1); g.addColorStop(1, c2);
+    rrPath(x, 0, 0, 256, 256, 58); x.fillStyle = g; x.fill();
+    x.save(); rrPath(x, 0, 0, 256, 256, 58); x.clip();
+    const gl = x.createLinearGradient(0, 0, 0, 150); gl.addColorStop(0, 'rgba(255,255,255,.22)'); gl.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = gl; x.fillRect(0, 0, 256, 150);
+    const sh = x.createLinearGradient(0, 160, 0, 256); sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,.18)');
+    x.fillStyle = sh; x.fillRect(0, 160, 256, 96); x.restore();
+    x.save(); x.shadowColor = 'rgba(0,0,0,.28)'; x.shadowBlur = 10; x.shadowOffsetY = 4; G[kind](x); x.restore();
+    return c.toDataURL('image/png');
+  }
+  // freies Symbol (Taskleiste)
+  function glyph(kind) { const c = cv(256, 256), x = c.getContext('2d'); x.save(); x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 8; x.shadowOffsetY = 3; G[kind](x); x.restore(); return c.toDataURL('image/png'); }
+  // Start-Knopf: orange Kreis mit Ring
+  function launcher() {
+    const c = cv(256, 256), x = c.getContext('2d');
+    const g = x.createRadialGradient(100, 80, 10, 128, 128, 128); g.addColorStop(0, '#ff8a4c'); g.addColorStop(1, '#e24a14');
+    x.beginPath(); x.arc(128, 128, 126, 0, Math.PI * 2); x.fillStyle = g; x.fill(); x.save(); x.shadowColor = 'rgba(90,20,0,.35)'; x.shadowBlur = 8; x.shadowOffsetY = 3; G.ring(x); x.restore();
+    return c.toDataURL('image/png');
+  }
+  // Addon-Icon (512)
+  function addonIcon() {
+    const c = cv(512, 512), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 512, 512); g.addColorStop(0, '#6a2257'); g.addColorStop(1, '#2a0420');
+    x.fillStyle = g; x.fillRect(0, 0, 512, 512); glow(x, 470, 30, 420, '233,84,32', .95);
+    x.save(); x.translate(76, 84); x.scale(1.4, 1.4); x.shadowColor = 'rgba(0,0,0,.4)'; x.shadowBlur = 14; G.tv(x); x.restore();
+    return c.toDataURL('image/png');
+  }
+
+  // ---- zusaetzliche Symbole ----
+  const star5 = (x, cx, cy, R, r) => { x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, d = i % 2 ? r : R; const px = cx + Math.cos(a) * d, py = cy + Math.sin(a) * d; i ? x.lineTo(px, py) : x.moveTo(px, py); } x.closePath(); };
+  Object.assign(G, {
+    star(x) { W(x); star5(x, 128, 132, 78, 34); x.stroke(); x.save(); x.globalAlpha = .25; x.fill(); x.restore(); },
+    plus(x) { W(x); x.lineWidth = 19; line(x, 128, 54, 128, 202); line(x, 54, 128, 202, 128); },
+    pencil(x) { W(x); x.save(); x.translate(128, 128); x.rotate(Math.PI / 4); x.lineWidth = 14; rrPath(x, -22, -84, 44, 118, 10); x.stroke(); x.beginPath(); x.moveTo(-22, 50); x.lineTo(0, 92); x.lineTo(22, 50); x.closePath(); x.fill(); line(x, -22, -50, 22, -50); x.restore(); },
+    folder(x) { W(x); x.beginPath(); x.moveTo(48, 196); x.lineTo(48, 78); x.quadraticCurveTo(48, 66, 60, 66); x.lineTo(104, 66); x.lineTo(124, 92); x.lineTo(196, 92); x.quadraticCurveTo(208, 92, 208, 104); x.lineTo(208, 196); x.quadraticCurveTo(208, 208, 196, 208); x.lineTo(60, 208); x.quadraticCurveTo(48, 208, 48, 196); x.stroke(); },
+    box(x) { W(x); rrPath(x, 52, 104, 152, 104, 16); x.stroke(); rrPath(x, 44, 70, 168, 40, 12); x.stroke(); line(x, 112, 140, 144, 140); },
+    note(x) { W(x); x.beginPath(); x.arc(92, 186, 24, 0, Math.PI * 2); x.fill(); x.beginPath(); x.arc(170, 168, 24, 0, Math.PI * 2); x.fill(); line(x, 114, 186, 114, 76, 192, 58, 192, 168); },
+    picture(x) { W(x); rrPath(x, 46, 64, 164, 128, 20); x.stroke(); x.beginPath(); x.arc(94, 108, 15, 0, Math.PI * 2); x.fill(); line(x, 54, 180, 108, 130, 146, 166, 168, 146, 204, 184); },
+    grid(x) { W(x); [[62, 62], [138, 62], [62, 138], [138, 138]].forEach(p => { rrPath(x, p[0], p[1], 56, 56, 14); x.fill(); }); }
+  });
+
+
+  // ---- weitere Symbole fuer die Stile ----
+  Object.assign(G, {
+    search(x) { W(x); x.lineWidth = 15; x.beginPath(); x.arc(112, 112, 56, 0, Math.PI * 2); x.stroke(); line(x, 154, 154, 206, 206); },
+    winlogo(x) {
+      x.fillStyle = '#ffffff';
+      [[[52, 62], [118, 54], [118, 118], [52, 118]], [[134, 52], [204, 42], [204, 118], [134, 118]], [[52, 138], [118, 138], [118, 202], [52, 194]], [[134, 138], [204, 138], [204, 214], [134, 202]]].forEach(q => { x.beginPath(); x.moveTo(q[0][0], q[0][1]); q.slice(1).forEach(p => x.lineTo(p[0], p[1])); x.closePath(); x.fill(); });
+    },
+    dots(x) { W(x); [74, 128, 182].forEach(cx => [74, 128, 182].forEach(cy => { x.beginPath(); x.arc(cx, cy, 15, 0, Math.PI * 2); x.fill(); })); }
+  });
+  // einfarbiges Symbol (ohne Schatten)
+  function glyphC(kind, color) {
+    const c = cv(256, 256), x = c.getContext('2d'); G[kind](x);
+    x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, 256, 256);
+    return c.toDataURL('image/png');
+  }
+  const jpg = (c) => c.toDataURL('image/jpeg', .9);
+  function bgWindows() {
+    const c = cv(1920, 1080), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 1920, 1080); g.addColorStop(0, '#1b72dc'); g.addColorStop(.45, '#1558b8'); g.addColorStop(1, '#082a6a');
+    x.fillStyle = g; x.fillRect(0, 0, 1920, 1080);
+    glow(x, 380, 260, 900, '60,150,255', .45);
+    glow(x, 1750, 1100, 900, '3,16,60', .75);
+    return jpg(c);
+  }
+  function bgBunt() {
+    const c = cv(1920, 1080), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 1920, 1080); g.addColorStop(0, '#1f8cff'); g.addColorStop(.42, '#7b5cf2'); g.addColorStop(.75, '#c158f5'); g.addColorStop(1, '#ff3d6b');
+    x.fillStyle = g; x.fillRect(0, 0, 1920, 1080);
+    glow(x, 1100, 1000, 700, '255,110,230', .55);
+    glow(x, -100, -100, 700, '40,170,255', .4);
+    return jpg(c);
+  }
+  function bgDunkel() {
+    const c = cv(1920, 1080), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, '#2c4b79'); g.addColorStop(.45, '#13203f'); g.addColorStop(1, '#070b18');
+    x.fillStyle = g; x.fillRect(0, 0, 1920, 1080);
+    glow(x, 950, -60, 1000, '70,130,200', .5);
+    return jpg(c);
+  }
+
+  // ================= Projekt aufbauen =================
+  S = newState('empty'); norm();
+  S.meta.name = String(o.name || 'Kodi Desktop').trim() || 'Kodi Desktop'; S.meta.author = String(o.author || '').trim() || 'Ich'; S.meta.ver = String(o.ver || '1.0.0').trim() || '1.0.0';
+  S.meta.desc = 'Ein leerer Desktop für Kodi im Aubergine-/Orange-Look. Jeder legt selbst fest, welche Addons, Skripte und Kodi-Verknüpfungen als Symbole mit Original-Icon erscheinen, und ordnet sie frei an. Mit Taskleiste, Startmenü und optionalem Autostart als Haupt-Oberfläche.';
+  S.theme = { primary: '#5a2450', focus: o.accent || '#e95420', bg: '#2c001e', rad: 30, anim: 'fade' };
+  S.mod.shadow = !!o.shadow; S.mod.fzoom = false; S.mod.ftc = '#ffffff'; S.mod.font = o.font || 'font13';
+  S.mod.hooks = true; S.mod.autostart = !!o.autostart; S.mod.autoDef = !!o.autoDef;
+  S.mod.backMode = o.lockBack === false ? 'exit' : 'stay'; S.mod.exitOwn = o.lockBack !== false; S.mod.autoDelay = 5; S.mod.retMenu = true; S.mod.ctx = true; S.mod.deeplinks = true;
+  S.bgImg = makeBg();
+  S.assets.icon = addonIcon(); S.assets.fanart = S.bgImg;
+
+  const reg = d => { const id = uid(); S.imgs[id] = { d, ext: 'png', w: 256, h: 256 }; return id; };
+  const IMG = {
+    launcher: reg(launcher())
+  };
+  // Symbole fuer die Kodi-Verknuepfungen (Dateinamen gehen an custom.py)
+  const SC = {
+    fav: ['star', '#f7a21b', '#e95420'], files: ['folder', '#4468e0', '#5a2fb5'], video: ['film', '#b134d6', '#5a2fbd'],
+    music: ['note', '#e8506f', '#b02440'], pics: ['picture', '#33bf74', '#16806b'], tv: ['tv', '#19b9a7', '#1a6fc4'],
+    addons: ['box', '#f7a21b', '#c4561a'], settings: ['gear', '#2cb7a8', '#1b6f84']
+  };
+  const SCI = {}, ICONS = {};
+  Object.keys(SC).forEach(k => { SCI[k] = reg(tileIcon(SC[k][0], SC[k][1], SC[k][2])); ICONS[k] = picName(SCI[k]); });
+
+  // ---- Aktionen ----
+  const py = f => ({ t: 'py', v: f });
+  const cmd = c => ({ t: 'custom', v: c });
+  const BACK = { t: 'back', v: '' }, HOME = { t: 'home', v: '' };
+  const gcache = {};
+  const gl = (kind, color) => { const k = kind + '|' + (color || ''); return gcache[k] || (gcache[k] = reg(color ? glyphC(kind, color) : glyph(kind))); };
+  Object.assign(IMG, { grid: gl('grid'), plus: gl('plus'), pencil: gl('pencil'), star: gl('star'), gear: gl('gear'), power: gl('power'), back: gl('back'), tvG: gl('tv') });
+  const mkBtn = (o, x, y, w, h, act, rad) => { const b = mk('button', { label: '', x, y, w, h, rad: rad == null ? 44 : rad, op: 0, act }); o.push(b); return b; };
+  const mkPic = (o, img, x, y, s) => o.push(mk('pic', { img, x, y, w: s, h: s, fit: 'keep' }));
+  const iconBtn = (o, img, x, y, act, size, glyph, rad) => { const b = mkBtn(o, x, y, size, size, act, rad); mkPic(o, img, x + Math.round((size - glyph) / 2), y + Math.round((size - glyph) / 2), glyph); return b; };
+  const TIME = (o, x, w, y, big) => {
+    o.push(mk('text', { label: '$INFO[System.Time]', x, y, w, h: big ? 66 : 56, font: 'font37', al: 'right' }));
+    o.push(mk('text', { label: '$INFO[System.Date(dd.mm.yyyy)]', x, y: y + (big ? 62 : 52), w, h: 40, font: 'font12', color: '#e6cfe0', al: 'right' }));
+  };
+
+  // Gemeinsame Taskleisten-Inhalte je Stil. mode: 'home' (Desktop) oder 'ordner' (Addon-Menue)
+  // Rueckgabe: { els, plus } - plus = Plus-Knopf (Startfokus bei leerem Desktop)
+  function barOf(style, mode) {
+    const o = [], home = mode === 'home';
+    const status = home ? '$INFO[Window.Property(desk.status)]' : 'Desktop  ›  $INFO[Window.Property(kfe.title)]';
+    const aMenu = home ? py('desk_menu') : HOME, aHome = home ? py('desk_home') : HOME, aStatus = home ? py('desk_add') : null;
+    const right = home
+      ? [[IMG.plus, py('desk_add')], [IMG.pencil, py('desk_edit')], [IMG.star, cmd('ActivateWindow(favouritesbrowser)')], [IMG.gear, cmd('ActivateWindow(settings)')], [IMG.power, py('desk_power')]]
+      : [[IMG.star, cmd('ActivateWindow(favouritesbrowser)')], [IMG.gear, cmd('ActivateWindow(settings)')], [IMG.power, py('desk_power')]];
+    let plusBtn = null;
+    const put = (o2, items, xEnd, y, size, glyph, step) => items.forEach((it, i) => { const bt = iconBtn(o2, it[0], xEnd - (items.length - i) * step, y, it[1], size, glyph, 50); if (it[0] === IMG.plus) plusBtn = bt; });
+
+    if (style === 'ubuntu') {
+      o.push(mk('box', { x: 0, y: 936, w: 1920, h: 144, color: '#1a0014', op: 50, rad: 0 }));
+      o.push(mk('pic', { img: IMG.launcher, x: 62, y: 958, w: 104, h: 104, rad: 50, fit: 'keep', act: aMenu }));
+      if (home) {
+        plusBtn = iconBtn(o, IMG.plus, 196, 966, py('desk_add'), 88, 68, 50);
+        iconBtn(o, IMG.pencil, 292, 966, py('desk_edit'), 88, 68, 50);
+      } else {
+        iconBtn(o, IMG.back, 196, 966, BACK, 88, 68, 50);
+      }
+      o.push(mk('box', { x: 400, y: 968, w: 640, h: 84, color: '#3a0f31', op: 78, rad: 50 }));
+      mkPic(o, IMG.tvG, 424, 980, 60);
+      o.push(mk('text', { label: status, x: 498, y: 968, w: 520, h: 84, font: 'font13', color: '#f3e3ee', al: 'left', scroll: true }));
+      iconBtn(o, IMG.star, 1176, 966, cmd('ActivateWindow(favouritesbrowser)'), 88, 68, 50);
+      iconBtn(o, IMG.gear, 1272, 966, cmd('ActivateWindow(settings)'), 88, 68, 50);
+      iconBtn(o, IMG.power, 1368, 966, py('desk_power'), 88, 68, 50);
+      TIME(o, 1500, 360, 950, true);
+    } else if (style === 'windows') {
+      o.push(mk('box', { x: 0, y: 962, w: 1920, h: 118, color: '#0e1525', op: 97, rad: 0 }));
+      o.push(mk('box', { x: 0, y: 960, w: 1920, h: 3, color: '#26385e', op: 100, rad: 0 }));
+      mkBtn(o, 92, 978, 216, 86, aMenu, 28);
+      mkPic(o, gl('winlogo', '#3fa4ff'), 112, 990, 62); 
+      o.push(mk('text', { label: 'Start', x: 180, y: 978, w: 124, h: 86, font: 'font13', color: '#46a6ff', al: 'left' }));
+      iconBtn(o, gl('home'), 316, 978, aHome, 86, 62, 28);
+      iconBtn(o, IMG.back, 408, 978, BACK, 86, 62, 28);
+      o.push(mk('box', { x: 512, y: 980, w: 560, h: 82, color: '#1c2640', op: 100, rad: 24 }));
+      if (aStatus) mkBtn(o, 512, 980, 560, 82, aStatus, 24);
+      mkPic(o, gl('search', '#c3cce0'), 532, 988, 64);
+      o.push(mk('text', { label: status, x: 612, y: 980, w: 440, h: 82, font: 'font13', color: '#9aa6bd', al: 'left', scroll: true }));
+      put(o, right, 1630, 976, 90, 64, 98);
+      TIME(o, 1640, 240, 972, false);
+    } else if (style === 'bunt') {
+      o.push(mk('box', { x: 340, y: 926, w: 1240, h: 138, color: '#f47ae9', op: 58, rad: 69, bw: 2, bc: '#f7c6ff' }));
+      mkBtn(o, 364, 950, 244, 90, aMenu, 44);
+      mkPic(o, IMG.grid, 380, 962, 66);
+      o.push(mk('text', { label: 'Start', x: 456, y: 950, w: 150, h: 90, font: 'font13', color: '#ffffff', al: 'left' }));
+      iconBtn(o, gl('home'), 616, 950, aHome, 90, 60, 44);
+      iconBtn(o, IMG.back, 706, 950, BACK, 90, 60, 44);
+      iconBtn(o, gl('search'), 796, 950, aStatus || HOME, 90, 60, 44);
+      put(o, right, 1352, 948, 92, 62, 92);
+      TIME(o, 1424, 140, 944, false);
+    } else {   // dunkel
+      iconBtn(o, IMG.back, 90, 976, BACK, 92, 62, 46);
+      iconBtn(o, gl('home'), 184, 976, aHome, 92, 62, 46);
+      o.push(mk('box', { x: 282, y: 968, w: 890, h: 104, color: '#161d3b', op: 100, rad: 52 }));
+      if (aStatus) mkBtn(o, 282, 968, 890, 104, aStatus, 52);
+      mkPic(o, gl('search', '#c3cce6'), 312, 988, 64);
+      o.push(mk('text', { label: status, x: 392, y: 968, w: 760, h: 104, font: 'font13', color: '#8d96b8', al: 'left', scroll: true }));
+      o.push(mk('box', { x: 1190, y: 968, w: 104, h: 104, color: '#27346a', op: 100, rad: 52 }));
+      mkBtn(o, 1190, 968, 104, 104, aMenu, 52);
+      mkPic(o, gl('dots'), 1212, 990, 60);
+      put(o, right, 1746, 974, 90, 62, 88);
+      TIME(o, 1752, 150, 962, false);
+    }
+    return { els: o, plus: plusBtn };
+  }
+
+  // ---- Seite "Ordner": Addon-Menues im jeweiligen Stil ----
+  const PAL = {
+    ubuntu: { frame: '#2a0f24', fb: '#6b3a5e', head: '#3d1636', row: '#4d1d43', side: '#1b0817', ttl: '#f3e3ee', txt: '#ead7e4', hint: '#ffd9a8', dots: true },
+    windows: { frame: '#0c1731', fb: '#2b4a86', head: '#12285a', row: '#17335f', side: '#08122a', ttl: '#e8f1ff', txt: '#cfe0ff', hint: '#ffe2a8', dots: false },
+    bunt: { frame: '#3b1b6e', fb: '#e6b3ff', head: '#5a2c9c', row: '#6c3bb4', side: '#2a1358', ttl: '#ffffff', txt: '#f3e6ff', hint: '#ffe9a8', dots: false },
+    dunkel: { frame: '#0c1230', fb: '#2b3566', head: '#151d44', row: '#1b2652', side: '#080d24', ttl: '#e6eaff', txt: '#c9d0ee', hint: '#ffe2a8', dots: false }
+  };
+  function ordnerOf(style) {
+    const P = PAL[style], win = [];
+    win.push(mk('box', { x: 76, y: 32, w: 1768, h: 872, color: P.frame, op: 90, rad: 6, bw: 2, bc: P.fb }));
+    win.push(mk('box', { x: 82, y: 38, w: 1756, h: 72, color: P.head, op: 100, rad: 22 }));
+    if (P.dots) [['#e95420', 118], ['#9a6f90', 156], ['#9a6f90', 194]].forEach(d => win.push(mk('box', { x: d[1], y: 62, w: 24, h: 24, color: d[0], op: 100, rad: 100 })));
+    win.push(mk('text', { label: '$INFO[Window.Property(kfe.title)]', x: 300, y: 38, w: 1320, h: 72, font: 'font13', al: 'center', color: P.ttl, scroll: true }));
+    const lst = mk('list', { label: '', x: 112, y: 134, w: 1012, h: 756, ltype: 'list', orient: 'vertical', ih: 96, gap: 10, lsrc: 'dir', dir: 'plugin://', dmedia: 'video', dmax: 300, nav: true, items: [], color: P.row, rad: 30 });
+    win.push(lst);
+    win.push(mk('box', { x: 1148, y: 134, w: 664, h: 756, color: P.side, op: 60, rad: 6 }));
+    win.push(mk('pic', { src: '$INFO[ListItem.Art(thumb)]', x: 1180, y: 164, w: 600, h: 338, fit: 'keep' }));
+    win.push(mk('text', { label: '$INFO[ListItem.Label]', x: 1180, y: 516, w: 600, h: 66, font: 'font27', scroll: true }));
+    win.push(mk('tbox', { label: '$INFO[ListItem.Property(kfe.plot)]', x: 1180, y: 592, w: 600, h: 280, font: 'font12', color: P.txt, scroll: true }));
+    win.push(mk('tbox', { label: '$INFO[Window.Property(desk.hint)]', x: 1180, y: 250, w: 600, h: 420, font: 'font13', color: P.hint, al: 'center' }));
+    barOf(style, 'ordner').els.forEach(e => win.push(e));
+    return { els: win, lst };
+  }
+
+  // ---- Desktop-Seite: leeres Kachel-Raster, das custom.py (on_page) fuellt ----
+  const MAXT = Math.max(12, Math.min(240, parseInt(o.maxTiles, 10) || 120));
+  const keys = Object.keys(SCI);
+  // Beschriftungs-Platte unter den Symbolen je Stil (Farbe, Deckkraft in %) - Textfarbe immer weiss
+  const PLATE = { ubuntu: ['#3a0f31', 72], windows: ['#08204f', 66], bunt: ['#4b1a8f', 60], dunkel: ['#0c1332', 74] };
+  const gridOf = (style) => {
+    const items = Array.from({ length: MAXT }, (_, i) => ({ l: '', l2: '', img: i < keys.length ? SCI[keys[i]] : '', src: i < keys.length ? '' : 'DefaultAddon.png', act: py('desk_click') }));
+    return mk('list', { label: '', x: 165, y: 20, w: 1590, h: 890, ltype: 'panel', iw: 150, ih: 200, gap: 30, lsrc: 'static', color: o.plate || PLATE[style][0], op: o.plate ? o.plateOp : PLATE[style][1], rad: 30, tc: '#ffffff', font: 'font13', items });
+  };
+  const hintOf = () => mk('tbox', { label: '$INFO[Window.Property(desk.hint)]', x: 400, y: 330, w: 1120, h: 260, font: 'font27', color: '#ead7e4', al: 'center' });
+
+  const STYLES = [
+    { key: 'ubuntu', label: 'Ubuntu', home: 'home', browse: 'ordner', fcol: null, bg: null },
+    { key: 'windows', label: 'Windows', home: 'home_win', browse: 'ordner_win', fcol: '#2f80f5', bg: bgWindows },
+    { key: 'bunt', label: 'Bunt', home: 'home_bunt', browse: 'ordner_bunt', fcol: '#d946ef', bg: bgBunt },
+    { key: 'dunkel', label: 'Dunkel', home: 'home_dunkel', browse: 'ordner_dunkel', fcol: '#5470ff', bg: bgDunkel }
+  ];
+  let SEL = STYLES.filter(s => (o.styles || []).includes(s.key));
+  if (!SEL.length) SEL = STYLES.slice();
+  SEL.sort((a, b2) => (b2.key === o.style) - (a.key === o.style));
+  SEL.forEach(st => { if (o.accent) st.fcol = o.accent; });
+  const pages = [], made = [];
+  SEL.forEach(st => {
+    const grid = gridOf(st.key), bar = barOf(st.key, 'home');
+    const hp = { id: st.home, name: 'Desktop ' + st.label, els: [grid, hintOf()].concat(bar.els), def: grid.id };
+    const od = ordnerOf(st.key);
+    const op = { id: st.browse, name: 'Ordner ' + st.label, els: od.els, def: od.lst.id };
+    if (st.fcol) { hp.fcol = st.fcol; op.fcol = st.fcol; }
+    if (st.bg) { hp.bgImg = st.bg(); op.bgImg = hp.bgImg; }
+    pages.push(hp, op);
+    made.push({ st, hp, op, grid, plus: bar.plus, lst: od.lst });
+  });
+  S.pages = pages;
+  S.settings = [{ id: 'desk_style', t: 'select', l: 'Design (Aussehen des Desktops)', d: SEL[0].label, v: SEL.map(s => s.label).join(', ') }];
+  norm();
+  S.cur = 0;
+
+  const STY = made.map(m => ({ key: m.st.key, label: m.st.label, home: m.st.home, browse: m.st.browse, plus: fid(m.hp, m.plus), blist: fid(m.op, m.lst), list: fid(m.hp, m.grid) }));
+  const src = CUSTOM.replace('__STYLES__', JSON.stringify(STY)).replace('__MAX_TILES__', String(MAXT)).replace('__ICONS__', JSON.stringify(ICONS));
+  S.overrides = { 'resources/lib/custom.py': src };
+  window.__desk = { IMG, SCI, SC, ICONS, keys, STY, STYLES: SEL };
+  return { pages: S.pages.map(p => p.name + ': ' + p.els.length + ' Elemente'), STY, imgs: Object.keys(S.imgs).length };
+};
+    const DESK_ST = [
+      { k: 'ubuntu', l: 'Ubuntu', d: 'Aubergine, orange', bg: 'linear-gradient(160deg,#5d1f4a,#25001a 80%)', ac: '#e95420' },
+      { k: 'windows', l: 'Windows', d: 'Blau, Startleiste', bg: 'linear-gradient(135deg,#1b72dc,#082a6a)', ac: '#2f80f5' },
+      { k: 'bunt', l: 'Bunt', d: 'Blau bis Pink, schwebende Leiste', bg: 'linear-gradient(135deg,#1f8cff,#7b5cf2 45%,#ff3d6b)', ac: '#d946ef' },
+      { k: 'dunkel', l: 'Dunkel', d: 'Nachtblau, ruhig', bg: 'linear-gradient(180deg,#2c4b79,#070b18)', ac: '#5470ff' }
+    ];
+    let TPLO = null;
+    const tplDefs = () => ({ name: 'Kodi Desktop', author: (S.meta.author && S.meta.author !== 'Ich' && S.meta.author !== 'zusatzmetall') ? S.meta.author : '', ver: '1.0.0', style: 'ubuntu', styles: { ubuntu: true, windows: true, bunt: true, dunkel: true }, accentOn: false, accent: '#e95420', plateOn: false, plate: '#3a0f31', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, pro: false });
+    function showDeskTpl() {
+      if (!TPLO) TPLO = tplDefs();
+      modal('<div id="tpl-box"></div>', 'tpl'); $('modal-in').style.maxWidth = '46rem'; tplRender();
+    }
+    function tplSet(k, v) { TPLO[k] = v; if (k === 'name') { const e = $('tpl-id'); if (e) e.textContent = 'plugin.video.' + slug(v || 'kodi desktop'); } }
+    function tplStyle(k) { TPLO.style = k; TPLO.styles[k] = true; if (!TPLO.accentOn) TPLO.accent = DESK_ST.find(s => s.k === k).ac; tplRender(); }
+    function tplToggleStyle(k) { const n = DESK_ST.filter(s => TPLO.styles[s.k]).length; if (TPLO.styles[k] && (n <= 1 || TPLO.style === k)) return toast(TPLO.style === k ? 'Der Start-Stil muss dabei sein.' : 'Mindestens ein Stil muss bleiben.'); TPLO.styles[k] = !TPLO.styles[k]; tplRender(); }
+    function tplRender() {
+      const T = TPLO, on = 'border-color:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,.35)', off = 'border-color:#334155';
+      const cards = DESK_ST.map(s => `<button type="button" onclick="tplStyle('${s.k}')" style="${T.style === s.k ? on : off};border-width:2px;border-style:solid;border-radius:12px;padding:6px;text-align:left;background:#0f172a;cursor:pointer">
+        <div style="height:64px;border-radius:8px;background:${s.bg};position:relative;overflow:hidden">${[0, 1, 2, 3].map(i => `<span style="position:absolute;left:${8 + i * 22}px;top:8px;width:18px;height:18px;border-radius:5px;background:${['#f7a21b', '#4468e0', '#b134d6', '#e8506f'][i]}"></span>`).join('')}<span style="position:absolute;left:0;right:0;bottom:0;height:12px;background:rgba(0,0,0,.45)"></span></div>
+        <div class="text-xs font-bold mt-1" style="color:#e2e8f0">${s.l}${T.style === s.k ? ' ✔' : ''}</div><div class="hint" style="margin:0">${s.d}</div></button>`).join('');
+      const pro = T.pro ? `<div class="mt-3 p-3 rounded-xl" style="background:#0b1220;border:1px solid #1e293b">
+        <div class="grid grid-cols-2 gap-2">
+          <label class="text-xs">Autor<input class="inp mt-1" value="${esc(T.author)}" oninput="tplSet('author',this.value)" placeholder="dein Name"></label>
+          <label class="text-xs">Version<input class="inp mt-1" value="${esc(T.ver)}" oninput="tplSet('ver',this.value)"></label>
+          <label class="text-xs">Max. Symbole auf dem Desktop<input class="inp mt-1" type="number" min="12" max="240" value="${T.maxTiles}" oninput="tplSet('maxTiles',this.value)"></label>
+          <label class="text-xs">Schrift (Kodi-Skin-Name)<input class="inp mt-1" list="dl-font" value="${esc(T.font)}" oninput="tplSet('font',this.value.trim())"></label>
+        </div>
+        <div class="text-xs font-bold mt-3">Stile im Addon</div>
+        <div class="flex flex-wrap gap-3 mt-1">${DESK_ST.map(s => `<label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.styles[s.k] ? 'checked' : ''} onchange="tplToggleStyle('${s.k}')"> ${s.l}</label>`).join('')}</div>
+        <p class="hint">Weniger Stile = kleineres ZIP. Der Start-Stil ist immer dabei.</p>
+        <label class="text-xs flex items-center gap-2 mt-3"><input type="checkbox" ${T.plateOn ? 'checked' : ''} onchange="tplSet('plateOn',this.checked);tplRender()"> Eigene Farbe für die Beschriftung unter den Symbolen</label>
+        ${T.plateOn ? `<div class="flex items-center gap-3 mt-1"><input type="color" value="${T.plate}" oninput="tplSet('plate',this.value)"><label class="text-xs flex-1">Deckkraft <b id="tpl-po">${T.plateOp}</b> %<input type="range" min="0" max="100" value="${T.plateOp}" class="w-full" oninput="tplSet('plateOp',+this.value);$('tpl-po').textContent=this.value"></label></div>` : ''}
+        <div class="flex flex-wrap gap-4 mt-3">
+          <label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.lockBack ? 'checked' : ''} onchange="tplSet('lockBack',this.checked)"> Zurück-Taste auf dem Desktop sperren (Beenden nur über das Power-Symbol)</label>
+          <label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.shadow ? 'checked' : ''} onchange="tplSet('shadow',this.checked)"> Schrift mit Schatten</label>
+          <label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.autostart ? 'checked' : ''} onchange="tplSet('autostart',this.checked);tplRender()"> Option „Beim Kodi-Start öffnen“</label>
+          ${T.autostart ? `<label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.autoDef ? 'checked' : ''} onchange="tplSet('autoDef',this.checked)"> schon vorausgewählt</label>` : ''}
+        </div></div>` : '';
+      $('tpl-box').style.color = '#e2e8f0'; $('tpl-box').innerHTML = `<div class="flex items-start justify-between gap-3"><div><h2 class="text-lg font-extrabold text-white">✨ Vorlage: Kodi Desktop</h2>
+        <p class="hint" style="font-size:12px">Ein fertiger Desktop mit Symbolen, Taskleiste und Startmenü. Jeder legt in Kodi selbst fest, welche Addons und Menüs als Kachel erscheinen.</p></div>
+        <button class="btn" onclick="closeModal()">✕</button></div>
+        <div class="text-xs font-bold mt-4">1 · Name</div>
+        <input class="inp mt-1" value="${esc(T.name)}" oninput="tplSet('name',this.value)" placeholder="Kodi Desktop">
+        <p class="hint">Kodi-Kennung: <code class="lk" id="tpl-id">plugin.video.${esc(slug(T.name || 'kodi desktop'))}</code></p>
+        <div class="text-xs font-bold mt-4">2 · Stil wählen <span class="hint" style="display:inline">(auf dem Gerät später in den Einstellungen umschaltbar)</span></div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">${cards}</div>
+        <div class="text-xs font-bold mt-4">3 · Akzentfarbe <span class="hint" style="display:inline">(Farbe der ausgewählten Kachel)</span></div>
+        <div class="flex items-center gap-3 mt-1"><input type="color" value="${T.accent}" oninput="tplSet('accent',this.value);tplSet('accentOn',true)">
+          <label class="text-xs flex items-center gap-1"><input type="checkbox" ${T.accentOn ? '' : 'checked'} onchange="tplSet('accentOn',!this.checked);if(this.checked){TPLO.accent=DESK_ST.find(s=>s.k===TPLO.style).ac;tplRender()}"> passend zum Stil</label></div>
+        <button class="btn mt-4" onclick="TPLO.pro=!TPLO.pro;tplRender()">${T.pro ? '▾' : '▸'} ⚙ Profi-Optionen</button>${pro}
+        <div class="flex flex-wrap gap-2 mt-5"><button class="btn pri" onclick="tplMake()">✨ Desktop erstellen</button><button class="btn" onclick="closeModal()">Abbrechen</button></div>
+        <p class="hint mt-2">Das ersetzt dein aktuelles Projekt (vorher kommt eine Rückfrage). Danach kannst du Seiten, Farben, Texte und Hintergründe wie gewohnt im Designer ändern und per „⬇ ZIP exportieren“ ein installierbares Addon erzeugen.</p>`;
+    }
+    function tplMake() {
+      const T = TPLO;
+      if (!String(T.name).trim()) return toast('Bitte einen Namen eingeben.');
+      if (!confirm('Das aktuelle Projekt wird durch die Vorlage ersetzt. Nicht gespeicherte Änderungen gehen verloren. Fortfahren?')) return;
+      const o = { name: T.name, author: T.author, ver: T.ver, style: T.style, styles: DESK_ST.filter(s => T.styles[s.k] || s.k === T.style).map(s => s.k), accent: T.accentOn ? T.accent : '', plate: T.plateOn ? T.plate : '', plateOp: T.plateOp, maxTiles: T.maxTiles, font: T.font || 'font13', shadow: T.shadow, autostart: T.autostart, autoDef: T.autoDef, lockBack: T.lockBack };
+      try {
+        DESK_BUILD(document.getElementById('desk-custom-py').textContent, o);
+      } catch (e) { console.error(e); return toast('Die Vorlage konnte nicht erstellt werden: ' + e.message); }
+      hist = []; redoS = []; closeModal(); renderAll(); fit(); save();
+      toast('Fertig! Jetzt kannst du alles anpassen oder direkt „⬇ ZIP exportieren“.');
+    }
+
     function newProject() {
       if (!confirm('Wirklich ein neues Projekt starten? Nicht gespeicherte Änderungen gehen verloren!')) return;
       localStorage.removeItem('kfe5'); localStorage.removeItem('kfe4'); S = newState('stream'); norm(); hist = []; redoS = []; renderAll(); fit(); toast('Neues Projekt gestartet!');
@@ -4753,6 +6029,7 @@ if __name__ == '__main__':
     function setMod(grp, k, v, re) { S[grp][k] = v; save(); renderStage(); if (re) modTab(MT); if (k === 'backMode') { if ($('m-back')) $('m-back').value = v; if (v === 'stay' && !hasExit()) toast('⚠ Lege noch einen Button mit „Addon komplett schließen“ an – sonst exportiert der Generator „Erst beim zweiten Zurück schließen“.'); } }
     // Gibt es irgendwo eine Aktion „Addon komplett schließen“?
     function hasExit() {
+      if (S.mod.exitOwn) return true;   // z.B. Kodi-Desktop-Vorlage: Beenden laeuft ueber eigenen Hook
       const ex = a => !!a && a.t === 'exit';
       return S.pages.some(p => p.els.some(e => ex(e.act) || (e.items || []).some(it => ex(it.act)))) || S.mod.keys.some(k => ex(k.act));
     }
