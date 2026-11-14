@@ -1807,7 +1807,7 @@ Mit der Auswahl „Stile im Addon“ im Assistenten gibt es entsprechend weniger
 
 🧹 **Sauberer Python-Code.** Unter „Für Profis“ gibt es den Schalter **Python ohne Kommentare, echte Umlaute**. Er entfernt in `addon.py`, `service.py` und `custom.py` alle Kommentare (`#`) und Docstrings (`"""`) und schreibt Texte mit ä, ö, ü, ß statt ae, oe, ue, ss. Die Desktop-Vorlage schaltet ihn ein, bei anderen Projekten ist er aus. Der 💻 Editor zeigt weiter die Originale; die Bereinigung greift erst beim Export.
 
-⚠️ **IDs im Blick behalten.** Beim Export trägt der Generator die echten Nummern von Kachel-Raster, Plus-Taste und Ordner-Liste selbst in `custom.py` ein (Version 1.4.7). Du kannst Elemente also verschieben, auch mit ⬆ nach vorn / ⬇ nach hinten ([Kapitel 35](#k35)). Voraussetzung: Das Raster bleibt ein **Widget** und die Plus-Taste ein Button mit der Aktion `py:desk_add`. Zusätzlich sucht der Desktop das Raster beim Start selbst. Fehlt es ganz, zeigt Kodi „Kachel-Raster nicht gefunden“ statt abzustürzen.
+⚠️ **IDs im Blick behalten.** Beim Export trägt der Generator die echten Nummern von Kachel-Raster, Plus-Taste und Ordner-Liste selbst in `custom.py` ein (Version 1.4.7). Du kannst Elemente also verschieben, auch mit ⬆ nach vorn / ⬇ nach hinten ([Kapitel 35](#k35)). Voraussetzung: Das Raster bleibt eine **Liste** (Typ „Liste“, Panel) und die Plus-Taste ein Button mit der Aktion `py:desk_add`. Zusätzlich sucht der Desktop das Raster beim Start selbst. Gibt es auf der Seite gar kein Raster (z. B. nur ein Kodi-Inhalts-Widget), lässt der Desktop die Seite in Ruhe.
 
 💡 Eigene Elemente (Logo, Textzeile, Bilder) kannst du frei dazusetzen. Änderungen an Texten und Farben sind gefahrlos.
 

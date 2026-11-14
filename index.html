@@ -696,6 +696,8 @@ def _is_list(ctl):
 def find_list(window, preferred, key='grid'):
     """Nummer der Liste auf dieser Seite. Bevorzugt die vom Generator vorgesehene Nummer; wurden im Designer
     Elemente verschoben oder eingefuegt (die Nummern aendern sich dann), wird die Liste der Seite gesucht."""
+    if not preferred:
+        return None
     ck = (key, window.getProperty('desk.page') or '')
     for cand in (_FOUND.get(ck), preferred):
         if cand is None:
@@ -722,6 +724,8 @@ def fill(window, select=None):
     items = load()
     edit = window.getProperty('desk.edit') == '1'
     pick = _int(window.getProperty('desk.pick'))
+    if not LIST_ID:
+        return
     gid = find_list(window, LIST_ID)
     if gid is None:
         log('Kachel-Raster nicht gefunden (keine Liste auf dieser Seite)', xbmc.LOGERROR)
@@ -782,9 +786,7 @@ def on_page(window, page_id):
         else:
             window.setProperty('desk.hint', '')
         return
-    gid = find_list(window, st['list'])
-    shift = (gid - st['list']) if gid is not None else 0      # Nummern verschoben? Dann auch das Plus
-    window.setProperty('desk.plus', str(st['plus'] + shift))
+    window.setProperty('desk.plus', str(st['plus']))
     window.setProperty('desk.edit', '')
     window.setProperty('desk.pick', '')
     fill(window)
@@ -5477,11 +5479,11 @@ if __name__ == '__main__':
           A.forEach(st => {
             const hp = S.pages.find(q => q.id === st.home), op = S.pages.find(q => q.id === st.browse);
             if (hp) {
-              const g = hp.els.find(e => e.type === 'widget'), pl = hp.els.filter(e => e.act && e.act.t === 'py' && e.act.v === 'desk_add').pop();
-              if (g) st.list = fid(hp, g);
+              const g = hp.els.find(e => e.type === 'list'), pl = hp.els.filter(e => e.act && e.act.t === 'py' && e.act.v === 'desk_add').pop();
+              st.list = g ? fid(hp, g) : 0;
               if (pl) st.plus = fid(hp, pl);
             }
-            if (op) { const l = op.els.find(e => e.type === 'widget'); if (l) st.blist = fid(op, l); }
+            if (op) { const l = op.els.find(e => e.type === 'list'); st.blist = l ? fid(op, l) : 0; }
           });
           return 'STYLES = ' + JSON.stringify(A);
         } catch (er) { return m0; }
@@ -5647,7 +5649,7 @@ if __name__ == '__main__':
     // Baut aus ein paar Angaben ein komplettes Desktop-Addon (Symbole, Taskleiste, Startmenü, 4 Designs).
     // Danach ist alles ganz normal im Designer änderbar.
     const DESK_BUILD = (CUSTOM, o) => {
-  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.7', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
+  o = Object.assign({ name: 'Kodi Desktop', author: 'zusatzmetall', ver: '1.4.8', style: 'ubuntu', styles: ['ubuntu', 'windows', 'bunt', 'dunkel'], accent: '', plate: '', plateOp: 66, maxTiles: 120, font: 'font13', shadow: false, autostart: true, autoDef: false, lockBack: true, cols: 9 }, o || {});
   // ================= Zeichen-Helfer =================
   const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const glow = (x, cx, cy, r, rgb, a) => {
