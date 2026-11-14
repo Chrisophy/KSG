@@ -2707,6 +2707,20 @@ def rpc(method, params, quiet=False):
     return res.get('result')
 
 
+_NO_GLYPH = ((0x1F000, 0x1FAFF), (0x2600, 0x27BF), (0xFE00, 0xFE0F), (0x200D, 0x200D), (0x20E3, 0x20E3), (0xE0000, 0xE007F))
+
+
+def clean_label(s):
+    """Entfernt Flaggen und Emojis, die Kodis Schrift nicht kennt (sonst erscheinen Kaestchen)."""
+    if not isinstance(s, str):
+        return s
+    t = ''.join(ch for ch in s if not any(a <= ord(ch) <= b for a, b in _NO_GLYPH))
+    while '  ' in t:
+        t = t.replace('  ', ' ')
+    t = t.strip()
+    return t or s
+
+
 def fix_url(u):
     """Macht Adressen aus Favoriten, Logs und XML brauchbar: &amp; wird zu &, ganz kodierte
     Adressen (plugin%3A%2F%2F...) werden wieder normal."""
@@ -3125,7 +3139,7 @@ class MenuBase(object):
             res = res or {}
             rows = []
             for it in (res.get('files') or [])[:limit]:
-                label = it.get('label') or it.get('title') or ''
+                label = clean_label(it.get('label') or it.get('title') or '')
                 if widget:
                     second = episode_code(it) if is_episode(it) else (str(it.get('year')) if it.get('year') else '')
                     item = xbmcgui.ListItem(label, second)
@@ -3319,7 +3333,8 @@ class MenuBase(object):
         elif ret.startswith('page:'):
             self.finish(('page', ret[5:]))
         elif ret.startswith('browse:'):
-            self.do({'k': 'browse', 'v': ret[7:], 'p': CONFIG.get('browse') or '', 'l': ''})
+            url, _sep, label = ret[7:].partition('@@')
+            self.do({'k': 'browse', 'v': url, 'p': CONFIG.get('browse') or '', 'l': label})
         elif ret.startswith('py:') and hooks():
             self.handle_return(call_hook(ret[3:].strip(), True, self))
         else:
@@ -3654,6 +3669,7 @@ So nutzt du sie:
       'exit'      -> Addon schliessen
       'page:ID'   -> zu einer Seite springen (ID steht im Modding-Inspektor)
       'browse:PFAD' -> Ordner im eigenen Browser zeigen, z.B. 'browse:plugin://plugin.video.xyz/'
+                       (optional mit Titel: 'browse:plugin://plugin.video.xyz/@@Mein Titel')
       'py:NAME'   -> eine andere Funktion aus dieser Datei aufrufen (auch aus dem Kontextmenue)
       jeder andere Text wird als Kodi-Befehl ausgefuehrt,
       z.B. 'ActivateWindow(home)' oder 'PlayMedia(https://...)'
